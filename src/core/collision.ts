@@ -1,17 +1,30 @@
-import type { LogPlatform, Vehicle } from './types.ts';
+import { WORLD_CONFIG, type LogPlatform, type Vehicle } from './types.ts';
 
-export function checkVehicleCollision(_playerX: number, _vehicles: Vehicle[]): Vehicle | null {
-  throw new Error('NotImplemented: checkVehicleCollision');
+export function checkVehicleCollision(playerX: number, vehicles: Vehicle[]): Vehicle | null {
+  for (const v of vehicles) {
+    const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + v.length) / 2;
+    if (Math.abs(playerX - v.x) < halfSpan) {
+      return v;
+    }
+  }
+  return null;
 }
 
-export function findSupportingLog(_playerX: number, _logs: LogPlatform[]): LogPlatform | null {
-  throw new Error('NotImplemented: findSupportingLog');
+export function findSupportingLog(playerX: number, logs: LogPlatform[]): LogPlatform | null {
+  for (const log of logs) {
+    const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
+    if (Math.abs(playerX - log.x) <= halfLen) {
+      return log;
+    }
+  }
+  return null;
 }
 
-export function isOutOfBoundsX(_playerX: number): boolean {
-  throw new Error('NotImplemented: isOutOfBoundsX');
+export function isOutOfBoundsX(playerX: number): boolean {
+  return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
 }
 
-export function quantizeLandX(_x: number): number {
-  throw new Error('NotImplemented: quantizeLandX');
+export function quantizeLandX(x: number): number {
+  const rounded = Math.round(x);
+  return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }

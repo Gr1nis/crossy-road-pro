@@ -1,26 +1,26 @@
 # PROJECT_STATE.md — Crossy Road (Vibe-Pro Pipeline)
 
-## 1. Архитектура и Стек (Утверждено в Фазе 1)
-- **Пайплайн**: `vibe-pro` (5-этапный инженерный регламент с Anti-Goodhart TDD)
-- **Стек**: TypeScript + Three.js + Vite + Vitest (модульная сборка + бандл в HTML)
-- **Объём механик (MVP)**:
-  - `GRASS`: статичные деревья/препятствия с гарантией сквозного пути (Solvability Invariant).
-  - `ROAD`: легковые и грузовые автомобили с 1D AABB коллизией.
-  - `RIVER`: плавающие брёвна с непрерывным дрейфом `X` и округлением при прыжке на сушу (`Math.round(x)`).
-  - Изометрическая ортографическая камера с отсечением при отставании игрока.
-  - `Score` и `High Score` с сохранением в `LocalStorage` (без поездов, без Орла, без магазина скинов).
-- **Репозиторий**: Локальный Git + авто-пуш в приватный репозиторий на GitHub (`Gr1nis`).
+## 1. Архитектура и Стек
+- **Пайплайн**: `vibe-pro` (Все 5 фаз завершены: Бриф → Спецификация → RED TDD → GREEN Реализация → Аудит & Sync)
+- **Стек**: TypeScript + Three.js (Voxel Isometric 3D) + WebAudio API Synthesizer + Node 24 Test Runner
+- **Точки входа**:
+  - [index.html](file:///C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/index.html) — Автономная 3D-игра (готова к запуску двойным кликом в браузере).
+  - [crossy_road_plan.html](file:///C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/crossy_road_plan.html) — Инженерный анализ и архитектурный план в HTML-формате.
 
-## 2. Реализованные артефакты (Фаза 1–2)
-- `crossy_road_plan.html`: Полный инженерный и геймдизайнерский разбор Crossy Road + архитектурный план в HTML-формате.
-- `.gitignore`: Строгий фильтр артефактов сборки, `node_modules` и секретов.
-- `implementation_plan.md`: Спецификация контрактов модулей `src/core` и инвариантов тестирования.
+## 2. Реализованные модули и их контракты
+- `src/core/types.ts`: Контракты `Lane`, `Vehicle`, `LogPlatform`, `PlayerState`, `WORLD_CONFIG`.
+- `src/core/prng.ts`: Детерминированный ГСЧ `Mulberry32`.
+- `src/core/laneGenerator.ts`: Генератор полос (`GRASS`, `ROAD`, `RIVER`) с гарантированным коридором проходимости и чередованием течения рек.
+- `src/core/collision.ts`: 1D AABB коллизии авто, поиск поддерживающего бревна, квантование `X` (`quantizeLandX`).
+- `src/core/scoreTracker.ts`: Монотонный трекер очков и `High Score` с защитой от повреждённого `LocalStorage`.
+- `src/core/gameEngine.ts`: Конечный автомат симуляции, буфер ввода (`inputQueue`), дрейф на брёвнах и скролл камеры.
+- `src/view/meshFactory.ts`, `src/view/sceneManager.ts`, `src/view/audioSynth.ts`: 3D воксельная сцена Three.js с мягкими тенями и процедурным звуком.
 
-## 3. Жесткие инварианты и ограничения (Anti-Goodhart)
-1. **Solvability Invariant**: На любой сгенерированной последовательности из `N = 5000` полос при любом `seed` существует валидный путь вперёд (ни одна полоса `GRASS` не блокирует все клетки `[-9..+9]`).
-2. **Continuous Log Riding & Quantization**: На реке координата игрока `X` синхронизирована со скоростью бревна (`dx = v_log * dt`); при прыжке с бревна на `GRASS`/`ROAD` координата `X` строго квантуется к целой сетке (`Number.isInteger(x)`).
-3. **Score Monotonicity & Storage Resilience**: `score` монотонно не убывает при шагах назад; `ScoreTracker` устойчив к невалидным строкам (`NaN`, отрицательные числа) в `LocalStorage`.
+## 3. Жесткие инварианты (Проверены 13 тестами — 100% GREEN)
+1. **Solvability Invariant**: 2 500+ полос на 5 разных `seed` всегда имеют сквозной проход между соседними полосами `GRASS`.
+2. **Continuous Log Drift & Quantization**: Позиция игрока на бревне сохраняет `player.x - log.x`, а при сходе на берег квантуется к `ℤ`.
+3. **Score Monotonicity & Storage Resilience**: Счёт никогда не убывает при шагах назад; битые значения `LocalStorage` безопасно сбрасываются в `0`.
 
 ## 4. Текущий этап и Next Up
-- **Текущий этап**: Фаза 2 завершена (Спецификация, HTML-план и Git-репозиторий подготовлены).
-- **Следующий шаг (Next Up)**: Фаза 3 (Adversarial TDD — RED) → создание Vitest тестов до реализации кода → Фаза 4 (GREEN) → Фаза 5 (Push в `Gr1nis`).
+- **Текущий этап**: Фаза 5 завершена (13/13 тестов GREEN, `index.html` скомпилирован).
+- **Next Up**: Возможные расширения по желанию (поезда, таймер Орла, магазин воксельных скинов).

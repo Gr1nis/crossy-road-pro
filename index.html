@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crossy Road 3D — Vibe-Pro Edition</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #87ceeb;
+    }
+    #game-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .hud {
+      position: fixed;
+      top: 20px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .score-card {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 22px;
+      border-radius: 14px;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+    .score-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+    .score-number {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: #38bdf8;
+    }
+    .high-score-number {
+      color: #fbbf24;
+    }
+    .controls-pad {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 54px);
+      grid-template-rows: repeat(2, 54px);
+      gap: 8px;
+      z-index: 15;
+    }
+    .pad-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.28);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s ease, background 0.15s;
+    }
+    .pad-btn:active {
+      transform: scale(0.92);
+      background: rgba(56, 189, 248, 0.85);
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+    }
+    .modal.hidden {
+      display: none;
+    }
+    .modal-card {
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 20px;
+      padding: 32px 40px;
+      text-align: center;
+      color: #f8fafc;
+      max-width: 420px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    .modal-card h2 {
+      font-size: 28px;
+      color: #f87171;
+      margin-bottom: 8px;
+    }
+    .modal-card p {
+      color: #cbd5e1;
+      margin-bottom: 24px;
+      font-size: 16px;
+    }
+    .restart-btn {
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      color: #fff;
+      border: none;
+      padding: 14px 32px;
+      font-size: 17px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+    .restart-btn:hover {
+      filter: brightness(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <div class="hud">
+    <div class="score-card">
+      <div class="score-label">Счёт (Score)</div>
+      <div id="score-value" class="score-number">0</div>
+    </div>
+    <div class="score-card">
+      <div class="score-label">Рекорд (High Score)</div>
+      <div id="high-score-value" class="score-number high-score-number">0</div>
+    </div>
+  </div>
+
+  <div class="controls-pad">
+    <div></div>
+    <button class="pad-btn" data-move="FORWARD" title="Вперёд (W / Up)">▲</button>
+    <div></div>
+    <button class="pad-btn" data-move="LEFT" title="Влево (A / Left)">◀</button>
+    <button class="pad-btn" data-move="BACKWARD" title="Назад (S / Down)">▼</button>
+    <button class="pad-btn" data-move="RIGHT" title="Вправо (D / Right)">▶</button>
+  </div>
+
+  <div id="game-over-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Игра окончена!</h2>
+      <p id="death-reason">Вас сбил автомобиль!</p>
+      <button id="restart-btn" class="restart-btn">Играть снова (Space)</button>
+    </div>
+  </div>
+
+  <script type="module">
+import * as THREE from 'https://unpkg.com/three@0.170.0/build/three.module.js';
+
+// --- Module: src/core/types.ts ---
+const LaneType = {
+  GRASS: 'GRASS',
+  ROAD: 'ROAD',
+  RIVER: 'RIVER',
+}         ;
+const MoveDirection = {
+  FORWARD: 'FORWARD',
+  BACKWARD: 'BACKWARD',
+  LEFT: 'LEFT',
+  RIGHT: 'RIGHT',
+}         ;
+const DeathReason = {
+  NONE: 'NONE',
+  CAR: 'CAR',
+  WATER: 'WATER',
+  OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
+  CAMERA_BEHIND: 'CAMERA_BEHIND',
+}         ;
+const WORLD_CONFIG = {
+  MIN_X: -9,
+  MAX_X: 9,
+  OUT_OF_BOUNDS_X: 9.6,
+  HOP_DURATION: 0.12,     // Длительность прыжка (120 мс)
+  PLAYER_WIDTH: 0.65,     // Ширина хитбокса игрока
+  LOG_MARGIN: 0.35,       // Допуск посадки на край бревна
+  CAMERA_BACK_LIMIT: 5.5, // Максимальное отставание позади камеры
+  BASE_CAMERA_SPEED: 0.85 // Скорость ползущего скролла камеры (полос/сек)
+}         ;
+
+// --- Module: src/core/prng.ts ---
+class PRNG {
+          state        ;
+
+  constructor(seed         = 123456) {
+    this.state = (seed >>> 0) || 1;
+  }
+
+  next()         {
+    let t = (this.state += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+
+  nextInt(min        , max        )         {
+    return Math.floor(this.next() * (max - min + 1)) + min;
+  }
+
+  nextFloat(min        , max        )         {
+    return this.next() * (max - min) + min;
+  }
+}
+
+// --- Module: src/core/collision.ts ---
+function checkVehicleCollision(playerX        , vehicles           )                 {
+  for (const v of vehicles) {
+    const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + v.length) / 2;
+    if (Math.abs(playerX - v.x) < halfSpan) {
+      return v;
+    }
+  }
+  return null;
+}
+function findSupportingLog(playerX        , logs               )                     {
+  for (const log of logs) {
+    const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
+    if (Math.abs(playerX - log.x) <= halfLen) {
+      return log;
+    }
+  }
+  return null;
+}
+function isOutOfBoundsX(playerX        )          {
+  return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
+}
+function quantizeLandX(x        )         {
+  const rounded = Math.round(x);
+  return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
+}
+
+// --- Module: src/core/scoreTracker.ts ---
+const STORAGE_KEY = 'crossy_road_high_score';
+class ScoreTracker {
+          currentScore = 0;
+          highScore = 0;
+          storage                 ;
+
+  constructor(storage                 ) {
+    this.storage = storage;
+    this.highScore = this.loadHighScore();
+  }
+
+          loadHighScore()         {
+    if (!this.storage) return 0;
+    try {
+      const raw = this.storage.getItem(STORAGE_KEY);
+      if (!raw) return 0;
+      const parsed = Number(raw);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        return 0;
+      }
+      return Math.floor(parsed);
+    } catch {
+      return 0;
+    }
+  }
+
+          saveHighScore()       {
+    if (!this.storage) return;
+    try {
+      this.storage.setItem(STORAGE_KEY, String(this.highScore));
+    } catch {
+      // Ignore storage quota / security errors
+    }
+  }
+
+  getScore()         {
+    return this.currentScore;
+  }
+
+  getHighScore()         {
+    return this.highScore;
+  }
+
+  updateRow(row        )       {
+    const cleanRow = Math.floor(row);
+    if (cleanRow > this.currentScore) {
+      this.currentScore = cleanRow;
+      if (this.currentScore > this.highScore) {
+        this.highScore = this.currentScore;
+        this.saveHighScore();
+      }
+    }
+  }
+
+  resetCurrentScore()       {
+    this.currentScore = 0;
+  }
+}
+
+// --- Module: src/core/laneGenerator.ts ---
+const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
+class LaneGenerator {
+                   baseSeed        ;
+          nextEntityId = 1;
+
+  constructor(seed         = 42) {
+    this.baseSeed = seed >>> 0;
+  }
+
+          rowPrng(index        )       {
+    const hashed = (this.baseSeed ^ Math.imul(index + 10007, 0x9e3779b9)) >>> 0;
+    return new PRNG(hashed);
+  }
+
+  /**
+   * Computes a deterministic safe corridor column X for a given row so that
+   * adjacent GRASS lanes always share at least 2 unblocked columns.
+   */
+          getSafeCorridorX(index        )         {
+    if (index <= 2) return 0;
+    const rng = this.rowPrng(Math.floor(index / 2));
+    return rng.nextInt(-5, 5);
+  }
+
+  generateLane(index        )       {
+    const rng = this.rowPrng(index);
+
+    // Safe Spawn Zone: rows -3..2 are always GRASS
+    let type                = LaneType.GRASS;
+    if (index > 2) {
+      const roll = rng.next();
+      if (roll < 0.38) {
+        type = LaneType.GRASS;
+      } else if (roll < 0.75) {
+        type = LaneType.ROAD;
+      } else {
+        type = LaneType.RIVER;
+      }
+    }
+
+    // Alternating direction for consecutive lanes (especially critical for RIVER)
+    const direction         = index % 2 === 0 ? 1 : -1;
+    const difficultyFactor = 1 + Math.min(Math.max(0, index) * 0.01, 1.1);
+    const speed = rng.nextFloat(1.8, 3.4) * difficultyFactor * direction;
+
+    const obstacles           = [];
+    const vehicles            = [];
+    const logs                = [];
+
+    if (type === LaneType.GRASS) {
+      const safeCurrent = this.getSafeCorridorX(index);
+      const safePrev = this.getSafeCorridorX(index - 1);
+
+      for (let x = WORLD_CONFIG.MIN_X; x <= WORLD_CONFIG.MAX_X; x++) {
+        // Keep central spawn area clear on rows -3..2
+        if (index <= 2 && Math.abs(x) <= 2) continue;
+        // Keep safe corridor columns clear so adjacent GRASS rows always share passable columns
+        if (x === safeCurrent || x === safePrev || x === 0) continue;
+
+        const treeChance = index <= 0 ? 0.35 : 0.28;
+        if (rng.next() < treeChance) {
+          obstacles.push(x);
+        }
+      }
+    } else if (type === LaneType.ROAD) {
+      const isTruckLane = rng.next() < 0.32;
+      const count = isTruckLane ? rng.nextInt(2, 3) : rng.nextInt(3, 4);
+      const vehicleLen = isTruckLane ? 2.3 : 1.35;
+      const spacing = 28 / count;
+
+      for (let i = 0; i < count; i++) {
+        const offset = -13 + i * spacing + rng.nextFloat(-0.8, 0.8);
+        vehicles.push({
+          id: index * 100 + i + 1,
+          x: offset,
+          length: vehicleLen,
+          speed,
+          type: isTruckLane ? 'truck' : 'car',
+          color: VEHICLE_COLORS[rng.nextInt(0, VEHICLE_COLORS.length - 1)],
+        });
+      }
+    } else if (type === LaneType.RIVER) {
+      const logCount = 3;
+      const logLen = rng.nextFloat(2.8, 3.8);
+      const spacing = 26 / logCount;
+      const riverSpeed = rng.nextFloat(1.3, 2.5) * difficultyFactor * direction;
+
+      for (let i = 0; i < logCount; i++) {
+        const offset = -11 + i * spacing + rng.nextFloat(-0.6, 0.6);
+        logs.push({
+          id: index * 100 + i + 1,
+          x: offset,
+          length: logLen,
+          speed: riverSpeed,
+        });
+      }
+    }
+
+    return {
+      index,
+      type,
+      obstacles,
+      vehicles,
+      logs,
+      direction,
+      speed,
+    };
+  }
+
+  generateRange(startIndex        , endIndex        )         {
+    const result         = [];
+    for (let i = startIndex; i <= endIndex; i++) {
+      result.push(this.generateLane(i));
+    }
+    return result;
+  }
+}
+
+// --- Module: src/core/gameEngine.ts ---
+const WRAP_LIMIT = 14;
+class GameEngine {
+          generator               ;
+          lanes = new Map              ();
+          scoreTracker              ;
+          player             ;
+          cameraZ = -1.0;
+          inputQueue                       = [];
+
+  constructor(seed         = 42, storage                 ) {
+    this.generator = new LaneGenerator(seed);
+    this.scoreTracker = new ScoreTracker(storage);
+    this.player = this.createInitialPlayer();
+    this.ensureLanesAround(0);
+  }
+
+          createInitialPlayer()              {
+    return {
+      row: 0,
+      x: 0,
+      targetRow: 0,
+      targetX: 0,
+      startRow: 0,
+      startX: 0,
+      isHopping: false,
+      hopProgress: 0,
+      ridingLogId: null,
+      isDead: false,
+      deathReason: DeathReason.NONE,
+      facing: MoveDirection.FORWARD,
+    };
+  }
+
+          ensureLanesAround(centerRow        )       {
+    for (let r = centerRow - 8; r <= centerRow + 28; r++) {
+      if (!this.lanes.has(r)) {
+        this.lanes.set(r, this.generator.generateLane(r));
+      }
+    }
+  }
+
+  getPlayer()              {
+    return this.player;
+  }
+
+  getLane(row        )       {
+    let lane = this.lanes.get(row);
+    if (!lane) {
+      lane = this.generator.generateLane(row);
+      this.lanes.set(row, lane);
+    }
+    return lane;
+  }
+
+  getActiveLanes()         {
+    this.ensureLanesAround(Math.round(this.player.row));
+    const list         = [];
+    const minRow = Math.floor(this.cameraZ) - 6;
+    const maxRow = Math.floor(this.player.row) + 24;
+    for (let r = minRow; r <= maxRow; r++) {
+      list.push(this.getLane(r));
+    }
+    return list;
+  }
+
+  getCameraZ()         {
+    return this.cameraZ;
+  }
+
+  getScore()         {
+    return this.scoreTracker.getScore();
+  }
+
+  getHighScore()         {
+    return this.scoreTracker.getHighScore();
+  }
+
+  queueMove(dir                    )       {
+    if (this.player.isDead) return;
+    if (this.inputQueue.length < 2) {
+      this.inputQueue.push(dir);
+    }
+    if (!this.player.isHopping) {
+      this.tryStartNextHop();
+    }
+  }
+
+          tryStartNextHop()       {
+    if (this.player.isDead || this.player.isHopping || this.inputQueue.length === 0) {
+      return;
+    }
+
+    const dir = this.inputQueue.shift() ;
+    this.player.facing = dir;
+
+    let nextRow = Math.round(this.player.row);
+    let nextX = this.player.x;
+
+    if (dir === MoveDirection.FORWARD) nextRow += 1;
+    else if (dir === MoveDirection.BACKWARD) nextRow -= 1;
+    else if (dir === MoveDirection.LEFT) nextX -= 1;
+    else if (dir === MoveDirection.RIGHT) nextX += 1;
+
+    const destLane = this.getLane(nextRow);
+
+    // Quantize X to integer grid whenever landing on non-RIVER lane (GRASS or ROAD)
+    if (destLane.type !== LaneType.RIVER) {
+      const quantized = Math.round(nextX);
+      if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
+        return; // Blocked by world boundary wall
+      }
+      nextX = quantizeLandX(nextX);
+    }
+
+    // Block movement into a static tree obstacle on GRASS
+    if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
+      return;
+    }
+
+    this.player.startRow = this.player.row;
+    this.player.startX = this.player.x;
+    this.player.targetRow = nextRow;
+    this.player.targetX = nextX;
+    this.player.isHopping = true;
+    this.player.hopProgress = 0;
+    this.player.ridingLogId = null;
+  }
+
+  step(dt        )       {
+    if (this.player.isDead || dt <= 0) return;
+
+    const currentLane = this.getLane(Math.round(this.player.row));
+
+    // 1. Update vehicles & logs across nearby lanes, and move player with log if riding
+    const minSimRow = Math.floor(this.cameraZ) - 6;
+    const maxSimRow = Math.floor(this.player.row) + 24;
+
+    for (let r = minSimRow; r <= maxSimRow; r++) {
+      const lane = this.getLane(r);
+
+      for (const v of lane.vehicles) {
+        v.x += v.speed * dt;
+        if (v.speed > 0 && v.x > WRAP_LIMIT) v.x = -WRAP_LIMIT;
+        else if (v.speed < 0 && v.x < -WRAP_LIMIT) v.x = WRAP_LIMIT;
+      }
+
+      for (const log of lane.logs) {
+        const dx = log.speed * dt;
+        log.x += dx;
+
+        // If player is standing on this log on this river lane, apply identical delta dx
+        if (
+          !this.player.isHopping &&
+          lane.index === Math.round(this.player.row) &&
+          this.player.ridingLogId === log.id
+        ) {
+          this.player.x += dx;
+          this.player.targetX = this.player.x;
+        }
+
+        if (log.speed > 0 && log.x > WRAP_LIMIT) log.x = -WRAP_LIMIT;
+        else if (log.speed < 0 && log.x < -WRAP_LIMIT) log.x = WRAP_LIMIT;
+      }
+    }
+
+    // 2. Advance hop animation if hopping
+    if (this.player.isHopping) {
+      this.player.hopProgress += dt / WORLD_CONFIG.HOP_DURATION;
+      if (this.player.hopProgress >= 1) {
+        this.player.hopProgress = 0;
+        this.player.isHopping = false;
+        this.player.row = this.player.targetRow;
+        this.player.x = this.player.targetX;
+
+        this.ensureLanesAround(this.player.row);
+        this.scoreTracker.updateRow(this.player.row);
+
+        const landedLane = this.getLane(this.player.row);
+        if (landedLane.type === LaneType.RIVER) {
+          const support = findSupportingLog(this.player.x, landedLane.logs);
+          if (support) {
+            this.player.ridingLogId = support.id;
+          } else {
+            this.killPlayer(DeathReason.WATER);
+            return;
+          }
+        } else {
+          this.player.x = quantizeLandX(this.player.x);
+          this.player.ridingLogId = null;
+        }
+
+        // Start buffered move if any
+        if (this.inputQueue.length > 0) {
+          this.tryStartNextHop();
+        }
+      } else {
+        const t = this.player.hopProgress;
+        this.player.row = this.player.startRow + (this.player.targetRow - this.player.startRow) * t;
+        this.player.x = this.player.startX + (this.player.targetX - this.player.startX) * t;
+      }
+    } else if (currentLane.type === LaneType.RIVER) {
+      // Ensure player is still supported by a log
+      const support = findSupportingLog(this.player.x, currentLane.logs);
+      if (!support) {
+        this.killPlayer(DeathReason.WATER);
+        return;
+      }
+      this.player.ridingLogId = support.id;
+    }
+
+    // 3. Check horizontal out-of-bounds (e.g. carried off-screen by a river log)
+    if (isOutOfBoundsX(this.player.x)) {
+      this.killPlayer(DeathReason.OUT_OF_BOUNDS);
+      return;
+    }
+
+    // 4. Check ROAD vehicle collisions
+    const activeRow = Math.round(this.player.row);
+    const activeLane = this.getLane(activeRow);
+    if (activeLane.type === LaneType.ROAD) {
+      const hitCar = checkVehicleCollision(this.player.x, activeLane.vehicles);
+      if (hitCar) {
+        this.killPlayer(DeathReason.CAR);
+        return;
+      }
+    }
+
+    // 5. Update camera scrolling & check bottom camera frustum timeout
+    const targetCamZ = this.player.row - 1.0;
+    this.cameraZ += WORLD_CONFIG.BASE_CAMERA_SPEED * dt;
+    if (targetCamZ > this.cameraZ) {
+      this.cameraZ += (targetCamZ - this.cameraZ) * Math.min(1, dt * 8);
+    }
+
+    if (this.player.row < this.cameraZ - WORLD_CONFIG.CAMERA_BACK_LIMIT) {
+      this.killPlayer(DeathReason.CAMERA_BEHIND);
+      return;
+    }
+  }
+
+          killPlayer(reason                                              )       {
+    this.player.isDead = true;
+    this.player.deathReason = reason;
+    this.inputQueue = [];
+  }
+
+  reset(newSeed         = Date.now())       {
+    this.generator = new LaneGenerator(newSeed);
+    this.lanes.clear();
+    this.scoreTracker.resetCurrentScore();
+    this.player = this.createInitialPlayer();
+    this.cameraZ = -1.0;
+    this.inputQueue = [];
+    this.ensureLanesAround(0);
+  }
+}
+
+// --- Module: src/view/audioSynth.ts ---
+class AudioSynth {
+          ctx                      = null;
+
+          ensureContext()                      {
+    if (typeof window === 'undefined') return null;
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || (window                                                          ).webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    return this.ctx;
+  }
+
+  playHop()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    const now = ctx.currentTime;
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(560, now + 0.08);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.09);
+  }
+
+  playSplash()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const bufferSize = ctx.sampleRate * 0.28;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.09));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(650, now);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.35, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start(now);
+  }
+
+  playCrash()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(42, now + 0.25);
+    gain.gain.setValueAtTime(0.28, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.26);
+  }
+}
+
+// --- Module: src/view/meshFactory.ts ---
+class MeshFactory {
+  static createChicken()              {
+    const group = new THREE.Group();
+
+    const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const redMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
+    const orangeMat = new THREE.MeshLambertMaterial({ color: 0xf97316 });
+    const darkMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+
+    // Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.62), whiteMat);
+    body.position.y = 0.38;
+    body.castShadow = true;
+    body.receiveShadow = true;
+    group.add(body);
+
+    // Red comb on head
+    const comb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.32), redMat);
+    comb.position.set(0, 0.74, 0.05);
+    comb.castShadow = true;
+    group.add(comb);
+
+    // Beak
+    const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.2), orangeMat);
+    beak.position.set(0, 0.48, 0.38);
+    beak.castShadow = true;
+    group.add(beak);
+
+    // Wattle under beak
+    const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.12), redMat);
+    wattle.position.set(0, 0.34, 0.34);
+    group.add(wattle);
+
+    // Eyes
+    const eyeGeo = new THREE.BoxGeometry(0.06, 0.08, 0.08);
+    const leftEye = new THREE.Mesh(eyeGeo, darkMat);
+    leftEye.position.set(-0.29, 0.52, 0.18);
+    const rightEye = new THREE.Mesh(eyeGeo, darkMat);
+    rightEye.position.set(0.29, 0.52, 0.18);
+    group.add(leftEye, rightEye);
+
+    return group;
+  }
+
+  static createTree(seedVariant        )              {
+    const group = new THREE.Group();
+    const trunkMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
+    const leavesMat = new THREE.MeshLambertMaterial({
+      color: seedVariant % 2 === 0 ? 0x16a34a : 0x15803d,
+    });
+
+    const trunk = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.55, 0.42), trunkMat);
+    trunk.position.y = 0.275;
+    trunk.castShadow = true;
+    trunk.receiveShadow = true;
+    group.add(trunk);
+
+    const height = 0.9 + (Math.abs(seedVariant) % 3) * 0.28;
+    const crown = new THREE.Mesh(new THREE.BoxGeometry(0.82, height, 0.82), leavesMat);
+    crown.position.y = 0.55 + height / 2;
+    crown.castShadow = true;
+    crown.receiveShadow = true;
+    group.add(crown);
+
+    return group;
+  }
+
+  static createVehicle(v         )              {
+    const group = new THREE.Group();
+    const bodyMat = new THREE.MeshLambertMaterial({ color: v.color });
+    const cabinMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+    const wheelMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+
+    if (v.type === 'truck') {
+      const trailer = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.82, 0.78), cabinMat);
+      trailer.position.set(-v.length * 0.14, 0.52, 0);
+      trailer.castShadow = true;
+      trailer.receiveShadow = true;
+      group.add(trailer);
+
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.28, 0.68, 0.74), bodyMat);
+      cab.position.set(v.length * 0.34, 0.44, 0);
+      cab.castShadow = true;
+      group.add(cab);
+    } else {
+      const chassis = new THREE.Mesh(new THREE.BoxGeometry(v.length, 0.42, 0.74), bodyMat);
+      chassis.position.y = 0.32;
+      chassis.castShadow = true;
+      chassis.receiveShadow = true;
+      group.add(chassis);
+
+      const top = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.56, 0.32, 0.64), cabinMat);
+      top.position.set(-0.05, 0.66, 0);
+      top.castShadow = true;
+      group.add(top);
+    }
+
+    const wheelGeo = new THREE.BoxGeometry(0.28, 0.24, 0.82);
+    const w1 = new THREE.Mesh(wheelGeo, wheelMat);
+    w1.position.set(-v.length * 0.3, 0.14, 0);
+    const w2 = new THREE.Mesh(wheelGeo, wheelMat);
+    w2.position.set(v.length * 0.3, 0.14, 0);
+    group.add(w1, w2);
+
+    if (v.speed < 0) {
+      group.rotation.y = Math.PI;
+    }
+
+    return group;
+  }
+
+  static createLog(log             )              {
+    const group = new THREE.Group();
+    const barkMat = new THREE.MeshLambertMaterial({ color: 0x854d0e });
+    const ringMat = new THREE.MeshLambertMaterial({ color: 0xfde047 });
+
+    const mainMesh = new THREE.Mesh(new THREE.BoxGeometry(log.length, 0.34, 0.68), barkMat);
+    mainMesh.position.y = -0.04;
+    mainMesh.receiveShadow = true;
+    mainMesh.castShadow = true;
+    group.add(mainMesh);
+
+    const ends = new THREE.Mesh(new THREE.BoxGeometry(log.length + 0.02, 0.22, 0.48), ringMat);
+    ends.position.y = -0.04;
+    group.add(ends);
+
+    return group;
+  }
+}
+
+// --- Module: src/view/sceneManager.ts ---
+class SceneManager {
+          scene             ;
+          camera                          ;
+          renderer                     ;
+          dirLight                        ;
+          chicken             ;
+          renderedLanes = new Map                      ();
+
+  constructor(container             ) {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x87ceeb);
+
+    const aspect = window.innerWidth / window.innerHeight;
+    const viewSize = 11;
+    this.camera = new THREE.OrthographicCamera(
+      -viewSize * aspect,
+      viewSize * aspect,
+      viewSize,
+      -viewSize,
+      -30,
+      80
+    );
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(this.renderer.domElement);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.68);
+    this.scene.add(ambient);
+
+    this.dirLight = new THREE.DirectionalLight(0xfffbeb, 1.1);
+    this.dirLight.position.set(14, 24, -12);
+    this.dirLight.castShadow = true;
+    this.dirLight.shadow.mapSize.width = 2048;
+    this.dirLight.shadow.mapSize.height = 2048;
+    this.dirLight.shadow.camera.near = 1;
+    this.dirLight.shadow.camera.far = 60;
+    const d = 18;
+    this.dirLight.shadow.camera.left = -d;
+    this.dirLight.shadow.camera.right = d;
+    this.dirLight.shadow.camera.top = d;
+    this.dirLight.shadow.camera.bottom = -d;
+    this.scene.add(this.dirLight);
+    this.scene.add(this.dirLight.target);
+
+    this.chicken = MeshFactory.createChicken();
+    this.scene.add(this.chicken);
+
+    window.addEventListener('resize', () => this.onResize());
+  }
+
+          onResize()       {
+    const aspect = window.innerWidth / window.innerHeight;
+    const viewSize = 11;
+    this.camera.left = -viewSize * aspect;
+    this.camera.right = viewSize * aspect;
+    this.camera.top = viewSize;
+    this.camera.bottom = -viewSize;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+          buildLaneGroup(lane      )               {
+    const group = new THREE.Group();
+    group.position.z = lane.index;
+
+    const vehicleMeshes = new Map                        ();
+    const logMeshes = new Map                        ();
+
+    let stripColor = 0x4ade80;
+    let stripHeight = 0.24;
+
+    if (lane.type === LaneType.GRASS) {
+      stripColor = lane.index % 2 === 0 ? 0x4ade80 : 0x22c55e;
+    } else if (lane.type === LaneType.ROAD) {
+      stripColor = 0x334155;
+      stripHeight = 0.16;
+    } else if (lane.type === LaneType.RIVER) {
+      stripColor = 0x0284c7;
+      stripHeight = 0.08;
+    }
+
+    const ground = new THREE.Mesh(
+      new THREE.BoxGeometry(30, stripHeight, 1),
+      new THREE.MeshLambertMaterial({ color: stripColor })
+    );
+    ground.position.y = -stripHeight / 2;
+    ground.receiveShadow = true;
+    group.add(ground);
+
+    if (lane.type === LaneType.ROAD) {
+      const dashGeo = new THREE.BoxGeometry(0.6, 0.02, 0.08);
+      const dashMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
+      for (let x = -10; x <= 10; x += 2) {
+        const dash = new THREE.Mesh(dashGeo, dashMat);
+        dash.position.set(x, 0.01, 0);
+        group.add(dash);
+      }
+    }
+
+    for (const treeX of lane.obstacles) {
+      const tree = MeshFactory.createTree(lane.index * 31 + treeX);
+      tree.position.x = treeX;
+      group.add(tree);
+    }
+
+    for (const v of lane.vehicles) {
+      const mesh = MeshFactory.createVehicle(v);
+      mesh.position.x = v.x;
+      group.add(mesh);
+      vehicleMeshes.set(v.id, mesh);
+    }
+
+    for (const log of lane.logs) {
+      const mesh = MeshFactory.createLog(log);
+      mesh.position.x = log.x;
+      group.add(mesh);
+      logMeshes.set(log.id, mesh);
+    }
+
+    return { group, vehicleMeshes, logMeshes };
+  }
+
+  sync(engine            )       {
+    const activeLanes = engine.getActiveLanes();
+    const activeIndices = new Set        ();
+
+    for (const lane of activeLanes) {
+      activeIndices.add(lane.index);
+      let rendered = this.renderedLanes.get(lane.index);
+      if (!rendered) {
+        rendered = this.buildLaneGroup(lane);
+        this.scene.add(rendered.group);
+        this.renderedLanes.set(lane.index, rendered);
+      }
+
+      for (const v of lane.vehicles) {
+        const m = rendered.vehicleMeshes.get(v.id);
+        if (m) m.position.x = v.x;
+      }
+
+      for (const log of lane.logs) {
+        const m = rendered.logMeshes.get(log.id);
+        if (m) m.position.x = log.x;
+      }
+    }
+
+    // Prune old lanes outside camera frustum
+    for (const [idx, rendered] of this.renderedLanes.entries()) {
+      if (!activeIndices.has(idx)) {
+        this.scene.remove(rendered.group);
+        this.renderedLanes.delete(idx);
+      }
+    }
+
+    // Update chicken transform & hop parabola
+    const p = engine.getPlayer();
+    const hopHeight = p.isHopping ? 4 * 0.75 * p.hopProgress * (1 - p.hopProgress) : 0;
+    const baseOffsetY = p.ridingLogId !== null ? 0.12 : 0;
+
+    // Note: In Three.js right-handed space with camera looking toward +Z,
+    // we invert X so MoveDirection.LEFT visually moves left on screen.
+    this.chicken.position.set(-p.x, baseOffsetY + hopHeight, p.row);
+
+    if (p.facing === MoveDirection.FORWARD) this.chicken.rotation.y = 0;
+    else if (p.facing === MoveDirection.BACKWARD) this.chicken.rotation.y = Math.PI;
+    else if (p.facing === MoveDirection.LEFT) this.chicken.rotation.y = Math.PI / 2;
+    else if (p.facing === MoveDirection.RIGHT) this.chicken.rotation.y = -Math.PI / 2;
+
+    if (p.isDead) {
+      if (p.deathReason === 'CAR') {
+        this.chicken.scale.set(1.4, 0.15, 1.4);
+      } else if (p.deathReason === 'WATER') {
+        this.chicken.position.y = -0.5;
+      }
+    } else {
+      const stretch = p.isHopping ? 1 + Math.sin(p.hopProgress * Math.PI) * 0.22 : 1;
+      this.chicken.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
+    }
+
+    // Update isometric camera & shadow light tracking
+    const camZ = engine.getCameraZ();
+    this.camera.position.set(-7.5, 12.5, camZ - 7.5);
+    this.camera.lookAt(0, 0, camZ + 2.5);
+
+    this.dirLight.position.set(-12, 22, camZ - 6);
+    this.dirLight.target.position.set(0, 0, camZ + 3);
+
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  clearAll()       {
+    for (const rendered of this.renderedLanes.values()) {
+      this.scene.remove(rendered.group);
+    }
+    this.renderedLanes.clear();
+  }
+}
+
+// --- Module: src/main.ts ---
+const container = document.getElementById('game-container') ;
+const scoreEl = document.getElementById('score-value') ;
+const highScoreEl = document.getElementById('high-score-value') ;
+const gameOverModal = document.getElementById('game-over-modal') ;
+const deathReasonEl = document.getElementById('death-reason') ;
+const restartBtn = document.getElementById('restart-btn') ;
+
+const engine = new GameEngine(Date.now(), window.localStorage);
+const sceneManager = new SceneManager(container);
+const audio = new AudioSynth();
+
+let wasDead = false;
+
+function triggerMove(dir                                                  )       {
+  if (engine.getPlayer().isDead) return;
+  engine.queueMove(dir);
+  audio.playHop();
+}
+
+window.addEventListener('keydown', (e) => {
+  if (engine.getPlayer().isDead) {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      restartGame();
+    }
+    return;
+  }
+
+  switch (e.code) {
+    case 'KeyW':
+    case 'ArrowUp':
+    case 'Space':
+      e.preventDefault();
+      triggerMove(MoveDirection.FORWARD);
+      break;
+    case 'KeyS':
+    case 'ArrowDown':
+      e.preventDefault();
+      triggerMove(MoveDirection.BACKWARD);
+      break;
+    case 'KeyA':
+    case 'ArrowLeft':
+      e.preventDefault();
+      triggerMove(MoveDirection.LEFT);
+      break;
+    case 'KeyD':
+    case 'ArrowRight':
+      e.preventDefault();
+      triggerMove(MoveDirection.RIGHT);
+      break;
+  }
+});
+
+// On-screen mobile/click directional buttons
+document.querySelectorAll('[data-move]').forEach((btn) => {
+  btn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    const dir = (btn               ).dataset.move                                                    ;
+    triggerMove(dir);
+  });
+});
+
+function restartGame()       {
+  wasDead = false;
+  gameOverModal.classList.add('hidden');
+  sceneManager.clearAll();
+  engine.reset(Date.now());
+}
+
+restartBtn.addEventListener('click', restartGame);
+
+const DEATH_LABELS                         = {
+  [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
+  [DeathReason.WATER]: 'Вы упали в бурную реку!',
+  [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
+  [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
+};
+
+let lastTime = performance.now();
+
+function animate(now        )       {
+  const dt = Math.min((now - lastTime) / 1000, 0.1);
+  lastTime = now;
+
+  engine.step(dt);
+  sceneManager.sync(engine);
+
+  scoreEl.textContent = String(engine.getScore());
+  highScoreEl.textContent = String(engine.getHighScore());
+
+  const p = engine.getPlayer();
+  if (p.isDead && !wasDead) {
+    wasDead = true;
+    if (p.deathReason === DeathReason.WATER) {
+      audio.playSplash();
+    } else {
+      audio.playCrash();
+    }
+    deathReasonEl.textContent = DEATH_LABELS[p.deathReason] ?? 'Игра окончена';
+    gameOverModal.classList.remove('hidden');
+  }
+
+  requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+
+
+  </script>
+</body>
+</html>
