@@ -6,181 +6,66 @@
   <title>Crossy Road 3D — Vibe-Pro Edition</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #87ceeb;
-    }
-    #game-container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-    .hud {
-      position: fixed;
-      top: 20px;
-      left: 24px;
-      right: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      pointer-events: none;
-      z-index: 10;
-    }
-    .score-card {
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(8px);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 10px 22px;
-      border-radius: 14px;
-      color: #fff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-    }
-    .score-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #94a3b8;
-      font-weight: 700;
-    }
-    .score-number {
-      font-size: 36px;
-      font-weight: 900;
-      line-height: 1.1;
-      color: #38bdf8;
-    }
-    .high-score-number {
-      color: #fbbf24;
-    }
-    .controls-pad {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      display: grid;
-      grid-template-columns: repeat(3, 54px);
-      grid-template-rows: repeat(2, 54px);
-      gap: 8px;
-      z-index: 15;
-    }
-    .pad-btn {
-      background: rgba(15, 23, 42, 0.8);
-      border: 2px solid rgba(255, 255, 255, 0.28);
-      border-radius: 12px;
-      color: #fff;
-      font-size: 20px;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.08s ease, background 0.15s;
-    }
-    .pad-btn:active {
-      transform: scale(0.92);
-      background: rgba(56, 189, 248, 0.85);
-    }
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.72);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 30;
-    }
-    .modal.hidden {
-      display: none;
-    }
-    .modal-card {
-      background: #1e293b;
-      border: 2px solid #334155;
-      border-radius: 20px;
-      padding: 32px 40px;
-      text-align: center;
-      color: #f8fafc;
-      max-width: 420px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    }
-    .modal-card h2 {
-      font-size: 28px;
-      color: #f87171;
-      margin-bottom: 8px;
-    }
-    .modal-card p {
-      color: #cbd5e1;
-      margin-bottom: 24px;
-      font-size: 16px;
-    }
-    .restart-btn {
-      background: linear-gradient(135deg, #38bdf8, #2563eb);
-      color: #fff;
-      border: none;
-      padding: 14px 32px;
-      font-size: 17px;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-    }
-    .restart-btn:hover {
-      filter: brightness(1.1);
-    }
-    .info-links {
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      display: flex;
-      gap: 10px;
-      z-index: 15;
-    }
-    .info-link {
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(8px);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 8px 14px;
-      border-radius: 12px;
-      color: #e2e8f0;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    .info-link:hover {
-      background: rgba(30, 41, 59, 0.92);
-      border-color: rgba(56, 189, 248, 0.6);
-      color: #38bdf8;
-    }
+    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; }
+    #game-container { width: 100%; height: 100%; position: relative; }
+    .hud { position: fixed; top: 20px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; gap: 14px; }
+    .hud-stats { display: flex; gap: 12px; }
+    .score-card { background: rgba(15, 23, 42, 0.82); backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.2); padding: 10px 18px; border-radius: 14px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); }
+    .score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 700; }
+    .score-number { font-size: 30px; font-weight: 900; line-height: 1.1; color: #38bdf8; }
+    .high-score-number { color: #fbbf24; }
+    .coins-number { color: #facc15; }
+    .gacha-panel { pointer-events: auto; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.22); border-radius: 14px; padding: 10px 14px; color: #fff; display: flex; flex-direction: column; gap: 8px; min-width: 280px; }
+    .gacha-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; }
+    .gacha-btn:hover { filter: brightness(1.1); }
+    .gacha-status { font-size: 12px; color: #fde047; font-weight: 600; min-height: 16px; }
+    .skin-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skin-btn { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .skin-btn.active { border-color: #38bdf8; background: #0284c7; color: #fff; }
+    .skin-btn.locked { opacity: 0.45; cursor: not-allowed; }
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 30; }
+    .modal.hidden { display: none; }
+    .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 20px; padding: 32px 40px; text-align: center; color: #f8fafc; max-width: 420px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
+    .modal-card h2 { font-size: 28px; color: #f87171; margin-bottom: 8px; }
+    .modal-card p { color: #cbd5e1; margin-bottom: 24px; font-size: 16px; }
+    .restart-btn { background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; border: none; padding: 14px 32px; font-size: 17px; font-weight: 700; border-radius: 12px; cursor: pointer; }
+    .info-links { position: fixed; bottom: 20px; left: 24px; display: flex; gap: 10px; z-index: 15; }
+    .info-link { background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 12px; color: #e2e8f0; text-decoration: none; font-size: 13px; font-weight: 700; }
   </style>
 </head>
 <body>
   <div id="game-container"></div>
 
   <div class="hud">
-    <div class="score-card">
-      <div class="score-label">Счёт (Score)</div>
-      <div id="score-value" class="score-number">0</div>
+    <div class="hud-stats">
+      <div class="score-card">
+        <div class="score-label">Счёт</div>
+        <div id="score-value" class="score-number">0</div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Рекорд</div>
+        <div id="high-score-value" class="score-number high-score-number">0</div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Монеты 🪙</div>
+        <div id="coins-value" class="score-number coins-number">0</div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Ритм-Комбо</div>
+        <div id="combo-value" class="score-number">x1</div>
+      </div>
     </div>
-    <div class="score-card">
-      <div class="score-label">Рекорд (High Score)</div>
-      <div id="high-score-value" class="score-number high-score-number">0</div>
+
+    <div class="gacha-panel">
+      <button id="gacha-btn" class="gacha-btn">🎰 Гача (10 🪙) [G]</button>
+      <div id="gacha-status" class="gacha-status">Управление: WASD / Стрелки / Space | [1-4] Скины</div>
+      <div id="skin-list" class="skin-list"></div>
     </div>
   </div>
 
   <div class="info-links">
     <a class="info-link" href="./crossy_road_plan.html" target="_blank" rel="noopener">📐 Архитектура (Plan)</a>
     <a class="info-link" href="https://github.com/Gr1nis/crossy-road-pro" target="_blank" rel="noopener">🐙 GitHub</a>
-  </div>
-
-  <div class="controls-pad">
-    <div></div>
-    <button class="pad-btn" data-move="FORWARD" title="Вперёд (W / Up)">▲</button>
-    <div></div>
-    <button class="pad-btn" data-move="LEFT" title="Влево (A / Left)">◀</button>
-    <button class="pad-btn" data-move="BACKWARD" title="Назад (S / Down)">▼</button>
-    <button class="pad-btn" data-move="RIGHT" title="Вправо (D / Right)">▶</button>
   </div>
 
   <div id="game-over-modal" class="modal hidden">
@@ -199,6 +84,7 @@ const LaneType = {
   GRASS: 'GRASS',
   ROAD: 'ROAD',
   RIVER: 'RIVER',
+  RAILWAY: 'RAILWAY',
 }         ;
 const MoveDirection = {
   FORWARD: 'FORWARD',
@@ -209,20 +95,28 @@ const MoveDirection = {
 const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
+  TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
 }         ;
+const ALL_SKINS                                                             = [
+  { id: 'chicken', name: 'Классическая Курица', badge: '🐔' },
+  { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
+  { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
+  { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
+];
 const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
-  WRAP_LIMIT: 22,         // Граница бесшовного заворачивания трафика и брёвен за пределами экрана 16:9 / 21:9
-  HOP_DURATION: 0.12,     // Длительность прыжка (120 мс)
-  PLAYER_WIDTH: 0.65,     // Ширина хитбокса игрока
-  LOG_MARGIN: 0.12,       // Честный допуск посадки на торец бревна (без зависания над водой)
-  CAMERA_BACK_LIMIT: 5.5, // Максимальное отставание позади камеры
-  BASE_CAMERA_SPEED: 0.85 // Скорость ползущего скролла камеры (полос/сек)
+  WRAP_LIMIT: 22,
+  HOP_DURATION: 0.12,
+  PLAYER_WIDTH: 0.65,
+  LOG_MARGIN: 0.12,
+  CAMERA_BACK_LIMIT: 5.5,
+  BASE_CAMERA_SPEED: 0.85,
+  GACHA_COST: 10,
 }         ;
 
 // --- Module: src/core/prng.ts ---
@@ -292,38 +186,88 @@ function vehicleScreenRotationY(speed        )         {
 }
 
 // --- Module: src/core/scoreTracker.ts ---
-const STORAGE_KEY = 'crossy_road_high_score';
+const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';
 class ScoreTracker {
           currentScore = 0;
           highScore = 0;
+          bestRow = 0;
+          coins = 0;
+          unlockedSkins           = ['chicken'];
+          selectedSkin         = 'chicken';
           storage                 ;
 
   constructor(storage                 ) {
     this.storage = storage;
-    this.highScore = this.loadHighScore();
+    this.loadFromStorage();
   }
 
-          loadHighScore()         {
-    if (!this.storage) return 0;
+          loadFromStorage()       {
+    if (!this.storage) return;
     try {
-      const raw = this.storage.getItem(STORAGE_KEY);
-      if (!raw) return 0;
-      const parsed = Number(raw);
-      if (!Number.isFinite(parsed) || parsed < 0) {
-        return 0;
+      const rawHigh = this.storage.getItem(HIGH_SCORE_KEY);
+      if (rawHigh !== null) {
+        const parsed = Number(rawHigh);
+        if (Number.isFinite(parsed) && parsed >= 0) {
+          this.highScore = Math.floor(parsed);
+        }
       }
-      return Math.floor(parsed);
+
+      const rawProfile = this.storage.getItem(PROFILE_KEY);
+      if (rawProfile) {
+        const data = JSON.parse(rawProfile)                         ;
+        if (typeof data.highScore === 'number' && Number.isFinite(data.highScore) && data.highScore > this.highScore) {
+          this.highScore = Math.floor(data.highScore);
+        }
+        if (typeof data.bestRow === 'number' && Number.isFinite(data.bestRow) && data.bestRow >= 0) {
+          this.bestRow = Math.floor(data.bestRow);
+        }
+        if (typeof data.coins === 'number' && Number.isFinite(data.coins) && data.coins >= 0) {
+          this.coins = Math.floor(data.coins);
+        }
+        const validSkinIds = new Set        (ALL_SKINS.map((s) => s.id));
+        if (Array.isArray(data.unlockedSkins)) {
+          const filtered = data.unlockedSkins.filter((s)              => validSkinIds.has(s));
+          this.unlockedSkins = Array.from(new Set        (['chicken', ...filtered]));
+        }
+        if (typeof data.selectedSkin === 'string' && this.unlockedSkins.includes(data.selectedSkin          )) {
+          this.selectedSkin = data.selectedSkin          ;
+        }
+      }
     } catch {
-      return 0;
+      // Resilient fallback on corrupted storage
     }
   }
 
-          saveHighScore()       {
+          saveToStorage()       {
     if (!this.storage) return;
     try {
-      this.storage.setItem(STORAGE_KEY, String(this.highScore));
+      this.storage.setItem(HIGH_SCORE_KEY, String(this.highScore));
+      const payload               = {
+        highScore: this.highScore,
+        bestRow: this.bestRow,
+        coins: this.coins,
+        unlockedSkins: this.unlockedSkins,
+        selectedSkin: this.selectedSkin,
+      };
+      this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
-      // Ignore storage quota / security errors
+      // Ignore storage quota errors
+    }
+  }
+
+  updateRow(row        , multiplier         = 1)       {
+    const cleanRow = Math.floor(row);
+    if (cleanRow > this.bestRow) {
+      this.bestRow = cleanRow;
+    }
+    if (cleanRow > this.currentScore) {
+      const delta = cleanRow - this.currentScore;
+      this.currentScore += delta * Math.max(1, Math.floor(multiplier));
+      if (this.currentScore > this.highScore) {
+        this.highScore = this.currentScore;
+      }
+      this.saveToStorage();
     }
   }
 
@@ -335,15 +279,50 @@ class ScoreTracker {
     return this.highScore;
   }
 
-  updateRow(row        )       {
-    const cleanRow = Math.floor(row);
-    if (cleanRow > this.currentScore) {
-      this.currentScore = cleanRow;
-      if (this.currentScore > this.highScore) {
-        this.highScore = this.currentScore;
-        this.saveHighScore();
-      }
+  getBestRow()         {
+    return this.bestRow;
+  }
+
+  getCoins()         {
+    return this.coins;
+  }
+
+  addCoins(amount        )       {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    this.coins += Math.floor(amount);
+    this.saveToStorage();
+  }
+
+  getUnlockedSkins()           {
+    return [...this.unlockedSkins];
+  }
+
+  getSelectedSkin()         {
+    return this.selectedSkin;
+  }
+
+  selectSkin(skinId        )          {
+    if (!this.unlockedSkins.includes(skinId)) return false;
+    this.selectedSkin = skinId;
+    this.saveToStorage();
+    return true;
+  }
+
+  rollGacha(randomIndex         = 0)                                                         {
+    const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.unlockedSkins.includes(id));
+    if (locked.length === 0) {
+      return { success: false, reason: 'ALL_UNLOCKED' };
     }
+    if (this.coins < WORLD_CONFIG.GACHA_COST) {
+      return { success: false, reason: 'NOT_ENOUGH_COINS' };
+    }
+    this.coins -= WORLD_CONFIG.GACHA_COST;
+    const idx = Math.abs(Math.floor(randomIndex)) % locked.length;
+    const chosen = locked[idx];
+    this.unlockedSkins.push(chosen);
+    this.selectedSkin = chosen;
+    this.saveToStorage();
+    return { success: true, skinId: chosen };
   }
 
   resetCurrentScore()       {
@@ -353,9 +332,9 @@ class ScoreTracker {
 
 // --- Module: src/core/laneGenerator.ts ---
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
+const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];
 class LaneGenerator {
                    baseSeed        ;
-          nextEntityId = 1;
 
   constructor(seed         = 42) {
     this.baseSeed = seed >>> 0;
@@ -366,10 +345,6 @@ class LaneGenerator {
     return new PRNG(hashed);
   }
 
-  /**
-   * Computes a deterministic safe corridor column X for a given row so that
-   * adjacent GRASS lanes always share at least 2 unblocked columns.
-   */
           getSafeCorridorX(index        )         {
     if (index <= 2) return 0;
     const rng = this.rowPrng(Math.floor(index / 2));
@@ -379,41 +354,44 @@ class LaneGenerator {
   generateLane(index        )       {
     const rng = this.rowPrng(index);
 
-    // Safe Spawn Zone: rows -3..2 are always GRASS
     let type                = LaneType.GRASS;
     if (index > 2) {
       const roll = rng.next();
-      if (roll < 0.38) {
+      if (roll < 0.36) {
         type = LaneType.GRASS;
-      } else if (roll < 0.75) {
+      } else if (roll < 0.68) {
         type = LaneType.ROAD;
-      } else {
+      } else if (roll < 0.88) {
         type = LaneType.RIVER;
+      } else {
+        type = LaneType.RAILWAY;
       }
     }
 
-    // Alternating direction for consecutive lanes (especially critical for RIVER)
     const direction         = index % 2 === 0 ? 1 : -1;
     const difficultyFactor = 1 + Math.min(Math.max(0, index) * 0.01, 1.1);
     const speed = rng.nextFloat(1.8, 3.4) * difficultyFactor * direction;
 
     const obstacles           = [];
+    const obstacleDetails                   = [];
+    const coins           = [];
     const vehicles            = [];
     const logs                = [];
+    let train                        ;
 
     if (type === LaneType.GRASS) {
       const safeCurrent = this.getSafeCorridorX(index);
       const safePrev = this.getSafeCorridorX(index - 1);
 
       for (let x = WORLD_CONFIG.MIN_X; x <= WORLD_CONFIG.MAX_X; x++) {
-        // Keep central spawn area clear on rows -3..2
         if (index <= 2 && Math.abs(x) <= 2) continue;
-        // Keep safe corridor columns clear so adjacent GRASS rows always share passable columns
         if (x === safeCurrent || x === safePrev || x === 0) continue;
 
         const treeChance = index <= 0 ? 0.35 : 0.28;
         if (rng.next() < treeChance) {
           obstacles.push(x);
+          const kind = OBSTACLE_KINDS[rng.nextInt(0, OBSTACLE_KINDS.length - 1)];
+          obstacleDetails.push({ x, kind });
         }
       }
     } else if (type === LaneType.ROAD) {
@@ -450,14 +428,38 @@ class LaneGenerator {
           speed: riverSpeed,
         });
       }
+    } else if (type === LaneType.RAILWAY) {
+      const period = rng.nextFloat(5.0, 7.5);
+      const trainSpeed = 32.0 * direction;
+      train = {
+        timer: rng.nextFloat(0, period * 0.7),
+        period,
+        warningDuration: 1.2,
+        isWarning: false,
+        isPassing: false,
+        x: -direction * (WORLD_CONFIG.WRAP_LIMIT + 10),
+        length: 14.0,
+        speed: trainSpeed,
+      };
+    }
+
+    // Spawn coins on unblocked tiles for rows > 0
+    if (index > 0 && type !== LaneType.RIVER && rng.next() < 0.55) {
+      const candidateX = rng.nextInt(-6, 6);
+      if (!obstacles.includes(candidateX)) {
+        coins.push(candidateX);
+      }
     }
 
     return {
       index,
       type,
       obstacles,
+      obstacleDetails,
+      coins,
       vehicles,
       logs,
+      train,
       direction,
       speed,
     };
@@ -481,6 +483,10 @@ class GameEngine {
           player             ;
           cameraZ = -1.0;
           inputQueue                       = [];
+          comboStreak = 0;
+          comboTimer = 0;
+          highestRowThisRun = 0;
+          gachaNonce = 0;
 
   constructor(seed         = 42, storage                 ) {
     this.generator = new LaneGenerator(seed);
@@ -550,6 +556,41 @@ class GameEngine {
     return this.scoreTracker.getHighScore();
   }
 
+  getBestRow()         {
+    return this.scoreTracker.getBestRow();
+  }
+
+  getCoins()         {
+    return this.scoreTracker.getCoins();
+  }
+
+  addCoins(amount        )       {
+    this.scoreTracker.addCoins(amount);
+  }
+
+  getUnlockedSkins()           {
+    return this.scoreTracker.getUnlockedSkins();
+  }
+
+  getSelectedSkin()         {
+    return this.scoreTracker.getSelectedSkin();
+  }
+
+  selectSkin(skinId        )          {
+    return this.scoreTracker.selectSkin(skinId);
+  }
+
+  rollGacha()                                                         {
+    this.gachaNonce += 1;
+    return this.scoreTracker.rollGacha(this.gachaNonce);
+  }
+
+  getComboMultiplier()         {
+    if (this.comboStreak >= 6) return 3;
+    if (this.comboStreak >= 3) return 2;
+    return 1;
+  }
+
   queueMove(dir                    )          {
     if (this.player.isDead) return false;
     if (this.inputQueue.length < 2) {
@@ -580,18 +621,16 @@ class GameEngine {
 
       const destLane = this.getLane(nextRow);
 
-      // Quantize X to integer grid whenever landing on non-RIVER lane (GRASS or ROAD)
       if (destLane.type !== LaneType.RIVER) {
         const quantized = Math.round(nextX);
         if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
-          continue; // Blocked by world boundary wall; try next queued command if any
+          continue;
         }
         nextX = quantizeLandX(nextX);
       }
 
-      // Block movement into a static tree obstacle on GRASS
       if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
-        continue; // Blocked by tree; try next queued command if any
+        continue;
       }
 
       this.player.startRow = this.player.row;
@@ -601,7 +640,6 @@ class GameEngine {
       this.player.isHopping = true;
       this.player.hopProgress = 0;
 
-      // If jumping onto or along a RIVER lane, attach ridingLogId to the target log so drift continues mid-hop
       if (destLane.type === LaneType.RIVER) {
         const targetLog = findSupportingLog(nextX, destLane.logs);
         this.player.ridingLogId = targetLog ? targetLog.id : null;
@@ -614,12 +652,28 @@ class GameEngine {
     return false;
   }
 
+          checkCoinPickup(lane      , x        )       {
+    if (!Array.isArray(lane.coins) || lane.coins.length === 0) return;
+    const roundedX = Math.round(x);
+    const idx = lane.coins.indexOf(roundedX);
+    if (idx !== -1) {
+      lane.coins.splice(idx, 1);
+      this.scoreTracker.addCoins(1);
+    }
+  }
+
   step(dt        )       {
     if (this.player.isDead || dt <= 0) return;
 
-    const currentLane = this.getLane(Math.round(this.player.row));
+    if (this.comboTimer > 0) {
+      this.comboTimer -= dt;
+      if (this.comboTimer <= 0) {
+        this.comboTimer = 0;
+        this.comboStreak = 0;
+      }
+    }
 
-    // 1. Update vehicles & logs across nearby lanes, and move player with log if riding
+    const currentLane = this.getLane(Math.round(this.player.row));
     const minSimRow = Math.floor(this.cameraZ) - 6;
     const maxSimRow = Math.floor(this.player.row) + 24;
 
@@ -636,7 +690,6 @@ class GameEngine {
         const dx = log.speed * dt;
         log.x += dx;
 
-        // If player is standing on or hopping onto/along this log, apply identical delta dx
         if (this.player.ridingLogId === log.id) {
           if (this.player.isHopping && lane.index === this.player.targetRow) {
             this.player.startX += dx;
@@ -650,9 +703,28 @@ class GameEngine {
         if (log.speed > 0 && log.x > WRAP_LIMIT) log.x = -WRAP_LIMIT;
         else if (log.speed < 0 && log.x < -WRAP_LIMIT) log.x = WRAP_LIMIT;
       }
+
+      if (lane.type === LaneType.RAILWAY && lane.train) {
+        const tr = lane.train;
+        if (tr.isPassing) {
+          tr.x += tr.speed * dt;
+          if (Math.abs(tr.x) > WRAP_LIMIT + 12) {
+            tr.isPassing = false;
+            tr.isWarning = false;
+            tr.timer = 0;
+          }
+        } else {
+          tr.timer += dt;
+          tr.isWarning = tr.timer >= tr.period - tr.warningDuration;
+          if (tr.timer >= tr.period) {
+            tr.isPassing = true;
+            tr.isWarning = true;
+            tr.x = tr.speed > 0 ? -(WRAP_LIMIT + 10) : WRAP_LIMIT + 10;
+          }
+        }
+      }
     }
 
-    // 2. Advance hop animation if hopping
     if (this.player.isHopping) {
       this.player.hopProgress += dt / WORLD_CONFIG.HOP_DURATION;
       if (this.player.hopProgress >= 1) {
@@ -662,7 +734,12 @@ class GameEngine {
         this.player.x = this.player.targetX;
 
         this.ensureLanesAround(this.player.row);
-        this.scoreTracker.updateRow(this.player.row);
+        if (this.player.row > this.highestRowThisRun) {
+          this.highestRowThisRun = this.player.row;
+          this.comboStreak += 1;
+          this.comboTimer = 1.25;
+        }
+        this.scoreTracker.updateRow(this.player.row, this.getComboMultiplier());
 
         const landedLane = this.getLane(this.player.row);
         if (landedLane.type === LaneType.RIVER) {
@@ -676,9 +753,9 @@ class GameEngine {
         } else {
           this.player.x = quantizeLandX(this.player.x);
           this.player.ridingLogId = null;
+          this.checkCoinPickup(landedLane, this.player.x);
         }
 
-        // Start buffered move if any
         if (this.inputQueue.length > 0) {
           this.tryStartNextHop();
         }
@@ -688,7 +765,6 @@ class GameEngine {
         this.player.x = this.player.startX + (this.player.targetX - this.player.startX) * t;
       }
     } else if (currentLane.type === LaneType.RIVER) {
-      // Ensure player is still supported by a log
       const support = findSupportingLog(this.player.x, currentLane.logs);
       if (!support) {
         this.killPlayer(DeathReason.WATER);
@@ -697,24 +773,30 @@ class GameEngine {
       this.player.ridingLogId = support.id;
     }
 
-    // 3. Check horizontal out-of-bounds (e.g. carried off-screen by a river log)
     if (isOutOfBoundsX(this.player.x)) {
       this.killPlayer(DeathReason.OUT_OF_BOUNDS);
       return;
     }
 
-    // 4. Check ROAD vehicle collisions
     const activeRow = Math.round(this.player.row);
     const activeLane = this.getLane(activeRow);
+    this.checkCoinPickup(activeLane, this.player.x);
+
     if (activeLane.type === LaneType.ROAD) {
       const hitCar = checkVehicleCollision(this.player.x, activeLane.vehicles);
       if (hitCar) {
         this.killPlayer(DeathReason.CAR);
         return;
       }
+    } else if (activeLane.type === LaneType.RAILWAY && activeLane.train?.isPassing) {
+      const tr = activeLane.train;
+      const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + tr.length) / 2;
+      if (Math.abs(this.player.x - tr.x) < halfSpan) {
+        this.killPlayer(DeathReason.TRAIN);
+        return;
+      }
     }
 
-    // 5. Update camera scrolling & check bottom camera frustum timeout
     const targetCamZ = this.player.row - 1.0;
     this.cameraZ += WORLD_CONFIG.BASE_CAMERA_SPEED * dt;
     if (targetCamZ > this.cameraZ) {
@@ -731,6 +813,8 @@ class GameEngine {
     this.player.isDead = true;
     this.player.deathReason = reason;
     this.inputQueue = [];
+    this.comboStreak = 0;
+    this.comboTimer = 0;
   }
 
   reset(newSeed         = Date.now())       {
@@ -740,6 +824,9 @@ class GameEngine {
     this.player = this.createInitialPlayer();
     this.cameraZ = -1.0;
     this.inputQueue = [];
+    this.comboStreak = 0;
+    this.comboTimer = 0;
+    this.highestRowThisRun = 0;
     this.ensureLanesAround(0);
   }
 }
@@ -762,79 +849,139 @@ class AudioSynth {
     return this.ctx;
   }
 
-  playHop()       {
+  playHop(comboMultiplier         = 1)       {
     const ctx = this.ensureContext();
     if (!ctx) return;
+
+    const pitchScale = 1 + (Math.max(1, comboMultiplier) - 1) * 0.14;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'triangle';
+    osc.frequency.setValueAtTime(320 * pitchScale, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(580 * pitchScale, ctx.currentTime + 0.09);
+
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.09);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.095);
+  }
+
+  playCoin()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
     const now = ctx.currentTime;
-    osc.frequency.setValueAtTime(280, now);
-    osc.frequency.exponentialRampToValueAtTime(560, now + 0.08);
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(987.77, now); // B5
+    osc.frequency.setValueAtTime(1318.51, now + 0.06); // E6
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.09);
+    osc.stop(now + 0.23);
   }
 
-  playSplash()       {
+  playGacha()       {
     const ctx = this.ensureContext();
     if (!ctx) return;
+
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const start = ctx.currentTime + idx * 0.065;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, start);
+      gain.gain.setValueAtTime(0.22, start);
+      gain.gain.exponentialRampToValueAtTime(0.01, start + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.19);
+    });
+  }
+
+  playTrainBell()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
     const now = ctx.currentTime;
-    const bufferSize = ctx.sampleRate * 0.28;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.09));
-    }
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(650, now);
-
+    const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.35, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
-
-    noise.connect(filter);
-    filter.connect(gain);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.setValueAtTime(660, now + 0.08);
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+    osc.connect(gain);
     gain.connect(ctx.destination);
-    noise.start(now);
+    osc.start(now);
+    osc.stop(now + 0.17);
   }
 
   playCrash()       {
     const ctx = this.ensureContext();
     if (!ctx) return;
-    const now = ctx.currentTime;
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(150, now);
-    osc.frequency.exponentialRampToValueAtTime(42, now + 0.25);
-    gain.gain.setValueAtTime(0.28, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+    osc.frequency.setValueAtTime(150, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(42, ctx.currentTime + 0.28);
+
+    gain.gain.setValueAtTime(0.26, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.26);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+  }
+
+  playSplash()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(420, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(95, ctx.currentTime + 0.25);
+
+    gain.gain.setValueAtTime(0.24, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.26);
   }
 }
 
 // --- Module: src/view/meshFactory.ts ---
 class MeshFactory {
-  static createChicken()              {
+  static createCharacter(skinId         = 'chicken', isGhost          = false)              {
     const group = new THREE.Group();
 
-    const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-    const redMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
-    const orangeMat = new THREE.MeshLambertMaterial({ color: 0xf97316 });
-    const darkMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+    const makeMat = (color        ) =>
+      new THREE.MeshLambertMaterial({
+        color: isGhost ? 0xfbbf24 : color,
+        transparent: isGhost,
+        opacity: isGhost ? 0.42 : 1.0,
+      });
 
-    // Feet / Legs touching Y = 0
+    const orangeMat = makeMat(0xf97316);
+    const darkMat = makeMat(0x1e293b);
+
+    // Legs touching Y = 0
     const legGeo = new THREE.BoxGeometry(0.1, 0.12, 0.14);
     const leftLeg = new THREE.Mesh(legGeo, orangeMat);
     leftLeg.position.set(-0.14, 0.06, 0);
@@ -842,46 +989,117 @@ class MeshFactory {
     rightLeg.position.set(0.14, 0.06, 0);
     group.add(leftLeg, rightLeg);
 
-    // Body
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.62), whiteMat);
-    body.position.y = 0.38;
-    body.castShadow = true;
-    body.receiveShadow = true;
-    group.add(body);
+    if (skinId === 'cyber_duck') {
+      const yellowMat = makeMat(0xfacc15);
+      const visorMat = makeMat(0x06b6d4);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.54, 0.64), yellowMat);
+      body.position.y = 0.37;
+      body.castShadow = !isGhost;
+      group.add(body);
 
-    // Red comb on head
-    const comb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.32), redMat);
-    comb.position.set(0, 0.74, 0.05);
-    comb.castShadow = true;
-    group.add(comb);
+      const bill = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.24), orangeMat);
+      bill.position.set(0, 0.44, 0.41);
+      group.add(bill);
 
-    // Beak
-    const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.2), orangeMat);
-    beak.position.set(0, 0.48, 0.38);
-    beak.castShadow = true;
-    group.add(beak);
+      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.14, 0.18), visorMat);
+      visor.position.set(0, 0.55, 0.26);
+      group.add(visor);
+    } else if (skinId === 'shadow_ninja') {
+      const suitMat = makeMat(0x0f172a);
+      const bandMat = makeMat(0xef4444);
+      const skinToneMat = makeMat(0xfde68a);
+      const steelMat = makeMat(0x94a3b8);
 
-    // Wattle under beak
-    const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.12), redMat);
-    wattle.position.set(0, 0.34, 0.34);
-    group.add(wattle);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.58), suitMat);
+      body.position.y = 0.39;
+      body.castShadow = !isGhost;
+      group.add(body);
 
-    // Eyes
-    const eyeGeo = new THREE.BoxGeometry(0.06, 0.08, 0.08);
-    const leftEye = new THREE.Mesh(eyeGeo, darkMat);
-    leftEye.position.set(-0.29, 0.52, 0.18);
-    const rightEye = new THREE.Mesh(eyeGeo, darkMat);
-    rightEye.position.set(0.29, 0.52, 0.18);
-    group.add(leftEye, rightEye);
+      const faceSlit = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.06), skinToneMat);
+      faceSlit.position.set(0, 0.52, 0.28);
+      group.add(faceSlit);
+
+      const headband = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 0.62), bandMat);
+      headband.position.set(0, 0.62, 0);
+      group.add(headband);
+
+      const katana = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.72, 0.08), steelMat);
+      katana.position.set(0.18, 0.52, -0.33);
+      katana.rotation.z = -0.35;
+      group.add(katana);
+    } else if (skinId === 'frost_penguin') {
+      const navyMat = makeMat(0x1e3a8a);
+      const bellyMat = makeMat(0xf8fafc);
+      const scarfMat = makeMat(0x38bdf8);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.56), navyMat);
+      body.position.y = 0.39;
+      body.castShadow = !isGhost;
+      group.add(body);
+
+      const belly = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.44, 0.06), bellyMat);
+      belly.position.set(0, 0.36, 0.27);
+      group.add(belly);
+
+      const scarf = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.1, 0.62), scarfMat);
+      scarf.position.set(0, 0.48, 0);
+      group.add(scarf);
+
+      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.2), orangeMat);
+      beak.position.set(0, 0.53, 0.34);
+      group.add(beak);
+    } else {
+      const whiteMat = makeMat(0xffffff);
+      const redMat = makeMat(0xef4444);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.62), whiteMat);
+      body.position.y = 0.38;
+      body.castShadow = !isGhost;
+      body.receiveShadow = !isGhost;
+      group.add(body);
+
+      const comb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.32), redMat);
+      comb.position.set(0, 0.74, 0.05);
+      group.add(comb);
+
+      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.2), orangeMat);
+      beak.position.set(0, 0.48, 0.38);
+      group.add(beak);
+
+      const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.12), redMat);
+      wattle.position.set(0, 0.34, 0.34);
+      group.add(wattle);
+
+      const eyeGeo = new THREE.BoxGeometry(0.06, 0.08, 0.08);
+      const leftEye = new THREE.Mesh(eyeGeo, darkMat);
+      leftEye.position.set(-0.29, 0.52, 0.18);
+      const rightEye = new THREE.Mesh(eyeGeo, darkMat);
+      rightEye.position.set(0.29, 0.52, 0.18);
+      group.add(leftEye, rightEye);
+    }
 
     return group;
   }
 
-  static createTree(seedVariant        )              {
+  static createChicken()              {
+    return MeshFactory.createCharacter('chicken');
+  }
+
+  static createObstacle(kind              , seedVariant        , isSnowBiome          = false)              {
+    if (kind === 'rock') {
+      return MeshFactory.createRock(seedVariant);
+    }
+    if (kind === 'bush') {
+      return MeshFactory.createBush(seedVariant, isSnowBiome);
+    }
+    return MeshFactory.createTree(seedVariant, isSnowBiome);
+  }
+
+  static createTree(seedVariant        , isSnowBiome          = false)              {
     const group = new THREE.Group();
     const trunkMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
     const leavesMat = new THREE.MeshLambertMaterial({
-      color: seedVariant % 2 === 0 ? 0x16a34a : 0x15803d,
+      color: isSnowBiome ? 0xe2e8f0 : seedVariant % 2 === 0 ? 0x16a34a : 0x15803d,
     });
 
     const trunk = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.55, 0.42), trunkMat);
@@ -900,11 +1118,128 @@ class MeshFactory {
     return group;
   }
 
+  static createRock(seedVariant        )              {
+    const group = new THREE.Group();
+    const baseMat = new THREE.MeshLambertMaterial({ color: 0x64748b });
+    const topMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.44, 0.72), baseMat);
+    base.position.y = 0.22;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    group.add(base);
+
+    const top = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.28, 0.48), topMat);
+    top.position.set((seedVariant % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0);
+    top.castShadow = true;
+    group.add(top);
+
+    return group;
+  }
+
+  static createBush(seedVariant        , isSnowBiome          = false)              {
+    const group = new THREE.Group();
+    const bushMat = new THREE.MeshLambertMaterial({
+      color: isSnowBiome ? 0xdbeafe : 0x22c55e,
+    });
+    const berryMat = new THREE.MeshLambertMaterial({
+      color: seedVariant % 2 === 0 ? 0xef4444 : 0xf59e0b,
+    });
+
+    const main = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.48, 0.78), bushMat);
+    main.position.y = 0.24;
+    main.castShadow = true;
+    group.add(main);
+
+    const b1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
+    b1.position.set(-0.2, 0.46, 0.22);
+    const b2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
+    b2.position.set(0.22, 0.42, -0.18);
+    group.add(b1, b2);
+
+    return group;
+  }
+
+  static createCoin()              {
+    const group = new THREE.Group();
+    const goldMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+    const innerMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
+
+    const rim = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.44, 0.12), goldMat);
+    rim.position.y = 0.36;
+    rim.castShadow = true;
+    group.add(rim);
+
+    const center = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.15), innerMat);
+    center.position.y = 0.36;
+    group.add(center);
+
+    return group;
+  }
+
+  static createRailwaySignal()                                                {
+    const group = new THREE.Group();
+    const poleMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+    const lightMat = new THREE.MeshBasicMaterial({ color: 0x334155 });
+
+    const pole = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.2, 0.14), poleMat);
+    pole.position.y = 0.6;
+    pole.castShadow = true;
+    group.add(pole);
+
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.28, 0.24), poleMat);
+    box.position.y = 1.22;
+    group.add(box);
+
+    const lightMesh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.28), lightMat);
+    lightMesh.position.y = 1.22;
+    group.add(lightMesh);
+
+    return { group, lightMesh };
+  }
+
+  static createTrain(length        , speed        )              {
+    const group = new THREE.Group();
+    const bodyMat = new THREE.MeshLambertMaterial({ color: 0xdc2626 });
+    const stripeMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+    const beamMat = new THREE.MeshBasicMaterial({
+      color: 0xfef08a,
+      transparent: true,
+      opacity: 0.55,
+    });
+
+    const carBody = new THREE.Mesh(new THREE.BoxGeometry(length, 0.96, 0.84), bodyMat);
+    carBody.position.y = 0.54;
+    carBody.castShadow = true;
+    group.add(carBody);
+
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(length + 0.04, 0.18, 0.86), stripeMat);
+    stripe.position.y = 0.44;
+    group.add(stripe);
+
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(length * 0.96, 0.14, 0.72), roofMat);
+    roof.position.y = 1.08;
+    group.add(roof);
+
+    const headlightBeam = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.92), beamMat);
+    headlightBeam.position.set(length / 2 + 1.6, 0.22, 0);
+    group.add(headlightBeam);
+
+    group.rotation.y = vehicleScreenRotationY(speed);
+    return group;
+  }
+
   static createVehicle(v         )              {
     const group = new THREE.Group();
     const bodyMat = new THREE.MeshLambertMaterial({ color: v.color });
     const cabinMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
     const wheelMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+    const beamMat = new THREE.MeshBasicMaterial({
+      color: 0xfef08a,
+      transparent: true,
+      opacity: 0.28,
+    });
 
     if (v.type === 'truck') {
       const trailer = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.82, 0.78), cabinMat);
@@ -930,6 +1265,10 @@ class MeshFactory {
       group.add(top);
     }
 
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.04, 0.62), beamMat);
+    beam.position.set(v.length / 2 + 0.7, 0.08, 0);
+    group.add(beam);
+
     const wheelGeo = new THREE.BoxGeometry(0.28, 0.24, 0.82);
     const w1 = new THREE.Mesh(wheelGeo, wheelMat);
     w1.position.set(-v.length * 0.3, 0.14, 0);
@@ -938,7 +1277,6 @@ class MeshFactory {
     group.add(w1, w2);
 
     group.rotation.y = vehicleScreenRotationY(v.speed);
-
     return group;
   }
 
@@ -967,8 +1305,11 @@ class SceneManager {
           camera                          ;
           renderer                     ;
           dirLight                        ;
-          chicken             ;
+          playerMesh             ;
+          ghostMesh             ;
+          currentSkin         = 'chicken';
           renderedLanes = new Map                      ();
+          shakeIntensity = 0;
 
   constructor(container             ) {
     this.scene = new THREE.Scene();
@@ -992,28 +1333,29 @@ class SceneManager {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(this.renderer.domElement);
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.68);
-    this.scene.add(ambient);
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.68));
 
     this.dirLight = new THREE.DirectionalLight(0xfffbeb, 1.1);
     this.dirLight.position.set(14, 24, -12);
     this.dirLight.castShadow = true;
-    this.dirLight.shadow.mapSize.width = 2048;
-    this.dirLight.shadow.mapSize.height = 2048;
-    this.dirLight.shadow.camera.near = 1;
-    this.dirLight.shadow.camera.far = 60;
+    this.dirLight.shadow.mapSize.set(2048, 2048);
     const d = 18;
     this.dirLight.shadow.camera.left = -d;
     this.dirLight.shadow.camera.right = d;
     this.dirLight.shadow.camera.top = d;
     this.dirLight.shadow.camera.bottom = -d;
-    this.scene.add(this.dirLight);
-    this.scene.add(this.dirLight.target);
+    this.scene.add(this.dirLight, this.dirLight.target);
 
-    this.chicken = MeshFactory.createChicken();
-    this.scene.add(this.chicken);
+    this.playerMesh = MeshFactory.createCharacter('chicken');
+    this.ghostMesh = MeshFactory.createCharacter('chicken', true);
+    this.ghostMesh.visible = false;
+    this.scene.add(this.playerMesh, this.ghostMesh);
 
     window.addEventListener('resize', () => this.onResize());
+  }
+
+  triggerShake(intensity         = 0.45)       {
+    this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
   }
 
           onResize()       {
@@ -1033,18 +1375,21 @@ class SceneManager {
 
     const vehicleMeshes = new Map                        ();
     const logMeshes = new Map                        ();
+    const coinMeshes = new Map                        ();
+    const isSnow = Math.floor(Math.max(0, lane.index) / 35) % 3 === 2;
 
-    let stripColor = 0x4ade80;
+    let stripColor = isSnow ? 0xe2e8f0 : lane.index % 2 === 0 ? 0x4ade80 : 0x22c55e;
     let stripHeight = 0.24;
 
-    if (lane.type === LaneType.GRASS) {
-      stripColor = lane.index % 2 === 0 ? 0x4ade80 : 0x22c55e;
-    } else if (lane.type === LaneType.ROAD) {
+    if (lane.type === LaneType.ROAD) {
       stripColor = 0x334155;
       stripHeight = 0.16;
     } else if (lane.type === LaneType.RIVER) {
       stripColor = 0x0284c7;
       stripHeight = 0.08;
+    } else if (lane.type === LaneType.RAILWAY) {
+      stripColor = 0x475569;
+      stripHeight = 0.2;
     }
 
     const ground = new THREE.Mesh(
@@ -1063,12 +1408,31 @@ class SceneManager {
         dash.position.set(worldToScreenX(x), 0.01, 0);
         group.add(dash);
       }
+    } else if (lane.type === LaneType.RAILWAY) {
+      const railMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
+      const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
+      r1.position.set(0, 0.03, -0.26);
+      const r2 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
+      r2.position.set(0, 0.03, 0.26);
+      group.add(r1, r2);
     }
 
-    for (const treeX of lane.obstacles) {
-      const tree = MeshFactory.createTree(lane.index * 31 + treeX);
-      tree.position.x = worldToScreenX(treeX);
-      group.add(tree);
+    const details = lane.obstacleDetails?.length
+      ? lane.obstacleDetails
+      : lane.obstacles.map((x) => ({ x, kind: 'tree'          }));
+
+    for (const item of details) {
+      const treeX = item.x;
+      const mesh = MeshFactory.createObstacle(item.kind, lane.index * 31 + treeX, isSnow);
+      mesh.position.x = worldToScreenX(treeX);
+      group.add(mesh);
+    }
+
+    for (const coinX of lane.coins ?? []) {
+      const coin = MeshFactory.createCoin();
+      coin.position.x = worldToScreenX(coinX);
+      group.add(coin);
+      coinMeshes.set(coinX, coin);
     }
 
     for (const v of lane.vehicles) {
@@ -1085,12 +1449,40 @@ class SceneManager {
       logMeshes.set(log.id, mesh);
     }
 
-    return { group, vehicleMeshes, logMeshes };
+    let trainMesh                            ;
+    let signalLight                        ;
+    if (lane.type === LaneType.RAILWAY && lane.train) {
+      const sig = MeshFactory.createRailwaySignal();
+      sig.group.position.set(worldToScreenX(-2.5), 0, -0.38);
+      group.add(sig.group);
+      signalLight = sig.lightMesh;
+
+      trainMesh = MeshFactory.createTrain(lane.train.length, lane.train.speed);
+      trainMesh.position.x = worldToScreenX(lane.train.x);
+      trainMesh.visible = lane.train.isPassing;
+      group.add(trainMesh);
+    }
+
+    return { group, vehicleMeshes, logMeshes, coinMeshes, trainMesh, signalLight };
   }
 
   sync(engine            )       {
+    const selectedSkin = engine.getSelectedSkin();
+    if (selectedSkin !== this.currentSkin) {
+      this.currentSkin = selectedSkin;
+      this.scene.remove(this.playerMesh);
+      this.playerMesh = MeshFactory.createCharacter(selectedSkin);
+      this.scene.add(this.playerMesh);
+    }
+
+    const p = engine.getPlayer();
+    const biomePhase = Math.floor(Math.max(0, p.row) / 35) % 3;
+    const skyHex = biomePhase === 1 ? 0x1e1b4b : biomePhase === 2 ? 0xcbd5e1 : 0x87ceeb;
+    (this.scene.background               ).setHex(skyHex);
+
     const activeLanes = engine.getActiveLanes();
     const activeIndices = new Set        ();
+    const nowSec = performance.now() * 0.004;
 
     for (const lane of activeLanes) {
       activeIndices.add(lane.index);
@@ -1108,11 +1500,31 @@ class SceneManager {
 
       for (const log of lane.logs) {
         const m = rendered.logMeshes.get(log.id);
-        if (m) m.position.x = worldToScreenX(log.x);
+        if (m) {
+          m.position.x = worldToScreenX(log.x);
+          m.position.y = p.ridingLogId === log.id ? -0.06 : 0;
+        }
+      }
+
+      for (const [cx, coinMesh] of rendered.coinMeshes.entries()) {
+        if (!lane.coins?.includes(cx)) {
+          rendered.group.remove(coinMesh);
+          rendered.coinMeshes.delete(cx);
+        } else {
+          coinMesh.rotation.y = nowSec;
+        }
+      }
+
+      if (lane.train && rendered.trainMesh && rendered.signalLight) {
+        rendered.trainMesh.visible = lane.train.isPassing;
+        rendered.trainMesh.position.x = worldToScreenX(lane.train.x);
+        const blink = lane.train.isWarning && Math.floor(performance.now() / 120) % 2 === 0;
+        (rendered.signalLight.material                           ).color.setHex(
+          blink ? 0xef4444 : 0x334155
+        );
       }
     }
 
-    // Prune old lanes outside camera frustum
     for (const [idx, rendered] of this.renderedLanes.entries()) {
       if (!activeIndices.has(idx)) {
         this.scene.remove(rendered.group);
@@ -1120,38 +1532,49 @@ class SceneManager {
       }
     }
 
-    // Update chicken transform & hop parabola
-    const p = engine.getPlayer();
     const hopHeight = p.isHopping ? 4 * 0.75 * p.hopProgress * (1 - p.hopProgress) : 0;
-    const baseOffsetY = p.ridingLogId !== null ? 0.12 : 0;
+    const baseOffsetY = p.ridingLogId !== null ? 0.08 : 0;
+    this.playerMesh.position.set(worldToScreenX(p.x), baseOffsetY + hopHeight, p.row);
 
-    // Unified coordinate mapping: all entities use worldToScreenX(x) = -x
-    this.chicken.position.set(worldToScreenX(p.x), baseOffsetY + hopHeight, p.row);
-
-    if (p.facing === MoveDirection.FORWARD) this.chicken.rotation.y = 0;
-    else if (p.facing === MoveDirection.BACKWARD) this.chicken.rotation.y = Math.PI;
-    else if (p.facing === MoveDirection.LEFT) this.chicken.rotation.y = Math.PI / 2;
-    else if (p.facing === MoveDirection.RIGHT) this.chicken.rotation.y = -Math.PI / 2;
+    if (p.facing === MoveDirection.FORWARD) this.playerMesh.rotation.y = 0;
+    else if (p.facing === MoveDirection.BACKWARD) this.playerMesh.rotation.y = Math.PI;
+    else if (p.facing === MoveDirection.LEFT) this.playerMesh.rotation.y = Math.PI / 2;
+    else if (p.facing === MoveDirection.RIGHT) this.playerMesh.rotation.y = -Math.PI / 2;
 
     if (p.isDead) {
-      if (p.deathReason === 'CAR') {
-        this.chicken.scale.set(1.4, 0.15, 1.4);
+      if (p.deathReason === 'CAR' || p.deathReason === 'TRAIN') {
+        this.playerMesh.scale.set(1.4, 0.15, 1.4);
       } else if (p.deathReason === 'WATER') {
-        this.chicken.position.y = -0.5;
+        this.playerMesh.position.y = -0.5;
       }
     } else {
       const stretch = p.isHopping ? 1 + Math.sin(p.hopProgress * Math.PI) * 0.22 : 1;
-      this.chicken.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
+      this.playerMesh.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
     }
 
-    // Update isometric camera & shadow light tracking
-    const camZ = engine.getCameraZ();
-    this.camera.position.set(-7.5, 12.5, camZ - 7.5);
-    this.camera.lookAt(0, 0, camZ + 2.5);
+    const bestRow = engine.getBestRow();
+    if (bestRow > 0) {
+      this.ghostMesh.visible = true;
+      this.ghostMesh.position.set(worldToScreenX(0), 0.05, bestRow);
+    } else {
+      this.ghostMesh.visible = false;
+    }
 
+    const camZ = engine.getCameraZ();
+    let shakeX = 0;
+    let shakeZ = 0;
+    if (this.shakeIntensity > 0.01) {
+      shakeX = (Math.random() - 0.5) * this.shakeIntensity;
+      shakeZ = (Math.random() - 0.5) * this.shakeIntensity;
+      this.shakeIntensity *= 0.85;
+    } else {
+      this.shakeIntensity = 0;
+    }
+
+    this.camera.position.set(-7.5 + shakeX, 12.5, camZ - 7.5 + shakeZ);
+    this.camera.lookAt(0, 0, camZ + 2.5);
     this.dirLight.position.set(-12, 22, camZ - 6);
     this.dirLight.target.position.set(0, 0, camZ + 3);
-
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -1167,24 +1590,91 @@ class SceneManager {
 const container = document.getElementById('game-container') ;
 const scoreEl = document.getElementById('score-value') ;
 const highScoreEl = document.getElementById('high-score-value') ;
+const coinsEl = document.getElementById('coins-value') ;
+const comboEl = document.getElementById('combo-value') ;
+const gachaBtn = document.getElementById('gacha-btn') ;
+const gachaStatusEl = document.getElementById('gacha-status') ;
+const skinListEl = document.getElementById('skin-list') ;
 const gameOverModal = document.getElementById('game-over-modal') ;
 const deathReasonEl = document.getElementById('death-reason') ;
 const restartBtn = document.getElementById('restart-btn') ;
 
-const engine = new GameEngine(Date.now(), window.localStorage);
+const urlSeed = Number(new URLSearchParams(window.location.search).get('seed'));
+const initialSeed = Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : Date.now();
+
+const engine = new GameEngine(initialSeed, window.localStorage);
 const sceneManager = new SceneManager(container);
 const audio = new AudioSynth();
 
 let wasDead = false;
+let lastCoins = engine.getCoins();
+
+function renderSkinsUI()       {
+  const unlocked = engine.getUnlockedSkins();
+  const active = engine.getSelectedSkin();
+  skinListEl.innerHTML = '';
+
+  ALL_SKINS.forEach((skin, idx) => {
+    const isUnlocked = unlocked.includes(skin.id);
+    const btn = document.createElement('button');
+    btn.className = `skin-btn ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
+    btn.textContent = isUnlocked ? `${skin.badge} ${skin.name} [${idx + 1}]` : `🔒 ???`;
+    btn.disabled = !isUnlocked;
+    btn.addEventListener('click', () => {
+      if (engine.selectSkin(skin.id)) {
+        audio.playCoin();
+        renderSkinsUI();
+      }
+    });
+    skinListEl.appendChild(btn);
+  });
+
+  const remaining = ALL_SKINS.length - unlocked.length;
+  gachaBtn.textContent =
+    remaining > 0 ? `🎰 Гача (${WORLD_CONFIG.GACHA_COST} 🪙) [G]` : '✨ Все скины открыты!';
+}
+
+function handleGachaRoll()       {
+  const res = engine.rollGacha();
+  if (res.success && res.skinId) {
+    audio.playGacha();
+    const meta = ALL_SKINS.find((s) => s.id === res.skinId);
+    gachaStatusEl.textContent = `🎉 Выбит новый скин: ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+    lastCoins = engine.getCoins();
+    renderSkinsUI();
+  } else if (res.reason === 'ALL_UNLOCKED') {
+    gachaStatusEl.textContent = '✨ Вы уже собрали все 4 скина!';
+  } else {
+    gachaStatusEl.textContent = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${engine.getCoins()} 🪙)`;
+  }
+}
+
+gachaBtn.addEventListener('click', handleGachaRoll);
+renderSkinsUI();
 
 function triggerMove(dir                                                  )       {
   if (engine.getPlayer().isDead) return;
   if (engine.queueMove(dir)) {
-    audio.playHop();
+    audio.playHop(engine.getComboMultiplier());
   }
 }
 
 window.addEventListener('keydown', (e) => {
+  if (e.code === 'KeyG') {
+    e.preventDefault();
+    handleGachaRoll();
+    return;
+  }
+  if (['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code)) {
+    const idx = Number(e.code.replace('Digit', '')) - 1;
+    const skin = ALL_SKINS[idx];
+    if (skin && engine.selectSkin(skin.id          )) {
+      audio.playCoin();
+      renderSkinsUI();
+    }
+    return;
+  }
+
   if (engine.getPlayer().isDead) {
     if (e.code === 'Space' || e.code === 'Enter') {
       restartGame();
@@ -1217,26 +1707,20 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// On-screen mobile/click directional buttons
-document.querySelectorAll('[data-move]').forEach((btn) => {
-  btn.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    const dir = (btn               ).dataset.move                                                    ;
-    triggerMove(dir);
-  });
-});
-
 function restartGame()       {
   wasDead = false;
   gameOverModal.classList.add('hidden');
   sceneManager.clearAll();
   engine.reset(Date.now());
+  lastCoins = engine.getCoins();
+  renderSkinsUI();
 }
 
 restartBtn.addEventListener('click', restartGame);
 
 const DEATH_LABELS                         = {
   [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
+  [DeathReason.TRAIN]: 'Вас снёс скоростной экспресс на переезде!',
   [DeathReason.WATER]: 'Вы упали в бурную реку!',
   [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
   [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
@@ -1251,8 +1735,19 @@ function animate(now        )       {
   engine.step(dt);
   sceneManager.sync(engine);
 
+  const currentCoins = engine.getCoins();
+  if (currentCoins > lastCoins) {
+    audio.playCoin();
+    lastCoins = currentCoins;
+    renderSkinsUI();
+  }
+
   scoreEl.textContent = String(engine.getScore());
   highScoreEl.textContent = String(engine.getHighScore());
+  coinsEl.textContent = String(currentCoins);
+  const mult = engine.getComboMultiplier();
+  comboEl.textContent = `x${mult}`;
+  comboEl.style.color = mult >= 3 ? '#f43f5e' : mult === 2 ? '#fbbf24' : '#38bdf8';
 
   const p = engine.getPlayer();
   if (p.isDead && !wasDead) {
@@ -1261,6 +1756,7 @@ function animate(now        )       {
       audio.playSplash();
     } else {
       audio.playCrash();
+      sceneManager.triggerShake(p.deathReason === DeathReason.TRAIN ? 0.9 : 0.45);
     }
     deathReasonEl.textContent = DEATH_LABELS[p.deathReason] ?? 'Игра окончена';
     gameOverModal.classList.remove('hidden');

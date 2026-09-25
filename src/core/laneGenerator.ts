@@ -5,14 +5,17 @@ import {
   type Lane,
   type LaneTypeValue,
   type LogPlatform,
+  type ObstacleDetail,
+  type ObstacleKind,
+  type TrainState,
   type Vehicle,
 } from './types.ts';
 
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
+const OBSTACLE_KINDS: ObstacleKind[] = ['tree', 'rock', 'bush'];
 
 export class LaneGenerator {
   private readonly baseSeed: number;
-  private nextEntityId = 1;
 
   constructor(seed: number = 42) {
     this.baseSeed = seed >>> 0;
@@ -23,10 +26,6 @@ export class LaneGenerator {
     return new PRNG(hashed);
   }
 
-  /**
-   * Computes a deterministic safe corridor column X for a given row so that
-   * adjacent GRASS lanes always share at least 2 unblocked columns.
-   */
   private getSafeCorridorX(index: number): number {
     if (index <= 2) return 0;
     const rng = this.rowPrng(Math.floor(index / 2));
@@ -36,41 +35,44 @@ export class LaneGenerator {
   generateLane(index: number): Lane {
     const rng = this.rowPrng(index);
 
-    // Safe Spawn Zone: rows -3..2 are always GRASS
     let type: LaneTypeValue = LaneType.GRASS;
     if (index > 2) {
       const roll = rng.next();
-      if (roll < 0.38) {
+      if (roll < 0.36) {
         type = LaneType.GRASS;
-      } else if (roll < 0.75) {
+      } else if (roll < 0.68) {
         type = LaneType.ROAD;
-      } else {
+      } else if (roll < 0.88) {
         type = LaneType.RIVER;
+      } else {
+        type = LaneType.RAILWAY;
       }
     }
 
-    // Alternating direction for consecutive lanes (especially critical for RIVER)
     const direction: 1 | -1 = index % 2 === 0 ? 1 : -1;
     const difficultyFactor = 1 + Math.min(Math.max(0, index) * 0.01, 1.1);
     const speed = rng.nextFloat(1.8, 3.4) * difficultyFactor * direction;
 
     const obstacles: number[] = [];
+    const obstacleDetails: ObstacleDetail[] = [];
+    const coins: number[] = [];
     const vehicles: Vehicle[] = [];
     const logs: LogPlatform[] = [];
+    let train: TrainState | undefined;
 
     if (type === LaneType.GRASS) {
       const safeCurrent = this.getSafeCorridorX(index);
       const safePrev = this.getSafeCorridorX(index - 1);
 
       for (let x = WORLD_CONFIG.MIN_X; x <= WORLD_CONFIG.MAX_X; x++) {
-        // Keep central spawn area clear on rows -3..2
         if (index <= 2 && Math.abs(x) <= 2) continue;
-        // Keep safe corridor columns clear so adjacent GRASS rows always share passable columns
         if (x === safeCurrent || x === safePrev || x === 0) continue;
 
         const treeChance = index <= 0 ? 0.35 : 0.28;
         if (rng.next() < treeChance) {
           obstacles.push(x);
+          const kind = OBSTACLE_KINDS[rng.nextInt(0, OBSTACLE_KINDS.length - 1)];
+          obstacleDetails.push({ x, kind });
         }
       }
     } else if (type === LaneType.ROAD) {
@@ -107,14 +109,38 @@ export class LaneGenerator {
           speed: riverSpeed,
         });
       }
+    } else if (type === LaneType.RAILWAY) {
+      const period = rng.nextFloat(5.0, 7.5);
+      const trainSpeed = 32.0 * direction;
+      train = {
+        timer: rng.nextFloat(0, period * 0.7),
+        period,
+        warningDuration: 1.2,
+        isWarning: false,
+        isPassing: false,
+        x: -direction * (WORLD_CONFIG.WRAP_LIMIT + 10),
+        length: 14.0,
+        speed: trainSpeed,
+      };
+    }
+
+    // Spawn coins on unblocked tiles for rows > 0
+    if (index > 0 && type !== LaneType.RIVER && rng.next() < 0.55) {
+      const candidateX = rng.nextInt(-6, 6);
+      if (!obstacles.includes(candidateX)) {
+        coins.push(candidateX);
+      }
     }
 
     return {
       index,
       type,
       obstacles,
+      obstacleDetails,
+      coins,
       vehicles,
       logs,
+      train,
       direction,
       speed,
     };

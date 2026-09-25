@@ -2,6 +2,7 @@ export const LaneType = {
   GRASS: 'GRASS',
   ROAD: 'ROAD',
   RIVER: 'RIVER',
+  RAILWAY: 'RAILWAY',
 } as const;
 
 export type LaneTypeValue = (typeof LaneType)[keyof typeof LaneType];
@@ -18,6 +19,7 @@ export type MoveDirectionValue = (typeof MoveDirection)[keyof typeof MoveDirecti
 export const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
+  TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
@@ -25,42 +27,72 @@ export const DeathReason = {
 
 export type DeathReasonValue = (typeof DeathReason)[keyof typeof DeathReason];
 
+export type SkinId = 'chicken' | 'cyber_duck' | 'shadow_ninja' | 'frost_penguin';
+
+export const ALL_SKINS: ReadonlyArray<{ id: SkinId; name: string; badge: string }> = [
+  { id: 'chicken', name: 'Классическая Курица', badge: '🐔' },
+  { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
+  { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
+  { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
+];
+
+export type ObstacleKind = 'tree' | 'rock' | 'bush';
+
+export interface ObstacleDetail {
+  x: number;
+  kind: ObstacleKind;
+}
+
 export interface Vehicle {
   id: number;
-  x: number;       // Центр автомобиля по оси X
-  length: number;  // Длина автомобиля (в тайлах, напр. 1.4 для легковой, 2.4 для грузовика)
-  speed: number;   // Скорость (тайлов/сек, со знаком направления)
+  x: number;
+  length: number;
+  speed: number;
   type: 'car' | 'truck';
   color: number;
 }
 
 export interface LogPlatform {
   id: number;
-  x: number;       // Центр бревна по оси X
-  length: number;  // Длина бревна (в тайлах, напр. 2.5 .. 4.0)
-  speed: number;   // Скорость течения (тайлов/сек, со знаком направления)
+  x: number;
+  length: number;
+  speed: number;
+}
+
+export interface TrainState {
+  timer: number;
+  period: number;
+  warningDuration: number;
+  isWarning: boolean;
+  isPassing: boolean;
+  x: number;
+  length: number;
+  speed: number;
 }
 
 export interface Lane {
   index: number;
   type: LaneTypeValue;
-  obstacles: number[];    // Заблокированные целочисленные координаты X (деревья/камни на GRASS)
-  vehicles: Vehicle[];    // Автомобили (для ROAD)
-  logs: LogPlatform[];    // Брёвна (для RIVER)
-  direction: 1 | -1;      // Направление движения на полосе
-  speed: number;          // Базовая скорость полосы
+  obstacles: number[];
+  obstacleDetails: ObstacleDetail[];
+  coins: number[];
+  vehicles: Vehicle[];
+  logs: LogPlatform[];
+  train?: TrainState;
+  direction: 1 | -1;
+  speed: number;
 }
 
 export interface PlayerState {
-  row: number;            // Текущая полоса Z (целое число в покое, интерполируется при прыжке)
-  x: number;              // Координата X (целая на суше, непрерывная на бревне)
-  targetRow: number;      // Целевая полоса Z при прыжке
-  targetX: number;        // Целевая координата X при прыжке
-  startRow: number;       // Начальная полоса Z текущего прыжка
-  startX: number;         // Начальная координата X текущего прыжка
-  isHopping: boolean;     // Находится ли в фазе прыжка
-  hopProgress: number;    // Прогресс прыжка [0..1]
-  ridingLogId: number | null; // ID бревна, на котором стоит игрок (если на RIVER)
+  row: number;
+  x: number;
+  targetRow: number;
+  targetX: number;
+  startRow: number;
+  startX: number;
+  isHopping: boolean;
+  hopProgress: number;
+  ridingLogId: number | null;
   isDead: boolean;
   deathReason: DeathReasonValue;
   facing: MoveDirectionValue;
@@ -75,10 +107,11 @@ export const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
-  WRAP_LIMIT: 22,         // Граница бесшовного заворачивания трафика и брёвен за пределами экрана 16:9 / 21:9
-  HOP_DURATION: 0.12,     // Длительность прыжка (120 мс)
-  PLAYER_WIDTH: 0.65,     // Ширина хитбокса игрока
-  LOG_MARGIN: 0.12,       // Честный допуск посадки на торец бревна (без зависания над водой)
-  CAMERA_BACK_LIMIT: 5.5, // Максимальное отставание позади камеры
-  BASE_CAMERA_SPEED: 0.85 // Скорость ползущего скролла камеры (полос/сек)
+  WRAP_LIMIT: 22,
+  HOP_DURATION: 0.12,
+  PLAYER_WIDTH: 0.65,
+  LOG_MARGIN: 0.12,
+  CAMERA_BACK_LIMIT: 5.5,
+  BASE_CAMERA_SPEED: 0.85,
+  GACHA_COST: 10,
 } as const;

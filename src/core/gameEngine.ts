@@ -14,6 +14,7 @@ import {
   type Lane,
   type MoveDirectionValue,
   type PlayerState,
+  type SkinId,
   type StorageAdapter,
 } from './types.ts';
 
@@ -26,6 +27,10 @@ export class GameEngine {
   private player: PlayerState;
   private cameraZ = -1.0;
   private inputQueue: MoveDirectionValue[] = [];
+  private comboStreak = 0;
+  private comboTimer = 0;
+  private highestRowThisRun = 0;
+  private gachaNonce = 0;
 
   constructor(seed: number = 42, storage?: StorageAdapter) {
     this.generator = new LaneGenerator(seed);
@@ -95,6 +100,41 @@ export class GameEngine {
     return this.scoreTracker.getHighScore();
   }
 
+  getBestRow(): number {
+    return this.scoreTracker.getBestRow();
+  }
+
+  getCoins(): number {
+    return this.scoreTracker.getCoins();
+  }
+
+  addCoins(amount: number): void {
+    this.scoreTracker.addCoins(amount);
+  }
+
+  getUnlockedSkins(): SkinId[] {
+    return this.scoreTracker.getUnlockedSkins();
+  }
+
+  getSelectedSkin(): SkinId {
+    return this.scoreTracker.getSelectedSkin();
+  }
+
+  selectSkin(skinId: SkinId): boolean {
+    return this.scoreTracker.selectSkin(skinId);
+  }
+
+  rollGacha(): { success: boolean; skinId?: SkinId; reason?: string } {
+    this.gachaNonce += 1;
+    return this.scoreTracker.rollGacha(this.gachaNonce);
+  }
+
+  getComboMultiplier(): number {
+    if (this.comboStreak >= 6) return 3;
+    if (this.comboStreak >= 3) return 2;
+    return 1;
+  }
+
   queueMove(dir: MoveDirectionValue): boolean {
     if (this.player.isDead) return false;
     if (this.inputQueue.length < 2) {
@@ -125,18 +165,16 @@ export class GameEngine {
 
       const destLane = this.getLane(nextRow);
 
-      // Quantize X to integer grid whenever landing on non-RIVER lane (GRASS or ROAD)
       if (destLane.type !== LaneType.RIVER) {
         const quantized = Math.round(nextX);
         if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
-          continue; // Blocked by world boundary wall; try next queued command if any
+          continue;
         }
         nextX = quantizeLandX(nextX);
       }
 
-      // Block movement into a static tree obstacle on GRASS
       if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
-        continue; // Blocked by tree; try next queued command if any
+        continue;
       }
 
       this.player.startRow = this.player.row;
@@ -146,7 +184,6 @@ export class GameEngine {
       this.player.isHopping = true;
       this.player.hopProgress = 0;
 
-      // If jumping onto or along a RIVER lane, attach ridingLogId to the target log so drift continues mid-hop
       if (destLane.type === LaneType.RIVER) {
         const targetLog = findSupportingLog(nextX, destLane.logs);
         this.player.ridingLogId = targetLog ? targetLog.id : null;
@@ -159,12 +196,28 @@ export class GameEngine {
     return false;
   }
 
+  private checkCoinPickup(lane: Lane, x: number): void {
+    if (!Array.isArray(lane.coins) || lane.coins.length === 0) return;
+    const roundedX = Math.round(x);
+    const idx = lane.coins.indexOf(roundedX);
+    if (idx !== -1) {
+      lane.coins.splice(idx, 1);
+      this.scoreTracker.addCoins(1);
+    }
+  }
+
   step(dt: number): void {
     if (this.player.isDead || dt <= 0) return;
 
-    const currentLane = this.getLane(Math.round(this.player.row));
+    if (this.comboTimer > 0) {
+      this.comboTimer -= dt;
+      if (this.comboTimer <= 0) {
+        this.comboTimer = 0;
+        this.comboStreak = 0;
+      }
+    }
 
-    // 1. Update vehicles & logs across nearby lanes, and move player with log if riding
+    const currentLane = this.getLane(Math.round(this.player.row));
     const minSimRow = Math.floor(this.cameraZ) - 6;
     const maxSimRow = Math.floor(this.player.row) + 24;
 
@@ -181,7 +234,6 @@ export class GameEngine {
         const dx = log.speed * dt;
         log.x += dx;
 
-        // If player is standing on or hopping onto/along this log, apply identical delta dx
         if (this.player.ridingLogId === log.id) {
           if (this.player.isHopping && lane.index === this.player.targetRow) {
             this.player.startX += dx;
@@ -195,9 +247,28 @@ export class GameEngine {
         if (log.speed > 0 && log.x > WRAP_LIMIT) log.x = -WRAP_LIMIT;
         else if (log.speed < 0 && log.x < -WRAP_LIMIT) log.x = WRAP_LIMIT;
       }
+
+      if (lane.type === LaneType.RAILWAY && lane.train) {
+        const tr = lane.train;
+        if (tr.isPassing) {
+          tr.x += tr.speed * dt;
+          if (Math.abs(tr.x) > WRAP_LIMIT + 12) {
+            tr.isPassing = false;
+            tr.isWarning = false;
+            tr.timer = 0;
+          }
+        } else {
+          tr.timer += dt;
+          tr.isWarning = tr.timer >= tr.period - tr.warningDuration;
+          if (tr.timer >= tr.period) {
+            tr.isPassing = true;
+            tr.isWarning = true;
+            tr.x = tr.speed > 0 ? -(WRAP_LIMIT + 10) : WRAP_LIMIT + 10;
+          }
+        }
+      }
     }
 
-    // 2. Advance hop animation if hopping
     if (this.player.isHopping) {
       this.player.hopProgress += dt / WORLD_CONFIG.HOP_DURATION;
       if (this.player.hopProgress >= 1) {
@@ -207,7 +278,12 @@ export class GameEngine {
         this.player.x = this.player.targetX;
 
         this.ensureLanesAround(this.player.row);
-        this.scoreTracker.updateRow(this.player.row);
+        if (this.player.row > this.highestRowThisRun) {
+          this.highestRowThisRun = this.player.row;
+          this.comboStreak += 1;
+          this.comboTimer = 1.25;
+        }
+        this.scoreTracker.updateRow(this.player.row, this.getComboMultiplier());
 
         const landedLane = this.getLane(this.player.row);
         if (landedLane.type === LaneType.RIVER) {
@@ -221,9 +297,9 @@ export class GameEngine {
         } else {
           this.player.x = quantizeLandX(this.player.x);
           this.player.ridingLogId = null;
+          this.checkCoinPickup(landedLane, this.player.x);
         }
 
-        // Start buffered move if any
         if (this.inputQueue.length > 0) {
           this.tryStartNextHop();
         }
@@ -233,7 +309,6 @@ export class GameEngine {
         this.player.x = this.player.startX + (this.player.targetX - this.player.startX) * t;
       }
     } else if (currentLane.type === LaneType.RIVER) {
-      // Ensure player is still supported by a log
       const support = findSupportingLog(this.player.x, currentLane.logs);
       if (!support) {
         this.killPlayer(DeathReason.WATER);
@@ -242,24 +317,30 @@ export class GameEngine {
       this.player.ridingLogId = support.id;
     }
 
-    // 3. Check horizontal out-of-bounds (e.g. carried off-screen by a river log)
     if (isOutOfBoundsX(this.player.x)) {
       this.killPlayer(DeathReason.OUT_OF_BOUNDS);
       return;
     }
 
-    // 4. Check ROAD vehicle collisions
     const activeRow = Math.round(this.player.row);
     const activeLane = this.getLane(activeRow);
+    this.checkCoinPickup(activeLane, this.player.x);
+
     if (activeLane.type === LaneType.ROAD) {
       const hitCar = checkVehicleCollision(this.player.x, activeLane.vehicles);
       if (hitCar) {
         this.killPlayer(DeathReason.CAR);
         return;
       }
+    } else if (activeLane.type === LaneType.RAILWAY && activeLane.train?.isPassing) {
+      const tr = activeLane.train;
+      const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + tr.length) / 2;
+      if (Math.abs(this.player.x - tr.x) < halfSpan) {
+        this.killPlayer(DeathReason.TRAIN);
+        return;
+      }
     }
 
-    // 5. Update camera scrolling & check bottom camera frustum timeout
     const targetCamZ = this.player.row - 1.0;
     this.cameraZ += WORLD_CONFIG.BASE_CAMERA_SPEED * dt;
     if (targetCamZ > this.cameraZ) {
@@ -276,6 +357,8 @@ export class GameEngine {
     this.player.isDead = true;
     this.player.deathReason = reason;
     this.inputQueue = [];
+    this.comboStreak = 0;
+    this.comboTimer = 0;
   }
 
   reset(newSeed: number = Date.now()): void {
@@ -285,6 +368,9 @@ export class GameEngine {
     this.player = this.createInitialPlayer();
     this.cameraZ = -1.0;
     this.inputQueue = [];
+    this.comboStreak = 0;
+    this.comboTimer = 0;
+    this.highestRowThisRun = 0;
     this.ensureLanesAround(0);
   }
 }
