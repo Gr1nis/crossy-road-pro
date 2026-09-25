@@ -18,8 +18,9 @@ let wasDead = false;
 
 function triggerMove(dir: typeof MoveDirection[keyof typeof MoveDirection]): void {
   if (engine.getPlayer().isDead) return;
-  engine.queueMove(dir);
-  audio.playHop();
+  if (engine.queueMove(dir)) {
+    audio.playHop();
+  }
 }
 
 window.addEventListener('keydown', (e) => {

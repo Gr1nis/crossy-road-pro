@@ -75,12 +75,13 @@ export class LaneGenerator {
       }
     } else if (type === LaneType.ROAD) {
       const isTruckLane = rng.next() < 0.32;
-      const count = isTruckLane ? rng.nextInt(2, 3) : rng.nextInt(3, 4);
+      const count = isTruckLane ? rng.nextInt(3, 4) : rng.nextInt(4, 6);
       const vehicleLen = isTruckLane ? 2.3 : 1.35;
-      const spacing = 28 / count;
+      const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
+      const spacing = ringSpan / count;
 
       for (let i = 0; i < count; i++) {
-        const offset = -13 + i * spacing + rng.nextFloat(-0.8, 0.8);
+        const offset = -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-0.8, 0.8);
         vehicles.push({
           id: index * 100 + i + 1,
           x: offset,
@@ -91,13 +92,14 @@ export class LaneGenerator {
         });
       }
     } else if (type === LaneType.RIVER) {
-      const logCount = 3;
+      const logCount = 5;
       const logLen = rng.nextFloat(2.8, 3.8);
-      const spacing = 26 / logCount;
+      const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
+      const spacing = ringSpan / logCount;
       const riverSpeed = rng.nextFloat(1.3, 2.5) * difficultyFactor * direction;
 
       for (let i = 0; i < logCount; i++) {
-        const offset = -11 + i * spacing + rng.nextFloat(-0.6, 0.6);
+        const offset = -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-0.6, 0.6);
         logs.push({
           id: index * 100 + i + 1,
           x: offset,

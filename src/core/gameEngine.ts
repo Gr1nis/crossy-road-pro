@@ -17,7 +17,7 @@ import {
   type StorageAdapter,
 } from './types.ts';
 
-const WRAP_LIMIT = 14;
+const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;
 
 export class GameEngine {
   private generator: LaneGenerator;
@@ -95,55 +95,68 @@ export class GameEngine {
     return this.scoreTracker.getHighScore();
   }
 
-  queueMove(dir: MoveDirectionValue): void {
-    if (this.player.isDead) return;
+  queueMove(dir: MoveDirectionValue): boolean {
+    if (this.player.isDead) return false;
     if (this.inputQueue.length < 2) {
       this.inputQueue.push(dir);
     }
     if (!this.player.isHopping) {
-      this.tryStartNextHop();
+      return this.tryStartNextHop();
     }
+    return true;
   }
 
-  private tryStartNextHop(): void {
-    if (this.player.isDead || this.player.isHopping || this.inputQueue.length === 0) {
-      return;
+  private tryStartNextHop(): boolean {
+    if (this.player.isDead || this.player.isHopping) {
+      return false;
     }
 
-    const dir = this.inputQueue.shift()!;
-    this.player.facing = dir;
+    while (this.inputQueue.length > 0) {
+      const dir = this.inputQueue.shift()!;
+      this.player.facing = dir;
 
-    let nextRow = Math.round(this.player.row);
-    let nextX = this.player.x;
+      let nextRow = Math.round(this.player.row);
+      let nextX = this.player.x;
 
-    if (dir === MoveDirection.FORWARD) nextRow += 1;
-    else if (dir === MoveDirection.BACKWARD) nextRow -= 1;
-    else if (dir === MoveDirection.LEFT) nextX -= 1;
-    else if (dir === MoveDirection.RIGHT) nextX += 1;
+      if (dir === MoveDirection.FORWARD) nextRow += 1;
+      else if (dir === MoveDirection.BACKWARD) nextRow -= 1;
+      else if (dir === MoveDirection.LEFT) nextX -= 1;
+      else if (dir === MoveDirection.RIGHT) nextX += 1;
 
-    const destLane = this.getLane(nextRow);
+      const destLane = this.getLane(nextRow);
 
-    // Quantize X to integer grid whenever landing on non-RIVER lane (GRASS or ROAD)
-    if (destLane.type !== LaneType.RIVER) {
-      const quantized = Math.round(nextX);
-      if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
-        return; // Blocked by world boundary wall
+      // Quantize X to integer grid whenever landing on non-RIVER lane (GRASS or ROAD)
+      if (destLane.type !== LaneType.RIVER) {
+        const quantized = Math.round(nextX);
+        if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
+          continue; // Blocked by world boundary wall; try next queued command if any
+        }
+        nextX = quantizeLandX(nextX);
       }
-      nextX = quantizeLandX(nextX);
+
+      // Block movement into a static tree obstacle on GRASS
+      if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
+        continue; // Blocked by tree; try next queued command if any
+      }
+
+      this.player.startRow = this.player.row;
+      this.player.startX = this.player.x;
+      this.player.targetRow = nextRow;
+      this.player.targetX = nextX;
+      this.player.isHopping = true;
+      this.player.hopProgress = 0;
+
+      // If jumping onto or along a RIVER lane, attach ridingLogId to the target log so drift continues mid-hop
+      if (destLane.type === LaneType.RIVER) {
+        const targetLog = findSupportingLog(nextX, destLane.logs);
+        this.player.ridingLogId = targetLog ? targetLog.id : null;
+      } else {
+        this.player.ridingLogId = null;
+      }
+      return true;
     }
 
-    // Block movement into a static tree obstacle on GRASS
-    if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
-      return;
-    }
-
-    this.player.startRow = this.player.row;
-    this.player.startX = this.player.x;
-    this.player.targetRow = nextRow;
-    this.player.targetX = nextX;
-    this.player.isHopping = true;
-    this.player.hopProgress = 0;
-    this.player.ridingLogId = null;
+    return false;
   }
 
   step(dt: number): void {
@@ -168,14 +181,15 @@ export class GameEngine {
         const dx = log.speed * dt;
         log.x += dx;
 
-        // If player is standing on this log on this river lane, apply identical delta dx
-        if (
-          !this.player.isHopping &&
-          lane.index === Math.round(this.player.row) &&
-          this.player.ridingLogId === log.id
-        ) {
-          this.player.x += dx;
-          this.player.targetX = this.player.x;
+        // If player is standing on or hopping onto/along this log, apply identical delta dx
+        if (this.player.ridingLogId === log.id) {
+          if (this.player.isHopping && lane.index === this.player.targetRow) {
+            this.player.startX += dx;
+            this.player.targetX += dx;
+          } else if (!this.player.isHopping && lane.index === Math.round(this.player.row)) {
+            this.player.x += dx;
+            this.player.targetX = this.player.x;
+          }
         }
 
         if (log.speed > 0 && log.x > WRAP_LIMIT) log.x = -WRAP_LIMIT;

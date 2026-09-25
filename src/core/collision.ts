@@ -28,3 +28,18 @@ export function quantizeLandX(x: number): number {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
+
+/**
+ * Maps logical world X coordinate to Three.js right-handed X coordinate
+ * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
+ */
+export function worldToScreenX(x: number): number {
+  return x === 0 ? 0 : -x;
+}
+
+/**
+ * Returns vehicle Y-rotation so the front of the vehicle faces its movement direction on screen.
+ */
+export function vehicleScreenRotationY(speed: number): number {
+  return speed > 0 ? Math.PI : 0;
+}

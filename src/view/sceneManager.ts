@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { worldToScreenX } from '../core/collision.ts';
 import type { GameEngine } from '../core/gameEngine.ts';
 import { LaneType, MoveDirection, type Lane } from '../core/types.ts';
 import { MeshFactory } from './meshFactory.ts';
@@ -95,7 +96,7 @@ export class SceneManager {
     }
 
     const ground = new THREE.Mesh(
-      new THREE.BoxGeometry(30, stripHeight, 1),
+      new THREE.BoxGeometry(48, stripHeight, 1),
       new THREE.MeshLambertMaterial({ color: stripColor })
     );
     ground.position.y = -stripHeight / 2;
@@ -105,29 +106,29 @@ export class SceneManager {
     if (lane.type === LaneType.ROAD) {
       const dashGeo = new THREE.BoxGeometry(0.6, 0.02, 0.08);
       const dashMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
-      for (let x = -10; x <= 10; x += 2) {
+      for (let x = -20; x <= 20; x += 2) {
         const dash = new THREE.Mesh(dashGeo, dashMat);
-        dash.position.set(x, 0.01, 0);
+        dash.position.set(worldToScreenX(x), 0.01, 0);
         group.add(dash);
       }
     }
 
     for (const treeX of lane.obstacles) {
       const tree = MeshFactory.createTree(lane.index * 31 + treeX);
-      tree.position.x = treeX;
+      tree.position.x = worldToScreenX(treeX);
       group.add(tree);
     }
 
     for (const v of lane.vehicles) {
       const mesh = MeshFactory.createVehicle(v);
-      mesh.position.x = v.x;
+      mesh.position.x = worldToScreenX(v.x);
       group.add(mesh);
       vehicleMeshes.set(v.id, mesh);
     }
 
     for (const log of lane.logs) {
       const mesh = MeshFactory.createLog(log);
-      mesh.position.x = log.x;
+      mesh.position.x = worldToScreenX(log.x);
       group.add(mesh);
       logMeshes.set(log.id, mesh);
     }
@@ -150,12 +151,12 @@ export class SceneManager {
 
       for (const v of lane.vehicles) {
         const m = rendered.vehicleMeshes.get(v.id);
-        if (m) m.position.x = v.x;
+        if (m) m.position.x = worldToScreenX(v.x);
       }
 
       for (const log of lane.logs) {
         const m = rendered.logMeshes.get(log.id);
-        if (m) m.position.x = log.x;
+        if (m) m.position.x = worldToScreenX(log.x);
       }
     }
 
@@ -172,9 +173,8 @@ export class SceneManager {
     const hopHeight = p.isHopping ? 4 * 0.75 * p.hopProgress * (1 - p.hopProgress) : 0;
     const baseOffsetY = p.ridingLogId !== null ? 0.12 : 0;
 
-    // Note: In Three.js right-handed space with camera looking toward +Z,
-    // we invert X so MoveDirection.LEFT visually moves left on screen.
-    this.chicken.position.set(-p.x, baseOffsetY + hopHeight, p.row);
+    // Unified coordinate mapping: all entities use worldToScreenX(x) = -x
+    this.chicken.position.set(worldToScreenX(p.x), baseOffsetY + hopHeight, p.row);
 
     if (p.facing === MoveDirection.FORWARD) this.chicken.rotation.y = 0;
     else if (p.facing === MoveDirection.BACKWARD) this.chicken.rotation.y = Math.PI;

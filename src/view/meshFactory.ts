@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { vehicleScreenRotationY } from '../core/collision.ts';
 import type { LogPlatform, Vehicle } from '../core/types.ts';
 
 export class MeshFactory {
@@ -9,6 +10,14 @@ export class MeshFactory {
     const redMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
     const orangeMat = new THREE.MeshLambertMaterial({ color: 0xf97316 });
     const darkMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+
+    // Feet / Legs touching Y = 0
+    const legGeo = new THREE.BoxGeometry(0.1, 0.12, 0.14);
+    const leftLeg = new THREE.Mesh(legGeo, orangeMat);
+    leftLeg.position.set(-0.14, 0.06, 0);
+    const rightLeg = new THREE.Mesh(legGeo, orangeMat);
+    rightLeg.position.set(0.14, 0.06, 0);
+    group.add(leftLeg, rightLeg);
 
     // Body
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.62), whiteMat);
@@ -105,9 +114,7 @@ export class MeshFactory {
     w2.position.set(v.length * 0.3, 0.14, 0);
     group.add(w1, w2);
 
-    if (v.speed < 0) {
-      group.rotation.y = Math.PI;
-    }
+    group.rotation.y = vehicleScreenRotationY(v.speed);
 
     return group;
   }
@@ -117,13 +124,13 @@ export class MeshFactory {
     const barkMat = new THREE.MeshLambertMaterial({ color: 0x854d0e });
     const ringMat = new THREE.MeshLambertMaterial({ color: 0xfde047 });
 
-    const mainMesh = new THREE.Mesh(new THREE.BoxGeometry(log.length, 0.34, 0.68), barkMat);
+    const mainMesh = new THREE.Mesh(new THREE.BoxGeometry(log.length, 0.32, 0.72), barkMat);
     mainMesh.position.y = -0.04;
     mainMesh.receiveShadow = true;
     mainMesh.castShadow = true;
     group.add(mainMesh);
 
-    const ends = new THREE.Mesh(new THREE.BoxGeometry(log.length + 0.02, 0.22, 0.48), ringMat);
+    const ends = new THREE.Mesh(new THREE.BoxGeometry(log.length + 0.04, 0.22, 0.52), ringMat);
     ends.position.y = -0.04;
     group.add(ends);
 
