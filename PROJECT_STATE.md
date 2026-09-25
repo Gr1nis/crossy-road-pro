@@ -4,8 +4,10 @@
 - **Пайплайн**: `vibe-pro` (Все 5 фаз завершены: Бриф → Спецификация → RED TDD → GREEN Реализация → Аудит & Sync)
 - **Стек**: TypeScript + Three.js (Voxel Isometric 3D) + WebAudio API Synthesizer + Node 24 Test Runner
 - **Точки входа**:
-  - [index.html](file:///C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/index.html) — Автономная 3D-игра (готова к запуску двойным кликом в браузере).
-  - [crossy_road_plan.html](file:///C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/crossy_road_plan.html) — Инженерный анализ и архитектурный план в HTML-формате.
+  - **GitHub Pages (Live Игра):** [https://gr1nis.github.io/crossy-road-pro/](https://gr1nis.github.io/crossy-road-pro/)
+  - **GitHub Pages (Архитектурный план):** [https://gr1nis.github.io/crossy-road-pro/crossy_road_plan.html](https://gr1nis.github.io/crossy-road-pro/crossy_road_plan.html)
+  - [index.html](file:///Users/egorbelogubec/.gemini/antigravity/scratch/crossy-road-pro/index.html) — Автономная 3D-игра (готова к запуску двойным кликом в браузере).
+  - [crossy_road_plan.html](file:///Users/egorbelogubec/.gemini/antigravity/scratch/crossy-road-pro/crossy_road_plan.html) — Инженерный анализ и архитектурный план в HTML-формате.
 
 ## 2. Реализованные модули и их контракты
 - `src/core/types.ts`: Контракты `Lane`, `Vehicle`, `LogPlatform`, `PlayerState`, `WORLD_CONFIG`.
@@ -22,5 +24,5 @@
 3. **Score Monotonicity & Storage Resilience**: Счёт никогда не убывает при шагах назад; битые значения `LocalStorage` безопасно сбрасываются в `0`.
 
 ## 4. Текущий этап и Next Up
-- **Текущий этап**: Фаза 5 завершена (13/13 тестов GREEN, `index.html` скомпилирован).
+- **Текущий этап**: Фаза 5 завершена + **GitHub Pages развёрнут и активен** (`https://gr1nis.github.io/crossy-road-pro/`).
 - **Next Up**: Возможные расширения по желанию (поезда, таймер Орла, магазин воксельных скинов).
