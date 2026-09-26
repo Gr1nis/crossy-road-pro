@@ -130,13 +130,27 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
     assert.equal(engine.getPlayer().deathReason, DeathReason.CAR);
   });
 
-  it('Invariant 6 (Camera Scroll Timeout): standing still while camera advances past CAMERA_BACK_LIMIT triggers CAMERA_BEHIND death', () => {
+  it('Invariant 6 (Camera Scroll Timeout & Grace Period): crossing camera back edge does not kill immediately; requires grace period expiry', () => {
     const engine = new GameEngine(505);
-    // Do not move; step simulation forward for 10 seconds
-    for (let i = 0; i < 50; i++) {
-      engine.step(0.2);
+    // Advance camera until player row is past CAMERA_BACK_LIMIT
+    // CAMERA_BACK_LIMIT = 7.2, player is at row 0, base speed = 0.85
+    // Camera reaches 7.2 + 0.1 around 8.6 seconds
+    const stepDt = 0.1;
+    let crossedEdge = false;
+
+    for (let i = 0; i < 200; i++) {
+      engine.step(stepDt);
+      if (!crossedEdge && engine.getCameraZ() - engine.getPlayer().row > WORLD_CONFIG.CAMERA_BACK_LIMIT) {
+        crossedEdge = true;
+        // At the moment of crossing, player must NOT be dead yet thanks to the grace period!
+        assert.equal(engine.getPlayer().isDead, false, 'Player must remain alive during camera grace period');
+        assert.ok(engine.getCameraGraceRatio() > 0, 'Grace timer ratio should be actively counting');
+      }
+      if (engine.getPlayer().isDead) break;
     }
-    assert.equal(engine.getPlayer().isDead, true);
+
+    assert.equal(crossedEdge, true, 'Player should cross the camera back boundary');
+    assert.equal(engine.getPlayer().isDead, true, 'Player should die after grace period expires');
     assert.equal(engine.getPlayer().deathReason, DeathReason.CAMERA_BEHIND);
   });
 });

@@ -62,6 +62,9 @@ const htmlContent = `<!DOCTYPE html>
     .hud-circle-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
     .hud-circle-btn:active { transform: scale(0.95); }
 
+    /* Danger vignette at bottom when player crosses edge */
+    #warning-vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: linear-gradient(to top, rgba(239, 68, 68, 0.65) 0%, rgba(239, 68, 68, 0.2) 20%, transparent 45%); transition: opacity 0.15s ease-out; }
+
     .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
     .modal.hidden { display: none !important; }
     .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 36px 40px; text-align: center; color: #f8fafc; max-width: 460px; width: 90%; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); position: relative; }
@@ -118,6 +121,7 @@ const htmlContent = `<!DOCTYPE html>
 </head>
 <body>
   <div id="game-container"></div>
+  <div id="warning-vignette"></div>
 
   <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
   <div class="hud">

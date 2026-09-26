@@ -26,6 +26,7 @@ export class GameEngine {
   private scoreTracker: ScoreTracker;
   private player: PlayerState;
   private cameraZ = -1.0;
+  private cameraGraceTimer = 0;
   private inputQueue: MoveDirectionValue[] = [];
   private comboStreak = 0;
   private comboTimer = 0;
@@ -80,7 +81,7 @@ export class GameEngine {
   getActiveLanes(): Lane[] {
     this.ensureLanesAround(Math.round(this.player.row));
     const list: Lane[] = [];
-    const minRow = Math.floor(this.cameraZ) - 8;
+    const minRow = Math.floor(this.cameraZ) - 12;
     const maxRow = Math.floor(this.player.row) + 24;
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));
@@ -90,6 +91,10 @@ export class GameEngine {
 
   getCameraZ(): number {
     return this.cameraZ;
+  }
+
+  getCameraGraceRatio(): number {
+    return Math.min(1, this.cameraGraceTimer / WORLD_CONFIG.CAMERA_GRACE_PERIOD);
   }
 
   getScore(): number {
@@ -341,15 +346,23 @@ export class GameEngine {
       }
     }
 
+    // 5. Update camera scrolling & check bottom camera frustum with grace period
     const targetCamZ = this.player.row - 1.0;
     this.cameraZ += WORLD_CONFIG.BASE_CAMERA_SPEED * dt;
     if (targetCamZ > this.cameraZ) {
       this.cameraZ += (targetCamZ - this.cameraZ) * Math.min(1, dt * 8);
     }
 
+    // Only when player has actually crossed behind the visible screen edge,
+    // start grace timer so player has time to escape before dying.
     if (this.player.row < this.cameraZ - WORLD_CONFIG.CAMERA_BACK_LIMIT) {
-      this.killPlayer(DeathReason.CAMERA_BEHIND);
-      return;
+      this.cameraGraceTimer += dt;
+      if (this.cameraGraceTimer >= WORLD_CONFIG.CAMERA_GRACE_PERIOD) {
+        this.killPlayer(DeathReason.CAMERA_BEHIND);
+        return;
+      }
+    } else {
+      this.cameraGraceTimer = 0;
     }
   }
 
@@ -359,6 +372,7 @@ export class GameEngine {
     this.inputQueue = [];
     this.comboStreak = 0;
     this.comboTimer = 0;
+    this.cameraGraceTimer = 0;
   }
 
   reset(newSeed: number = Date.now()): void {
@@ -367,6 +381,7 @@ export class GameEngine {
     this.scoreTracker.resetCurrentScore();
     this.player = this.createInitialPlayer();
     this.cameraZ = -1.0;
+    this.cameraGraceTimer = 0;
     this.inputQueue = [];
     this.comboStreak = 0;
     this.comboTimer = 0;

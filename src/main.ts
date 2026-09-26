@@ -7,6 +7,7 @@ const container = document.getElementById('game-container')!;
 const scoreEl = document.getElementById('score-value')!;
 const coinsEl = document.getElementById('coins-value')!;
 const pauseBtn = document.getElementById('pause-btn')!;
+const warningVignetteEl = document.getElementById('warning-vignette');
 
 // Main Menu Elements
 const mainMenuModal = document.getElementById('main-menu-modal')!;
@@ -356,6 +357,15 @@ function animate(now: number): void {
 
   if (scoreEl) scoreEl.textContent = String(engine.getScore());
   if (coinsEl) coinsEl.textContent = String(currentCoins);
+
+  if (warningVignetteEl) {
+    if (isPlaying && !isPaused && !engine.getPlayer().isDead) {
+      const graceRatio = engine.getCameraGraceRatio();
+      warningVignetteEl.style.opacity = graceRatio > 0 ? String(0.3 + graceRatio * 0.7) : '0';
+    } else {
+      warningVignetteEl.style.opacity = '0';
+    }
+  }
 
   const p = engine.getPlayer();
   if (isPlaying && p.isDead && !wasDead) {
