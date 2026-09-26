@@ -1,0 +1,2444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crossy Road 3D — Vibe-Pro Edition</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; }
+    #game-container { width: 100%; height: 100%; position: relative; }
+    
+    /* Clean Minimal In-Game HUD: Coins, Distance & Pause button only */
+    .hud { position: fixed; top: 20px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
+    .hud-stats { display: flex; gap: 14px; }
+    .score-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.22); padding: 10px 22px; border-radius: 16px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
+    .score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 800; }
+    .score-number { font-size: 32px; font-weight: 900; line-height: 1.1; color: #38bdf8; }
+    .coins-number { color: #facc15; }
+    
+    .hud-actions { pointer-events: auto; }
+    .hud-circle-btn { width: 48px; height: 48px; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 2px solid rgba(255, 255, 255, 0.25); color: #fff; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: transform 0.1s ease, filter 0.1s; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
+    .hud-circle-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
+    .hud-circle-btn:active { transform: scale(0.95); }
+
+    /* Danger vignette at bottom when player crosses edge */
+    #warning-vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: linear-gradient(to top, rgba(239, 68, 68, 0.65) 0%, rgba(239, 68, 68, 0.2) 20%, transparent 45%); transition: opacity 0.15s ease-out; }
+
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
+    .modal.hidden { display: none !important; }
+    .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 36px 40px; text-align: center; color: #f8fafc; max-width: 460px; width: 90%; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); position: relative; }
+    .modal-card h1 { font-size: 36px; font-weight: 900; color: #38bdf8; margin-bottom: 6px; letter-spacing: -0.02em; text-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); }
+    .modal-card h2 { font-size: 26px; color: #f87171; margin-bottom: 8px; }
+    .modal-card p { color: #cbd5e1; margin-bottom: 24px; font-size: 15px; line-height: 1.5; }
+    
+    .menu-stats-row { display: flex; justify-content: center; gap: 16px; margin: 18px 0 24px; }
+    .menu-stat-pill { background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-radius: 12px; padding: 8px 16px; font-size: 13px; color: #94a3b8; font-weight: 700; }
+    .menu-stat-pill strong { color: #f8fafc; font-size: 15px; margin-left: 4px; }
+    .menu-stat-pill.gold strong { color: #facc15; }
+    
+    .menu-btn-stack { display: flex; flex-direction: column; gap: 12px; }
+    .menu-btn { width: 100%; border: none; padding: 15px 24px; font-size: 17px; font-weight: 800; border-radius: 14px; cursor: pointer; transition: transform 0.1s ease, filter 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); }
+    .menu-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+    .menu-btn:active { transform: translateY(0); }
+    .menu-btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 19px; }
+    .menu-btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; }
+    .menu-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; }
+    .menu-btn-slate { background: linear-gradient(135deg, #475569, #334155); color: #f8fafc; }
+    .menu-btn-secondary { background: #334155; color: #e2e8f0; }
+
+    .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+    .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; }
+    .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
+    .gacha-skin-card.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 14px rgba(56, 189, 248, 0.3); }
+    .gacha-skin-card.locked { opacity: 0.45; cursor: not-allowed; }
+    .gacha-skin-badge { font-size: 32px; margin-bottom: 4px; }
+    .gacha-skin-name { font-size: 13px; font-weight: 700; color: #f8fafc; }
+    .gacha-skin-tag { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-top: 4px; }
+    .gacha-skin-card.active .gacha-skin-tag { color: #38bdf8; }
+
+    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 18px; margin: 18px 0; text-align: left; }
+    .lb-row { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
+    .lb-row.header { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #334155; }
+    .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-radius: 8px; }
+    .placeholder-badge { display: inline-block; background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+
+    /* Settings Modal Styles */
+    .settings-group { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 16px 20px; margin: 20px 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+    .settings-row { display: flex; justify-content: space-between; align-items: center; }
+    .settings-label { font-size: 15px; font-weight: 700; color: #f8fafc; }
+    .settings-subtext { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .2s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .2s; border-radius: 50%; }
+    input:checked + .slider { background-color: #10b981; }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    .info-links { position: fixed; bottom: 20px; left: 24px; display: flex; gap: 10px; z-index: 15; }
+    .info-link { background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 12px; color: #e2e8f0; text-decoration: none; font-size: 13px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div id="game-container"></div>
+  <div id="warning-vignette"></div>
+
+  <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
+  <div class="hud">
+    <div class="hud-stats">
+      <div class="score-card">
+        <div class="score-label">Пройденный путь</div>
+        <div id="score-value" class="score-number">0</div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Монеты 🪙</div>
+        <div id="coins-value" class="score-number coins-number">0</div>
+      </div>
+    </div>
+
+    <div class="hud-actions">
+      <button id="pause-btn" class="hud-circle-btn" title="Пауза [Esc / P]">⏸</button>
+    </div>
+  </div>
+
+  <div class="info-links">
+    <a class="info-link" href="./crossy_road_plan.html" target="_blank" rel="noopener">📐 Архитектура (Plan)</a>
+    <a class="info-link" href="https://github.com/Gr1nis/crossy-road-pro" target="_blank" rel="noopener">🐙 GitHub</a>
+  </div>
+
+  <!-- Главное меню (Main Menu Modal) -->
+  <div id="main-menu-modal" class="modal">
+    <div class="modal-card">
+      <h1>CROSSY ROAD</h1>
+      <p>Классическая воксельная аркада с поездами, реками и скинами</p>
+
+      <div class="menu-stats-row">
+        <div class="menu-stat-pill">Рекорд: <strong id="menu-high-score">0</strong></div>
+        <div class="menu-stat-pill gold">Монеты: <strong id="menu-coins">0</strong> 🪙</div>
+      </div>
+
+      <div class="menu-btn-stack">
+        <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
+        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Гача-автомат (100 🪙)</button>
+        <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
+        <button id="menu-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Меню паузы (Pause Modal) -->
+  <div id="pause-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 style="color: #38bdf8;">⏸ ПАУЗА</h2>
+      <p>Игра приостановлена. Выберите действие:</p>
+
+      <div class="menu-btn-stack">
+        <button id="pause-resume-btn" class="menu-btn menu-btn-primary">▶ Продолжить (Esc / P)</button>
+        <button id="pause-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
+        <button id="pause-menu-btn" class="menu-btn menu-btn-secondary">🏠 Обратно в главное меню</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно настроек (Settings Modal) -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 style="color: #94a3b8;">⚙ НАСТРОЙКИ</h2>
+      <p>Параметры звука и управления</p>
+
+      <div class="settings-group">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Звуковые эффекты</div>
+            <div class="settings-subtext">Синтезатор прыжков, монет, поездов и аварий</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-sound-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button id="settings-close-btn" class="menu-btn menu-btn-primary">Готово</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно Гача-автомата -->
+  <div id="gacha-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 style="color: #fbbf24;">🎰 ГАЧА-АВТОМАТ</h2>
+      <p>Испытайте удачу и откройте новые воксельные скины!<br>Стоимость одного прокрута — <strong>100 монет</strong>.</p>
+
+      <div class="menu-stat-pill gold" style="display: inline-block; margin-bottom: 12px;">
+        Ваш баланс: <strong id="gacha-modal-coins">0</strong> 🪙
+      </div>
+
+      <div id="gacha-modal-status" class="gacha-status" style="margin-bottom: 8px;">1 прокрут = 100 монет</div>
+
+      <div id="gacha-modal-skin-list" class="gacha-modal-grid"></div>
+
+      <div class="menu-btn-stack">
+        <button id="gacha-modal-roll-btn" class="menu-btn menu-btn-amber">Крутить за 100 🪙</button>
+        <button id="gacha-modal-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно Таблицы лидеров (Заглушка) -->
+  <div id="leaderboard-modal" class="modal hidden">
+    <div class="modal-card">
+      <span class="placeholder-badge">СКОРО В ОБНОВЛЕНИИ</span>
+      <h2 style="color: #c084fc;">🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
+      <p>Глобальный рейтинг игроков находится в разработке и будет подключен в следующем обновлении.</p>
+
+      <div class="leaderboard-preview-box">
+        <div class="lb-row header">
+          <span>Ранг</span>
+          <span>Игрок</span>
+          <span>Рекорд</span>
+        </div>
+        <div class="lb-row current-player">
+          <span>#1 (Вы)</span>
+          <span>👤 Игрок</span>
+          <span id="leaderboard-best-score">0</span>
+        </div>
+        <div class="lb-row" style="opacity: 0.6;">
+          <span>#2</span>
+          <span>🤖 CyberDuck</span>
+          <span>142</span>
+        </div>
+        <div class="lb-row" style="opacity: 0.5;">
+          <span>#3</span>
+          <span>🤖 MasterChicken</span>
+          <span>98</span>
+        </div>
+      </div>
+
+      <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Экран Game Over -->
+  <div id="game-over-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Игра окончена!</h2>
+      <p id="death-reason">Вас сбил автомобиль!</p>
+      <div class="menu-btn-stack">
+        <button id="restart-btn" class="menu-btn menu-btn-primary">Играть снова (Space)</button>
+        <button id="to-menu-btn" class="menu-btn menu-btn-secondary">Главное меню (Esc)</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+import * as THREE from 'https://unpkg.com/three@0.170.0/build/three.module.js';
+
+// --- Module: src/core/types.ts ---
+const LaneType = {
+  GRASS: 'GRASS',
+  ROAD: 'ROAD',
+  RIVER: 'RIVER',
+  RAILWAY: 'RAILWAY',
+}         ;
+const MoveDirection = {
+  FORWARD: 'FORWARD',
+  BACKWARD: 'BACKWARD',
+  LEFT: 'LEFT',
+  RIGHT: 'RIGHT',
+}         ;
+const DeathReason = {
+  NONE: 'NONE',
+  CAR: 'CAR',
+  TRAIN: 'TRAIN',
+  WATER: 'WATER',
+  OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
+  CAMERA_BEHIND: 'CAMERA_BEHIND',
+}         ;
+const ALL_SKINS                                                             = [
+  { id: 'chicken', name: 'Классическая Курица', badge: '🐔' },
+  { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
+  { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
+  { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
+];
+const WORLD_CONFIG = {
+  MIN_X: -9,
+  MAX_X: 9,
+  OUT_OF_BOUNDS_X: 9.6,
+  WRAP_LIMIT: 22,
+  HOP_DURATION: 0.12,
+  PLAYER_WIDTH: 0.65,
+  LOG_MARGIN: 0.12,
+  CAMERA_BACK_LIMIT: 18.0,
+  CAMERA_GRACE_PERIOD: 1.25,
+  BASE_CAMERA_SPEED: 0.85,
+  GACHA_COST: 100,
+}         ;
+
+// --- Module: src/core/prng.ts ---
+class PRNG {
+          state        ;
+
+  constructor(seed         = 123456) {
+    this.state = (seed >>> 0) || 1;
+  }
+
+  next()         {
+    let t = (this.state += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+
+  nextInt(min        , max        )         {
+    return Math.floor(this.next() * (max - min + 1)) + min;
+  }
+
+  nextFloat(min        , max        )         {
+    return this.next() * (max - min) + min;
+  }
+}
+
+// --- Module: src/core/collision.ts ---
+function checkVehicleCollision(playerX        , vehicles           )                 {
+  for (const v of vehicles) {
+    const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + v.length) / 2;
+    if (Math.abs(playerX - v.x) < halfSpan) {
+      return v;
+    }
+  }
+  return null;
+}
+function findSupportingLog(playerX        , logs               )                     {
+  for (const log of logs) {
+    const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
+    if (Math.abs(playerX - log.x) <= halfLen) {
+      return log;
+    }
+  }
+  return null;
+}
+
+/**
+ * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
+ * relative to the center of the log, so the character cleanly magnets to a log section.
+ */
+function snapToLogSlot(landingX        , log             )         {
+  const rel = landingX - log.x;
+  // Discrete 1.0-spaced slots centered on log
+  const snappedRel = Math.round(rel);
+  const maxRel = Math.max(0, (log.length - 1.0) / 2);
+  const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
+  return log.x + clampedRel;
+}
+function isOutOfBoundsX(playerX        )          {
+  return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
+}
+function quantizeLandX(x        )         {
+  const rounded = Math.round(x);
+  return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
+}
+
+/**
+ * Maps logical world X coordinate to Three.js right-handed X coordinate
+ * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
+ */
+function worldToScreenX(x        )         {
+  return x === 0 ? 0 : -x;
+}
+
+/**
+ * Returns vehicle Y-rotation so the front of the vehicle faces its movement direction on screen.
+ */
+function vehicleScreenRotationY(speed        )         {
+  return speed > 0 ? Math.PI : 0;
+}
+
+/**
+ * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
+ * of the player character under the isometric orthographic camera.
+ * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
+ */
+function getCameraFrustumNdcY(playerX        , playerRow        , camZ        )         {
+  const sx = -playerX + 0.35;
+  const sy = 0.65;
+  const sz = playerRow + 0.35;
+  const dx = sx + 7.5;
+  const dy = sy - 12.5;
+  const dz = sz - camZ + 7.5;
+  const vy = dx * 0.42426406871192857 + dy * 0.7071067811865476 + dz * 0.565685424949238;
+  return vy / 11;
+}
+
+/**
+ * Returns true only when the player's 3D mesh has completely crossed below
+ * the visible bottom edge of the screen (NDC Y < -1.0).
+ */
+function isPlayerBehindCameraFrustum(playerX        , playerRow        , camZ        )          {
+  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -1.0;
+}
+
+// --- Module: src/core/scoreTracker.ts ---
+const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';
+class ScoreTracker {
+          currentScore = 0;
+          highScore = 0;
+          bestRow = 0;
+          coins = 0;
+          unlockedSkins           = ['chicken'];
+          selectedSkin         = 'chicken';
+          storage                 ;
+
+  constructor(storage                 ) {
+    this.storage = storage;
+    this.loadFromStorage();
+  }
+
+          loadFromStorage()       {
+    if (!this.storage) return;
+    try {
+      const rawHigh = this.storage.getItem(HIGH_SCORE_KEY);
+      if (rawHigh !== null) {
+        const parsed = Number(rawHigh);
+        if (Number.isFinite(parsed) && parsed >= 0) {
+          this.highScore = Math.floor(parsed);
+        }
+      }
+
+      const rawProfile = this.storage.getItem(PROFILE_KEY);
+      if (rawProfile) {
+        const data = JSON.parse(rawProfile)                         ;
+        if (typeof data.highScore === 'number' && Number.isFinite(data.highScore) && data.highScore > this.highScore) {
+          this.highScore = Math.floor(data.highScore);
+        }
+        if (typeof data.bestRow === 'number' && Number.isFinite(data.bestRow) && data.bestRow >= 0) {
+          this.bestRow = Math.floor(data.bestRow);
+        }
+        if (typeof data.coins === 'number' && Number.isFinite(data.coins) && data.coins >= 0) {
+          this.coins = Math.floor(data.coins);
+        }
+        const validSkinIds = new Set        (ALL_SKINS.map((s) => s.id));
+        if (Array.isArray(data.unlockedSkins)) {
+          const filtered = data.unlockedSkins.filter((s)              => validSkinIds.has(s));
+          this.unlockedSkins = Array.from(new Set        (['chicken', ...filtered]));
+        }
+        if (typeof data.selectedSkin === 'string' && this.unlockedSkins.includes(data.selectedSkin          )) {
+          this.selectedSkin = data.selectedSkin          ;
+        }
+      }
+    } catch {
+      // Resilient fallback on corrupted storage
+    }
+  }
+
+          saveToStorage()       {
+    if (!this.storage) return;
+    try {
+      this.storage.setItem(HIGH_SCORE_KEY, String(this.highScore));
+      const payload               = {
+        highScore: this.highScore,
+        bestRow: this.bestRow,
+        coins: this.coins,
+        unlockedSkins: this.unlockedSkins,
+        selectedSkin: this.selectedSkin,
+      };
+      this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
+    } catch {
+      // Ignore storage quota errors
+    }
+  }
+
+  updateRow(row        , multiplier         = 1)       {
+    const cleanRow = Math.floor(row);
+    if (cleanRow > this.bestRow) {
+      this.bestRow = cleanRow;
+    }
+    if (cleanRow > this.currentScore) {
+      const delta = cleanRow - this.currentScore;
+      this.currentScore += delta * Math.max(1, Math.floor(multiplier));
+      if (this.currentScore > this.highScore) {
+        this.highScore = this.currentScore;
+      }
+      this.saveToStorage();
+    }
+  }
+
+  getScore()         {
+    return this.currentScore;
+  }
+
+  getHighScore()         {
+    return this.highScore;
+  }
+
+  getBestRow()         {
+    return this.bestRow;
+  }
+
+  getCoins()         {
+    return this.coins;
+  }
+
+  addCoins(amount        )       {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    this.coins += Math.floor(amount);
+    this.saveToStorage();
+  }
+
+  getUnlockedSkins()           {
+    return [...this.unlockedSkins];
+  }
+
+  getSelectedSkin()         {
+    return this.selectedSkin;
+  }
+
+  selectSkin(skinId        )          {
+    if (!this.unlockedSkins.includes(skinId)) return false;
+    this.selectedSkin = skinId;
+    this.saveToStorage();
+    return true;
+  }
+
+  rollGacha(randomIndex         = 0)                                                         {
+    const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.unlockedSkins.includes(id));
+    if (locked.length === 0) {
+      return { success: false, reason: 'ALL_UNLOCKED' };
+    }
+    if (this.coins < WORLD_CONFIG.GACHA_COST) {
+      return { success: false, reason: 'NOT_ENOUGH_COINS' };
+    }
+    this.coins -= WORLD_CONFIG.GACHA_COST;
+    const idx = Math.abs(Math.floor(randomIndex)) % locked.length;
+    const chosen = locked[idx];
+    this.unlockedSkins.push(chosen);
+    this.selectedSkin = chosen;
+    this.saveToStorage();
+    return { success: true, skinId: chosen };
+  }
+
+  resetCurrentScore()       {
+    this.currentScore = 0;
+  }
+}
+
+// --- Module: src/core/laneGenerator.ts ---
+const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
+const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];
+class LaneGenerator {
+                   baseSeed        ;
+
+  constructor(seed         = 42) {
+    this.baseSeed = seed >>> 0;
+  }
+
+          rowPrng(index        )       {
+    const hashed = (this.baseSeed ^ Math.imul(index + 10007, 0x9e3779b9)) >>> 0;
+    return new PRNG(hashed);
+  }
+
+          getSafeCorridorX(index        )         {
+    if (index <= 2) return 0;
+    const rng = this.rowPrng(Math.floor(index / 2));
+    return rng.nextInt(-5, 5);
+  }
+
+  generateLane(index        )       {
+    const rng = this.rowPrng(index);
+
+    let type                = LaneType.GRASS;
+    if (index > 2) {
+      const roll = rng.next();
+      if (roll < 0.36) {
+        type = LaneType.GRASS;
+      } else if (roll < 0.68) {
+        type = LaneType.ROAD;
+      } else if (roll < 0.88) {
+        type = LaneType.RIVER;
+      } else {
+        type = LaneType.RAILWAY;
+      }
+    }
+
+    const direction         = index % 2 === 0 ? 1 : -1;
+    const difficultyFactor = 1 + Math.min(Math.max(0, index) * 0.01, 1.1);
+    const speed = rng.nextFloat(1.8, 3.4) * difficultyFactor * direction;
+
+    const obstacles           = [];
+    const obstacleDetails                   = [];
+    const coins           = [];
+    const vehicles            = [];
+    const logs                = [];
+    let train                        ;
+
+    if (type === LaneType.GRASS) {
+      const safeCurrent = this.getSafeCorridorX(index);
+      const safePrev = this.getSafeCorridorX(index - 1);
+
+      for (let x = WORLD_CONFIG.MIN_X; x <= WORLD_CONFIG.MAX_X; x++) {
+        if (index <= 2 && Math.abs(x) <= 2) continue;
+        if (x === safeCurrent || x === safePrev || x === 0) continue;
+
+        const treeChance = index <= 0 ? 0.35 : 0.28;
+        if (rng.next() < treeChance) {
+          obstacles.push(x);
+          const kind = OBSTACLE_KINDS[rng.nextInt(0, OBSTACLE_KINDS.length - 1)];
+          obstacleDetails.push({ x, kind });
+        }
+      }
+    } else if (type === LaneType.ROAD) {
+      const isTruckLane = rng.next() < 0.32;
+      const count = isTruckLane ? rng.nextInt(3, 4) : rng.nextInt(4, 6);
+      const vehicleLen = isTruckLane ? 2.3 : 1.35;
+      const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
+      const spacing = ringSpan / count;
+
+      for (let i = 0; i < count; i++) {
+        const offset = -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-0.8, 0.8);
+        vehicles.push({
+          id: index * 100 + i + 1,
+          x: offset,
+          length: vehicleLen,
+          speed,
+          type: isTruckLane ? 'truck' : 'car',
+          color: VEHICLE_COLORS[rng.nextInt(0, VEHICLE_COLORS.length - 1)],
+        });
+      }
+    } else if (type === LaneType.RIVER) {
+      const logCount = 5;
+      const logLen = rng.nextFloat(2.8, 3.8);
+      const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
+      const spacing = ringSpan / logCount;
+      const riverSpeed = rng.nextFloat(1.3, 2.5) * difficultyFactor * direction;
+
+      for (let i = 0; i < logCount; i++) {
+        const offset = -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-0.6, 0.6);
+        logs.push({
+          id: index * 100 + i + 1,
+          x: offset,
+          length: logLen,
+          speed: riverSpeed,
+        });
+      }
+    } else if (type === LaneType.RAILWAY) {
+      const period = rng.nextFloat(5.0, 7.5);
+      const trainSpeed = 32.0 * direction;
+      train = {
+        timer: rng.nextFloat(0, period * 0.7),
+        period,
+        warningDuration: 1.2,
+        isWarning: false,
+        isPassing: false,
+        x: -direction * (WORLD_CONFIG.WRAP_LIMIT + 10),
+        length: 14.0,
+        speed: trainSpeed,
+      };
+    }
+
+    // Spawn coins on unblocked tiles for rows > 0 (balanced arcade rarity)
+    if (index > 0 && type !== LaneType.RIVER && rng.next() < 0.22) {
+      const candidateX = rng.nextInt(-6, 6);
+      if (!obstacles.includes(candidateX)) {
+        coins.push(candidateX);
+      }
+    }
+
+    return {
+      index,
+      type,
+      obstacles,
+      obstacleDetails,
+      coins,
+      vehicles,
+      logs,
+      train,
+      direction,
+      speed,
+    };
+  }
+
+  generateRange(startIndex        , endIndex        )         {
+    const result         = [];
+    for (let i = startIndex; i <= endIndex; i++) {
+      result.push(this.generateLane(i));
+    }
+    return result;
+  }
+}
+
+// --- Module: src/core/gameEngine.ts ---
+const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;
+class GameEngine {
+          generator               ;
+          lanes = new Map              ();
+          scoreTracker              ;
+          player             ;
+          cameraZ = -1.0;
+          cameraGraceTimer = 0;
+          inputQueue                       = [];
+          comboStreak = 0;
+          comboTimer = 0;
+          highestRowThisRun = 0;
+          gachaNonce = 0;
+
+  constructor(seed         = 42, storage                 ) {
+    this.generator = new LaneGenerator(seed);
+    this.scoreTracker = new ScoreTracker(storage);
+    this.player = this.createInitialPlayer();
+    this.ensureLanesAround(0);
+  }
+
+          createInitialPlayer()              {
+    return {
+      row: 0,
+      x: 0,
+      targetRow: 0,
+      targetX: 0,
+      startRow: 0,
+      startX: 0,
+      isHopping: false,
+      hopProgress: 0,
+      ridingLogId: null,
+      isDead: false,
+      deathReason: DeathReason.NONE,
+      facing: MoveDirection.FORWARD,
+    };
+  }
+
+          ensureLanesAround(centerRow        )       {
+    const minR = Math.min(centerRow - 8, Math.floor(this.cameraZ) - 26);
+    const maxR = Math.max(centerRow + 28, Math.floor(this.cameraZ) + 28);
+    for (let r = minR; r <= maxR; r++) {
+      if (!this.lanes.has(r)) {
+        this.lanes.set(r, this.generator.generateLane(r));
+      }
+    }
+  }
+
+  getPlayer()              {
+    return this.player;
+  }
+
+  getLane(row        )       {
+    let lane = this.lanes.get(row);
+    if (!lane) {
+      lane = this.generator.generateLane(row);
+      this.lanes.set(row, lane);
+    }
+    return lane;
+  }
+
+  getActiveLanes()         {
+    this.ensureLanesAround(Math.round(this.player.row));
+    const list         = [];
+    const minRow = Math.min(Math.floor(this.cameraZ) - 24, Math.floor(this.player.row) - 8);
+    const maxRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
+    for (let r = minRow; r <= maxRow; r++) {
+      list.push(this.getLane(r));
+    }
+    return list;
+  }
+
+  getCameraZ()         {
+    return this.cameraZ;
+  }
+
+  getPlayerNdcY()         {
+    return getCameraFrustumNdcY(this.player.x, this.player.row, this.cameraZ);
+  }
+
+  isBehindCameraEdge()          {
+    return isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+  }
+
+  getCameraGraceTimer()         {
+    return this.cameraGraceTimer;
+  }
+
+  getCameraGraceRatio()         {
+    return Math.min(1, this.cameraGraceTimer / WORLD_CONFIG.CAMERA_GRACE_PERIOD);
+  }
+
+  getScore()         {
+    return this.scoreTracker.getScore();
+  }
+
+  getHighScore()         {
+    return this.scoreTracker.getHighScore();
+  }
+
+  getBestRow()         {
+    return this.scoreTracker.getBestRow();
+  }
+
+  getCoins()         {
+    return this.scoreTracker.getCoins();
+  }
+
+  addCoins(amount        )       {
+    this.scoreTracker.addCoins(amount);
+  }
+
+  getUnlockedSkins()           {
+    return this.scoreTracker.getUnlockedSkins();
+  }
+
+  getSelectedSkin()         {
+    return this.scoreTracker.getSelectedSkin();
+  }
+
+  selectSkin(skinId        )          {
+    return this.scoreTracker.selectSkin(skinId);
+  }
+
+  rollGacha()                                                         {
+    this.gachaNonce += 1;
+    return this.scoreTracker.rollGacha(this.gachaNonce);
+  }
+
+  getComboMultiplier()         {
+    if (this.comboStreak >= 6) return 3;
+    if (this.comboStreak >= 3) return 2;
+    return 1;
+  }
+
+  queueMove(dir                    )          {
+    if (this.player.isDead) return false;
+    if (this.inputQueue.length < 2) {
+      this.inputQueue.push(dir);
+    }
+    if (!this.player.isHopping) {
+      return this.tryStartNextHop();
+    }
+    return true;
+  }
+
+          tryStartNextHop()          {
+    if (this.player.isDead || this.player.isHopping) {
+      return false;
+    }
+
+    while (this.inputQueue.length > 0) {
+      const dir = this.inputQueue.shift() ;
+      this.player.facing = dir;
+
+      let nextRow = Math.round(this.player.row);
+      let nextX = this.player.x;
+
+      if (dir === MoveDirection.FORWARD) nextRow += 1;
+      else if (dir === MoveDirection.BACKWARD) nextRow -= 1;
+      else if (dir === MoveDirection.LEFT) nextX -= 1;
+      else if (dir === MoveDirection.RIGHT) nextX += 1;
+
+      const destLane = this.getLane(nextRow);
+
+      if (destLane.type !== LaneType.RIVER) {
+        const quantized = Math.round(nextX);
+        if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
+          continue;
+        }
+        nextX = quantizeLandX(nextX);
+      }
+
+      if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
+        continue;
+      }
+
+      this.player.startRow = this.player.row;
+      this.player.startX = this.player.x;
+      this.player.targetRow = nextRow;
+      this.player.targetX = nextX;
+      this.player.isHopping = true;
+      this.player.hopProgress = 0;
+
+      if (destLane.type === LaneType.RIVER) {
+        const targetLog = findSupportingLog(nextX, destLane.logs);
+        this.player.ridingLogId = targetLog ? targetLog.id : null;
+      } else {
+        this.player.ridingLogId = null;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+          checkCoinPickup(lane      , x        )       {
+    if (!Array.isArray(lane.coins) || lane.coins.length === 0) return;
+    const roundedX = Math.round(x);
+    const idx = lane.coins.indexOf(roundedX);
+    if (idx !== -1) {
+      lane.coins.splice(idx, 1);
+      this.scoreTracker.addCoins(1);
+    }
+  }
+
+  step(dt        )       {
+    if (this.player.isDead || dt <= 0) return;
+
+    if (this.comboTimer > 0) {
+      this.comboTimer -= dt;
+      if (this.comboTimer <= 0) {
+        this.comboTimer = 0;
+        this.comboStreak = 0;
+      }
+    }
+
+    const currentLane = this.getLane(Math.round(this.player.row));
+    const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
+
+    for (let r = minSimRow; r <= maxSimRow; r++) {
+      const lane = this.getLane(r);
+
+      for (const v of lane.vehicles) {
+        v.x += v.speed * dt;
+        if (v.speed > 0 && v.x > WRAP_LIMIT) v.x = -WRAP_LIMIT;
+        else if (v.speed < 0 && v.x < -WRAP_LIMIT) v.x = WRAP_LIMIT;
+      }
+
+      for (const log of lane.logs) {
+        const dx = log.speed * dt;
+        log.x += dx;
+
+        if (this.player.ridingLogId === log.id) {
+          if (this.player.isHopping && lane.index === this.player.targetRow) {
+            this.player.startX += dx;
+            this.player.targetX += dx;
+          } else if (!this.player.isHopping && lane.index === Math.round(this.player.row)) {
+            this.player.x += dx;
+            this.player.targetX = this.player.x;
+          }
+        }
+
+        if (log.speed > 0 && log.x > WRAP_LIMIT) log.x = -WRAP_LIMIT;
+        else if (log.speed < 0 && log.x < -WRAP_LIMIT) log.x = WRAP_LIMIT;
+      }
+
+      if (lane.type === LaneType.RAILWAY && lane.train) {
+        const tr = lane.train;
+        if (tr.isPassing) {
+          tr.x += tr.speed * dt;
+          if (Math.abs(tr.x) > WRAP_LIMIT + 12) {
+            tr.isPassing = false;
+            tr.isWarning = false;
+            tr.timer = 0;
+          }
+        } else {
+          tr.timer += dt;
+          tr.isWarning = tr.timer >= tr.period - tr.warningDuration;
+          if (tr.timer >= tr.period) {
+            tr.isPassing = true;
+            tr.isWarning = true;
+            tr.x = tr.speed > 0 ? -(WRAP_LIMIT + 10) : WRAP_LIMIT + 10;
+          }
+        }
+      }
+    }
+
+    if (this.player.isHopping) {
+      this.player.hopProgress += dt / WORLD_CONFIG.HOP_DURATION;
+      if (this.player.hopProgress >= 1) {
+        this.player.hopProgress = 0;
+        this.player.isHopping = false;
+        this.player.row = this.player.targetRow;
+        this.player.x = this.player.targetX;
+
+        this.ensureLanesAround(this.player.row);
+        if (this.player.row > this.highestRowThisRun) {
+          this.highestRowThisRun = this.player.row;
+          this.comboStreak += 1;
+          this.comboTimer = 1.25;
+        }
+        this.scoreTracker.updateRow(this.player.row, this.getComboMultiplier());
+
+        const landedLane = this.getLane(this.player.row);
+        if (landedLane.type === LaneType.RIVER) {
+          const support = findSupportingLog(this.player.x, landedLane.logs);
+          if (support) {
+            this.player.ridingLogId = support.id;
+            // Magnetize to the nearest discrete segment slot on the log
+            this.player.x = snapToLogSlot(this.player.x, support);
+            this.player.targetX = this.player.x;
+          } else {
+            this.killPlayer(DeathReason.WATER);
+            return;
+          }
+        } else {
+          this.player.x = quantizeLandX(this.player.x);
+          this.player.ridingLogId = null;
+          this.checkCoinPickup(landedLane, this.player.x);
+        }
+
+        if (this.inputQueue.length > 0) {
+          this.tryStartNextHop();
+        }
+      } else {
+        const t = this.player.hopProgress;
+        this.player.row = this.player.startRow + (this.player.targetRow - this.player.startRow) * t;
+        this.player.x = this.player.startX + (this.player.targetX - this.player.startX) * t;
+      }
+    } else if (currentLane.type === LaneType.RIVER) {
+      const support = findSupportingLog(this.player.x, currentLane.logs);
+      if (!support) {
+        this.killPlayer(DeathReason.WATER);
+        return;
+      }
+      this.player.ridingLogId = support.id;
+    }
+
+    if (isOutOfBoundsX(this.player.x)) {
+      this.killPlayer(DeathReason.OUT_OF_BOUNDS);
+      return;
+    }
+
+    const activeRow = Math.round(this.player.row);
+    const activeLane = this.getLane(activeRow);
+    this.checkCoinPickup(activeLane, this.player.x);
+
+    if (activeLane.type === LaneType.ROAD) {
+      const hitCar = checkVehicleCollision(this.player.x, activeLane.vehicles);
+      if (hitCar) {
+        this.killPlayer(DeathReason.CAR);
+        return;
+      }
+    } else if (activeLane.type === LaneType.RAILWAY && activeLane.train?.isPassing) {
+      const tr = activeLane.train;
+      const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + tr.length) / 2;
+      if (Math.abs(this.player.x - tr.x) < halfSpan) {
+        this.killPlayer(DeathReason.TRAIN);
+        return;
+      }
+    }
+
+    // 5. Update camera scrolling & check bottom camera frustum with grace period
+    const targetCamZ = this.player.row - 1.0;
+    this.cameraZ += WORLD_CONFIG.BASE_CAMERA_SPEED * dt;
+    if (targetCamZ > this.cameraZ) {
+      this.cameraZ += (targetCamZ - this.cameraZ) * Math.min(1, dt * 8);
+    }
+
+    // Only when player has actually crossed behind the visible screen edge,
+    // start grace timer so player has time to escape before dying.
+    const isBehindEdge = isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+    if (isBehindEdge) {
+      this.cameraGraceTimer += dt;
+      if (this.cameraGraceTimer >= WORLD_CONFIG.CAMERA_GRACE_PERIOD) {
+        this.killPlayer(DeathReason.CAMERA_BEHIND);
+        return;
+      }
+    } else {
+      this.cameraGraceTimer = 0;
+    }
+  }
+
+          killPlayer(reason                                              )       {
+    this.player.isDead = true;
+    this.player.deathReason = reason;
+    this.inputQueue = [];
+    this.comboStreak = 0;
+    this.comboTimer = 0;
+    this.cameraGraceTimer = 0;
+  }
+
+  reset(newSeed         = Date.now())       {
+    this.generator = new LaneGenerator(newSeed);
+    this.lanes.clear();
+    this.scoreTracker.resetCurrentScore();
+    this.player = this.createInitialPlayer();
+    this.cameraZ = -1.0;
+    this.cameraGraceTimer = 0;
+    this.inputQueue = [];
+    this.comboStreak = 0;
+    this.comboTimer = 0;
+    this.highestRowThisRun = 0;
+    this.ensureLanesAround(0);
+  }
+}
+
+// --- Module: src/view/audioSynth.ts ---
+class AudioSynth {
+          ctx                      = null;
+          soundEnabled          = true;
+          musicVolume         = 0.7;
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const savedSound = localStorage.getItem('crossy_setting_sound');
+      if (savedSound !== null) {
+        this.soundEnabled = savedSound !== 'false';
+      }
+    }
+  }
+
+  isSoundEnabled()          {
+    return this.soundEnabled;
+  }
+
+  setSoundEnabled(enabled         )       {
+    this.soundEnabled = enabled;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crossy_setting_sound', String(enabled));
+    }
+  }
+
+          ensureContext()                      {
+    if (typeof window === 'undefined' || !this.soundEnabled) return null;
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || (window                                                          ).webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    return this.ctx;
+  }
+
+  playHop(comboMultiplier         = 1, surface                                    = 'grass')       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const pitchScale = 1 + (Math.max(1, comboMultiplier) - 1) * 0.14;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    if (surface === 'log') {
+      // Warm hollow wooden clack
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(220 * pitchScale, now + 0.07);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.075);
+    } else if (surface === 'road') {
+      // Crisp asphalt tap
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(380 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(620 * pitchScale, now + 0.065);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+    } else if (surface === 'rail') {
+      // Metallic ping
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(520 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(780 * pitchScale, now + 0.08);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.085);
+    } else {
+      // Soft bouncy grass hop
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(310 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(560 * pitchScale, now + 0.09);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+    }
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
+
+  playCoin()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(987.77, now); // B5
+    osc.frequency.setValueAtTime(1318.51, now + 0.06); // E6
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.23);
+  }
+
+  playGacha()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+
+      gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + idx * 0.08 + 0.18);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + idx * 0.08);
+      osc.stop(now + idx * 0.08 + 0.19);
+    });
+  }
+
+  playTrainWhistle()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    [440, 554.37].forEach((freq) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.45);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.46);
+    });
+  }
+
+  playCrash()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(42, ctx.currentTime + 0.28);
+
+    gain.gain.setValueAtTime(0.26, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+  }
+
+  playSplash()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(420, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(95, ctx.currentTime + 0.25);
+
+    gain.gain.setValueAtTime(0.24, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.26);
+  }
+}
+
+// --- Module: src/view/meshFactory.ts ---
+class MeshFactory {
+  static createCharacter(skinId         = 'chicken', isGhost          = false)              {
+    const group = new THREE.Group();
+
+    const makeMat = (color        ) =>
+      new THREE.MeshLambertMaterial({
+        color: isGhost ? 0xfbbf24 : color,
+        transparent: isGhost,
+        opacity: isGhost ? 0.42 : 1.0,
+      });
+
+    const orangeMat = makeMat(0xf97316);
+    const darkMat = makeMat(0x1e293b);
+
+    // Legs touching Y = 0
+    const legGeo = new THREE.BoxGeometry(0.1, 0.12, 0.14);
+    const leftLeg = new THREE.Mesh(legGeo, orangeMat);
+    leftLeg.position.set(-0.14, 0.06, 0);
+    const rightLeg = new THREE.Mesh(legGeo, orangeMat);
+    rightLeg.position.set(0.14, 0.06, 0);
+    group.add(leftLeg, rightLeg);
+
+    if (skinId === 'cyber_duck') {
+      const yellowMat = makeMat(0xfacc15);
+      const visorMat = makeMat(0x06b6d4);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.54, 0.64), yellowMat);
+      body.position.y = 0.37;
+      body.castShadow = !isGhost;
+      group.add(body);
+
+      const bill = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.24), orangeMat);
+      bill.position.set(0, 0.44, 0.41);
+      group.add(bill);
+
+      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.14, 0.18), visorMat);
+      visor.position.set(0, 0.55, 0.26);
+      group.add(visor);
+    } else if (skinId === 'shadow_ninja') {
+      const suitMat = makeMat(0x0f172a);
+      const bandMat = makeMat(0xef4444);
+      const skinToneMat = makeMat(0xfde68a);
+      const steelMat = makeMat(0x94a3b8);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.58), suitMat);
+      body.position.y = 0.39;
+      body.castShadow = !isGhost;
+      group.add(body);
+
+      const faceSlit = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.06), skinToneMat);
+      faceSlit.position.set(0, 0.52, 0.28);
+      group.add(faceSlit);
+
+      const headband = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 0.62), bandMat);
+      headband.position.set(0, 0.62, 0);
+      group.add(headband);
+
+      const katana = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.72, 0.08), steelMat);
+      katana.position.set(0.18, 0.52, -0.33);
+      katana.rotation.z = -0.35;
+      group.add(katana);
+    } else if (skinId === 'frost_penguin') {
+      const navyMat = makeMat(0x1e3a8a);
+      const bellyMat = makeMat(0xf8fafc);
+      const scarfMat = makeMat(0x38bdf8);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.56), navyMat);
+      body.position.y = 0.39;
+      body.castShadow = !isGhost;
+      group.add(body);
+
+      const belly = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.44, 0.06), bellyMat);
+      belly.position.set(0, 0.36, 0.27);
+      group.add(belly);
+
+      const scarf = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.1, 0.62), scarfMat);
+      scarf.position.set(0, 0.48, 0);
+      group.add(scarf);
+
+      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.2), orangeMat);
+      beak.position.set(0, 0.53, 0.34);
+      group.add(beak);
+    } else {
+      const whiteMat = makeMat(0xffffff);
+      const redMat = makeMat(0xef4444);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.62), whiteMat);
+      body.position.y = 0.38;
+      body.castShadow = !isGhost;
+      body.receiveShadow = !isGhost;
+      group.add(body);
+
+      const comb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.32), redMat);
+      comb.position.set(0, 0.74, 0.05);
+      group.add(comb);
+
+      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.2), orangeMat);
+      beak.position.set(0, 0.48, 0.38);
+      group.add(beak);
+
+      const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.12), redMat);
+      wattle.position.set(0, 0.34, 0.34);
+      group.add(wattle);
+
+      const eyeGeo = new THREE.BoxGeometry(0.06, 0.08, 0.08);
+      const leftEye = new THREE.Mesh(eyeGeo, darkMat);
+      leftEye.position.set(-0.29, 0.52, 0.18);
+      const rightEye = new THREE.Mesh(eyeGeo, darkMat);
+      rightEye.position.set(0.29, 0.52, 0.18);
+      group.add(leftEye, rightEye);
+    }
+
+    return group;
+  }
+
+  static createChicken()              {
+    return MeshFactory.createCharacter('chicken');
+  }
+
+  static createObstacle(kind              , seedVariant        , isSnowBiome          = false)              {
+    if (kind === 'rock') {
+      return MeshFactory.createRock(seedVariant);
+    }
+    if (kind === 'bush') {
+      return MeshFactory.createBush(seedVariant, isSnowBiome);
+    }
+    return MeshFactory.createTree(seedVariant, isSnowBiome);
+  }
+
+  static createTree(seedVariant        , isSnowBiome          = false)              {
+    const group = new THREE.Group();
+    const trunkMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
+    const leavesMat = new THREE.MeshLambertMaterial({
+      color: isSnowBiome ? 0xe2e8f0 : seedVariant % 2 === 0 ? 0x16a34a : 0x15803d,
+    });
+
+    const trunk = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.55, 0.42), trunkMat);
+    trunk.position.y = 0.275;
+    trunk.castShadow = true;
+    trunk.receiveShadow = true;
+    group.add(trunk);
+
+    const height = 0.9 + (Math.abs(seedVariant) % 3) * 0.28;
+    const crown = new THREE.Mesh(new THREE.BoxGeometry(0.82, height, 0.82), leavesMat);
+    crown.position.y = 0.55 + height / 2;
+    crown.castShadow = true;
+    crown.receiveShadow = true;
+    group.add(crown);
+
+    return group;
+  }
+
+  static createRock(seedVariant        )              {
+    const group = new THREE.Group();
+    const baseMat = new THREE.MeshLambertMaterial({ color: 0x64748b });
+    const topMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.44, 0.72), baseMat);
+    base.position.y = 0.22;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    group.add(base);
+
+    const top = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.28, 0.48), topMat);
+    top.position.set((seedVariant % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0);
+    top.castShadow = true;
+    group.add(top);
+
+    return group;
+  }
+
+  static createBush(seedVariant        , isSnowBiome          = false)              {
+    const group = new THREE.Group();
+    const bushMat = new THREE.MeshLambertMaterial({
+      color: isSnowBiome ? 0xdbeafe : 0x22c55e,
+    });
+    const berryMat = new THREE.MeshLambertMaterial({
+      color: seedVariant % 2 === 0 ? 0xef4444 : 0xf59e0b,
+    });
+
+    const main = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.48, 0.78), bushMat);
+    main.position.y = 0.24;
+    main.castShadow = true;
+    group.add(main);
+
+    const b1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
+    b1.position.set(-0.2, 0.46, 0.22);
+    const b2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
+    b2.position.set(0.22, 0.42, -0.18);
+    group.add(b1, b2);
+
+    return group;
+  }
+
+  static createCoin()              {
+    const group = new THREE.Group();
+    const goldMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+    const innerMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
+
+    const rim = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.44, 0.12), goldMat);
+    rim.position.y = 0.36;
+    rim.castShadow = true;
+    group.add(rim);
+
+    const center = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.15), innerMat);
+    center.position.y = 0.36;
+    group.add(center);
+
+    return group;
+  }
+
+  static createRailwaySignal()                                                {
+    const group = new THREE.Group();
+    const poleMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+    const lightMat = new THREE.MeshBasicMaterial({ color: 0x334155 });
+
+    const pole = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.2, 0.14), poleMat);
+    pole.position.y = 0.6;
+    pole.castShadow = true;
+    group.add(pole);
+
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.28, 0.24), poleMat);
+    box.position.y = 1.22;
+    group.add(box);
+
+    const lightMesh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.28), lightMat);
+    lightMesh.position.y = 1.22;
+    group.add(lightMesh);
+
+    return { group, lightMesh };
+  }
+
+  static createTrain(length        , speed        )              {
+    const group = new THREE.Group();
+    const bodyMat = new THREE.MeshLambertMaterial({ color: 0xdc2626 });
+    const stripeMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+    const beamMat = new THREE.MeshBasicMaterial({
+      color: 0xfef08a,
+      transparent: true,
+      opacity: 0.55,
+    });
+
+    const carBody = new THREE.Mesh(new THREE.BoxGeometry(length, 0.96, 0.84), bodyMat);
+    carBody.position.y = 0.54;
+    carBody.castShadow = true;
+    group.add(carBody);
+
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(length + 0.04, 0.18, 0.86), stripeMat);
+    stripe.position.y = 0.44;
+    group.add(stripe);
+
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(length * 0.96, 0.14, 0.72), roofMat);
+    roof.position.y = 1.08;
+    group.add(roof);
+
+    const headlightBeam = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.92), beamMat);
+    headlightBeam.position.set(length / 2 + 1.6, 0.22, 0);
+    group.add(headlightBeam);
+
+    group.rotation.y = vehicleScreenRotationY(speed);
+    return group;
+  }
+
+  static createVehicle(v         )              {
+    const group = new THREE.Group();
+    const bodyMat = new THREE.MeshLambertMaterial({ color: v.color });
+    const cabinMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+    const wheelMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+    const beamMat = new THREE.MeshBasicMaterial({
+      color: 0xfef08a,
+      transparent: true,
+      opacity: 0.28,
+    });
+
+    if (v.type === 'truck') {
+      const trailer = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.82, 0.78), cabinMat);
+      trailer.position.set(-v.length * 0.14, 0.52, 0);
+      trailer.castShadow = true;
+      trailer.receiveShadow = true;
+      group.add(trailer);
+
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.28, 0.68, 0.74), bodyMat);
+      cab.position.set(v.length * 0.34, 0.44, 0);
+      cab.castShadow = true;
+      group.add(cab);
+    } else {
+      const chassis = new THREE.Mesh(new THREE.BoxGeometry(v.length, 0.42, 0.74), bodyMat);
+      chassis.position.y = 0.32;
+      chassis.castShadow = true;
+      chassis.receiveShadow = true;
+      group.add(chassis);
+
+      const top = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.56, 0.32, 0.64), cabinMat);
+      top.position.set(-0.05, 0.66, 0);
+      top.castShadow = true;
+      group.add(top);
+    }
+
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.04, 0.62), beamMat);
+    beam.position.set(v.length / 2 + 0.7, 0.08, 0);
+    group.add(beam);
+
+    const wheelGeo = new THREE.BoxGeometry(0.28, 0.24, 0.82);
+    const w1 = new THREE.Mesh(wheelGeo, wheelMat);
+    w1.position.set(-v.length * 0.3, 0.14, 0);
+    const w2 = new THREE.Mesh(wheelGeo, wheelMat);
+    w2.position.set(v.length * 0.3, 0.14, 0);
+    group.add(w1, w2);
+
+    group.rotation.y = vehicleScreenRotationY(v.speed);
+    return group;
+  }
+
+  static createLog(log             )              {
+    const group = new THREE.Group();
+    const barkMat = new THREE.MeshLambertMaterial({ color: 0x854d0e });
+    const ringMat = new THREE.MeshLambertMaterial({ color: 0xfde047 });
+
+    const mainMesh = new THREE.Mesh(new THREE.BoxGeometry(log.length, 0.32, 0.72), barkMat);
+    mainMesh.position.y = -0.04;
+    mainMesh.receiveShadow = true;
+    mainMesh.castShadow = true;
+    group.add(mainMesh);
+
+    const ends = new THREE.Mesh(new THREE.BoxGeometry(log.length + 0.04, 0.22, 0.52), ringMat);
+    ends.position.y = -0.04;
+    group.add(ends);
+
+    // Visual segment notches representing magnet slots on the log
+    const notchMat = new THREE.MeshLambertMaterial({ color: 0x582a08 });
+    const slotCount = Math.floor(log.length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
+        const notch = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.33, 0.73), notchMat);
+        notch.position.set(s, -0.04, 0);
+        group.add(notch);
+      }
+    }
+
+    return group;
+  }
+
+  static createWaterfallEdge(side                  )              {
+    const group = new THREE.Group();
+    // Rock cliff bank
+    const cliffMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+    const cliff = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.4, 1.0), cliffMat);
+    cliff.position.set(0, -1.2, 0);
+    cliff.receiveShadow = true;
+    group.add(cliff);
+
+    // Falling water column
+    const waterFallMat = new THREE.MeshLambertMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.88,
+    });
+    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.9), waterFallMat);
+    const fallOffset = side === 'left' ? -0.22 : 0.22;
+    fall.position.set(fallOffset, -1.15, 0);
+    group.add(fall);
+
+    // Foam mist crest at the top
+    const foamMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.94), foamMat);
+    foamTop.position.set(fallOffset, -0.05, 0);
+    group.add(foamTop);
+
+    // Splash bottom block
+    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.96), foamMat);
+    splash.position.set(fallOffset, -2.15, 0);
+    group.add(splash);
+
+    return group;
+  }
+
+  static createRoadMarkings()              {
+    const group = new THREE.Group();
+    const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+    const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); // Amber center dashes
+
+    // Continuous solid white shoulder lines at boundary edges
+    const solidEdgeGeo = new THREE.BoxGeometry(0.12, 0.02, 1.0);
+    const leftSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
+    leftSolid.position.set(worldToScreenX(-9.5), 0.015, 0);
+    const rightSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
+    rightSolid.position.set(worldToScreenX(9.5), 0.015, 0);
+    group.add(leftSolid, rightSolid);
+
+    // Dashed center lane markings
+    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.1);
+    for (let x = -9; x <= 9; x += 1.8) {
+      const dash = new THREE.Mesh(dashGeo, dashMat);
+      dash.position.set(worldToScreenX(x), 0.015, 0);
+      group.add(dash);
+    }
+
+    return group;
+  }
+}
+
+// --- Module: src/view/sceneManager.ts ---
+class SceneManager {
+          scene             ;
+          camera                          ;
+          renderer                     ;
+          dirLight                        ;
+          playerMesh             ;
+          currentSkin         = 'chicken';
+          renderedLanes = new Map                      ();
+          shakeIntensity = 0;
+          particles             = [];
+          lastHoppingState = false;
+
+  constructor(container             ) {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x87ceeb);
+
+    const aspect = window.innerWidth / window.innerHeight;
+    const viewSize = 11;
+    this.camera = new THREE.OrthographicCamera(
+      -viewSize * aspect,
+      viewSize * aspect,
+      viewSize,
+      -viewSize,
+      -30,
+      80
+    );
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(this.renderer.domElement);
+
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.68));
+
+    this.dirLight = new THREE.DirectionalLight(0xfffbeb, 1.1);
+    this.dirLight.position.set(14, 24, -12);
+    this.dirLight.castShadow = true;
+    this.dirLight.shadow.mapSize.set(2048, 2048);
+    const d = 18;
+    this.dirLight.shadow.camera.left = -d;
+    this.dirLight.shadow.camera.right = d;
+    this.dirLight.shadow.camera.top = d;
+    this.dirLight.shadow.camera.bottom = -d;
+    this.scene.add(this.dirLight, this.dirLight.target);
+
+    this.playerMesh = MeshFactory.createCharacter('chicken');
+    this.scene.add(this.playerMesh);
+
+    window.addEventListener('resize', () => this.onResize());
+  }
+
+  triggerShake(intensity         = 0.45)       {
+    this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
+  }
+
+  spawnHopPuff(x        , y        , z        , color        , count         = 6)       {
+    const geo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    const mat = new THREE.MeshLambertMaterial({ color });
+
+    for (let i = 0; i < count; i++) {
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(
+        worldToScreenX(x) + (Math.random() - 0.5) * 0.35,
+        y + 0.05,
+        z + (Math.random() - 0.5) * 0.35
+      );
+      this.scene.add(mesh);
+
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.0 + Math.random() * 1.5;
+      this.particles.push({
+        mesh,
+        vx: Math.cos(angle) * speed,
+        vy: 1.2 + Math.random() * 2.0,
+        vz: Math.sin(angle) * speed,
+        life: 0,
+        maxLife: 0.35 + Math.random() * 0.2,
+      });
+    }
+  }
+
+  spawnDeathFeathers(x        , y        , z        , reason        )       {
+    const isWater = reason === 'WATER';
+    const isTrain = reason === 'TRAIN';
+    const count = isTrain ? 28 : isWater ? 18 : 20;
+    const colors = isWater
+      ? [0x38bdf8, 0x0284c7, 0xffffff]
+      : [0xffffff, 0xf97316, 0xef4444, 0xfacc15];
+
+    for (let i = 0; i < count; i++) {
+      const c = colors[Math.floor(Math.random() * colors.length)];
+      const size = isWater ? 0.09 + Math.random() * 0.06 : 0.12 + Math.random() * 0.1;
+      const geo = new THREE.BoxGeometry(size, size, size);
+      const mat = new THREE.MeshLambertMaterial({ color: c });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(
+        worldToScreenX(x) + (Math.random() - 0.5) * 0.4,
+        y + 0.2,
+        z + (Math.random() - 0.5) * 0.4
+      );
+      this.scene.add(mesh);
+
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI * 0.5;
+      const spd = isTrain ? 4.5 + Math.random() * 5.0 : 2.5 + Math.random() * 3.5;
+
+      this.particles.push({
+        mesh,
+        vx: Math.cos(theta) * Math.sin(phi) * spd,
+        vy: Math.cos(phi) * spd + 1.5,
+        vz: Math.sin(theta) * Math.sin(phi) * spd,
+        life: 0,
+        maxLife: 0.55 + Math.random() * 0.35,
+      });
+    }
+  }
+
+          updateParticles(dt        )       {
+    const gravity = -14.0;
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.life += dt;
+      if (p.life >= p.maxLife) {
+        this.scene.remove(p.mesh);
+        p.mesh.geometry.dispose();
+        this.particles.splice(i, 1);
+        continue;
+      }
+
+      p.vy += gravity * dt;
+      p.mesh.position.x += p.vx * dt;
+      p.mesh.position.y += p.vy * dt;
+      p.mesh.position.z += p.vz * dt;
+
+      const progress = p.life / p.maxLife;
+      const scale = Math.max(0.01, 1 - progress);
+      p.mesh.scale.set(scale, scale, scale);
+    }
+  }
+
+          onResize()       {
+    const aspect = window.innerWidth / window.innerHeight;
+    const viewSize = 11;
+    this.camera.left = -viewSize * aspect;
+    this.camera.right = viewSize * aspect;
+    this.camera.top = viewSize;
+    this.camera.bottom = -viewSize;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+          buildLaneGroup(lane      )               {
+    const group = new THREE.Group();
+    group.position.z = lane.index;
+
+    const vehicleMeshes = new Map                        ();
+    const logMeshes = new Map                        ();
+    const coinMeshes = new Map                        ();
+    const isSnow = Math.floor(Math.max(0, lane.index) / 35) % 3 === 2;
+
+    let stripColor = isSnow ? 0xf1f5f9 : 0x4ade80;
+    let stripHeight = 0.24;
+
+    if (lane.type === LaneType.GRASS) {
+      if (isSnow) {
+        stripColor = lane.index % 2 === 0 ? 0xf8fafc : 0xe2e8f0;
+      } else {
+        stripColor = lane.index % 2 === 0 ? 0x4ade80 : 0x22c55e;
+      }
+    } else if (lane.type === LaneType.ROAD) {
+      stripColor = 0x334155;
+      stripHeight = 0.16;
+    } else if (lane.type === LaneType.RIVER) {
+      stripColor = 0x0284c7;
+      stripHeight = 0.08;
+    } else if (lane.type === LaneType.RAILWAY) {
+      stripColor = 0x475569;
+      stripHeight = 0.2;
+    }
+
+    const ground = new THREE.Mesh(
+      new THREE.BoxGeometry(48, stripHeight, 1),
+      new THREE.MeshLambertMaterial({ color: stripColor })
+    );
+    ground.position.y = -stripHeight / 2;
+    ground.receiveShadow = true;
+    group.add(ground);
+
+    if (lane.type === LaneType.ROAD) {
+      const roadMarkings = MeshFactory.createRoadMarkings();
+      group.add(roadMarkings);
+    } else if (lane.type === LaneType.RIVER) {
+      // Cascading waterfalls at the left and right borders of the river
+      const leftWaterfall = MeshFactory.createWaterfallEdge('left');
+      leftWaterfall.position.set(worldToScreenX(-10.2), 0, 0);
+      const rightWaterfall = MeshFactory.createWaterfallEdge('right');
+      rightWaterfall.position.set(worldToScreenX(10.2), 0, 0);
+      group.add(leftWaterfall, rightWaterfall);
+    } else if (lane.type === LaneType.RAILWAY) {
+      const railMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
+      const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
+      r1.position.set(0, 0.03, -0.26);
+      const r2 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
+      r2.position.set(0, 0.03, 0.26);
+      group.add(r1, r2);
+    }
+
+    const details = lane.obstacleDetails?.length
+      ? lane.obstacleDetails
+      : lane.obstacles.map((x) => ({ x, kind: 'tree'          }));
+
+    for (const item of details) {
+      const treeX = item.x;
+      const mesh = MeshFactory.createObstacle(item.kind, lane.index * 31 + treeX, isSnow);
+      mesh.position.x = worldToScreenX(treeX);
+      group.add(mesh);
+    }
+
+    for (const coinX of lane.coins ?? []) {
+      const coin = MeshFactory.createCoin();
+      coin.position.x = worldToScreenX(coinX);
+      group.add(coin);
+      coinMeshes.set(coinX, coin);
+    }
+
+    for (const v of lane.vehicles) {
+      const mesh = MeshFactory.createVehicle(v);
+      mesh.position.x = worldToScreenX(v.x);
+      group.add(mesh);
+      vehicleMeshes.set(v.id, mesh);
+    }
+
+    for (const log of lane.logs) {
+      const mesh = MeshFactory.createLog(log);
+      mesh.position.x = worldToScreenX(log.x);
+      group.add(mesh);
+      logMeshes.set(log.id, mesh);
+    }
+
+    let trainMesh                            ;
+    let signalLight                        ;
+    if (lane.type === LaneType.RAILWAY && lane.train) {
+      const sig = MeshFactory.createRailwaySignal();
+      sig.group.position.set(worldToScreenX(-2.5), 0, -0.38);
+      group.add(sig.group);
+      signalLight = sig.lightMesh;
+
+      trainMesh = MeshFactory.createTrain(lane.train.length, lane.train.speed);
+      trainMesh.position.x = worldToScreenX(lane.train.x);
+      trainMesh.visible = lane.train.isPassing;
+      group.add(trainMesh);
+    }
+
+    return { group, vehicleMeshes, logMeshes, coinMeshes, trainMesh, signalLight };
+  }
+
+  sync(engine            , dt         = 0.016)       {
+    const selectedSkin = engine.getSelectedSkin();
+    if (selectedSkin !== this.currentSkin) {
+      this.currentSkin = selectedSkin;
+      this.scene.remove(this.playerMesh);
+      this.playerMesh = MeshFactory.createCharacter(selectedSkin);
+      this.scene.add(this.playerMesh);
+    }
+
+    const p = engine.getPlayer();
+    const biomePhase = Math.floor(Math.max(0, p.row) / 35) % 3;
+    const skyHex = biomePhase === 1 ? 0x1e1b4b : biomePhase === 2 ? 0xcbd5e1 : 0x87ceeb;
+    (this.scene.background               ).setHex(skyHex);
+
+    const activeLanes = engine.getActiveLanes();
+    const activeIndices = new Set        ();
+    const nowSec = performance.now() * 0.004;
+
+    for (const lane of activeLanes) {
+      activeIndices.add(lane.index);
+      let rendered = this.renderedLanes.get(lane.index);
+      if (!rendered) {
+        rendered = this.buildLaneGroup(lane);
+        this.scene.add(rendered.group);
+        this.renderedLanes.set(lane.index, rendered);
+      }
+
+      for (const v of lane.vehicles) {
+        const m = rendered.vehicleMeshes.get(v.id);
+        if (m) m.position.x = worldToScreenX(v.x);
+      }
+
+      for (const log of lane.logs) {
+        const m = rendered.logMeshes.get(log.id);
+        if (m) {
+          m.position.x = worldToScreenX(log.x);
+          m.position.y = p.ridingLogId === log.id ? -0.06 : 0;
+        }
+      }
+
+      for (const [cx, coinMesh] of rendered.coinMeshes.entries()) {
+        if (!lane.coins?.includes(cx)) {
+          rendered.group.remove(coinMesh);
+          rendered.coinMeshes.delete(cx);
+        } else {
+          coinMesh.rotation.y = nowSec;
+        }
+      }
+
+      if (lane.train && rendered.trainMesh && rendered.signalLight) {
+        rendered.trainMesh.visible = lane.train.isPassing;
+        rendered.trainMesh.position.x = worldToScreenX(lane.train.x);
+        const blink = lane.train.isWarning && Math.floor(performance.now() / 120) % 2 === 0;
+        (rendered.signalLight.material                           ).color.setHex(
+          blink ? 0xef4444 : 0x334155
+        );
+      }
+    }
+
+    for (const [idx, rendered] of this.renderedLanes.entries()) {
+      if (!activeIndices.has(idx)) {
+        this.scene.remove(rendered.group);
+        this.renderedLanes.delete(idx);
+      }
+    }
+
+    // Landing detection for surface puff particles
+    if (this.lastHoppingState && !p.isHopping && !p.isDead) {
+      const landedLane = engine.getLane(p.row);
+      const isSnow = Math.floor(Math.max(0, p.row) / 35) % 3 === 2;
+      let puffColor = 0xffffff;
+      if (landedLane.type === LaneType.GRASS) {
+        puffColor = isSnow ? 0xffffff : 0x86efac;
+      } else if (landedLane.type === LaneType.ROAD) {
+        puffColor = 0x94a3b8;
+      } else if (landedLane.type === LaneType.RIVER) {
+        puffColor = 0xfde047; // Wood bark flakes on log
+      } else if (landedLane.type === LaneType.RAILWAY) {
+        puffColor = 0xd1d5db;
+      }
+      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 5);
+    }
+    this.lastHoppingState = p.isHopping;
+
+    const hopHeight = p.isHopping ? 4 * 0.75 * p.hopProgress * (1 - p.hopProgress) : 0;
+    const baseOffsetY = p.ridingLogId !== null ? 0.08 : 0;
+    this.playerMesh.position.set(worldToScreenX(p.x), baseOffsetY + hopHeight, p.row);
+
+    if (p.facing === MoveDirection.FORWARD) this.playerMesh.rotation.y = 0;
+    else if (p.facing === MoveDirection.BACKWARD) this.playerMesh.rotation.y = Math.PI;
+    else if (p.facing === MoveDirection.LEFT) this.playerMesh.rotation.y = Math.PI / 2;
+    else if (p.facing === MoveDirection.RIGHT) this.playerMesh.rotation.y = -Math.PI / 2;
+
+    if (p.isDead) {
+      if (p.deathReason === 'CAR' || p.deathReason === 'TRAIN') {
+        this.playerMesh.scale.set(1.4, 0.15, 1.4);
+      } else if (p.deathReason === 'WATER') {
+        this.playerMesh.position.y = -0.5;
+      }
+    } else {
+      const stretch = p.isHopping ? 1 + Math.sin(p.hopProgress * Math.PI) * 0.22 : 1;
+      this.playerMesh.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
+    }
+
+    this.updateParticles(dt);
+
+    const camZ = engine.getCameraZ();
+    let shakeX = 0;
+    let shakeZ = 0;
+    if (this.shakeIntensity > 0.01) {
+      shakeX = (Math.random() - 0.5) * this.shakeIntensity;
+      shakeZ = (Math.random() - 0.5) * this.shakeIntensity;
+      this.shakeIntensity *= 0.85;
+    } else {
+      this.shakeIntensity = 0;
+    }
+
+    this.camera.position.set(-7.5 + shakeX, 12.5, camZ - 7.5 + shakeZ);
+    this.camera.lookAt(0, 0, camZ + 2.5);
+    this.dirLight.position.set(-12, 22, camZ - 6);
+    this.dirLight.target.position.set(0, 0, camZ + 3);
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  clearAll()       {
+    for (const rendered of this.renderedLanes.values()) {
+      this.scene.remove(rendered.group);
+    }
+    this.renderedLanes.clear();
+
+    for (const p of this.particles) {
+      this.scene.remove(p.mesh);
+      p.mesh.geometry.dispose();
+    }
+    this.particles = [];
+  }
+}
+
+// --- Module: src/main.ts ---
+const container = document.getElementById('game-container') ;
+const scoreEl = document.getElementById('score-value') ;
+const coinsEl = document.getElementById('coins-value') ;
+const pauseBtn = document.getElementById('pause-btn') ;
+const warningVignetteEl = document.getElementById('warning-vignette');
+
+// Main Menu Elements
+const mainMenuModal = document.getElementById('main-menu-modal') ;
+const menuPlayBtn = document.getElementById('menu-play-btn') ;
+const menuGachaBtn = document.getElementById('menu-gacha-btn') ;
+const menuLeaderboardBtn = document.getElementById('menu-leaderboard-btn') ;
+const menuSettingsBtn = document.getElementById('menu-settings-btn') ;
+const menuHighScoreEl = document.getElementById('menu-high-score') ;
+const menuCoinsEl = document.getElementById('menu-coins') ;
+
+// Pause Modal Elements
+const pauseModal = document.getElementById('pause-modal') ;
+const pauseResumeBtn = document.getElementById('pause-resume-btn') ;
+const pauseSettingsBtn = document.getElementById('pause-settings-btn') ;
+const pauseMenuBtn = document.getElementById('pause-menu-btn') ;
+
+// Settings Modal Elements
+const settingsModal = document.getElementById('settings-modal') ;
+const settingSoundToggle = document.getElementById('setting-sound-toggle')                           ;
+const settingsCloseBtn = document.getElementById('settings-close-btn') ;
+
+// Gacha Modal Elements
+const gachaModal = document.getElementById('gacha-modal') ;
+const gachaModalRollBtn = document.getElementById('gacha-modal-roll-btn') ;
+const gachaModalCloseBtn = document.getElementById('gacha-modal-close-btn') ;
+const gachaModalCoinsEl = document.getElementById('gacha-modal-coins') ;
+const gachaModalStatusEl = document.getElementById('gacha-modal-status') ;
+const gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list') ;
+
+// Leaderboard Modal Elements
+const leaderboardModal = document.getElementById('leaderboard-modal') ;
+const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn') ;
+const leaderboardBestScoreEl = document.getElementById('leaderboard-best-score') ;
+
+// Game Over Modal Elements
+const gameOverModal = document.getElementById('game-over-modal') ;
+const deathReasonEl = document.getElementById('death-reason') ;
+const restartBtn = document.getElementById('restart-btn') ;
+const toMenuBtn = document.getElementById('to-menu-btn') ;
+
+const urlSeed = Number(new URLSearchParams(window.location.search).get('seed'));
+const initialSeed = Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : Date.now();
+
+const engine = new GameEngine(initialSeed, window.localStorage);
+const sceneManager = new SceneManager(container);
+const audio = new AudioSynth();
+
+let isPlaying = false;
+let isPaused = false;
+let wasDead = false;
+let lastCoins = engine.getCoins();
+let settingsReturnTo                   = 'menu';
+
+if (settingSoundToggle) {
+  settingSoundToggle.checked = audio.isSoundEnabled();
+  settingSoundToggle.addEventListener('change', () => {
+    audio.setSoundEnabled(settingSoundToggle.checked);
+  });
+}
+
+function updateMenuStats()       {
+  if (menuHighScoreEl) menuHighScoreEl.textContent = String(engine.getHighScore());
+  if (menuCoinsEl) menuCoinsEl.textContent = String(engine.getCoins());
+  if (leaderboardBestScoreEl) leaderboardBestScoreEl.textContent = String(engine.getHighScore());
+}
+
+function renderSkinsUI()       {
+  const unlocked = engine.getUnlockedSkins();
+  const active = engine.getSelectedSkin();
+  const remaining = ALL_SKINS.length - unlocked.length;
+
+  if (gachaModalSkinListEl) {
+    gachaModalSkinListEl.innerHTML = '';
+    ALL_SKINS.forEach((skin) => {
+      const isUnlocked = unlocked.includes(skin.id);
+      const card = document.createElement('div');
+      card.className = `gacha-skin-card ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
+      card.innerHTML = `
+        <div class="gacha-skin-badge">${isUnlocked ? skin.badge : '🔒'}</div>
+        <div class="gacha-skin-name">${isUnlocked ? skin.name : 'Секретный скин'}</div>
+        <div class="gacha-skin-tag">${active === skin.id ? 'ВЫБРАН' : isUnlocked ? 'ДОСТУПЕН' : 'ЗАКРЫТ'}</div>
+      `;
+      if (isUnlocked) {
+        card.addEventListener('click', () => {
+          if (engine.selectSkin(skin.id)) {
+            audio.playCoin();
+            renderSkinsUI();
+          }
+        });
+      }
+      gachaModalSkinListEl.appendChild(card);
+    });
+  }
+
+  if (gachaModalCoinsEl) gachaModalCoinsEl.textContent = String(engine.getCoins());
+  if (gachaModalRollBtn) {
+    gachaModalRollBtn.textContent = remaining > 0 ? `Крутить за ${WORLD_CONFIG.GACHA_COST} 🪙` : 'Все скины собраны!';
+    (gachaModalRollBtn                     ).disabled = remaining === 0;
+  }
+  updateMenuStats();
+}
+
+function handleGachaRoll()       {
+  const res = engine.rollGacha();
+  if (res.success && res.skinId) {
+    audio.playGacha();
+    const meta = ALL_SKINS.find((s) => s.id === res.skinId);
+    const msg = `🎉 Выбит новый скин: ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
+    lastCoins = engine.getCoins();
+    renderSkinsUI();
+  } else if (res.reason === 'ALL_UNLOCKED') {
+    const msg = '✨ Вы уже собрали все 4 скина!';
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
+  } else {
+    const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${engine.getCoins()} 🪙)`;
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
+  }
+}
+
+if (gachaModalRollBtn) gachaModalRollBtn.addEventListener('click', handleGachaRoll);
+
+function openMainMenu()       {
+  isPlaying = false;
+  isPaused = false;
+  mainMenuModal.classList.remove('hidden');
+  pauseModal.classList.add('hidden');
+  gameOverModal.classList.add('hidden');
+  gachaModal.classList.add('hidden');
+  leaderboardModal.classList.add('hidden');
+  settingsModal.classList.add('hidden');
+  updateMenuStats();
+}
+
+function startGame()       {
+  mainMenuModal.classList.add('hidden');
+  pauseModal.classList.add('hidden');
+  gameOverModal.classList.add('hidden');
+  gachaModal.classList.add('hidden');
+  leaderboardModal.classList.add('hidden');
+  settingsModal.classList.add('hidden');
+  wasDead = false;
+  isPaused = false;
+  sceneManager.clearAll();
+  engine.reset(Date.now());
+  lastCoins = engine.getCoins();
+  isPlaying = true;
+  renderSkinsUI();
+}
+
+function pauseGame()       {
+  if (!isPlaying || engine.getPlayer().isDead || isPaused) return;
+  isPaused = true;
+  pauseModal.classList.remove('hidden');
+}
+
+function resumeGame()       {
+  if (!isPaused) return;
+  isPaused = false;
+  pauseModal.classList.add('hidden');
+  lastTime = performance.now();
+}
+
+function openSettings(from                  )       {
+  settingsReturnTo = from;
+  settingsModal.classList.remove('hidden');
+}
+
+function closeSettings()       {
+  settingsModal.classList.add('hidden');
+  if (settingsReturnTo === 'pause') {
+    pauseModal.classList.remove('hidden');
+  } else {
+    mainMenuModal.classList.remove('hidden');
+  }
+}
+
+if (menuPlayBtn) menuPlayBtn.addEventListener('click', startGame);
+
+if (menuGachaBtn) {
+  menuGachaBtn.addEventListener('click', () => {
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = `1 прокрут = ${WORLD_CONFIG.GACHA_COST} монет`;
+    gachaModal.classList.remove('hidden');
+    renderSkinsUI();
+  });
+}
+
+if (gachaModalCloseBtn) {
+  gachaModalCloseBtn.addEventListener('click', () => {
+    gachaModal.classList.add('hidden');
+  });
+}
+
+if (menuLeaderboardBtn) {
+  menuLeaderboardBtn.addEventListener('click', () => {
+    leaderboardModal.classList.remove('hidden');
+    updateMenuStats();
+  });
+}
+
+if (leaderboardCloseBtn) {
+  leaderboardCloseBtn.addEventListener('click', () => {
+    leaderboardModal.classList.add('hidden');
+  });
+}
+
+if (menuSettingsBtn) {
+  menuSettingsBtn.addEventListener('click', () => openSettings('menu'));
+}
+
+if (pauseBtn) pauseBtn.addEventListener('click', pauseGame);
+if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', resumeGame);
+if (pauseSettingsBtn) pauseSettingsBtn.addEventListener('click', () => {
+  pauseModal.classList.add('hidden');
+  openSettings('pause');
+});
+if (pauseMenuBtn) pauseMenuBtn.addEventListener('click', openMainMenu);
+
+if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettings);
+
+if (toMenuBtn) toMenuBtn.addEventListener('click', openMainMenu);
+if (restartBtn) restartBtn.addEventListener('click', startGame);
+
+function triggerMove(dir                                                  )       {
+  if (!isPlaying || isPaused || engine.getPlayer().isDead) return;
+  const targetRow = engine.getPlayer().row + (dir === MoveDirection.FORWARD ? 1 : dir === MoveDirection.BACKWARD ? -1 : 0);
+  const lane = engine.getLane(targetRow);
+  let surface                                    = 'grass';
+  if (lane.type === 'ROAD') surface = 'road';
+  else if (lane.type === 'RIVER') surface = 'log';
+  else if (lane.type === 'RAILWAY') surface = 'rail';
+
+  if (engine.queueMove(dir)) {
+    audio.playHop(engine.getComboMultiplier(), surface);
+  }
+}
+
+window.addEventListener('keydown', (e) => {
+  // If settings modal is open
+  if (!settingsModal.classList.contains('hidden')) {
+    if (e.code === 'Escape' || e.code === 'Enter') {
+      e.preventDefault();
+      closeSettings();
+    }
+    return;
+  }
+
+  // If pause modal is open
+  if (!pauseModal.classList.contains('hidden')) {
+    if (e.code === 'Escape' || e.code === 'KeyP' || e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      resumeGame();
+    }
+    return;
+  }
+
+  // If in game, Escape or 'P' toggles pause
+  if (isPlaying && !engine.getPlayer().isDead) {
+    if (e.code === 'Escape' || e.code === 'KeyP') {
+      e.preventDefault();
+      pauseGame();
+      return;
+    }
+  }
+
+  // If Main Menu is open
+  if (!mainMenuModal.classList.contains('hidden')) {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      startGame();
+    }
+    return;
+  }
+
+  // If Gacha modal is open
+  if (!gachaModal.classList.contains('hidden')) {
+    if (e.code === 'Escape') {
+      gachaModal.classList.add('hidden');
+    } else if (e.code === 'KeyG' || e.code === 'Enter') {
+      handleGachaRoll();
+    }
+    return;
+  }
+
+  // If Leaderboard modal is open
+  if (!leaderboardModal.classList.contains('hidden')) {
+    if (e.code === 'Escape' || e.code === 'Enter') {
+      leaderboardModal.classList.add('hidden');
+    }
+    return;
+  }
+
+  // Game over state
+  if (engine.getPlayer().isDead) {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      startGame();
+    } else if (e.code === 'Escape') {
+      openMainMenu();
+    }
+    return;
+  }
+
+  // Active gameplay movement
+  switch (e.code) {
+    case 'KeyW':
+    case 'ArrowUp':
+    case 'Space':
+      e.preventDefault();
+      triggerMove(MoveDirection.FORWARD);
+      break;
+    case 'KeyS':
+    case 'ArrowDown':
+      e.preventDefault();
+      triggerMove(MoveDirection.BACKWARD);
+      break;
+    case 'KeyA':
+    case 'ArrowLeft':
+      e.preventDefault();
+      triggerMove(MoveDirection.LEFT);
+      break;
+    case 'KeyD':
+    case 'ArrowRight':
+      e.preventDefault();
+      triggerMove(MoveDirection.RIGHT);
+      break;
+  }
+});
+
+const DEATH_LABELS                         = {
+  [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
+  [DeathReason.TRAIN]: 'Вас снёс скоростной экспресс на переезде!',
+  [DeathReason.WATER]: 'Вы упали в бурную реку!',
+  [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
+  [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
+};
+
+let lastTime = performance.now();
+
+function animate(now        )       {
+  const dt = Math.min((now - lastTime) / 1000, 0.1);
+  lastTime = now;
+
+  if (isPlaying && !isPaused) {
+    engine.step(dt);
+  }
+  sceneManager.sync(engine, dt);
+
+  const currentCoins = engine.getCoins();
+  if (currentCoins > lastCoins) {
+    audio.playCoin();
+    lastCoins = currentCoins;
+    renderSkinsUI();
+  }
+
+  if (scoreEl) scoreEl.textContent = String(engine.getScore());
+  if (coinsEl) coinsEl.textContent = String(currentCoins);
+
+  if (warningVignetteEl) {
+    if (isPlaying && !isPaused && !engine.getPlayer().isDead) {
+      const graceRatio = engine.getCameraGraceRatio();
+      warningVignetteEl.style.opacity = graceRatio > 0 ? String(0.3 + graceRatio * 0.7) : '0';
+    } else {
+      warningVignetteEl.style.opacity = '0';
+    }
+  }
+
+  const p = engine.getPlayer();
+  if (isPlaying && p.isDead && !wasDead) {
+    wasDead = true;
+    sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
+    if (p.deathReason === DeathReason.WATER) {
+      audio.playSplash();
+    } else {
+      audio.playCrash();
+      sceneManager.triggerShake(p.deathReason === DeathReason.TRAIN ? 0.9 : 0.45);
+    }
+    if (deathReasonEl) deathReasonEl.textContent = DEATH_LABELS[p.deathReason] ?? 'Игра окончена';
+    if (gameOverModal) gameOverModal.classList.remove('hidden');
+    updateMenuStats();
+  }
+
+  requestAnimationFrame(animate);
+}
+
+// Initial state: show Main Menu
+renderSkinsUI();
+openMainMenu();
+requestAnimationFrame(animate);
+
+
+  </script>
+</body>
+</html>
