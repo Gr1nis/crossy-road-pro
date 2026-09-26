@@ -56,3 +56,27 @@ export function worldToScreenX(x: number): number {
 export function vehicleScreenRotationY(speed: number): number {
   return speed > 0 ? Math.PI : 0;
 }
+
+/**
+ * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
+ * of the player character under the isometric orthographic camera.
+ * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
+ */
+export function getCameraFrustumNdcY(playerX: number, playerRow: number, camZ: number): number {
+  const sx = -playerX + 0.35;
+  const sy = 0.65;
+  const sz = playerRow + 0.35;
+  const dx = sx + 7.5;
+  const dy = sy - 12.5;
+  const dz = sz - camZ + 7.5;
+  const vy = dx * 0.42426406871192857 + dy * 0.7071067811865476 + dz * 0.565685424949238;
+  return vy / 11;
+}
+
+/**
+ * Returns true only when the player's 3D mesh has completely crossed below
+ * the visible bottom edge of the screen (NDC Y < -1.0).
+ */
+export function isPlayerBehindCameraFrustum(playerX: number, playerRow: number, camZ: number): boolean {
+  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -1.0;
+}

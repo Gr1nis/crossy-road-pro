@@ -1,7 +1,9 @@
 import {
   checkVehicleCollision,
   findSupportingLog,
+  getCameraFrustumNdcY,
   isOutOfBoundsX,
+  isPlayerBehindCameraFrustum,
   quantizeLandX,
   snapToLogSlot,
 } from './collision.ts';
@@ -59,7 +61,9 @@ export class GameEngine {
   }
 
   private ensureLanesAround(centerRow: number): void {
-    for (let r = centerRow - 8; r <= centerRow + 28; r++) {
+    const minR = Math.min(centerRow - 8, Math.floor(this.cameraZ) - 26);
+    const maxR = Math.max(centerRow + 28, Math.floor(this.cameraZ) + 28);
+    for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
         this.lanes.set(r, this.generator.generateLane(r));
       }
@@ -82,8 +86,8 @@ export class GameEngine {
   getActiveLanes(): Lane[] {
     this.ensureLanesAround(Math.round(this.player.row));
     const list: Lane[] = [];
-    const minRow = Math.floor(this.cameraZ) - 12;
-    const maxRow = Math.floor(this.player.row) + 24;
+    const minRow = Math.min(Math.floor(this.cameraZ) - 24, Math.floor(this.player.row) - 8);
+    const maxRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));
     }
@@ -92,6 +96,18 @@ export class GameEngine {
 
   getCameraZ(): number {
     return this.cameraZ;
+  }
+
+  getPlayerNdcY(): number {
+    return getCameraFrustumNdcY(this.player.x, this.player.row, this.cameraZ);
+  }
+
+  isBehindCameraEdge(): boolean {
+    return isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+  }
+
+  getCameraGraceTimer(): number {
+    return this.cameraGraceTimer;
   }
 
   getCameraGraceRatio(): number {
@@ -224,8 +240,8 @@ export class GameEngine {
     }
 
     const currentLane = this.getLane(Math.round(this.player.row));
-    const minSimRow = Math.floor(this.cameraZ) - 6;
-    const maxSimRow = Math.floor(this.player.row) + 24;
+    const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
 
     for (let r = minSimRow; r <= maxSimRow; r++) {
       const lane = this.getLane(r);
@@ -359,7 +375,8 @@ export class GameEngine {
 
     // Only when player has actually crossed behind the visible screen edge,
     // start grace timer so player has time to escape before dying.
-    if (this.player.row < this.cameraZ - WORLD_CONFIG.CAMERA_BACK_LIMIT) {
+    const isBehindEdge = isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+    if (isBehindEdge) {
       this.cameraGraceTimer += dt;
       if (this.cameraGraceTimer >= WORLD_CONFIG.CAMERA_GRACE_PERIOD) {
         this.killPlayer(DeathReason.CAMERA_BEHIND);

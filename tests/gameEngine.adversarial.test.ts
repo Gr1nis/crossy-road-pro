@@ -132,15 +132,14 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
 
   it('Invariant 6 (Camera Scroll Timeout & Grace Period): crossing camera back edge does not kill immediately; requires grace period expiry', () => {
     const engine = new GameEngine(505);
-    // Advance camera until player row is past CAMERA_BACK_LIMIT
-    // CAMERA_BACK_LIMIT = 7.2, player is at row 0, base speed = 0.85
-    // Camera reaches 7.2 + 0.1 around 8.6 seconds
+    // Advance camera until player row crosses camera frustum edge
+    // Base speed = 0.85, player is at row 0, camera crosses frustum around 22.8 seconds
     const stepDt = 0.1;
     let crossedEdge = false;
 
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 300; i++) {
       engine.step(stepDt);
-      if (!crossedEdge && engine.getCameraZ() - engine.getPlayer().row > WORLD_CONFIG.CAMERA_BACK_LIMIT) {
+      if (!crossedEdge && engine.isBehindCameraEdge()) {
         crossedEdge = true;
         // At the moment of crossing, player must NOT be dead yet thanks to the grace period!
         assert.equal(engine.getPlayer().isDead, false, 'Player must remain alive during camera grace period');
@@ -152,5 +151,19 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
     assert.equal(crossedEdge, true, 'Player should cross the camera back boundary');
     assert.equal(engine.getPlayer().isDead, true, 'Player should die after grace period expires');
     assert.equal(engine.getPlayer().deathReason, DeathReason.CAMERA_BEHIND);
+  });
+
+  it('Invariant 7 (Start Backward Movement Frustum Invariant): hopping backward from start does not kill player while still inside screen view', () => {
+    const engine = new GameEngine(606);
+    // At start, player is at row 0, camZ = -1.0.
+    // Hopping backward through row -1, -2, -3 ... -15 must keep player safely alive on-screen!
+    for (let r = 1; r <= 15; r++) {
+      const moved = engine.queueMove(MoveDirection.BACKWARD);
+      assert.equal(moved, true, `Player should be able to hop backward to row -${r}`);
+      engine.step(WORLD_CONFIG.HOP_DURATION + 0.01);
+      assert.equal(engine.getPlayer().row, -r);
+      assert.equal(engine.getPlayer().isDead, false, `Player must not die at row -${r} because still visible on screen`);
+      assert.equal(engine.isBehindCameraEdge(), false, `Row -${r} must still be within visible screen frustum`);
+    }
   });
 });

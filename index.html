@@ -311,6 +311,18 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
+}
+
+/**
+ * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
+ * relative to the center of the log, so the character cleanly magnets to a log section.
+ */function snapToLogSlot(landingX        , log             )         {
+  const rel = landingX - log.x;
+  // Discrete 1.0-spaced slots centered on log
+  const snappedRel = Math.round(rel);
+  const maxRel = Math.max(0, (log.length - 1.0) / 2);
+  const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
+  return log.x + clampedRel;
 }function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
 }function quantizeLandX(x        )         {
@@ -894,6 +906,9 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
           const support = findSupportingLog(this.player.x, landedLane.logs);
           if (support) {
             this.player.ridingLogId = support.id;
+            // Magnetize to the nearest discrete segment slot on the log
+            this.player.x = snapToLogSlot(this.player.x, support);
+            this.player.targetX = this.player.x;
           } else {
             this.killPlayer(DeathReason.WATER);
             return;
@@ -1029,24 +1044,49 @@ class AudioSynth {
     return this.ctx;
   }
 
-  playHop(comboMultiplier         = 1)       {
+  playHop(comboMultiplier         = 1, surface                                    = 'grass')       {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
     const pitchScale = 1 + (Math.max(1, comboMultiplier) - 1) * 0.14;
+    const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(320 * pitchScale, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(580 * pitchScale, ctx.currentTime + 0.09);
 
-    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.09);
+    if (surface === 'log') {
+      // Warm hollow wooden clack
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(220 * pitchScale, now + 0.07);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.075);
+    } else if (surface === 'road') {
+      // Crisp asphalt tap
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(380 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(620 * pitchScale, now + 0.065);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+    } else if (surface === 'rail') {
+      // Metallic ping
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(520 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(780 * pitchScale, now + 0.08);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.085);
+    } else {
+      // Soft bouncy grass hop
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(310 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(560 * pitchScale, now + 0.09);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+    }
 
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.095);
+    osc.start(now);
+    osc.stop(now + 0.1);
   }
 
   playCoin()       {
@@ -1481,6 +1521,75 @@ class MeshFactory {
     ends.position.y = -0.04;
     group.add(ends);
 
+    // Visual segment notches representing magnet slots on the log
+    const notchMat = new THREE.MeshLambertMaterial({ color: 0x582a08 });
+    const slotCount = Math.floor(log.length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
+        const notch = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.33, 0.73), notchMat);
+        notch.position.set(s, -0.04, 0);
+        group.add(notch);
+      }
+    }
+
+    return group;
+  }
+
+  static createWaterfallEdge(side                  )              {
+    const group = new THREE.Group();
+    // Rock cliff bank
+    const cliffMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+    const cliff = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.4, 1.0), cliffMat);
+    cliff.position.set(0, -1.2, 0);
+    cliff.receiveShadow = true;
+    group.add(cliff);
+
+    // Falling water column
+    const waterFallMat = new THREE.MeshLambertMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.88,
+    });
+    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.9), waterFallMat);
+    const fallOffset = side === 'left' ? -0.22 : 0.22;
+    fall.position.set(fallOffset, -1.15, 0);
+    group.add(fall);
+
+    // Foam mist crest at the top
+    const foamMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.94), foamMat);
+    foamTop.position.set(fallOffset, -0.05, 0);
+    group.add(foamTop);
+
+    // Splash bottom block
+    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.96), foamMat);
+    splash.position.set(fallOffset, -2.15, 0);
+    group.add(splash);
+
+    return group;
+  }
+
+  static createRoadMarkings()              {
+    const group = new THREE.Group();
+    const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+    const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); // Amber center dashes
+
+    // Continuous solid white shoulder lines at boundary edges
+    const solidEdgeGeo = new THREE.BoxGeometry(0.12, 0.02, 1.0);
+    const leftSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
+    leftSolid.position.set(worldToScreenX(-9.5), 0.015, 0);
+    const rightSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
+    rightSolid.position.set(worldToScreenX(9.5), 0.015, 0);
+    group.add(leftSolid, rightSolid);
+
+    // Dashed center lane markings
+    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.1);
+    for (let x = -9; x <= 9; x += 1.8) {
+      const dash = new THREE.Mesh(dashGeo, dashMat);
+      dash.position.set(worldToScreenX(x), 0.015, 0);
+      group.add(dash);
+    }
+
     return group;
   }
 }
@@ -1495,6 +1604,8 @@ class SceneManager {
           currentSkin         = 'chicken';
           renderedLanes = new Map                      ();
           shakeIntensity = 0;
+          particles             = [];
+          lastHoppingState = false;
 
   constructor(container             ) {
     this.scene = new THREE.Scene();
@@ -1541,6 +1652,91 @@ class SceneManager {
     this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
   }
 
+  spawnHopPuff(x        , y        , z        , color        , count         = 6)       {
+    const geo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    const mat = new THREE.MeshLambertMaterial({ color });
+
+    for (let i = 0; i < count; i++) {
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(
+        worldToScreenX(x) + (Math.random() - 0.5) * 0.35,
+        y + 0.05,
+        z + (Math.random() - 0.5) * 0.35
+      );
+      this.scene.add(mesh);
+
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.0 + Math.random() * 1.5;
+      this.particles.push({
+        mesh,
+        vx: Math.cos(angle) * speed,
+        vy: 1.2 + Math.random() * 2.0,
+        vz: Math.sin(angle) * speed,
+        life: 0,
+        maxLife: 0.35 + Math.random() * 0.2,
+      });
+    }
+  }
+
+  spawnDeathFeathers(x        , y        , z        , reason        )       {
+    const isWater = reason === 'WATER';
+    const isTrain = reason === 'TRAIN';
+    const count = isTrain ? 28 : isWater ? 18 : 20;
+    const colors = isWater
+      ? [0x38bdf8, 0x0284c7, 0xffffff]
+      : [0xffffff, 0xf97316, 0xef4444, 0xfacc15];
+
+    for (let i = 0; i < count; i++) {
+      const c = colors[Math.floor(Math.random() * colors.length)];
+      const size = isWater ? 0.09 + Math.random() * 0.06 : 0.12 + Math.random() * 0.1;
+      const geo = new THREE.BoxGeometry(size, size, size);
+      const mat = new THREE.MeshLambertMaterial({ color: c });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(
+        worldToScreenX(x) + (Math.random() - 0.5) * 0.4,
+        y + 0.2,
+        z + (Math.random() - 0.5) * 0.4
+      );
+      this.scene.add(mesh);
+
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI * 0.5;
+      const spd = isTrain ? 4.5 + Math.random() * 5.0 : 2.5 + Math.random() * 3.5;
+
+      this.particles.push({
+        mesh,
+        vx: Math.cos(theta) * Math.sin(phi) * spd,
+        vy: Math.cos(phi) * spd + 1.5,
+        vz: Math.sin(theta) * Math.sin(phi) * spd,
+        life: 0,
+        maxLife: 0.55 + Math.random() * 0.35,
+      });
+    }
+  }
+
+          updateParticles(dt        )       {
+    const gravity = -14.0;
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.life += dt;
+      if (p.life >= p.maxLife) {
+        this.scene.remove(p.mesh);
+        p.mesh.geometry.dispose();
+        this.particles.splice(i, 1);
+        continue;
+      }
+
+      p.vy += gravity * dt;
+      p.mesh.position.x += p.vx * dt;
+      p.mesh.position.y += p.vy * dt;
+      p.mesh.position.z += p.vz * dt;
+
+      const progress = p.life / p.maxLife;
+      const scale = Math.max(0.01, 1 - progress);
+      p.mesh.scale.set(scale, scale, scale);
+    }
+  }
+
           onResize()       {
     const aspect = window.innerWidth / window.innerHeight;
     const viewSize = 11;
@@ -1561,10 +1757,16 @@ class SceneManager {
     const coinMeshes = new Map                        ();
     const isSnow = Math.floor(Math.max(0, lane.index) / 35) % 3 === 2;
 
-    let stripColor = isSnow ? 0xe2e8f0 : lane.index % 2 === 0 ? 0x4ade80 : 0x22c55e;
+    let stripColor = isSnow ? 0xf1f5f9 : 0x4ade80;
     let stripHeight = 0.24;
 
-    if (lane.type === LaneType.ROAD) {
+    if (lane.type === LaneType.GRASS) {
+      if (isSnow) {
+        stripColor = lane.index % 2 === 0 ? 0xf8fafc : 0xe2e8f0;
+      } else {
+        stripColor = lane.index % 2 === 0 ? 0x4ade80 : 0x22c55e;
+      }
+    } else if (lane.type === LaneType.ROAD) {
       stripColor = 0x334155;
       stripHeight = 0.16;
     } else if (lane.type === LaneType.RIVER) {
@@ -1584,13 +1786,15 @@ class SceneManager {
     group.add(ground);
 
     if (lane.type === LaneType.ROAD) {
-      const dashGeo = new THREE.BoxGeometry(0.6, 0.02, 0.08);
-      const dashMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
-      for (let x = -20; x <= 20; x += 2) {
-        const dash = new THREE.Mesh(dashGeo, dashMat);
-        dash.position.set(worldToScreenX(x), 0.01, 0);
-        group.add(dash);
-      }
+      const roadMarkings = MeshFactory.createRoadMarkings();
+      group.add(roadMarkings);
+    } else if (lane.type === LaneType.RIVER) {
+      // Cascading waterfalls at the left and right borders of the river
+      const leftWaterfall = MeshFactory.createWaterfallEdge('left');
+      leftWaterfall.position.set(worldToScreenX(-10.2), 0, 0);
+      const rightWaterfall = MeshFactory.createWaterfallEdge('right');
+      rightWaterfall.position.set(worldToScreenX(10.2), 0, 0);
+      group.add(leftWaterfall, rightWaterfall);
     } else if (lane.type === LaneType.RAILWAY) {
       const railMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
       const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
@@ -1649,7 +1853,7 @@ class SceneManager {
     return { group, vehicleMeshes, logMeshes, coinMeshes, trainMesh, signalLight };
   }
 
-  sync(engine            )       {
+  sync(engine            , dt         = 0.016)       {
     const selectedSkin = engine.getSelectedSkin();
     if (selectedSkin !== this.currentSkin) {
       this.currentSkin = selectedSkin;
@@ -1715,6 +1919,24 @@ class SceneManager {
       }
     }
 
+    // Landing detection for surface puff particles
+    if (this.lastHoppingState && !p.isHopping && !p.isDead) {
+      const landedLane = engine.getLane(p.row);
+      const isSnow = Math.floor(Math.max(0, p.row) / 35) % 3 === 2;
+      let puffColor = 0xffffff;
+      if (landedLane.type === LaneType.GRASS) {
+        puffColor = isSnow ? 0xffffff : 0x86efac;
+      } else if (landedLane.type === LaneType.ROAD) {
+        puffColor = 0x94a3b8;
+      } else if (landedLane.type === LaneType.RIVER) {
+        puffColor = 0xfde047; // Wood bark flakes on log
+      } else if (landedLane.type === LaneType.RAILWAY) {
+        puffColor = 0xd1d5db;
+      }
+      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 5);
+    }
+    this.lastHoppingState = p.isHopping;
+
     const hopHeight = p.isHopping ? 4 * 0.75 * p.hopProgress * (1 - p.hopProgress) : 0;
     const baseOffsetY = p.ridingLogId !== null ? 0.08 : 0;
     this.playerMesh.position.set(worldToScreenX(p.x), baseOffsetY + hopHeight, p.row);
@@ -1734,7 +1956,9 @@ class SceneManager {
       const stretch = p.isHopping ? 1 + Math.sin(p.hopProgress * Math.PI) * 0.22 : 1;
       this.playerMesh.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
     }
- 
+
+    this.updateParticles(dt);
+
     const camZ = engine.getCameraZ();
     let shakeX = 0;
     let shakeZ = 0;
@@ -1758,6 +1982,12 @@ class SceneManager {
       this.scene.remove(rendered.group);
     }
     this.renderedLanes.clear();
+
+    for (const p of this.particles) {
+      this.scene.remove(p.mesh);
+      p.mesh.geometry.dispose();
+    }
+    this.particles = [];
   }
 }
 
@@ -1992,8 +2222,15 @@ if (restartBtn) restartBtn.addEventListener('click', startGame);
 
 function triggerMove(dir                                                  )       {
   if (!isPlaying || isPaused || engine.getPlayer().isDead) return;
+  const targetRow = engine.getPlayer().row + (dir === MoveDirection.FORWARD ? 1 : dir === MoveDirection.BACKWARD ? -1 : 0);
+  const lane = engine.getLane(targetRow);
+  let surface                                    = 'grass';
+  if (lane.type === 'ROAD') surface = 'road';
+  else if (lane.type === 'RIVER') surface = 'log';
+  else if (lane.type === 'RAILWAY') surface = 'rail';
+
   if (engine.queueMove(dir)) {
-    audio.playHop(engine.getComboMultiplier());
+    audio.playHop(engine.getComboMultiplier(), surface);
   }
 }
 
@@ -2105,7 +2342,7 @@ function animate(now        )       {
   if (isPlaying && !isPaused) {
     engine.step(dt);
   }
-  sceneManager.sync(engine);
+  sceneManager.sync(engine, dt);
 
   const currentCoins = engine.getCoins();
   if (currentCoins > lastCoins) {
@@ -2129,6 +2366,7 @@ function animate(now        )       {
   const p = engine.getPlayer();
   if (isPlaying && p.isDead && !wasDead) {
     wasDead = true;
+    sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
     if (p.deathReason === DeathReason.WATER) {
       audio.playSplash();
     } else {
