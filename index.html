@@ -16,19 +16,51 @@
     .high-score-number { color: #fbbf24; }
     .coins-number { color: #facc15; }
     .gacha-panel { pointer-events: auto; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.22); border-radius: 14px; padding: 10px 14px; color: #fff; display: flex; flex-direction: column; gap: 8px; min-width: 280px; }
-    .gacha-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; }
-    .gacha-btn:hover { filter: brightness(1.1); }
+    .gacha-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; transition: transform 0.1s ease, filter 0.1s; }
+    .gacha-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
     .gacha-status { font-size: 12px; color: #fde047; font-weight: 600; min-height: 16px; }
     .skin-list { display: flex; flex-wrap: wrap; gap: 6px; }
-    .skin-btn { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .skin-btn.active { border-color: #38bdf8; background: #0284c7; color: #fff; }
+    .skin-btn { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.1s ease; }
+    .skin-btn.active { border-color: #38bdf8; background: #0284c7; color: #fff; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
     .skin-btn.locked { opacity: 0.45; cursor: not-allowed; }
-    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 30; }
-    .modal.hidden { display: none; }
-    .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 20px; padding: 32px 40px; text-align: center; color: #f8fafc; max-width: 420px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
-    .modal-card h2 { font-size: 28px; color: #f87171; margin-bottom: 8px; }
-    .modal-card p { color: #cbd5e1; margin-bottom: 24px; font-size: 16px; }
-    .restart-btn { background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; border: none; padding: 14px 32px; font-size: 17px; font-weight: 700; border-radius: 12px; cursor: pointer; }
+    
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
+    .modal.hidden { display: none !important; }
+    .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 36px 40px; text-align: center; color: #f8fafc; max-width: 460px; width: 90%; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); position: relative; }
+    .modal-card h1 { font-size: 36px; font-weight: 900; color: #38bdf8; margin-bottom: 6px; letter-spacing: -0.02em; text-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); }
+    .modal-card h2 { font-size: 26px; color: #f87171; margin-bottom: 8px; }
+    .modal-card p { color: #cbd5e1; margin-bottom: 24px; font-size: 15px; line-height: 1.5; }
+    
+    .menu-stats-row { display: flex; justify-content: center; gap: 16px; margin: 18px 0 24px; }
+    .menu-stat-pill { background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-radius: 12px; padding: 8px 16px; font-size: 13px; color: #94a3b8; font-weight: 700; }
+    .menu-stat-pill strong { color: #f8fafc; font-size: 15px; margin-left: 4px; }
+    .menu-stat-pill.gold strong { color: #facc15; }
+    
+    .menu-btn-stack { display: flex; flex-direction: column; gap: 12px; }
+    .menu-btn { width: 100%; border: none; padding: 15px 24px; font-size: 17px; font-weight: 800; border-radius: 14px; cursor: pointer; transition: transform 0.1s ease, filter 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); }
+    .menu-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+    .menu-btn:active { transform: translateY(0); }
+    .menu-btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 19px; }
+    .menu-btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; }
+    .menu-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; }
+    .menu-btn-secondary { background: #334155; color: #e2e8f0; }
+
+    .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+    .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; }
+    .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
+    .gacha-skin-card.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 14px rgba(56, 189, 248, 0.3); }
+    .gacha-skin-card.locked { opacity: 0.45; cursor: not-allowed; }
+    .gacha-skin-badge { font-size: 32px; margin-bottom: 4px; }
+    .gacha-skin-name { font-size: 13px; font-weight: 700; color: #f8fafc; }
+    .gacha-skin-tag { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-top: 4px; }
+    .gacha-skin-card.active .gacha-skin-tag { color: #38bdf8; }
+
+    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 18px; margin: 18px 0; text-align: left; }
+    .lb-row { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
+    .lb-row.header { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #334155; }
+    .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-radius: 8px; }
+    .placeholder-badge { display: inline-block; background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+
     .info-links { position: fixed; bottom: 20px; left: 24px; display: flex; gap: 10px; z-index: 15; }
     .info-link { background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 12px; color: #e2e8f0; text-decoration: none; font-size: 13px; font-weight: 700; }
   </style>
@@ -57,7 +89,7 @@
     </div>
 
     <div class="gacha-panel">
-      <button id="gacha-btn" class="gacha-btn">🎰 Гача (10 🪙) [G]</button>
+      <button id="gacha-btn" class="gacha-btn">🎰 Гача (100 🪙) [G]</button>
       <div id="gacha-status" class="gacha-status">Управление: WASD / Стрелки / Space | [1-4] Скины</div>
       <div id="skin-list" class="skin-list"></div>
     </div>
@@ -68,11 +100,89 @@
     <a class="info-link" href="https://github.com/Gr1nis/crossy-road-pro" target="_blank" rel="noopener">🐙 GitHub</a>
   </div>
 
+  <!-- Главное меню (Main Menu Modal) -->
+  <div id="main-menu-modal" class="modal">
+    <div class="modal-card">
+      <h1>CROSSY ROAD</h1>
+      <p>Классическая воксельная аркада с поездами, реками и скинами</p>
+
+      <div class="menu-stats-row">
+        <div class="menu-stat-pill">Рекорд: <strong id="menu-high-score">0</strong></div>
+        <div class="menu-stat-pill gold">Монеты: <strong id="menu-coins">0</strong> 🪙</div>
+      </div>
+
+      <div class="menu-btn-stack">
+        <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
+        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Гача-автомат (100 🪙)</button>
+        <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно Гача-автомата -->
+  <div id="gacha-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 style="color: #fbbf24;">🎰 ГАЧА-АВТОМАТ</h2>
+      <p>Испытайте удачу и откройте новые воксельные скины!<br>Стоимость одного прокрута — <strong>100 монет</strong>.</p>
+
+      <div class="menu-stat-pill gold" style="display: inline-block; margin-bottom: 12px;">
+        Ваш баланс: <strong id="gacha-modal-coins">0</strong> 🪙
+      </div>
+
+      <div id="gacha-modal-status" class="gacha-status" style="margin-bottom: 8px;">1 прокрут = 100 монет</div>
+
+      <div id="gacha-modal-skin-list" class="gacha-modal-grid"></div>
+
+      <div class="menu-btn-stack">
+        <button id="gacha-modal-roll-btn" class="menu-btn menu-btn-amber">Крутить за 100 🪙</button>
+        <button id="gacha-modal-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно Таблицы лидеров (Заглушка) -->
+  <div id="leaderboard-modal" class="modal hidden">
+    <div class="modal-card">
+      <span class="placeholder-badge">СКОРО В ОБНОВЛЕНИИ</span>
+      <h2 style="color: #c084fc;">🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
+      <p>Глобальный рейтинг игроков находится в разработке и будет подключен в следующем обновлении.</p>
+
+      <div class="leaderboard-preview-box">
+        <div class="lb-row header">
+          <span>Ранг</span>
+          <span>Игрок</span>
+          <span>Рекорд</span>
+        </div>
+        <div class="lb-row current-player">
+          <span>#1 (Вы)</span>
+          <span>👤 Игрок</span>
+          <span id="leaderboard-best-score">0</span>
+        </div>
+        <div class="lb-row" style="opacity: 0.6;">
+          <span>#2</span>
+          <span>🤖 CyberDuck</span>
+          <span>142</span>
+        </div>
+        <div class="lb-row" style="opacity: 0.5;">
+          <span>#3</span>
+          <span>🤖 MasterChicken</span>
+          <span>98</span>
+        </div>
+      </div>
+
+      <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Экран Game Over -->
   <div id="game-over-modal" class="modal hidden">
     <div class="modal-card">
       <h2>Игра окончена!</h2>
       <p id="death-reason">Вас сбил автомобиль!</p>
-      <button id="restart-btn" class="restart-btn">Играть снова (Space)</button>
+      <div class="menu-btn-stack">
+        <button id="restart-btn" class="menu-btn menu-btn-primary">Играть снова (Space)</button>
+        <button id="to-menu-btn" class="menu-btn menu-btn-secondary">Главное меню (Esc)</button>
+      </div>
     </div>
   </div>
 
@@ -85,28 +195,24 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;
-const MoveDirection = {
+}         ;const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;
-const DeathReason = {
+}         ;const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;
-const ALL_SKINS                                                             = [
+}         ;const ALL_SKINS                                                             = [
   { id: 'chicken', name: 'Классическая Курица', badge: '🐔' },
   { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
   { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
   { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
-];
-const WORLD_CONFIG = {
+];const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -114,9 +220,9 @@ const WORLD_CONFIG = {
   HOP_DURATION: 0.12,
   PLAYER_WIDTH: 0.65,
   LOG_MARGIN: 0.12,
-  CAMERA_BACK_LIMIT: 5.5,
+  CAMERA_BACK_LIMIT: 6.5,
   BASE_CAMERA_SPEED: 0.85,
-  GACHA_COST: 10,
+  GACHA_COST: 100,
 }         ;
 
 // --- Module: src/core/prng.ts ---
@@ -152,8 +258,7 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}
-function findSupportingLog(playerX        , logs               )                     {
+}function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -161,11 +266,9 @@ function findSupportingLog(playerX        , logs               )                
     }
   }
   return null;
-}
-function isOutOfBoundsX(playerX        )          {
+}function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}
-function quantizeLandX(x        )         {
+}function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -173,22 +276,19 @@ function quantizeLandX(x        )         {
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */
-function worldToScreenX(x        )         {
+ */function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
 }
 
 /**
  * Returns vehicle Y-rotation so the front of the vehicle faces its movement direction on screen.
- */
-function vehicleScreenRotationY(speed        )         {
+ */function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
 }
 
 // --- Module: src/core/scoreTracker.ts ---
 const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
-const PROFILE_KEY = 'crossy_road_pro_profile_v1';
-class ScoreTracker {
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
           currentScore = 0;
           highScore = 0;
           bestRow = 0;
@@ -332,8 +432,7 @@ class ScoreTracker {
 
 // --- Module: src/core/laneGenerator.ts ---
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
-const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];
-class LaneGenerator {
+const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGenerator {
                    baseSeed        ;
 
   constructor(seed         = 42) {
@@ -443,8 +542,8 @@ class LaneGenerator {
       };
     }
 
-    // Spawn coins on unblocked tiles for rows > 0
-    if (index > 0 && type !== LaneType.RIVER && rng.next() < 0.55) {
+    // Spawn coins on unblocked tiles for rows > 0 (balanced arcade rarity)
+    if (index > 0 && type !== LaneType.RIVER && rng.next() < 0.22) {
       const candidateX = rng.nextInt(-6, 6);
       if (!obstacles.includes(candidateX)) {
         coins.push(candidateX);
@@ -475,8 +574,7 @@ class LaneGenerator {
 }
 
 // --- Module: src/core/gameEngine.ts ---
-const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;
-class GameEngine {
+const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
           generator               ;
           lanes = new Map              ();
           scoreTracker              ;
@@ -536,7 +634,7 @@ class GameEngine {
   getActiveLanes()         {
     this.ensureLanesAround(Math.round(this.player.row));
     const list         = [];
-    const minRow = Math.floor(this.cameraZ) - 6;
+    const minRow = Math.floor(this.cameraZ) - 8;
     const maxRow = Math.floor(this.player.row) + 24;
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));
@@ -1598,6 +1696,28 @@ const skinListEl = document.getElementById('skin-list') ;
 const gameOverModal = document.getElementById('game-over-modal') ;
 const deathReasonEl = document.getElementById('death-reason') ;
 const restartBtn = document.getElementById('restart-btn') ;
+const toMenuBtn = document.getElementById('to-menu-btn') ;
+
+// Main Menu Elements
+const mainMenuModal = document.getElementById('main-menu-modal') ;
+const menuPlayBtn = document.getElementById('menu-play-btn') ;
+const menuGachaBtn = document.getElementById('menu-gacha-btn') ;
+const menuLeaderboardBtn = document.getElementById('menu-leaderboard-btn') ;
+const menuHighScoreEl = document.getElementById('menu-high-score') ;
+const menuCoinsEl = document.getElementById('menu-coins') ;
+
+// Gacha Modal Elements
+const gachaModal = document.getElementById('gacha-modal') ;
+const gachaModalRollBtn = document.getElementById('gacha-modal-roll-btn') ;
+const gachaModalCloseBtn = document.getElementById('gacha-modal-close-btn') ;
+const gachaModalCoinsEl = document.getElementById('gacha-modal-coins') ;
+const gachaModalStatusEl = document.getElementById('gacha-modal-status') ;
+const gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list') ;
+
+// Leaderboard Modal Elements
+const leaderboardModal = document.getElementById('leaderboard-modal') ;
+const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn') ;
+const leaderboardBestScoreEl = document.getElementById('leaderboard-best-score') ;
 
 const urlSeed = Number(new URLSearchParams(window.location.search).get('seed'));
 const initialSeed = Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : Date.now();
@@ -1606,32 +1726,73 @@ const engine = new GameEngine(initialSeed, window.localStorage);
 const sceneManager = new SceneManager(container);
 const audio = new AudioSynth();
 
+let isPlaying = false;
 let wasDead = false;
 let lastCoins = engine.getCoins();
+
+function updateMenuStats()       {
+  if (menuHighScoreEl) menuHighScoreEl.textContent = String(engine.getHighScore());
+  if (menuCoinsEl) menuCoinsEl.textContent = String(engine.getCoins());
+  if (leaderboardBestScoreEl) leaderboardBestScoreEl.textContent = String(engine.getHighScore());
+}
 
 function renderSkinsUI()       {
   const unlocked = engine.getUnlockedSkins();
   const active = engine.getSelectedSkin();
-  skinListEl.innerHTML = '';
-
-  ALL_SKINS.forEach((skin, idx) => {
-    const isUnlocked = unlocked.includes(skin.id);
-    const btn = document.createElement('button');
-    btn.className = `skin-btn ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
-    btn.textContent = isUnlocked ? `${skin.badge} ${skin.name} [${idx + 1}]` : `🔒 ???`;
-    btn.disabled = !isUnlocked;
-    btn.addEventListener('click', () => {
-      if (engine.selectSkin(skin.id)) {
-        audio.playCoin();
-        renderSkinsUI();
-      }
-    });
-    skinListEl.appendChild(btn);
-  });
-
   const remaining = ALL_SKINS.length - unlocked.length;
-  gachaBtn.textContent =
-    remaining > 0 ? `🎰 Гача (${WORLD_CONFIG.GACHA_COST} 🪙) [G]` : '✨ Все скины открыты!';
+  const gachaText = remaining > 0 ? `🎰 Гача (${WORLD_CONFIG.GACHA_COST} 🪙) [G]` : '✨ Все скины открыты!';
+
+  // HUD panel skin list
+  if (skinListEl) {
+    skinListEl.innerHTML = '';
+    ALL_SKINS.forEach((skin, idx) => {
+      const isUnlocked = unlocked.includes(skin.id);
+      const btn = document.createElement('button');
+      btn.className = `skin-btn ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
+      btn.textContent = isUnlocked ? `${skin.badge} ${skin.name} [${idx + 1}]` : `🔒 ???`;
+      btn.disabled = !isUnlocked;
+      btn.addEventListener('click', () => {
+        if (engine.selectSkin(skin.id)) {
+          audio.playCoin();
+          renderSkinsUI();
+        }
+      });
+      skinListEl.appendChild(btn);
+    });
+  }
+
+  if (gachaBtn) gachaBtn.textContent = gachaText;
+
+  // Gacha modal skin list
+  if (gachaModalSkinListEl) {
+    gachaModalSkinListEl.innerHTML = '';
+    ALL_SKINS.forEach((skin, idx) => {
+      const isUnlocked = unlocked.includes(skin.id);
+      const card = document.createElement('div');
+      card.className = `gacha-skin-card ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
+      card.innerHTML = `
+        <div class="gacha-skin-badge">${isUnlocked ? skin.badge : '🔒'}</div>
+        <div class="gacha-skin-name">${isUnlocked ? skin.name : 'Секретный скин'}</div>
+        <div class="gacha-skin-tag">${active === skin.id ? 'ВЫБРАН' : isUnlocked ? 'ДОСТУПЕН' : 'ЗАКРЫТ'}</div>
+      `;
+      if (isUnlocked) {
+        card.addEventListener('click', () => {
+          if (engine.selectSkin(skin.id)) {
+            audio.playCoin();
+            renderSkinsUI();
+          }
+        });
+      }
+      gachaModalSkinListEl.appendChild(card);
+    });
+  }
+
+  if (gachaModalCoinsEl) gachaModalCoinsEl.textContent = String(engine.getCoins());
+  if (gachaModalRollBtn) {
+    gachaModalRollBtn.textContent = remaining > 0 ? `Крутить за ${WORLD_CONFIG.GACHA_COST} 🪙` : 'Все скины собраны!';
+    (gachaModalRollBtn                     ).disabled = remaining === 0;
+  }
+  updateMenuStats();
 }
 
 function handleGachaRoll()       {
@@ -1639,32 +1800,117 @@ function handleGachaRoll()       {
   if (res.success && res.skinId) {
     audio.playGacha();
     const meta = ALL_SKINS.find((s) => s.id === res.skinId);
-    gachaStatusEl.textContent = `🎉 Выбит новый скин: ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+    const msg = `🎉 Выбит новый скин: ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+    if (gachaStatusEl) gachaStatusEl.textContent = msg;
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
     lastCoins = engine.getCoins();
     renderSkinsUI();
   } else if (res.reason === 'ALL_UNLOCKED') {
-    gachaStatusEl.textContent = '✨ Вы уже собрали все 4 скина!';
+    const msg = '✨ Вы уже собрали все 4 скина!';
+    if (gachaStatusEl) gachaStatusEl.textContent = msg;
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
   } else {
-    gachaStatusEl.textContent = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${engine.getCoins()} 🪙)`;
+    const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${engine.getCoins()} 🪙)`;
+    if (gachaStatusEl) gachaStatusEl.textContent = msg;
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
   }
 }
 
-gachaBtn.addEventListener('click', handleGachaRoll);
-renderSkinsUI();
+if (gachaBtn) gachaBtn.addEventListener('click', handleGachaRoll);
+if (gachaModalRollBtn) gachaModalRollBtn.addEventListener('click', handleGachaRoll);
+
+function openMainMenu()       {
+  isPlaying = false;
+  mainMenuModal.classList.remove('hidden');
+  gameOverModal.classList.add('hidden');
+  gachaModal.classList.add('hidden');
+  leaderboardModal.classList.add('hidden');
+  updateMenuStats();
+}
+
+function startGame()       {
+  mainMenuModal.classList.add('hidden');
+  gameOverModal.classList.add('hidden');
+  gachaModal.classList.add('hidden');
+  leaderboardModal.classList.add('hidden');
+  wasDead = false;
+  sceneManager.clearAll();
+  engine.reset(Date.now());
+  lastCoins = engine.getCoins();
+  isPlaying = true;
+  renderSkinsUI();
+}
+
+if (menuPlayBtn) menuPlayBtn.addEventListener('click', startGame);
+
+if (menuGachaBtn) {
+  menuGachaBtn.addEventListener('click', () => {
+    if (gachaModalStatusEl) gachaModalStatusEl.textContent = `1 прокрут = ${WORLD_CONFIG.GACHA_COST} монет`;
+    gachaModal.classList.remove('hidden');
+    renderSkinsUI();
+  });
+}
+
+if (gachaModalCloseBtn) {
+  gachaModalCloseBtn.addEventListener('click', () => {
+    gachaModal.classList.add('hidden');
+  });
+}
+
+if (menuLeaderboardBtn) {
+  menuLeaderboardBtn.addEventListener('click', () => {
+    leaderboardModal.classList.remove('hidden');
+    updateMenuStats();
+  });
+}
+
+if (leaderboardCloseBtn) {
+  leaderboardCloseBtn.addEventListener('click', () => {
+    leaderboardModal.classList.add('hidden');
+  });
+}
+
+if (toMenuBtn) toMenuBtn.addEventListener('click', openMainMenu);
 
 function triggerMove(dir                                                  )       {
-  if (engine.getPlayer().isDead) return;
+  if (!isPlaying || engine.getPlayer().isDead) return;
   if (engine.queueMove(dir)) {
     audio.playHop(engine.getComboMultiplier());
   }
 }
 
 window.addEventListener('keydown', (e) => {
+  // If modals are open, handle escape or space
+  if (!mainMenuModal.classList.contains('hidden')) {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      startGame();
+    }
+    return;
+  }
+
+  if (!gachaModal.classList.contains('hidden')) {
+    if (e.code === 'Escape') {
+      gachaModal.classList.add('hidden');
+    } else if (e.code === 'KeyG' || e.code === 'Enter') {
+      handleGachaRoll();
+    }
+    return;
+  }
+
+  if (!leaderboardModal.classList.contains('hidden')) {
+    if (e.code === 'Escape' || e.code === 'Enter') {
+      leaderboardModal.classList.add('hidden');
+    }
+    return;
+  }
+
   if (e.code === 'KeyG') {
     e.preventDefault();
     handleGachaRoll();
     return;
   }
+
   if (['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code)) {
     const idx = Number(e.code.replace('Digit', '')) - 1;
     const skin = ALL_SKINS[idx];
@@ -1677,7 +1923,9 @@ window.addEventListener('keydown', (e) => {
 
   if (engine.getPlayer().isDead) {
     if (e.code === 'Space' || e.code === 'Enter') {
-      restartGame();
+      startGame();
+    } else if (e.code === 'Escape') {
+      openMainMenu();
     }
     return;
   }
@@ -1707,16 +1955,7 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-function restartGame()       {
-  wasDead = false;
-  gameOverModal.classList.add('hidden');
-  sceneManager.clearAll();
-  engine.reset(Date.now());
-  lastCoins = engine.getCoins();
-  renderSkinsUI();
-}
-
-restartBtn.addEventListener('click', restartGame);
+if (restartBtn) restartBtn.addEventListener('click', startGame);
 
 const DEATH_LABELS                         = {
   [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
@@ -1732,7 +1971,9 @@ function animate(now        )       {
   const dt = Math.min((now - lastTime) / 1000, 0.1);
   lastTime = now;
 
-  engine.step(dt);
+  if (isPlaying) {
+    engine.step(dt);
+  }
   sceneManager.sync(engine);
 
   const currentCoins = engine.getCoins();
@@ -1750,7 +1991,7 @@ function animate(now        )       {
   comboEl.style.color = mult >= 3 ? '#f43f5e' : mult === 2 ? '#fbbf24' : '#38bdf8';
 
   const p = engine.getPlayer();
-  if (p.isDead && !wasDead) {
+  if (isPlaying && p.isDead && !wasDead) {
     wasDead = true;
     if (p.deathReason === DeathReason.WATER) {
       audio.playSplash();
@@ -1760,11 +2001,15 @@ function animate(now        )       {
     }
     deathReasonEl.textContent = DEATH_LABELS[p.deathReason] ?? 'Игра окончена';
     gameOverModal.classList.remove('hidden');
+    updateMenuStats();
   }
 
   requestAnimationFrame(animate);
 }
 
+// Initial state: show Main Menu
+renderSkinsUI();
+openMainMenu();
 requestAnimationFrame(animate);
 
 

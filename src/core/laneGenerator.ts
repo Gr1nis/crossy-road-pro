@@ -124,8 +124,8 @@ export class LaneGenerator {
       };
     }
 
-    // Spawn coins on unblocked tiles for rows > 0
-    if (index > 0 && type !== LaneType.RIVER && rng.next() < 0.55) {
+    // Spawn coins on unblocked tiles for rows > 0 (balanced arcade rarity)
+    if (index > 0 && type !== LaneType.RIVER && rng.next() < 0.22) {
       const candidateX = rng.nextInt(-6, 6);
       if (!obstacles.includes(candidateX)) {
         coins.push(candidateX);

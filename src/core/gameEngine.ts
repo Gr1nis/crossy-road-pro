@@ -80,7 +80,7 @@ export class GameEngine {
   getActiveLanes(): Lane[] {
     this.ensureLanesAround(Math.round(this.player.row));
     const list: Lane[] = [];
-    const minRow = Math.floor(this.cameraZ) - 6;
+    const minRow = Math.floor(this.cameraZ) - 8;
     const maxRow = Math.floor(this.player.row) + 24;
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));

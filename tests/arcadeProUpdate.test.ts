@@ -106,8 +106,8 @@ describe('Arcade Pro Update — Railway, Coins, Rocks/Bushes, Gacha Skins, Combo
     const failRoll = engine.rollGacha();
     assert.equal(failRoll.success, false, 'Gacha roll must fail when player has insufficient coins');
 
-    // Grant 30 coins (3 rolls x 10 coins) and unlock all 3 gacha skins
-    engine.addCoins(30);
+    // Grant 300 coins (3 rolls x 100 coins) and unlock all 3 gacha skins
+    engine.addCoins(300);
     const unlockedSet = new Set<string>();
     for (let i = 0; i < 3; i++) {
       const res = engine.rollGacha();
