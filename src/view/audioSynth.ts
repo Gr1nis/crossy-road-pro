@@ -1,8 +1,30 @@
 export class AudioSynth {
   private ctx: AudioContext | null = null;
+  private soundEnabled: boolean = true;
+  private musicVolume: number = 0.7;
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const savedSound = localStorage.getItem('crossy_setting_sound');
+      if (savedSound !== null) {
+        this.soundEnabled = savedSound !== 'false';
+      }
+    }
+  }
+
+  isSoundEnabled(): boolean {
+    return this.soundEnabled;
+  }
+
+  setSoundEnabled(enabled: boolean): void {
+    this.soundEnabled = enabled;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crossy_setting_sound', String(enabled));
+    }
+  }
 
   private ensureContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === 'undefined' || !this.soundEnabled) return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
@@ -59,38 +81,44 @@ export class AudioSynth {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
+    const now = ctx.currentTime;
     const notes = [523.25, 659.25, 783.99, 1046.5];
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      const start = ctx.currentTime + idx * 0.065;
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, start);
-      gain.gain.setValueAtTime(0.22, start);
-      gain.gain.exponentialRampToValueAtTime(0.01, start + 0.18);
+      osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+
+      gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + idx * 0.08 + 0.18);
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(start);
-      osc.stop(start + 0.19);
+      osc.start(now + idx * 0.08);
+      osc.stop(now + idx * 0.08 + 0.19);
     });
   }
 
-  playTrainBell(): void {
+  playTrainWhistle(): void {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(880, now);
-    osc.frequency.setValueAtTime(660, now + 0.08);
-    gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.17);
+    [440, 554.37].forEach((freq) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.45);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.46);
+    });
   }
 
   playCrash(): void {

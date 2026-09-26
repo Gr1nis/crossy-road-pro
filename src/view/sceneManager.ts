@@ -19,7 +19,6 @@ export class SceneManager {
   private renderer: THREE.WebGLRenderer;
   private dirLight: THREE.DirectionalLight;
   private playerMesh: THREE.Group;
-  private ghostMesh: THREE.Group;
   private currentSkin: SkinId = 'chicken';
   private renderedLanes = new Map<number, RenderedLane>();
   private shakeIntensity = 0;
@@ -60,9 +59,7 @@ export class SceneManager {
     this.scene.add(this.dirLight, this.dirLight.target);
 
     this.playerMesh = MeshFactory.createCharacter('chicken');
-    this.ghostMesh = MeshFactory.createCharacter('chicken', true);
-    this.ghostMesh.visible = false;
-    this.scene.add(this.playerMesh, this.ghostMesh);
+    this.scene.add(this.playerMesh);
 
     window.addEventListener('resize', () => this.onResize());
   }
@@ -264,15 +261,7 @@ export class SceneManager {
       const stretch = p.isHopping ? 1 + Math.sin(p.hopProgress * Math.PI) * 0.22 : 1;
       this.playerMesh.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
     }
-
-    const bestRow = engine.getBestRow();
-    if (bestRow > 0) {
-      this.ghostMesh.visible = true;
-      this.ghostMesh.position.set(worldToScreenX(0), 0.05, bestRow);
-    } else {
-      this.ghostMesh.visible = false;
-    }
-
+ 
     const camZ = engine.getCameraZ();
     let shakeX = 0;
     let shakeZ = 0;

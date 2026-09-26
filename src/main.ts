@@ -5,24 +5,28 @@ import { SceneManager } from './view/sceneManager.ts';
 
 const container = document.getElementById('game-container')!;
 const scoreEl = document.getElementById('score-value')!;
-const highScoreEl = document.getElementById('high-score-value')!;
 const coinsEl = document.getElementById('coins-value')!;
-const comboEl = document.getElementById('combo-value')!;
-const gachaBtn = document.getElementById('gacha-btn')!;
-const gachaStatusEl = document.getElementById('gacha-status')!;
-const skinListEl = document.getElementById('skin-list')!;
-const gameOverModal = document.getElementById('game-over-modal')!;
-const deathReasonEl = document.getElementById('death-reason')!;
-const restartBtn = document.getElementById('restart-btn')!;
-const toMenuBtn = document.getElementById('to-menu-btn')!;
+const pauseBtn = document.getElementById('pause-btn')!;
 
 // Main Menu Elements
 const mainMenuModal = document.getElementById('main-menu-modal')!;
 const menuPlayBtn = document.getElementById('menu-play-btn')!;
 const menuGachaBtn = document.getElementById('menu-gacha-btn')!;
 const menuLeaderboardBtn = document.getElementById('menu-leaderboard-btn')!;
+const menuSettingsBtn = document.getElementById('menu-settings-btn')!;
 const menuHighScoreEl = document.getElementById('menu-high-score')!;
 const menuCoinsEl = document.getElementById('menu-coins')!;
+
+// Pause Modal Elements
+const pauseModal = document.getElementById('pause-modal')!;
+const pauseResumeBtn = document.getElementById('pause-resume-btn')!;
+const pauseSettingsBtn = document.getElementById('pause-settings-btn')!;
+const pauseMenuBtn = document.getElementById('pause-menu-btn')!;
+
+// Settings Modal Elements
+const settingsModal = document.getElementById('settings-modal')!;
+const settingSoundToggle = document.getElementById('setting-sound-toggle') as HTMLInputElement | null;
+const settingsCloseBtn = document.getElementById('settings-close-btn')!;
 
 // Gacha Modal Elements
 const gachaModal = document.getElementById('gacha-modal')!;
@@ -37,6 +41,12 @@ const leaderboardModal = document.getElementById('leaderboard-modal')!;
 const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn')!;
 const leaderboardBestScoreEl = document.getElementById('leaderboard-best-score')!;
 
+// Game Over Modal Elements
+const gameOverModal = document.getElementById('game-over-modal')!;
+const deathReasonEl = document.getElementById('death-reason')!;
+const restartBtn = document.getElementById('restart-btn')!;
+const toMenuBtn = document.getElementById('to-menu-btn')!;
+
 const urlSeed = Number(new URLSearchParams(window.location.search).get('seed'));
 const initialSeed = Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : Date.now();
 
@@ -45,8 +55,17 @@ const sceneManager = new SceneManager(container);
 const audio = new AudioSynth();
 
 let isPlaying = false;
+let isPaused = false;
 let wasDead = false;
 let lastCoins = engine.getCoins();
+let settingsReturnTo: 'menu' | 'pause' = 'menu';
+
+if (settingSoundToggle) {
+  settingSoundToggle.checked = audio.isSoundEnabled();
+  settingSoundToggle.addEventListener('change', () => {
+    audio.setSoundEnabled(settingSoundToggle.checked);
+  });
+}
 
 function updateMenuStats(): void {
   if (menuHighScoreEl) menuHighScoreEl.textContent = String(engine.getHighScore());
@@ -58,33 +77,10 @@ function renderSkinsUI(): void {
   const unlocked = engine.getUnlockedSkins();
   const active = engine.getSelectedSkin();
   const remaining = ALL_SKINS.length - unlocked.length;
-  const gachaText = remaining > 0 ? `🎰 Гача (${WORLD_CONFIG.GACHA_COST} 🪙) [G]` : '✨ Все скины открыты!';
 
-  // HUD panel skin list
-  if (skinListEl) {
-    skinListEl.innerHTML = '';
-    ALL_SKINS.forEach((skin, idx) => {
-      const isUnlocked = unlocked.includes(skin.id);
-      const btn = document.createElement('button');
-      btn.className = `skin-btn ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
-      btn.textContent = isUnlocked ? `${skin.badge} ${skin.name} [${idx + 1}]` : `🔒 ???`;
-      btn.disabled = !isUnlocked;
-      btn.addEventListener('click', () => {
-        if (engine.selectSkin(skin.id)) {
-          audio.playCoin();
-          renderSkinsUI();
-        }
-      });
-      skinListEl.appendChild(btn);
-    });
-  }
-
-  if (gachaBtn) gachaBtn.textContent = gachaText;
-
-  // Gacha modal skin list
   if (gachaModalSkinListEl) {
     gachaModalSkinListEl.innerHTML = '';
-    ALL_SKINS.forEach((skin, idx) => {
+    ALL_SKINS.forEach((skin) => {
       const isUnlocked = unlocked.includes(skin.id);
       const card = document.createElement('div');
       card.className = `gacha-skin-card ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
@@ -119,44 +115,73 @@ function handleGachaRoll(): void {
     audio.playGacha();
     const meta = ALL_SKINS.find((s) => s.id === res.skinId);
     const msg = `🎉 Выбит новый скин: ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
-    if (gachaStatusEl) gachaStatusEl.textContent = msg;
     if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
     lastCoins = engine.getCoins();
     renderSkinsUI();
   } else if (res.reason === 'ALL_UNLOCKED') {
     const msg = '✨ Вы уже собрали все 4 скина!';
-    if (gachaStatusEl) gachaStatusEl.textContent = msg;
     if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
   } else {
     const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${engine.getCoins()} 🪙)`;
-    if (gachaStatusEl) gachaStatusEl.textContent = msg;
     if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
   }
 }
 
-if (gachaBtn) gachaBtn.addEventListener('click', handleGachaRoll);
 if (gachaModalRollBtn) gachaModalRollBtn.addEventListener('click', handleGachaRoll);
 
 function openMainMenu(): void {
   isPlaying = false;
+  isPaused = false;
   mainMenuModal.classList.remove('hidden');
+  pauseModal.classList.add('hidden');
   gameOverModal.classList.add('hidden');
   gachaModal.classList.add('hidden');
   leaderboardModal.classList.add('hidden');
+  settingsModal.classList.add('hidden');
   updateMenuStats();
 }
 
 function startGame(): void {
   mainMenuModal.classList.add('hidden');
+  pauseModal.classList.add('hidden');
   gameOverModal.classList.add('hidden');
   gachaModal.classList.add('hidden');
   leaderboardModal.classList.add('hidden');
+  settingsModal.classList.add('hidden');
   wasDead = false;
+  isPaused = false;
   sceneManager.clearAll();
   engine.reset(Date.now());
   lastCoins = engine.getCoins();
   isPlaying = true;
   renderSkinsUI();
+}
+
+function pauseGame(): void {
+  if (!isPlaying || engine.getPlayer().isDead || isPaused) return;
+  isPaused = true;
+  pauseModal.classList.remove('hidden');
+}
+
+function resumeGame(): void {
+  if (!isPaused) return;
+  isPaused = false;
+  pauseModal.classList.add('hidden');
+  lastTime = performance.now();
+}
+
+function openSettings(from: 'menu' | 'pause'): void {
+  settingsReturnTo = from;
+  settingsModal.classList.remove('hidden');
+}
+
+function closeSettings(): void {
+  settingsModal.classList.add('hidden');
+  if (settingsReturnTo === 'pause') {
+    pauseModal.classList.remove('hidden');
+  } else {
+    mainMenuModal.classList.remove('hidden');
+  }
 }
 
 if (menuPlayBtn) menuPlayBtn.addEventListener('click', startGame);
@@ -188,17 +213,59 @@ if (leaderboardCloseBtn) {
   });
 }
 
+if (menuSettingsBtn) {
+  menuSettingsBtn.addEventListener('click', () => openSettings('menu'));
+}
+
+if (pauseBtn) pauseBtn.addEventListener('click', pauseGame);
+if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', resumeGame);
+if (pauseSettingsBtn) pauseSettingsBtn.addEventListener('click', () => {
+  pauseModal.classList.add('hidden');
+  openSettings('pause');
+});
+if (pauseMenuBtn) pauseMenuBtn.addEventListener('click', openMainMenu);
+
+if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettings);
+
 if (toMenuBtn) toMenuBtn.addEventListener('click', openMainMenu);
+if (restartBtn) restartBtn.addEventListener('click', startGame);
 
 function triggerMove(dir: typeof MoveDirection[keyof typeof MoveDirection]): void {
-  if (!isPlaying || engine.getPlayer().isDead) return;
+  if (!isPlaying || isPaused || engine.getPlayer().isDead) return;
   if (engine.queueMove(dir)) {
     audio.playHop(engine.getComboMultiplier());
   }
 }
 
 window.addEventListener('keydown', (e) => {
-  // If modals are open, handle escape or space
+  // If settings modal is open
+  if (!settingsModal.classList.contains('hidden')) {
+    if (e.code === 'Escape' || e.code === 'Enter') {
+      e.preventDefault();
+      closeSettings();
+    }
+    return;
+  }
+
+  // If pause modal is open
+  if (!pauseModal.classList.contains('hidden')) {
+    if (e.code === 'Escape' || e.code === 'KeyP' || e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      resumeGame();
+    }
+    return;
+  }
+
+  // If in game, Escape or 'P' toggles pause
+  if (isPlaying && !engine.getPlayer().isDead) {
+    if (e.code === 'Escape' || e.code === 'KeyP') {
+      e.preventDefault();
+      pauseGame();
+      return;
+    }
+  }
+
+  // If Main Menu is open
   if (!mainMenuModal.classList.contains('hidden')) {
     if (e.code === 'Space' || e.code === 'Enter') {
       e.preventDefault();
@@ -207,6 +274,7 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  // If Gacha modal is open
   if (!gachaModal.classList.contains('hidden')) {
     if (e.code === 'Escape') {
       gachaModal.classList.add('hidden');
@@ -216,6 +284,7 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  // If Leaderboard modal is open
   if (!leaderboardModal.classList.contains('hidden')) {
     if (e.code === 'Escape' || e.code === 'Enter') {
       leaderboardModal.classList.add('hidden');
@@ -223,22 +292,7 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (e.code === 'KeyG') {
-    e.preventDefault();
-    handleGachaRoll();
-    return;
-  }
-
-  if (['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code)) {
-    const idx = Number(e.code.replace('Digit', '')) - 1;
-    const skin = ALL_SKINS[idx];
-    if (skin && engine.selectSkin(skin.id as SkinId)) {
-      audio.playCoin();
-      renderSkinsUI();
-    }
-    return;
-  }
-
+  // Game over state
   if (engine.getPlayer().isDead) {
     if (e.code === 'Space' || e.code === 'Enter') {
       startGame();
@@ -248,6 +302,7 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  // Active gameplay movement
   switch (e.code) {
     case 'KeyW':
     case 'ArrowUp':
@@ -273,8 +328,6 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-if (restartBtn) restartBtn.addEventListener('click', startGame);
-
 const DEATH_LABELS: Record<string, string> = {
   [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
   [DeathReason.TRAIN]: 'Вас снёс скоростной экспресс на переезде!',
@@ -289,7 +342,7 @@ function animate(now: number): void {
   const dt = Math.min((now - lastTime) / 1000, 0.1);
   lastTime = now;
 
-  if (isPlaying) {
+  if (isPlaying && !isPaused) {
     engine.step(dt);
   }
   sceneManager.sync(engine);
@@ -301,12 +354,8 @@ function animate(now: number): void {
     renderSkinsUI();
   }
 
-  scoreEl.textContent = String(engine.getScore());
-  highScoreEl.textContent = String(engine.getHighScore());
-  coinsEl.textContent = String(currentCoins);
-  const mult = engine.getComboMultiplier();
-  comboEl.textContent = `x${mult}`;
-  comboEl.style.color = mult >= 3 ? '#f43f5e' : mult === 2 ? '#fbbf24' : '#38bdf8';
+  if (scoreEl) scoreEl.textContent = String(engine.getScore());
+  if (coinsEl) coinsEl.textContent = String(currentCoins);
 
   const p = engine.getPlayer();
   if (isPlaying && p.isDead && !wasDead) {
@@ -317,8 +366,8 @@ function animate(now: number): void {
       audio.playCrash();
       sceneManager.triggerShake(p.deathReason === DeathReason.TRAIN ? 0.9 : 0.45);
     }
-    deathReasonEl.textContent = DEATH_LABELS[p.deathReason] ?? 'Игра окончена';
-    gameOverModal.classList.remove('hidden');
+    if (deathReasonEl) deathReasonEl.textContent = DEATH_LABELS[p.deathReason] ?? 'Игра окончена';
+    if (gameOverModal) gameOverModal.classList.remove('hidden');
     updateMenuStats();
   }
 

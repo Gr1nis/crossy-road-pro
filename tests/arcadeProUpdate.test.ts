@@ -147,9 +147,9 @@ describe('Arcade Pro Update — Railway, Coins, Rocks/Bushes, Gacha Skins, Combo
     engine.step(1.5);
     assert.equal(engine.getComboMultiplier(), 1, 'Pausing for 1.5s must reset combo multiplier to 1');
 
-    // Verify index.html has no mobile .controls-pad
+    // Verify index.html has no mobile .controls-pad and gacha button is accessed via main menu
     const html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
     assert.equal(html.includes('class="controls-pad"'), false, 'Mobile controls-pad must be removed from index.html');
-    assert.equal(html.includes('gacha-btn'), true, 'Gacha machine button must be present in index.html');
+    assert.equal(html.includes('menu-gacha-btn'), true, 'Gacha machine button must be present in main menu');
   });
 });

@@ -48,22 +48,20 @@ const htmlContent = `<!DOCTYPE html>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; }
     #game-container { width: 100%; height: 100%; position: relative; }
-    .hud { position: fixed; top: 20px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; gap: 14px; }
-    .hud-stats { display: flex; gap: 12px; }
-    .score-card { background: rgba(15, 23, 42, 0.82); backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.2); padding: 10px 18px; border-radius: 14px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); }
-    .score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 700; }
-    .score-number { font-size: 30px; font-weight: 900; line-height: 1.1; color: #38bdf8; }
-    .high-score-number { color: #fbbf24; }
-    .coins-number { color: #facc15; }
-    .gacha-panel { pointer-events: auto; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.22); border-radius: 14px; padding: 10px 14px; color: #fff; display: flex; flex-direction: column; gap: 8px; min-width: 280px; }
-    .gacha-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; transition: transform 0.1s ease, filter 0.1s; }
-    .gacha-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-    .gacha-status { font-size: 12px; color: #fde047; font-weight: 600; min-height: 16px; }
-    .skin-list { display: flex; flex-wrap: wrap; gap: 6px; }
-    .skin-btn { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.1s ease; }
-    .skin-btn.active { border-color: #38bdf8; background: #0284c7; color: #fff; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
-    .skin-btn.locked { opacity: 0.45; cursor: not-allowed; }
     
+    /* Clean Minimal In-Game HUD: Coins, Distance & Pause button only */
+    .hud { position: fixed; top: 20px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
+    .hud-stats { display: flex; gap: 14px; }
+    .score-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.22); padding: 10px 22px; border-radius: 16px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
+    .score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 800; }
+    .score-number { font-size: 32px; font-weight: 900; line-height: 1.1; color: #38bdf8; }
+    .coins-number { color: #facc15; }
+    
+    .hud-actions { pointer-events: auto; }
+    .hud-circle-btn { width: 48px; height: 48px; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 2px solid rgba(255, 255, 255, 0.25); color: #fff; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: transform 0.1s ease, filter 0.1s; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
+    .hud-circle-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
+    .hud-circle-btn:active { transform: scale(0.95); }
+
     .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
     .modal.hidden { display: none !important; }
     .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 36px 40px; text-align: center; color: #f8fafc; max-width: 460px; width: 90%; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); position: relative; }
@@ -83,6 +81,7 @@ const htmlContent = `<!DOCTYPE html>
     .menu-btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 19px; }
     .menu-btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; }
     .menu-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; }
+    .menu-btn-slate { background: linear-gradient(135deg, #475569, #334155); color: #f8fafc; }
     .menu-btn-secondary { background: #334155; color: #e2e8f0; }
 
     .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
@@ -101,6 +100,18 @@ const htmlContent = `<!DOCTYPE html>
     .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-radius: 8px; }
     .placeholder-badge { display: inline-block; background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
 
+    /* Settings Modal Styles */
+    .settings-group { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 16px 20px; margin: 20px 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+    .settings-row { display: flex; justify-content: space-between; align-items: center; }
+    .settings-label { font-size: 15px; font-weight: 700; color: #f8fafc; }
+    .settings-subtext { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .2s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .2s; border-radius: 50%; }
+    input:checked + .slider { background-color: #10b981; }
+    input:checked + .slider:before { transform: translateX(22px); }
+
     .info-links { position: fixed; bottom: 20px; left: 24px; display: flex; gap: 10px; z-index: 15; }
     .info-link { background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 12px; color: #e2e8f0; text-decoration: none; font-size: 13px; font-weight: 700; }
   </style>
@@ -108,30 +119,21 @@ const htmlContent = `<!DOCTYPE html>
 <body>
   <div id="game-container"></div>
 
+  <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
   <div class="hud">
     <div class="hud-stats">
       <div class="score-card">
-        <div class="score-label">Счёт</div>
+        <div class="score-label">Пройденный путь</div>
         <div id="score-value" class="score-number">0</div>
-      </div>
-      <div class="score-card">
-        <div class="score-label">Рекорд</div>
-        <div id="high-score-value" class="score-number high-score-number">0</div>
       </div>
       <div class="score-card">
         <div class="score-label">Монеты 🪙</div>
         <div id="coins-value" class="score-number coins-number">0</div>
       </div>
-      <div class="score-card">
-        <div class="score-label">Ритм-Комбо</div>
-        <div id="combo-value" class="score-number">x1</div>
-      </div>
     </div>
 
-    <div class="gacha-panel">
-      <button id="gacha-btn" class="gacha-btn">🎰 Гача (100 🪙) [G]</button>
-      <div id="gacha-status" class="gacha-status">Управление: WASD / Стрелки / Space | [1-4] Скины</div>
-      <div id="skin-list" class="skin-list"></div>
+    <div class="hud-actions">
+      <button id="pause-btn" class="hud-circle-btn" title="Пауза [Esc / P]">⏸</button>
     </div>
   </div>
 
@@ -155,7 +157,45 @@ const htmlContent = `<!DOCTYPE html>
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
         <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Гача-автомат (100 🪙)</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
+        <button id="menu-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Меню паузы (Pause Modal) -->
+  <div id="pause-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 style="color: #38bdf8;">⏸ ПАУЗА</h2>
+      <p>Игра приостановлена. Выберите действие:</p>
+
+      <div class="menu-btn-stack">
+        <button id="pause-resume-btn" class="menu-btn menu-btn-primary">▶ Продолжить (Esc / P)</button>
+        <button id="pause-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
+        <button id="pause-menu-btn" class="menu-btn menu-btn-secondary">🏠 Обратно в главное меню</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно настроек (Settings Modal) -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 style="color: #94a3b8;">⚙ НАСТРОЙКИ</h2>
+      <p>Параметры звука и управления</p>
+
+      <div class="settings-group">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Звуковые эффекты</div>
+            <div class="settings-subtext">Синтезатор прыжков, монет, поездов и аварий</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-sound-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button id="settings-close-btn" class="menu-btn menu-btn-primary">Готово</button>
     </div>
   </div>
 
