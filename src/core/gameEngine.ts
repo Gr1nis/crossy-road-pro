@@ -3,6 +3,7 @@ import {
   findSupportingLog,
   isOutOfBoundsX,
   quantizeLandX,
+  snapToLogSlot,
 } from './collision.ts';
 import { LaneGenerator } from './laneGenerator.ts';
 import { ScoreTracker } from './scoreTracker.ts';
@@ -295,6 +296,9 @@ export class GameEngine {
           const support = findSupportingLog(this.player.x, landedLane.logs);
           if (support) {
             this.player.ridingLogId = support.id;
+            // Magnetize to the nearest discrete segment slot on the log
+            this.player.x = snapToLogSlot(this.player.x, support);
+            this.player.targetX = this.player.x;
           } else {
             this.killPlayer(DeathReason.WATER);
             return;

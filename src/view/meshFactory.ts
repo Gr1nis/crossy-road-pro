@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { vehicleScreenRotationY } from '../core/collision.ts';
+import { vehicleScreenRotationY, worldToScreenX } from '../core/collision.ts';
 import type { LogPlatform, ObstacleKind, SkinId, Vehicle } from '../core/types.ts';
 
 export class MeshFactory {
@@ -329,6 +329,75 @@ export class MeshFactory {
     const ends = new THREE.Mesh(new THREE.BoxGeometry(log.length + 0.04, 0.22, 0.52), ringMat);
     ends.position.y = -0.04;
     group.add(ends);
+
+    // Visual segment notches representing magnet slots on the log
+    const notchMat = new THREE.MeshLambertMaterial({ color: 0x582a08 });
+    const slotCount = Math.floor(log.length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
+        const notch = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.33, 0.73), notchMat);
+        notch.position.set(s, -0.04, 0);
+        group.add(notch);
+      }
+    }
+
+    return group;
+  }
+
+  static createWaterfallEdge(side: 'left' | 'right'): THREE.Group {
+    const group = new THREE.Group();
+    // Rock cliff bank
+    const cliffMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+    const cliff = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.4, 1.0), cliffMat);
+    cliff.position.set(0, -1.2, 0);
+    cliff.receiveShadow = true;
+    group.add(cliff);
+
+    // Falling water column
+    const waterFallMat = new THREE.MeshLambertMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.88,
+    });
+    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.9), waterFallMat);
+    const fallOffset = side === 'left' ? -0.22 : 0.22;
+    fall.position.set(fallOffset, -1.15, 0);
+    group.add(fall);
+
+    // Foam mist crest at the top
+    const foamMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.94), foamMat);
+    foamTop.position.set(fallOffset, -0.05, 0);
+    group.add(foamTop);
+
+    // Splash bottom block
+    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.96), foamMat);
+    splash.position.set(fallOffset, -2.15, 0);
+    group.add(splash);
+
+    return group;
+  }
+
+  static createRoadMarkings(): THREE.Group {
+    const group = new THREE.Group();
+    const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+    const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); // Amber center dashes
+
+    // Continuous solid white shoulder lines at boundary edges
+    const solidEdgeGeo = new THREE.BoxGeometry(0.12, 0.02, 1.0);
+    const leftSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
+    leftSolid.position.set(worldToScreenX(-9.5), 0.015, 0);
+    const rightSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
+    rightSolid.position.set(worldToScreenX(9.5), 0.015, 0);
+    group.add(leftSolid, rightSolid);
+
+    // Dashed center lane markings
+    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.1);
+    for (let x = -9; x <= 9; x += 1.8) {
+      const dash = new THREE.Mesh(dashGeo, dashMat);
+      dash.position.set(worldToScreenX(x), 0.015, 0);
+      group.add(dash);
+    }
 
     return group;
   }

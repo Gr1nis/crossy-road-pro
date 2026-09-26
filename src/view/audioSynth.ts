@@ -37,24 +37,49 @@ export class AudioSynth {
     return this.ctx;
   }
 
-  playHop(comboMultiplier: number = 1): void {
+  playHop(comboMultiplier: number = 1, surface: 'grass' | 'road' | 'log' | 'rail' = 'grass'): void {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
     const pitchScale = 1 + (Math.max(1, comboMultiplier) - 1) * 0.14;
+    const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(320 * pitchScale, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(580 * pitchScale, ctx.currentTime + 0.09);
 
-    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.09);
+    if (surface === 'log') {
+      // Warm hollow wooden clack
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(220 * pitchScale, now + 0.07);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.075);
+    } else if (surface === 'road') {
+      // Crisp asphalt tap
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(380 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(620 * pitchScale, now + 0.065);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+    } else if (surface === 'rail') {
+      // Metallic ping
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(520 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(780 * pitchScale, now + 0.08);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.085);
+    } else {
+      // Soft bouncy grass hop
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(310 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(560 * pitchScale, now + 0.09);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+    }
 
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.095);
+    osc.start(now);
+    osc.stop(now + 0.1);
   }
 
   playCoin(): void {

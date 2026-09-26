@@ -233,8 +233,15 @@ if (restartBtn) restartBtn.addEventListener('click', startGame);
 
 function triggerMove(dir: typeof MoveDirection[keyof typeof MoveDirection]): void {
   if (!isPlaying || isPaused || engine.getPlayer().isDead) return;
+  const targetRow = engine.getPlayer().row + (dir === MoveDirection.FORWARD ? 1 : dir === MoveDirection.BACKWARD ? -1 : 0);
+  const lane = engine.getLane(targetRow);
+  let surface: 'grass' | 'road' | 'log' | 'rail' = 'grass';
+  if (lane.type === 'ROAD') surface = 'road';
+  else if (lane.type === 'RIVER') surface = 'log';
+  else if (lane.type === 'RAILWAY') surface = 'rail';
+
   if (engine.queueMove(dir)) {
-    audio.playHop(engine.getComboMultiplier());
+    audio.playHop(engine.getComboMultiplier(), surface);
   }
 }
 
@@ -346,7 +353,7 @@ function animate(now: number): void {
   if (isPlaying && !isPaused) {
     engine.step(dt);
   }
-  sceneManager.sync(engine);
+  sceneManager.sync(engine, dt);
 
   const currentCoins = engine.getCoins();
   if (currentCoins > lastCoins) {
@@ -370,6 +377,7 @@ function animate(now: number): void {
   const p = engine.getPlayer();
   if (isPlaying && p.isDead && !wasDead) {
     wasDead = true;
+    sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
     if (p.deathReason === DeathReason.WATER) {
       audio.playSplash();
     } else {

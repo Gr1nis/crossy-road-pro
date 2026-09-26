@@ -20,6 +20,19 @@ export function findSupportingLog(playerX: number, logs: LogPlatform[]): LogPlat
   return null;
 }
 
+/**
+ * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
+ * relative to the center of the log, so the character cleanly magnets to a log section.
+ */
+export function snapToLogSlot(landingX: number, log: LogPlatform): number {
+  const rel = landingX - log.x;
+  // Discrete 1.0-spaced slots centered on log
+  const snappedRel = Math.round(rel);
+  const maxRel = Math.max(0, (log.length - 1.0) / 2);
+  const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
+  return log.x + clampedRel;
+}
+
 export function isOutOfBoundsX(playerX: number): boolean {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
 }
