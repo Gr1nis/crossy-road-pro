@@ -1,6 +1,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { stripTypeScriptTypes } from 'node:module';
+import * as nodeModule from 'node:module';
+import ts from 'typescript';
+
+function stripTypes(source) {
+  if (typeof nodeModule.stripTypeScriptTypes === 'function') {
+    return nodeModule.stripTypeScriptTypes(source);
+  }
+  return ts.transpileModule(source, {
+    compilerOptions: {
+      target: ts.ScriptTarget.ESNext,
+      module: ts.ModuleKind.ESNext,
+    },
+  }).outputText;
+}
 
 const ROOT = process.cwd();
 
@@ -22,7 +35,7 @@ let combinedJs = `import * as THREE from 'https://unpkg.com/three@0.170.0/build/
 for (const relPath of moduleOrder) {
   const fullPath = path.join(ROOT, relPath);
   const tsSource = fs.readFileSync(fullPath, 'utf8');
-  let jsCode = stripTypeScriptTypes(tsSource);
+  let jsCode = stripTypes(tsSource);
 
   // Remove local relative imports and THREE imports (hoisted to top)
   jsCode = jsCode
@@ -88,20 +101,37 @@ const htmlContent = `<!DOCTYPE html>
     .menu-btn-secondary { background: #334155; color: #e2e8f0; }
 
     .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
-    .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; }
+    .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
     .gacha-skin-card.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 14px rgba(56, 189, 248, 0.3); }
-    .gacha-skin-card.locked { opacity: 0.45; cursor: not-allowed; }
-    .gacha-skin-badge { font-size: 32px; margin-bottom: 4px; }
+    .gacha-skin-card.locked { opacity: 0.48; cursor: not-allowed; }
+    .gacha-skin-badge { font-size: 32px; margin: 4px 0; }
     .gacha-skin-name { font-size: 13px; font-weight: 700; color: #f8fafc; }
     .gacha-skin-tag { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-top: 4px; }
     .gacha-skin-card.active .gacha-skin-tag { color: #38bdf8; }
+    .rarity-badge { display: inline-block; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 999px; margin-bottom: 4px; }
+    .rarity-common { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #64748b; }
+    .rarity-rare { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
+    .rarity-epic { background: rgba(192, 132, 252, 0.22); color: #c084fc; border: 1px solid #9333ea; box-shadow: 0 0 8px rgba(168, 85, 247, 0.3); }
+    .rarity-legendary { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.3)); color: #fbbf24; border: 1px solid #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
-    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 18px; margin: 18px 0; text-align: left; }
-    .lb-row { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
+    .lb-name-form { display: flex; gap: 8px; margin-bottom: 12px; }
+    .lb-name-input { flex: 1; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 10px 14px; color: #f8fafc; font-size: 14px; font-weight: 700; outline: none; }
+    .lb-name-input:focus { border-color: #38bdf8; }
+    .lb-save-btn { background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; border-radius: 12px; padding: 0 16px; color: #fff; font-weight: 800; font-size: 13px; cursor: pointer; }
+    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 14px; margin: 12px 0 18px; text-align: left; max-height: 240px; overflow-y: auto; }
+    .lb-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
     .lb-row.header { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #334155; }
-    .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-radius: 8px; }
-    .placeholder-badge { display: inline-block; background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+    .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.12); border-radius: 8px; font-weight: 800; }
+    .placeholder-badge { display: inline-block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
+
+    /* Toast Notifications */
+    #toast-container { position: fixed; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
+    .toast-item { background: rgba(15, 23, 42, 0.94); border: 2px solid #f59e0b; border-radius: 16px; padding: 12px 16px; color: #f8fafc; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); display: flex; align-items: center; gap: 12px; animation: toastIn 0.28s ease-out; backdrop-filter: blur(10px); }
+    .toast-icon { font-size: 26px; line-height: 1; }
+    .toast-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.04em; }
+    .toast-desc { font-size: 12px; color: #e2e8f0; margin-top: 2px; font-weight: 600; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
 
     /* Settings Modal Styles */
     .settings-group { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 16px 20px; margin: 20px 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
@@ -122,6 +152,7 @@ const htmlContent = `<!DOCTYPE html>
 <body>
   <div id="game-container"></div>
   <div id="warning-vignette"></div>
+  <div id="toast-container"></div>
 
   <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
   <div class="hud">
@@ -184,7 +215,7 @@ const htmlContent = `<!DOCTYPE html>
   <div id="settings-modal" class="modal hidden">
     <div class="modal-card">
       <h2 style="color: #94a3b8;">⚙ НАСТРОЙКИ</h2>
-      <p>Параметры звука и управления</p>
+      <p>Параметры звука, музыки и управления</p>
 
       <div class="settings-group">
         <div class="settings-row">
@@ -194,6 +225,16 @@ const htmlContent = `<!DOCTYPE html>
           </div>
           <label class="switch">
             <input type="checkbox" id="setting-sound-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Фоновая музыка</div>
+            <div class="settings-subtext">Динамический ретро-саундтрек во время игры</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-music-toggle" checked>
             <span class="slider"></span>
           </label>
         </div>
@@ -224,34 +265,25 @@ const htmlContent = `<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- Модальное окно Таблицы лидеров (Заглушка) -->
+  <!-- Модальное окно Таблицы лидеров -->
   <div id="leaderboard-modal" class="modal hidden">
     <div class="modal-card">
-      <span class="placeholder-badge">СКОРО В ОБНОВЛЕНИИ</span>
+      <span class="placeholder-badge">LIVE ТОП ЗАБЕГОВ</span>
       <h2 style="color: #c084fc;">🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
-      <p>Глобальный рейтинг игроков находится в разработке и будет подключен в следующем обновлении.</p>
+      <p>Введите своё имя и соревнуйтесь за первое место в рейтинге лучших забегов!</p>
+
+      <div class="lb-name-form">
+        <input type="text" id="leaderboard-name-input" class="lb-name-input" maxlength="18" placeholder="Ваше имя игрока..." value="Игрок" />
+        <button id="leaderboard-save-name-btn" class="lb-save-btn">Сохранить</button>
+      </div>
 
       <div class="leaderboard-preview-box">
         <div class="lb-row header">
           <span>Ранг</span>
           <span>Игрок</span>
-          <span>Рекорд</span>
+          <span>Очки (Лучший: <span id="leaderboard-best-score">0</span>)</span>
         </div>
-        <div class="lb-row current-player">
-          <span>#1 (Вы)</span>
-          <span>👤 Игрок</span>
-          <span id="leaderboard-best-score">0</span>
-        </div>
-        <div class="lb-row" style="opacity: 0.6;">
-          <span>#2</span>
-          <span>🤖 CyberDuck</span>
-          <span>142</span>
-        </div>
-        <div class="lb-row" style="opacity: 0.5;">
-          <span>#3</span>
-          <span>🤖 MasterChicken</span>
-          <span>98</span>
-        </div>
+        <div id="leaderboard-rows"></div>
       </div>
 
       <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>

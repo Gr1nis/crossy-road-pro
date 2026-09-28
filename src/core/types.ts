@@ -36,6 +36,32 @@ export const ALL_SKINS: ReadonlyArray<{ id: SkinId; name: string; badge: string 
   { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
 ];
 
+export const Biome = {
+  FOREST: 'forest',
+  WINTER: 'winter',
+  DESERT: 'desert',
+  NEON: 'neon',
+} as const;
+
+export type BiomeType = (typeof Biome)[keyof typeof Biome];
+export type BiomeValue = BiomeType;
+export type BiomeId = BiomeType;
+
+export const BIOME_ORDER: ReadonlyArray<BiomeType> = [
+  Biome.FOREST,
+  Biome.WINTER,
+  Biome.DESERT,
+  Biome.NEON,
+];
+
+export const BIOME_INTERVAL = 25;
+
+export function getBiomeForScore(score: number): BiomeType {
+  const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
+  const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
+  return BIOME_ORDER[biomeIndex];
+}
+
 export type ObstacleKind = 'tree' | 'rock' | 'bush';
 
 export interface ObstacleDetail {
@@ -73,6 +99,7 @@ export interface TrainState {
 export interface Lane {
   index: number;
   type: LaneTypeValue;
+  biome: BiomeType;
   obstacles: number[];
   obstacleDetails: ObstacleDetail[];
   coins: number[];
@@ -98,6 +125,18 @@ export interface PlayerState {
   facing: MoveDirectionValue;
 }
 
+export interface GameState {
+  player: PlayerState;
+  score: number;
+  highScore: number;
+  bestRow: number;
+  coins: number;
+  biome: BiomeType;
+  comboMultiplier: number;
+  cameraZ: number;
+  cameraGraceRatio: number;
+}
+
 export interface StorageAdapter {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
@@ -115,4 +154,5 @@ export const WORLD_CONFIG = {
   CAMERA_GRACE_PERIOD: 1.25,
   BASE_CAMERA_SPEED: 0.85,
   GACHA_COST: 100,
+  BIOME_INTERVAL: 25,
 } as const;

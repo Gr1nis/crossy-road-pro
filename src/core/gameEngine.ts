@@ -11,9 +11,12 @@ import { LaneGenerator } from './laneGenerator.ts';
 import { ScoreTracker } from './scoreTracker.ts';
 import {
   DeathReason,
+  getBiomeForScore,
   LaneType,
   MoveDirection,
   WORLD_CONFIG,
+  type BiomeType,
+  type GameState,
   type Lane,
   type MoveDirectionValue,
   type PlayerState,
@@ -63,9 +66,11 @@ export class GameEngine {
   private ensureLanesAround(centerRow: number): void {
     const minR = Math.min(centerRow - 8, Math.floor(this.cameraZ) - 26);
     const maxR = Math.max(centerRow + 28, Math.floor(this.cameraZ) + 28);
+    const currentScore = this.scoreTracker.getScore();
     for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
-        this.lanes.set(r, this.generator.generateLane(r));
+        const effectiveScore = Math.max(0, r, currentScore);
+        this.lanes.set(r, this.generator.generateLane(r, effectiveScore));
       }
     }
   }
@@ -74,10 +79,37 @@ export class GameEngine {
     return this.player;
   }
 
+  getBiome(): BiomeType {
+    return getBiomeForScore(this.getScore());
+  }
+
+  getCurrentBiome(): BiomeType {
+    return this.getBiome();
+  }
+
+  getGameState(): GameState {
+    return {
+      player: this.player,
+      score: this.getScore(),
+      highScore: this.getHighScore(),
+      bestRow: this.getBestRow(),
+      coins: this.getCoins(),
+      biome: this.getBiome(),
+      comboMultiplier: this.getComboMultiplier(),
+      cameraZ: this.cameraZ,
+      cameraGraceRatio: this.getCameraGraceRatio(),
+    };
+  }
+
+  getState(): GameState {
+    return this.getGameState();
+  }
+
   getLane(row: number): Lane {
     let lane = this.lanes.get(row);
     if (!lane) {
-      lane = this.generator.generateLane(row);
+      const effectiveScore = Math.max(0, row, this.scoreTracker.getScore());
+      lane = this.generator.generateLane(row, effectiveScore);
       this.lanes.set(row, lane);
     }
     return lane;
@@ -146,7 +178,11 @@ export class GameEngine {
     return this.scoreTracker.selectSkin(skinId);
   }
 
-  rollGacha(): { success: boolean; skinId?: SkinId; reason?: string } {
+  getScoreTracker(): ScoreTracker {
+    return this.scoreTracker;
+  }
+
+  rollGacha() {
     this.gachaNonce += 1;
     return this.scoreTracker.rollGacha(this.gachaNonce);
   }
@@ -299,13 +335,19 @@ export class GameEngine {
         this.player.row = this.player.targetRow;
         this.player.x = this.player.targetX;
 
-        this.ensureLanesAround(this.player.row);
         if (this.player.row > this.highestRowThisRun) {
           this.highestRowThisRun = this.player.row;
           this.comboStreak += 1;
           this.comboTimer = 1.25;
         }
         this.scoreTracker.updateRow(this.player.row, this.getComboMultiplier());
+        const currentScore = this.scoreTracker.getScore();
+        for (const [r, cachedLane] of this.lanes.entries()) {
+          if (r >= this.player.row) {
+            cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
+          }
+        }
+        this.ensureLanesAround(this.player.row);
 
         const landedLane = this.getLane(this.player.row);
         if (landedLane.type === LaneType.RIVER) {

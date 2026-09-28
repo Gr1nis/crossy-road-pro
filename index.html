@@ -48,20 +48,37 @@
     .menu-btn-secondary { background: #334155; color: #e2e8f0; }
 
     .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
-    .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; }
+    .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
     .gacha-skin-card.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 14px rgba(56, 189, 248, 0.3); }
-    .gacha-skin-card.locked { opacity: 0.45; cursor: not-allowed; }
-    .gacha-skin-badge { font-size: 32px; margin-bottom: 4px; }
+    .gacha-skin-card.locked { opacity: 0.48; cursor: not-allowed; }
+    .gacha-skin-badge { font-size: 32px; margin: 4px 0; }
     .gacha-skin-name { font-size: 13px; font-weight: 700; color: #f8fafc; }
     .gacha-skin-tag { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-top: 4px; }
     .gacha-skin-card.active .gacha-skin-tag { color: #38bdf8; }
+    .rarity-badge { display: inline-block; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 999px; margin-bottom: 4px; }
+    .rarity-common { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #64748b; }
+    .rarity-rare { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
+    .rarity-epic { background: rgba(192, 132, 252, 0.22); color: #c084fc; border: 1px solid #9333ea; box-shadow: 0 0 8px rgba(168, 85, 247, 0.3); }
+    .rarity-legendary { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.3)); color: #fbbf24; border: 1px solid #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
-    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 18px; margin: 18px 0; text-align: left; }
-    .lb-row { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
+    .lb-name-form { display: flex; gap: 8px; margin-bottom: 12px; }
+    .lb-name-input { flex: 1; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 10px 14px; color: #f8fafc; font-size: 14px; font-weight: 700; outline: none; }
+    .lb-name-input:focus { border-color: #38bdf8; }
+    .lb-save-btn { background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; border-radius: 12px; padding: 0 16px; color: #fff; font-weight: 800; font-size: 13px; cursor: pointer; }
+    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 14px; margin: 12px 0 18px; text-align: left; max-height: 240px; overflow-y: auto; }
+    .lb-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
     .lb-row.header { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #334155; }
-    .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-radius: 8px; }
-    .placeholder-badge { display: inline-block; background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+    .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.12); border-radius: 8px; font-weight: 800; }
+    .placeholder-badge { display: inline-block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
+
+    /* Toast Notifications */
+    #toast-container { position: fixed; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
+    .toast-item { background: rgba(15, 23, 42, 0.94); border: 2px solid #f59e0b; border-radius: 16px; padding: 12px 16px; color: #f8fafc; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); display: flex; align-items: center; gap: 12px; animation: toastIn 0.28s ease-out; backdrop-filter: blur(10px); }
+    .toast-icon { font-size: 26px; line-height: 1; }
+    .toast-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.04em; }
+    .toast-desc { font-size: 12px; color: #e2e8f0; margin-top: 2px; font-weight: 600; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
 
     /* Settings Modal Styles */
     .settings-group { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 16px 20px; margin: 20px 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
@@ -82,6 +99,7 @@
 <body>
   <div id="game-container"></div>
   <div id="warning-vignette"></div>
+  <div id="toast-container"></div>
 
   <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
   <div class="hud">
@@ -144,7 +162,7 @@
   <div id="settings-modal" class="modal hidden">
     <div class="modal-card">
       <h2 style="color: #94a3b8;">⚙ НАСТРОЙКИ</h2>
-      <p>Параметры звука и управления</p>
+      <p>Параметры звука, музыки и управления</p>
 
       <div class="settings-group">
         <div class="settings-row">
@@ -154,6 +172,16 @@
           </div>
           <label class="switch">
             <input type="checkbox" id="setting-sound-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Фоновая музыка</div>
+            <div class="settings-subtext">Динамический ретро-саундтрек во время игры</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-music-toggle" checked>
             <span class="slider"></span>
           </label>
         </div>
@@ -184,34 +212,25 @@
     </div>
   </div>
 
-  <!-- Модальное окно Таблицы лидеров (Заглушка) -->
+  <!-- Модальное окно Таблицы лидеров -->
   <div id="leaderboard-modal" class="modal hidden">
     <div class="modal-card">
-      <span class="placeholder-badge">СКОРО В ОБНОВЛЕНИИ</span>
+      <span class="placeholder-badge">LIVE ТОП ЗАБЕГОВ</span>
       <h2 style="color: #c084fc;">🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
-      <p>Глобальный рейтинг игроков находится в разработке и будет подключен в следующем обновлении.</p>
+      <p>Введите своё имя и соревнуйтесь за первое место в рейтинге лучших забегов!</p>
+
+      <div class="lb-name-form">
+        <input type="text" id="leaderboard-name-input" class="lb-name-input" maxlength="18" placeholder="Ваше имя игрока..." value="Игрок" />
+        <button id="leaderboard-save-name-btn" class="lb-save-btn">Сохранить</button>
+      </div>
 
       <div class="leaderboard-preview-box">
         <div class="lb-row header">
           <span>Ранг</span>
           <span>Игрок</span>
-          <span>Рекорд</span>
+          <span>Очки (Лучший: <span id="leaderboard-best-score">0</span>)</span>
         </div>
-        <div class="lb-row current-player">
-          <span>#1 (Вы)</span>
-          <span>👤 Игрок</span>
-          <span id="leaderboard-best-score">0</span>
-        </div>
-        <div class="lb-row" style="opacity: 0.6;">
-          <span>#2</span>
-          <span>🤖 CyberDuck</span>
-          <span>142</span>
-        </div>
-        <div class="lb-row" style="opacity: 0.5;">
-          <span>#3</span>
-          <span>🤖 MasterChicken</span>
-          <span>98</span>
-        </div>
+        <div id="leaderboard-rows"></div>
       </div>
 
       <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
@@ -256,7 +275,21 @@ const LaneType = {
   { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
   { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
   { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
-];const WORLD_CONFIG = {
+];const Biome = {
+  FOREST: 'forest',
+  WINTER: 'winter',
+  DESERT: 'desert',
+  NEON: 'neon',
+}         ;const BIOME_ORDER                           = [
+  Biome.FOREST,
+  Biome.WINTER,
+  Biome.DESERT,
+  Biome.NEON,
+];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
+  const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
+  const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
+  return BIOME_ORDER[biomeIndex];
+}const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -264,10 +297,11 @@ const LaneType = {
   HOP_DURATION: 0.12,
   PLAYER_WIDTH: 0.65,
   LOG_MARGIN: 0.12,
-  CAMERA_BACK_LIMIT: 7.2,
+  CAMERA_BACK_LIMIT: 18.0,
   CAMERA_GRACE_PERIOD: 1.25,
   BASE_CAMERA_SPEED: 0.85,
   GACHA_COST: 100,
+  BIOME_INTERVAL: 25,
 }         ;
 
 // --- Module: src/core/prng.ts ---
@@ -343,20 +377,83 @@ function checkVehicleCollision(playerX        , vehicles           )            
   return speed > 0 ? Math.PI : 0;
 }
 
+/**
+ * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
+ * of the player character under the isometric orthographic camera.
+ * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
+ */function getCameraFrustumNdcY(playerX        , playerRow        , camZ        )         {
+  const sx = -playerX + 0.35;
+  const sy = 0.65;
+  const sz = playerRow + 0.35;
+  const dx = sx + 7.5;
+  const dy = sy - 12.5;
+  const dz = sz - camZ + 7.5;
+  const vy = dx * 0.42426406871192857 + dy * 0.7071067811865476 + dz * 0.565685424949238;
+  return vy / 11;
+}
+
+/**
+ * Returns true only when the player's 3D mesh has completely crossed below
+ * the visible bottom edge of the screen (NDC Y < -1.0).
+ */function isPlayerBehindCameraFrustum(playerX        , playerRow        , camZ        )          {
+  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -1.0;
+}
+
 // --- Module: src/core/scoreTracker.ts ---
 const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
-const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
+  COMMON: 'Common',
+  RARE: 'Rare',
+  EPIC: 'Epic',
+  LEGENDARY: 'Legendary',
+}         ;const GACHA_DUPLICATE_CASHBACK = 40;const MAX_LEADERBOARD_ENTRIES = 10;const SKIN_RARITY_MAP                                  = {
+  chicken: SkinRarity.COMMON,
+  cyber_duck: SkinRarity.RARE,
+  shadow_ninja: SkinRarity.EPIC,
+  frost_penguin: SkinRarity.LEGENDARY,
+};const SKIN_RARITY_WEIGHTS                                  = {
+  [SkinRarity.COMMON]: 50,
+  [SkinRarity.RARE]: 30,
+  [SkinRarity.EPIC]: 15,
+  [SkinRarity.LEGENDARY]: 5,
+};const DEFAULT_BOT_RIVALS                                                = [
+  { playerName: 'CyberKaiser', score: 250, skinId: 'shadow_ninja', date: '2026-09-20', isBot: true },
+  { playerName: 'ArcticFlash', score: 210, skinId: 'frost_penguin', date: '2026-09-21', isBot: true },
+  { playerName: 'NeonQuack', score: 175, skinId: 'cyber_duck', date: '2026-09-22', isBot: true },
+  { playerName: 'ShadowHopper', score: 142, skinId: 'shadow_ninja', date: '2026-09-23', isBot: true },
+  { playerName: 'MasterChicken', score: 115, skinId: 'chicken', date: '2026-09-23', isBot: true },
+  { playerName: 'GlacierWing', score: 95, skinId: 'frost_penguin', date: '2026-09-24', isBot: true },
+  { playerName: 'PixelDrifter', score: 75, skinId: 'cyber_duck', date: '2026-09-24', isBot: true },
+  { playerName: 'TurboCluck', score: 55, skinId: 'chicken', date: '2026-09-25', isBot: true },
+  { playerName: 'TrainDodger', score: 35, skinId: 'shadow_ninja', date: '2026-09-25', isBot: true },
+  { playerName: 'RookieFeather', score: 18, skinId: 'chicken', date: '2026-09-26', isBot: true },
+];const ACHIEVEMENT_DEFINITIONS                                                              = [
+  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣' },
+  { id: 'collector', title: 'Коллекционер', description: 'Откройте все скины в Гача-автомате', badge: '🎭' },
+  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆' },
+  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰' },
+  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑' },
+];class ScoreTracker {
           currentScore = 0;
           highScore = 0;
           bestRow = 0;
           coins = 0;
           unlockedSkins           = ['chicken'];
           selectedSkin         = 'chicken';
+          playerName = 'Игрок';
+          playerRuns                                        = [];
+          unlockedAchievements = new Set               ();
+          achievementDates = new Map                       ();
+          trainsSurvived = 0;
           storage                 ;
 
-  constructor(storage                 ) {
+  constructor(storage                 , initialPlayerName         ) {
     this.storage = storage;
+    if (initialPlayerName && initialPlayerName.trim().length > 0) {
+      this.playerName = initialPlayerName.trim();
+    }
     this.loadFromStorage();
+    this.evaluateAchievements();
   }
 
           loadFromStorage()       {
@@ -390,6 +487,35 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
         if (typeof data.selectedSkin === 'string' && this.unlockedSkins.includes(data.selectedSkin          )) {
           this.selectedSkin = data.selectedSkin          ;
         }
+        if (typeof data.playerName === 'string' && data.playerName.trim().length > 0) {
+          this.playerName = data.playerName.trim();
+        }
+        if (Array.isArray(data.playerRuns)) {
+          this.playerRuns = data.playerRuns
+            .filter(
+              (r)                                      =>
+                Boolean(r) &&
+                typeof r.playerName === 'string' &&
+                typeof r.score === 'number' &&
+                Number.isFinite(r.score) &&
+                r.score >= 0 &&
+                validSkinIds.has(r.skinId) &&
+                typeof r.date === 'string'
+            )
+            .map((r) => ({ ...r, score: Math.floor(r.score), isBot: false }))
+            .slice(0, MAX_LEADERBOARD_ENTRIES);
+        }
+        const validAchIds = new Set        (ACHIEVEMENT_DEFINITIONS.map((a) => a.id));
+        if (Array.isArray(data.unlockedAchievements)) {
+          for (const id of data.unlockedAchievements) {
+            if (validAchIds.has(id)) {
+              this.unlockedAchievements.add(id                 );
+            }
+          }
+        }
+        if (typeof data.trainsSurvived === 'number' && Number.isFinite(data.trainsSurvived) && data.trainsSurvived >= 0) {
+          this.trainsSurvived = Math.floor(data.trainsSurvived);
+        }
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -406,6 +532,10 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
         coins: this.coins,
         unlockedSkins: this.unlockedSkins,
         selectedSkin: this.selectedSkin,
+        playerName: this.playerName,
+        playerRuns: this.playerRuns,
+        unlockedAchievements: Array.from(this.unlockedAchievements),
+        trainsSurvived: this.trainsSurvived,
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
@@ -414,6 +544,7 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
   }
 
   updateRow(row        , multiplier         = 1)       {
+    if (!Number.isFinite(row)) return;
     const cleanRow = Math.floor(row);
     if (cleanRow > this.bestRow) {
       this.bestRow = cleanRow;
@@ -424,6 +555,7 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
       if (this.currentScore > this.highScore) {
         this.highScore = this.currentScore;
       }
+      this.evaluateAchievements();
       this.saveToStorage();
     }
   }
@@ -447,6 +579,7 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
   addCoins(amount        )       {
     if (!Number.isFinite(amount) || amount <= 0) return;
     this.coins += Math.floor(amount);
+    this.evaluateAchievements();
     this.saveToStorage();
   }
 
@@ -458,6 +591,10 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
     return this.selectedSkin;
   }
 
+  getSkinRarity(skinId        )                  {
+    return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
+  }
+
   selectSkin(skinId        )          {
     if (!this.unlockedSkins.includes(skinId)) return false;
     this.selectedSkin = skinId;
@@ -465,29 +602,208 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';class ScoreTracker {
     return true;
   }
 
-  rollGacha(randomIndex         = 0)                                                         {
-    const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.unlockedSkins.includes(id));
-    if (locked.length === 0) {
-      return { success: false, reason: 'ALL_UNLOCKED' };
+          pickSkinByRoll(randomInput        )         {
+    if (!Number.isInteger(randomInput) && randomInput > 0 && randomInput < 1) {
+      const rollPct = randomInput * 100;
+      if (rollPct < 50) return 'chicken';
+      if (rollPct < 80) return 'cyber_duck';
+      if (rollPct < 95) return 'shadow_ninja';
+      return 'frost_penguin';
     }
+    const intVal = Math.floor(randomInput);
+    if (intVal > 0) {
+      const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.unlockedSkins.includes(id));
+      if (locked.length > 0) {
+        return locked[(intVal - 1) % locked.length];
+      }
+    }
+    const idx = Math.abs(intVal) % ALL_SKINS.length;
+    return ALL_SKINS[idx].id;
+  }
+
+  rollGacha(randomIndex         = 0, forceSkinId         )                  {
     if (this.coins < WORLD_CONFIG.GACHA_COST) {
       return { success: false, reason: 'NOT_ENOUGH_COINS' };
     }
     this.coins -= WORLD_CONFIG.GACHA_COST;
-    const idx = Math.abs(Math.floor(randomIndex)) % locked.length;
-    const chosen = locked[idx];
+    const chosen = forceSkinId ?? this.pickSkinByRoll(randomIndex);
+    const rarity = this.getSkinRarity(chosen);
+    const isDuplicate = this.unlockedSkins.includes(chosen);
+
+    if (isDuplicate) {
+      this.coins += GACHA_DUPLICATE_CASHBACK;
+      this.evaluateAchievements();
+      this.saveToStorage();
+      return {
+        success: true,
+        skinId: chosen,
+        rarity,
+        isDuplicate: true,
+        cashback: GACHA_DUPLICATE_CASHBACK,
+      };
+    }
+
     this.unlockedSkins.push(chosen);
     this.selectedSkin = chosen;
+    this.evaluateAchievements();
     this.saveToStorage();
-    return { success: true, skinId: chosen };
+    return {
+      success: true,
+      skinId: chosen,
+      rarity,
+      isDuplicate: false,
+      cashback: 0,
+    };
+  }
+
+  getPlayerName()         {
+    return this.playerName;
+  }
+
+  setPlayerName(name        )       {
+    const clean = name.trim();
+    if (clean.length > 0) {
+      this.playerName = clean.slice(0, 24);
+      this.saveToStorage();
+    }
+  }
+
+  recordRun(
+    score         = this.currentScore,
+    meta                                                          
+  )                                                                                                         {
+    const cleanScore = Number.isFinite(score) && score >= 0 ? Math.floor(score) : 0;
+    const prevLeaderboard = this.getLeaderboard();
+    const prevBotsAbove = prevLeaderboard.filter((e) => e.isBot && e.score >= this.highScore).map((e) => e.playerName);
+
+    const isNewHighScore = cleanScore > this.highScore;
+    if (isNewHighScore) {
+      this.highScore = cleanScore;
+      if (cleanScore > this.bestRow) {
+        this.bestRow = cleanScore;
+      }
+    }
+
+    const entryDate = meta?.date ?? new Date().toISOString().slice(0, 10);
+    const entryName = meta?.playerName?.trim() || this.playerName;
+    const entrySkin = meta?.skinId ?? this.selectedSkin;
+
+    if (cleanScore > 0) {
+      this.playerRuns.unshift({
+        playerName: entryName,
+        score: cleanScore,
+        skinId: entrySkin,
+        date: entryDate,
+        isBot: false,
+      });
+      this.playerRuns.sort((a, b) => b.score - a.score);
+      this.playerRuns = this.playerRuns.slice(0, MAX_LEADERBOARD_ENTRIES);
+    }
+
+    const updated = this.getLeaderboard();
+    const overtakenBots = prevBotsAbove.filter((botName) => {
+      const bot = DEFAULT_BOT_RIVALS.find((b) => b.playerName === botName);
+      return bot !== undefined && cleanScore > bot.score;
+    });
+
+    const found = updated.find(
+      (e) => !e.isBot && e.score === cleanScore && e.playerName === entryName && e.skinId === entrySkin
+    );
+    this.evaluateAchievements();
+    this.saveToStorage();
+    return {
+      rank: found ? found.rank : null,
+      overtakenBots,
+      isNewHighScore,
+      entries: updated,
+    };
+  }
+
+  getPlayerRuns()                     {
+    return this.playerRuns.map((r, idx) => ({ ...r, rank: idx + 1 }));
+  }
+
+  getLeaderboard()                     {
+    const combined                                        = [...this.playerRuns, ...DEFAULT_BOT_RIVALS];
+    combined.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.isBot !== b.isBot) return a.isBot ? 1 : -1;
+      return 0;
+    });
+    return combined.slice(0, MAX_LEADERBOARD_ENTRIES).map((entry, idx) => ({
+      ...entry,
+      rank: idx + 1,
+    }));
+  }
+
+  getNextRival(referenceScore         = this.currentScore)                          {
+    const board = this.getLeaderboard();
+    const botsAhead = board.filter((e) => e.isBot && e.score > referenceScore);
+    if (botsAhead.length === 0) return null;
+    return botsAhead[botsAhead.length - 1];
+  }
+
+  recordTrainSurvived(count         = 1)       {
+    if (!Number.isFinite(count) || count <= 0) return;
+    this.trainsSurvived += Math.floor(count);
+    this.evaluateAchievements();
+    this.saveToStorage();
+  }
+
+  getTrainsSurvived()         {
+    return this.trainsSurvived;
+  }
+
+  unlockAchievement(id               , date         )          {
+    if (this.unlockedAchievements.has(id)) return false;
+    this.unlockedAchievements.add(id);
+    this.achievementDates.set(id, date ?? new Date().toISOString().slice(0, 10));
+    this.saveToStorage();
+    return true;
+  }
+
+  isAchievementUnlocked(id               )          {
+    return this.unlockedAchievements.has(id);
+  }
+
+  getAchievements()                {
+    return ACHIEVEMENT_DEFINITIONS.map((def) => ({
+      ...def,
+      unlocked: this.unlockedAchievements.has(def.id),
+      unlockedAt: this.achievementDates.get(def.id),
+    }));
+  }
+
+          evaluateAchievements()       {
+    if (this.currentScore >= 50 || this.highScore >= 50) {
+      this.unlockedAchievements.add('first_50_steps');
+    }
+    if (this.unlockedSkins.length >= ALL_SKINS.length) {
+      this.unlockedAchievements.add('collector');
+    }
+    if (this.trainsSurvived >= 5) {
+      this.unlockedAchievements.add('train_conqueror');
+    }
+    if (this.coins >= 200) {
+      this.unlockedAchievements.add('rich_hopper');
+    }
+    const topBotScore = DEFAULT_BOT_RIVALS[0]?.score ?? 250;
+    if (this.highScore > topBotScore) {
+      this.unlockedAchievements.add('leaderboard_champion');
+    }
   }
 
   resetCurrentScore()       {
+    if (this.currentScore > 0) {
+      this.recordRun(this.currentScore);
+    }
     this.currentScore = 0;
   }
 }
 
 // --- Module: src/core/laneGenerator.ts ---
+export { Biome, BIOME_INTERVAL, BIOME_ORDER, getBiomeForScore,                };
+
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
 const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGenerator {
                    baseSeed        ;
@@ -507,8 +823,20 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
     return rng.nextInt(-5, 5);
   }
 
-  generateLane(index        )       {
+  getBiome(scoreOrIndex        )            {
+    return getBiomeForScore(scoreOrIndex);
+  }
+
+  getDifficultyFactor(scoreOrIndex        )         {
+    const effective = Math.max(0, scoreOrIndex);
+    return 1 + Math.min(effective * 0.015, 1.8);
+  }
+
+  generateLane(index        , score         )       {
     const rng = this.rowPrng(index);
+    const effectiveScore = score !== undefined ? Math.max(0, score) : Math.max(0, index);
+    const biome = getBiomeForScore(effectiveScore);
+    const tier = Math.floor(effectiveScore / BIOME_INTERVAL);
 
     let type                = LaneType.GRASS;
     if (index > 2) {
@@ -525,8 +853,8 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
     }
 
     const direction         = index % 2 === 0 ? 1 : -1;
-    const difficultyFactor = 1 + Math.min(Math.max(0, index) * 0.01, 1.1);
-    const speed = rng.nextFloat(1.8, 3.4) * difficultyFactor * direction;
+    const difficultyFactor = this.getDifficultyFactor(effectiveScore);
+    const speed = rng.nextFloat(2.0, 3.0) * difficultyFactor * direction;
 
     const obstacles           = [];
     const obstacleDetails                   = [];
@@ -538,12 +866,16 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
     if (type === LaneType.GRASS) {
       const safeCurrent = this.getSafeCorridorX(index);
       const safePrev = this.getSafeCorridorX(index - 1);
+      const totalCols = WORLD_CONFIG.MAX_X - WORLD_CONFIG.MIN_X + 1;
+      const maxObstacles = totalCols - 5; // Guarantees >= 5 free columns (>= 4 required)
 
-      for (let x = WORLD_CONFIG.MIN_X; x <= WORLD_CONFIG.MAX_X; x++) {
+      for (let x         = WORLD_CONFIG.MIN_X; x <= WORLD_CONFIG.MAX_X; x++) {
         if (index <= 2 && Math.abs(x) <= 2) continue;
         if (x === safeCurrent || x === safePrev || x === 0) continue;
+        if (obstacles.length >= maxObstacles) continue;
 
-        const treeChance = index <= 0 ? 0.35 : 0.28;
+        const treeChance =
+          index <= 0 ? 0.35 : Math.min(0.4, 0.26 + Math.min(effectiveScore, 140) * 0.001);
         if (rng.next() < treeChance) {
           obstacles.push(x);
           const kind = OBSTACLE_KINDS[rng.nextInt(0, OBSTACLE_KINDS.length - 1)];
@@ -552,13 +884,21 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
       }
     } else if (type === LaneType.ROAD) {
       const isTruckLane = rng.next() < 0.32;
-      const count = isTruckLane ? rng.nextInt(3, 4) : rng.nextInt(4, 6);
+      const densityTier = Math.min(4, tier);
+      const baseCount = isTruckLane ? rng.nextInt(2, 3) : rng.nextInt(3, 4);
+      const bonusCount = isTruckLane ? densityTier : Math.round(densityTier * 1.5);
+      const count = isTruckLane
+        ? Math.min(7, baseCount + bonusCount)
+        : Math.min(10, baseCount + bonusCount);
       const vehicleLen = isTruckLane ? 2.3 : 1.35;
       const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
       const spacing = ringSpan / count;
+      // Bound jitter so bumper-to-bumper clear gap is always >= 2.2 units for guaranteed passability
+      const maxJitter = Math.min(0.45, Math.max(0.1, (spacing - vehicleLen - 2.2) / 2));
 
       for (let i = 0; i < count; i++) {
-        const offset = -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-0.8, 0.8);
+        const offset =
+          -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-maxJitter, maxJitter);
         vehicles.push({
           id: index * 100 + i + 1,
           x: offset,
@@ -569,11 +909,11 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
         });
       }
     } else if (type === LaneType.RIVER) {
-      const logCount = 5;
+      const logCount = effectiveScore >= 75 ? 4 : 5;
       const logLen = rng.nextFloat(2.8, 3.8);
       const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
       const spacing = ringSpan / logCount;
-      const riverSpeed = rng.nextFloat(1.3, 2.5) * difficultyFactor * direction;
+      const riverSpeed = rng.nextFloat(1.3, 2.3) * (1 + Math.min(effectiveScore * 0.008, 0.8)) * direction;
 
       for (let i = 0; i < logCount; i++) {
         const offset = -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-0.6, 0.6);
@@ -585,8 +925,10 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
         });
       }
     } else if (type === LaneType.RAILWAY) {
-      const period = rng.nextFloat(5.0, 7.5);
-      const trainSpeed = 32.0 * direction;
+      const trainSpeedFactor = 1 + Math.min(effectiveScore * 0.01, 1.0);
+      const periodScale = 1 + Math.min(effectiveScore * 0.008, 0.6);
+      const period = Math.max(3.0, rng.nextFloat(5.4, 7.2) / periodScale);
+      const trainSpeed = 32.0 * trainSpeedFactor * direction;
       train = {
         timer: rng.nextFloat(0, period * 0.7),
         period,
@@ -610,6 +952,7 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
     return {
       index,
       type,
+      biome,
       obstacles,
       obstacleDetails,
       coins,
@@ -621,10 +964,10 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
     };
   }
 
-  generateRange(startIndex        , endIndex        )         {
+  generateRange(startIndex        , endIndex        , score         )         {
     const result         = [];
     for (let i = startIndex; i <= endIndex; i++) {
-      result.push(this.generateLane(i));
+      result.push(this.generateLane(i, score));
     }
     return result;
   }
@@ -669,9 +1012,13 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
   }
 
           ensureLanesAround(centerRow        )       {
-    for (let r = centerRow - 8; r <= centerRow + 28; r++) {
+    const minR = Math.min(centerRow - 8, Math.floor(this.cameraZ) - 26);
+    const maxR = Math.max(centerRow + 28, Math.floor(this.cameraZ) + 28);
+    const currentScore = this.scoreTracker.getScore();
+    for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
-        this.lanes.set(r, this.generator.generateLane(r));
+        const effectiveScore = Math.max(0, r, currentScore);
+        this.lanes.set(r, this.generator.generateLane(r, effectiveScore));
       }
     }
   }
@@ -680,10 +1027,37 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     return this.player;
   }
 
+  getBiome()            {
+    return getBiomeForScore(this.getScore());
+  }
+
+  getCurrentBiome()            {
+    return this.getBiome();
+  }
+
+  getGameState()            {
+    return {
+      player: this.player,
+      score: this.getScore(),
+      highScore: this.getHighScore(),
+      bestRow: this.getBestRow(),
+      coins: this.getCoins(),
+      biome: this.getBiome(),
+      comboMultiplier: this.getComboMultiplier(),
+      cameraZ: this.cameraZ,
+      cameraGraceRatio: this.getCameraGraceRatio(),
+    };
+  }
+
+  getState()            {
+    return this.getGameState();
+  }
+
   getLane(row        )       {
     let lane = this.lanes.get(row);
     if (!lane) {
-      lane = this.generator.generateLane(row);
+      const effectiveScore = Math.max(0, row, this.scoreTracker.getScore());
+      lane = this.generator.generateLane(row, effectiveScore);
       this.lanes.set(row, lane);
     }
     return lane;
@@ -692,8 +1066,8 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
   getActiveLanes()         {
     this.ensureLanesAround(Math.round(this.player.row));
     const list         = [];
-    const minRow = Math.floor(this.cameraZ) - 12;
-    const maxRow = Math.floor(this.player.row) + 24;
+    const minRow = Math.min(Math.floor(this.cameraZ) - 24, Math.floor(this.player.row) - 8);
+    const maxRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));
     }
@@ -702,6 +1076,18 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
 
   getCameraZ()         {
     return this.cameraZ;
+  }
+
+  getPlayerNdcY()         {
+    return getCameraFrustumNdcY(this.player.x, this.player.row, this.cameraZ);
+  }
+
+  isBehindCameraEdge()          {
+    return isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+  }
+
+  getCameraGraceTimer()         {
+    return this.cameraGraceTimer;
   }
 
   getCameraGraceRatio()         {
@@ -740,7 +1126,11 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     return this.scoreTracker.selectSkin(skinId);
   }
 
-  rollGacha()                                                         {
+  getScoreTracker()               {
+    return this.scoreTracker;
+  }
+
+  rollGacha() {
     this.gachaNonce += 1;
     return this.scoreTracker.rollGacha(this.gachaNonce);
   }
@@ -834,8 +1224,8 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     }
 
     const currentLane = this.getLane(Math.round(this.player.row));
-    const minSimRow = Math.floor(this.cameraZ) - 6;
-    const maxSimRow = Math.floor(this.player.row) + 24;
+    const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
 
     for (let r = minSimRow; r <= maxSimRow; r++) {
       const lane = this.getLane(r);
@@ -893,13 +1283,19 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
         this.player.row = this.player.targetRow;
         this.player.x = this.player.targetX;
 
-        this.ensureLanesAround(this.player.row);
         if (this.player.row > this.highestRowThisRun) {
           this.highestRowThisRun = this.player.row;
           this.comboStreak += 1;
           this.comboTimer = 1.25;
         }
         this.scoreTracker.updateRow(this.player.row, this.getComboMultiplier());
+        const currentScore = this.scoreTracker.getScore();
+        for (const [r, cachedLane] of this.lanes.entries()) {
+          if (r >= this.player.row) {
+            cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
+          }
+        }
+        this.ensureLanesAround(this.player.row);
 
         const landedLane = this.getLane(this.player.row);
         if (landedLane.type === LaneType.RIVER) {
@@ -969,7 +1365,8 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
 
     // Only when player has actually crossed behind the visible screen edge,
     // start grace timer so player has time to escape before dying.
-    if (this.player.row < this.cameraZ - WORLD_CONFIG.CAMERA_BACK_LIMIT) {
+    const isBehindEdge = isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+    if (isBehindEdge) {
       this.cameraGraceTimer += dt;
       if (this.cameraGraceTimer >= WORLD_CONFIG.CAMERA_GRACE_PERIOD) {
         this.killPlayer(DeathReason.CAMERA_BEHIND);
@@ -1008,13 +1405,21 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
 class AudioSynth {
           ctx                      = null;
           soundEnabled          = true;
-          musicVolume         = 0.7;
+          musicEnabled          = true;
+          musicVolume         = 0.22;
+          isMusicPlaying          = false;
+          musicTimerId                                        = null;
+          musicStep         = 0;
 
   constructor() {
     if (typeof window !== 'undefined') {
       const savedSound = localStorage.getItem('crossy_setting_sound');
       if (savedSound !== null) {
         this.soundEnabled = savedSound !== 'false';
+      }
+      const savedMusic = localStorage.getItem('crossy_setting_music');
+      if (savedMusic !== null) {
+        this.musicEnabled = savedMusic !== 'false';
       }
     }
   }
@@ -1028,10 +1433,29 @@ class AudioSynth {
     if (typeof window !== 'undefined') {
       localStorage.setItem('crossy_setting_sound', String(enabled));
     }
+    if (!enabled) {
+      this.stopMusic();
+    }
   }
 
-          ensureContext()                      {
-    if (typeof window === 'undefined' || !this.soundEnabled) return null;
+  isMusicEnabled()          {
+    return this.musicEnabled;
+  }
+
+  setMusicEnabled(enabled         )       {
+    this.musicEnabled = enabled;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crossy_setting_music', String(enabled));
+    }
+    if (enabled && this.soundEnabled) {
+      this.startMusic();
+    } else {
+      this.stopMusic();
+    }
+  }
+
+          ensureContext(ignoreSoundFlag          = false)                      {
+    if (typeof window === 'undefined' || (!ignoreSoundFlag && !this.soundEnabled)) return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window                                                          ).webkitAudioContext;
       if (AudioCtx) {
@@ -1042,6 +1466,73 @@ class AudioSynth {
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
+  }
+
+  startMusic()       {
+    if (!this.musicEnabled || !this.soundEnabled || this.isMusicPlaying) return;
+    const ctx = this.ensureContext(true);
+    if (!ctx) return;
+
+    this.isMusicPlaying = true;
+    // Unobtrusive pentatonic chiptune-lite groove (16-step sequence, 220ms per step)
+    const bassNotes = [
+      130.81, 0, 130.81, 164.81,
+      174.61, 0, 174.61, 196.0,
+      146.83, 0, 146.83, 174.61,
+      196.0, 0, 164.81, 146.83,
+    ];
+    const leadNotes = [
+      523.25, 0, 659.25, 587.33,
+      523.25, 392.0, 440.0, 0,
+      587.33, 0, 659.25, 783.99,
+      659.25, 587.33, 523.25, 0,
+    ];
+
+    this.musicTimerId = setInterval(() => {
+      if (!this.isMusicPlaying || !this.musicEnabled || !this.soundEnabled) return;
+      const activeCtx = this.ensureContext(true);
+      if (!activeCtx || activeCtx.state !== 'running') return;
+
+      const step = this.musicStep % 16;
+      this.musicStep++;
+      const now = activeCtx.currentTime;
+
+      const bassFreq = bassNotes[step];
+      if (bassFreq > 0) {
+        const bOsc = activeCtx.createOscillator();
+        const bGain = activeCtx.createGain();
+        bOsc.type = 'triangle';
+        bOsc.frequency.setValueAtTime(bassFreq, now);
+        bGain.gain.setValueAtTime(0.055 * this.musicVolume, now);
+        bGain.gain.exponentialRampToValueAtTime(0.002, now + 0.18);
+        bOsc.connect(bGain);
+        bGain.connect(activeCtx.destination);
+        bOsc.start(now);
+        bOsc.stop(now + 0.19);
+      }
+
+      const leadFreq = leadNotes[step];
+      if (leadFreq > 0) {
+        const lOsc = activeCtx.createOscillator();
+        const lGain = activeCtx.createGain();
+        lOsc.type = 'sine';
+        lOsc.frequency.setValueAtTime(leadFreq, now);
+        lGain.gain.setValueAtTime(0.038 * this.musicVolume, now);
+        lGain.gain.exponentialRampToValueAtTime(0.002, now + 0.16);
+        lOsc.connect(lGain);
+        lGain.connect(activeCtx.destination);
+        lOsc.start(now);
+        lOsc.stop(now + 0.17);
+      }
+    }, 220);
+  }
+
+  stopMusic()       {
+    this.isMusicPlaying = false;
+    if (this.musicTimerId !== null) {
+      clearInterval(this.musicTimerId);
+      this.musicTimerId = null;
+    }
   }
 
   playHop(comboMultiplier         = 1, surface                                    = 'grass')       {
@@ -1190,6 +1681,137 @@ class AudioSynth {
     osc.start();
     osc.stop(ctx.currentTime + 0.26);
   }
+
+  playSkinVoice(skinId         = 'chicken')       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const id = skinId.toLowerCase();
+
+    if (id.includes('duck')) {
+      // Cyber-Duck: nasal synth quack with digital pitch inflection
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(640, now);
+      osc.frequency.exponentialRampToValueAtTime(410, now + 0.045);
+      osc.frequency.exponentialRampToValueAtTime(530, now + 0.09);
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.095);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.1);
+    } else if (id.includes('ninja') || id.includes('shadow')) {
+      // Shadow-Ninja: stealthy swift blade/breath accent
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1480, now);
+      osc.frequency.exponentialRampToValueAtTime(420, now + 0.055);
+      gain.gain.setValueAtTime(0.085, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.06);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.065);
+    } else if (id.includes('penguin') || id.includes('frost')) {
+      // Frost-Penguin: crystalline icy chirp
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(1320, now + 0.065);
+      gain.gain.setValueAtTime(0.11, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.075);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } else {
+      // Classic Chicken (and custom skins): playful bawk-cluck inflection
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+      const offset = id === 'chicken' ? 1 : 0.85 + ((Math.abs(hash) % 35) / 100);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(540 * offset, now);
+      osc.frequency.exponentialRampToValueAtTime(790 * offset, now + 0.035);
+      osc.frequency.exponentialRampToValueAtTime(610 * offset, now + 0.075);
+      gain.gain.setValueAtTime(0.11, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.085);
+    }
+  }
+
+  playGachaRoll()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const ticks = [330, 392, 440, 523.25, 587.33, 659.25];
+    ticks.forEach((freq, i) => {
+      const t = now + i * 0.055;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.09, t);
+      gain.gain.exponentialRampToValueAtTime(0.005, t + 0.045);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.05);
+    });
+  }
+
+  playGachaUnlock(isRare          = false)       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const notes = isRare
+      ? [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98]
+      : [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, idx) => {
+      const t = now + idx * 0.075;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = isRare ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(isRare ? 0.15 : 0.16, t);
+      gain.gain.exponentialRampToValueAtTime(0.005, t + 0.22);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.23);
+    });
+  }
+
+  playNewHighScore()       {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const fanfare = [
+      { freq: 523.25, delay: 0.0, dur: 0.11 },
+      { freq: 659.25, delay: 0.1, dur: 0.11 },
+      { freq: 783.99, delay: 0.2, dur: 0.11 },
+      { freq: 1046.5, delay: 0.31, dur: 0.34 },
+    ];
+    fanfare.forEach(({ freq, delay, dur }) => {
+      const t = now + delay;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.005, t + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
+    });
+  }
 }
 
 // --- Module: src/view/meshFactory.ts ---
@@ -1207,73 +1829,115 @@ class MeshFactory {
     const orangeMat = makeMat(0xf97316);
     const darkMat = makeMat(0x1e293b);
 
-    // Legs touching Y = 0
-    const legGeo = new THREE.BoxGeometry(0.1, 0.12, 0.14);
+    // Detailed feet and legs touching Y = 0
+    const legGeo = new THREE.BoxGeometry(0.1, 0.14, 0.12);
+    const footGeo = new THREE.BoxGeometry(0.14, 0.04, 0.22);
     const leftLeg = new THREE.Mesh(legGeo, orangeMat);
-    leftLeg.position.set(-0.14, 0.06, 0);
+    leftLeg.position.set(-0.14, 0.07, 0);
     const rightLeg = new THREE.Mesh(legGeo, orangeMat);
-    rightLeg.position.set(0.14, 0.06, 0);
-    group.add(leftLeg, rightLeg);
+    rightLeg.position.set(0.14, 0.07, 0);
+    const leftFoot = new THREE.Mesh(footGeo, orangeMat);
+    leftFoot.position.set(-0.14, 0.02, 0.04);
+    const rightFoot = new THREE.Mesh(footGeo, orangeMat);
+    rightFoot.position.set(0.14, 0.02, 0.04);
+    group.add(leftLeg, rightLeg, leftFoot, rightFoot);
 
     if (skinId === 'cyber_duck') {
       const yellowMat = makeMat(0xfacc15);
       const visorMat = makeMat(0x06b6d4);
+      const chromeMat = makeMat(0x94a3b8);
+      const neonPinkMat = makeMat(0xec4899);
+
       const body = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.54, 0.64), yellowMat);
       body.position.y = 0.37;
       body.castShadow = !isGhost;
+      body.receiveShadow = !isGhost;
       group.add(body);
 
-      const bill = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.24), orangeMat);
-      bill.position.set(0, 0.44, 0.41);
-      group.add(bill);
+      // Cyber wings & jetpack thrusters
+      const wingGeo = new THREE.BoxGeometry(0.08, 0.28, 0.38);
+      const leftWing = new THREE.Mesh(wingGeo, yellowMat);
+      leftWing.position.set(-0.33, 0.36, -0.02);
+      const rightWing = new THREE.Mesh(wingGeo, yellowMat);
+      rightWing.position.set(0.33, 0.36, -0.02);
+      const jetpack = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.3, 0.14), chromeMat);
+      jetpack.position.set(0, 0.38, -0.36);
+      const thrusterCore = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.06), neonPinkMat);
+      thrusterCore.position.set(0, 0.38, -0.44);
+      group.add(leftWing, rightWing, jetpack, thrusterCore);
 
-      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.14, 0.18), visorMat);
+      const bill = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.12, 0.24), orangeMat);
+      bill.position.set(0, 0.44, 0.41);
+      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.14, 0.2), visorMat);
       visor.position.set(0, 0.55, 0.26);
-      group.add(visor);
+      const antenna = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.06), chromeMat);
+      antenna.position.set(0, 0.72, -0.05);
+      const antennaTip = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.1), neonPinkMat);
+      antennaTip.position.set(0, 0.82, -0.05);
+      group.add(bill, visor, antenna, antennaTip);
     } else if (skinId === 'shadow_ninja') {
       const suitMat = makeMat(0x0f172a);
+      const armorMat = makeMat(0x1e293b);
       const bandMat = makeMat(0xef4444);
       const skinToneMat = makeMat(0xfde68a);
-      const steelMat = makeMat(0x94a3b8);
+      const steelMat = makeMat(0xcbd5e1);
+      const goldMat = makeMat(0xf59e0b);
 
       const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.58), suitMat);
       body.position.y = 0.39;
       body.castShadow = !isGhost;
+      body.receiveShadow = !isGhost;
       group.add(body);
 
+      const chestArmor = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.24, 0.6), armorMat);
+      chestArmor.position.set(0, 0.34, 0);
       const faceSlit = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.06), skinToneMat);
       faceSlit.position.set(0, 0.52, 0.28);
-      group.add(faceSlit);
-
+      const leftEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.08), suitMat);
+      leftEye.position.set(-0.12, 0.52, 0.29);
+      const rightEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.08), suitMat);
+      rightEye.position.set(0.12, 0.52, 0.29);
       const headband = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 0.62), bandMat);
       headband.position.set(0, 0.62, 0);
-      group.add(headband);
+      const bandTail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 0.12), bandMat);
+      bandTail.position.set(-0.14, 0.56, -0.35);
 
-      const katana = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.72, 0.08), steelMat);
-      katana.position.set(0.18, 0.52, -0.33);
-      katana.rotation.z = -0.35;
-      group.add(katana);
+      const katanaBlade = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.74, 0.08), steelMat);
+      katanaBlade.position.set(0.18, 0.52, -0.33);
+      katanaBlade.rotation.z = -0.35;
+      const katanaHilt = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.06, 0.14), goldMat);
+      katanaHilt.position.set(0.06, 0.78, -0.33);
+      group.add(chestArmor, faceSlit, leftEye, rightEye, headband, bandTail, katanaBlade, katanaHilt);
     } else if (skinId === 'frost_penguin') {
       const navyMat = makeMat(0x1e3a8a);
       const bellyMat = makeMat(0xf8fafc);
       const scarfMat = makeMat(0x38bdf8);
+      const earmuffMat = makeMat(0xef4444);
 
       const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.56), navyMat);
       body.position.y = 0.39;
       body.castShadow = !isGhost;
+      body.receiveShadow = !isGhost;
       group.add(body);
 
       const belly = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.44, 0.06), bellyMat);
       belly.position.set(0, 0.36, 0.27);
-      group.add(belly);
-
+      const flipperGeo = new THREE.BoxGeometry(0.08, 0.32, 0.26);
+      const leftFlipper = new THREE.Mesh(flipperGeo, navyMat);
+      leftFlipper.position.set(-0.32, 0.36, 0);
+      const rightFlipper = new THREE.Mesh(flipperGeo, navyMat);
+      rightFlipper.position.set(0.32, 0.36, 0);
       const scarf = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.1, 0.62), scarfMat);
       scarf.position.set(0, 0.48, 0);
-      group.add(scarf);
-
+      const scarfTail = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.08), scarfMat);
+      scarfTail.position.set(0.14, 0.36, 0.31);
       const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.2), orangeMat);
       beak.position.set(0, 0.53, 0.34);
-      group.add(beak);
+      const muffLeft = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.16), earmuffMat);
+      muffLeft.position.set(-0.31, 0.58, 0.04);
+      const muffRight = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.16), earmuffMat);
+      muffRight.position.set(0.31, 0.58, 0.04);
+      group.add(belly, leftFlipper, rightFlipper, scarf, scarfTail, beak, muffLeft, muffRight);
     } else {
       const whiteMat = makeMat(0xffffff);
       const redMat = makeMat(0xef4444);
@@ -1284,24 +1948,27 @@ class MeshFactory {
       body.receiveShadow = !isGhost;
       group.add(body);
 
+      const wingGeo = new THREE.BoxGeometry(0.08, 0.28, 0.36);
+      const leftWing = new THREE.Mesh(wingGeo, whiteMat);
+      leftWing.position.set(-0.32, 0.36, -0.02);
+      const rightWing = new THREE.Mesh(wingGeo, whiteMat);
+      rightWing.position.set(0.32, 0.36, -0.02);
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.14), whiteMat);
+      tail.position.set(0, 0.44, -0.36);
+
       const comb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.32), redMat);
       comb.position.set(0, 0.74, 0.05);
-      group.add(comb);
-
       const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.2), orangeMat);
       beak.position.set(0, 0.48, 0.38);
-      group.add(beak);
-
       const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.12), redMat);
       wattle.position.set(0, 0.34, 0.34);
-      group.add(wattle);
 
       const eyeGeo = new THREE.BoxGeometry(0.06, 0.08, 0.08);
       const leftEye = new THREE.Mesh(eyeGeo, darkMat);
       leftEye.position.set(-0.29, 0.52, 0.18);
       const rightEye = new THREE.Mesh(eyeGeo, darkMat);
       rightEye.position.set(0.29, 0.52, 0.18);
-      group.add(leftEye, rightEye);
+      group.add(leftWing, rightWing, tail, comb, beak, wattle, leftEye, rightEye);
     }
 
     return group;
@@ -1311,77 +1978,164 @@ class MeshFactory {
     return MeshFactory.createCharacter('chicken');
   }
 
-  static createObstacle(kind              , seedVariant        , isSnowBiome          = false)              {
+  static createObstacle(
+    kind              ,
+    seedVariant        ,
+    biomeOrSnow                      = false
+  )              {
+    const biome            =
+      typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
     if (kind === 'rock') {
-      return MeshFactory.createRock(seedVariant);
+      return MeshFactory.createRock(seedVariant, biome);
     }
     if (kind === 'bush') {
-      return MeshFactory.createBush(seedVariant, isSnowBiome);
+      return MeshFactory.createBush(seedVariant, biome);
     }
-    return MeshFactory.createTree(seedVariant, isSnowBiome);
+    return MeshFactory.createTree(seedVariant, biome);
   }
 
-  static createTree(seedVariant        , isSnowBiome          = false)              {
+  static createTree(seedVariant        , biomeOrSnow                      = false)              {
     const group = new THREE.Group();
-    const trunkMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
-    const leavesMat = new THREE.MeshLambertMaterial({
-      color: isSnowBiome ? 0xe2e8f0 : seedVariant % 2 === 0 ? 0x16a34a : 0x15803d,
-    });
+    const biome            =
+      typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
+    const absSeed = Math.abs(seedVariant);
 
-    const trunk = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.55, 0.42), trunkMat);
-    trunk.position.y = 0.275;
+    if (biome === 'desert') {
+      // Voxel Saguaro Cactus with arms & desert blossom
+      const cactusMat = new THREE.MeshLambertMaterial({ color: 0x15803d });
+      const flowerMat = new THREE.MeshLambertMaterial({ color: 0xf43f5e });
+      const stem = new THREE.Mesh(new THREE.BoxGeometry(0.36, 1.35, 0.36), cactusMat);
+      stem.position.y = 0.675;
+      stem.castShadow = true;
+      stem.receiveShadow = true;
+      const armLeftH = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.22), cactusMat);
+      armLeftH.position.set(-0.26, 0.65, 0);
+      const armLeftV = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.42, 0.22), cactusMat);
+      armLeftV.position.set(-0.34, 0.86, 0);
+      const armRightH = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.22), cactusMat);
+      armRightH.position.set(0.26, 0.82, 0);
+      const armRightV = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.22), cactusMat);
+      armRightV.position.set(0.34, 1.0, 0);
+      const flower = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.16), flowerMat);
+      flower.position.set(0, 1.4, 0);
+      group.add(stem, armLeftH, armLeftV, armRightH, armRightV, flower);
+      return group;
+    }
+
+    const trunkMat = new THREE.MeshLambertMaterial({
+      color: biome === 'neon' ? 0x1e1b4b : 0x78350f,
+    });
+    const trunk = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.56, 0.36), trunkMat);
+    trunk.position.y = 0.28;
     trunk.castShadow = true;
     trunk.receiveShadow = true;
     group.add(trunk);
 
-    const height = 0.9 + (Math.abs(seedVariant) % 3) * 0.28;
-    const crown = new THREE.Mesh(new THREE.BoxGeometry(0.82, height, 0.82), leavesMat);
-    crown.position.y = 0.55 + height / 2;
-    crown.castShadow = true;
-    crown.receiveShadow = true;
-    group.add(crown);
+    const isPine = absSeed % 2 === 1 || biome === 'winter';
+    const leafColor =
+      biome === 'winter'
+        ? 0x0f766e
+        : biome === 'neon'
+          ? absSeed % 2 === 0
+            ? 0x06b6d4
+            : 0xd946ef
+          : absSeed % 3 === 0
+            ? 0x16a34a
+            : absSeed % 3 === 1
+              ? 0x15803d
+              : 0x22c55e;
+    const leavesMat = new THREE.MeshLambertMaterial({ color: leafColor });
+
+    if (isPine) {
+      // Multi-tiered conifer pine tree
+      const t1 = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.46, 0.86), leavesMat);
+      t1.position.y = 0.72;
+      const t2 = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.44, 0.66), leavesMat);
+      t2.position.y = 1.1;
+      const t3 = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.38, 0.42), leavesMat);
+      t3.position.y = 1.44;
+      t1.castShadow = t2.castShadow = t3.castShadow = true;
+      group.add(t1, t2, t3);
+      if (biome === 'winter') {
+        const snowMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
+        const s1 = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.08, 0.88), snowMat);
+        s1.position.y = 0.96;
+        const s2 = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.12, 0.44), snowMat);
+        s2.position.y = 1.65;
+        group.add(s1, s2);
+      }
+    } else {
+      // Detailed blocky oak / cyber tree with crown & side foliage clusters
+      const height = 0.85 + (absSeed % 3) * 0.22;
+      const crown = new THREE.Mesh(new THREE.BoxGeometry(0.82, height, 0.82), leavesMat);
+      crown.position.y = 0.54 + height / 2;
+      crown.castShadow = true;
+      crown.receiveShadow = true;
+      const topCap = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.24, 0.56), leavesMat);
+      topCap.position.y = 0.54 + height + 0.1;
+      topCap.castShadow = true;
+      group.add(crown, topCap);
+    }
 
     return group;
   }
 
-  static createRock(seedVariant        )              {
+  static createRock(seedVariant        , biome            = 'forest')              {
     const group = new THREE.Group();
-    const baseMat = new THREE.MeshLambertMaterial({ color: 0x64748b });
-    const topMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+    const baseMat = new THREE.MeshLambertMaterial({
+      color: biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : 0x64748b,
+    });
+    const topMat = new THREE.MeshLambertMaterial({
+      color: biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x22d3ee : 0x94a3b8,
+    });
 
     const base = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.44, 0.72), baseMat);
     base.position.y = 0.22;
     base.castShadow = true;
     base.receiveShadow = true;
-    group.add(base);
-
+    const sideShard = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.3, 0.34), baseMat);
+    sideShard.position.set(seedVariant % 2 === 0 ? -0.26 : 0.26, 0.15, 0.18);
     const top = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.28, 0.48), topMat);
     top.position.set((seedVariant % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0);
     top.castShadow = true;
-    group.add(top);
+    group.add(base, sideShard, top);
 
     return group;
   }
 
-  static createBush(seedVariant        , isSnowBiome          = false)              {
+  static createBush(seedVariant        , biomeOrSnow                      = false)              {
     const group = new THREE.Group();
+    const biome            =
+      typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
     const bushMat = new THREE.MeshLambertMaterial({
-      color: isSnowBiome ? 0xdbeafe : 0x22c55e,
+      color:
+        biome === 'winter'
+          ? 0xdbeafe
+          : biome === 'desert'
+            ? 0xa16207
+            : biome === 'neon'
+              ? 0x7e22ce
+              : 0x22c55e,
     });
     const berryMat = new THREE.MeshLambertMaterial({
-      color: seedVariant % 2 === 0 ? 0xef4444 : 0xf59e0b,
+      color: biome === 'neon' ? 0x06b6d4 : seedVariant % 2 === 0 ? 0xef4444 : 0xf59e0b,
     });
 
-    const main = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.48, 0.78), bushMat);
-    main.position.y = 0.24;
+    const main = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.46, 0.78), bushMat);
+    main.position.y = 0.23;
     main.castShadow = true;
-    group.add(main);
+    const crown = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.22, 0.54), bushMat);
+    crown.position.y = 0.52;
+    crown.castShadow = true;
+    group.add(main, crown);
 
     const b1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
-    b1.position.set(-0.2, 0.46, 0.22);
+    b1.position.set(-0.22, 0.46, 0.22);
     const b2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
     b2.position.set(0.22, 0.42, -0.18);
-    group.add(b1, b2);
+    const b3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), berryMat);
+    b3.position.set(0.05, 0.62, 0.12);
+    group.add(b1, b2, b3);
 
     return group;
   }
@@ -1460,47 +2214,124 @@ class MeshFactory {
     const group = new THREE.Group();
     const bodyMat = new THREE.MeshLambertMaterial({ color: v.color });
     const cabinMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+    const glassMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+    const chromeMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
     const wheelMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+    const tailLightMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+    const headLightMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
     const beamMat = new THREE.MeshBasicMaterial({
       color: 0xfef08a,
       transparent: true,
       opacity: 0.28,
     });
 
-    if (v.type === 'truck') {
-      const trailer = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.82, 0.78), cabinMat);
-      trailer.position.set(-v.length * 0.14, 0.52, 0);
-      trailer.castShadow = true;
-      trailer.receiveShadow = true;
-      group.add(trailer);
+    const variant = Math.abs(v.id) % 3;
 
-      const cab = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.28, 0.68, 0.74), bodyMat);
-      cab.position.set(v.length * 0.34, 0.44, 0);
+    if (v.type === 'truck') {
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.28, 0.7, 0.74), bodyMat);
+      cab.position.set(v.length * 0.34, 0.45, 0);
       cab.castShadow = true;
-      group.add(cab);
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.26, 0.66), glassMat);
+      windshield.position.set(v.length * 0.45, 0.58, 0);
+      const grille = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 0.52), chromeMat);
+      grille.position.set(v.length * 0.48, 0.3, 0);
+      const exhaust = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.88, 0.08), chromeMat);
+      exhaust.position.set(v.length * 0.2, 0.58, -0.36);
+      group.add(cab, windshield, grille, exhaust);
+
+      if (variant === 1) {
+        // Tanker Truck with cylindrical voxel fuel tank & hazard bands
+        const baseBed = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.14, 0.76), chromeMat);
+        baseBed.position.set(-v.length * 0.14, 0.22, 0);
+        const tankMain = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.64, 0.56, 0.68), cabinMat);
+        tankMain.position.set(-v.length * 0.14, 0.56, 0);
+        tankMain.castShadow = true;
+        const tankTop = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.58, 0.14, 0.44), bodyMat);
+        tankTop.position.set(-v.length * 0.14, 0.88, 0);
+        group.add(baseBed, tankMain, tankTop);
+      } else if (variant === 2) {
+        // Timber / Flatbed Hauler carrying stacked voxel logs
+        const flatbed = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.16, 0.78), chromeMat);
+        flatbed.position.set(-v.length * 0.14, 0.24, 0);
+        const logMat = new THREE.MeshLambertMaterial({ color: 0x854d0e });
+        const l1 = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.62, 0.24, 0.28), logMat);
+        l1.position.set(-v.length * 0.14, 0.44, -0.18);
+        const l2 = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.62, 0.24, 0.28), logMat);
+        l2.position.set(-v.length * 0.14, 0.44, 0.18);
+        const l3 = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.58, 0.24, 0.3), logMat);
+        l3.position.set(-v.length * 0.14, 0.68, 0);
+        l1.castShadow = l2.castShadow = l3.castShadow = true;
+        group.add(flatbed, l1, l2, l3);
+      } else {
+        // Classic Box Delivery Trailer with side trim stripe
+        const trailer = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.84, 0.78), cabinMat);
+        trailer.position.set(-v.length * 0.14, 0.53, 0);
+        trailer.castShadow = true;
+        trailer.receiveShadow = true;
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.69, 0.14, 0.8), bodyMat);
+        stripe.position.set(-v.length * 0.14, 0.48, 0);
+        group.add(trailer, stripe);
+      }
     } else {
-      const chassis = new THREE.Mesh(new THREE.BoxGeometry(v.length, 0.42, 0.74), bodyMat);
-      chassis.position.y = 0.32;
+      const chassis = new THREE.Mesh(new THREE.BoxGeometry(v.length, 0.38, 0.74), bodyMat);
+      chassis.position.y = 0.3;
       chassis.castShadow = true;
       chassis.receiveShadow = true;
       group.add(chassis);
 
-      const top = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.56, 0.32, 0.64), cabinMat);
-      top.position.set(-0.05, 0.66, 0);
-      top.castShadow = true;
-      group.add(top);
+      if (variant === 0) {
+        // Sports Coupe with low aerodynamic cabin, racing stripe & rear spoiler
+        const top = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.48, 0.26, 0.64), glassMat);
+        top.position.set(-0.04, 0.6, 0);
+        const roofCap = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.38, 0.06, 0.6), bodyMat);
+        roofCap.position.set(-0.04, 0.75, 0);
+        const spoiler = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.72), chromeMat);
+        spoiler.position.set(-v.length * 0.44, 0.55, 0);
+        group.add(top, roofCap, spoiler);
+      } else if (variant === 1) {
+        // Off-Road SUV with tall boxy cabin, roof rack & rear spare wheel
+        const suvTop = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.34, 0.68), bodyMat);
+        suvTop.position.set(-0.08, 0.64, 0);
+        suvTop.castShadow = true;
+        const suvGlass = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.7, 0.2, 0.7), glassMat);
+        suvGlass.position.set(-0.06, 0.63, 0);
+        const roofRack = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.46, 0.08, 0.52), chromeMat);
+        roofRack.position.set(-0.1, 0.84, 0);
+        const spareTire = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.28), wheelMat);
+        spareTire.position.set(-v.length * 0.52, 0.44, 0);
+        group.add(suvTop, suvGlass, roofRack, spareTire);
+      } else {
+        // Sedan / Cruiser with distinct cabin & roof beacon
+        const top = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.56, 0.32, 0.64), cabinMat);
+        top.position.set(-0.05, 0.64, 0);
+        top.castShadow = true;
+        const windows = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.58, 0.18, 0.66), glassMat);
+        windows.position.set(-0.05, 0.62, 0);
+        const lightBar = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.08, 0.38), tailLightMat);
+        lightBar.position.set(-0.05, 0.84, 0);
+        group.add(top, windows, lightBar);
+      }
     }
 
+    // Headlights, taillights, and light beam
+    const hl = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, 0.58), headLightMat);
+    hl.position.set(v.length / 2 + 0.01, 0.32, 0);
+    const tl = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, 0.58), tailLightMat);
+    tl.position.set(-v.length / 2 - 0.01, 0.32, 0);
     const beam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.04, 0.62), beamMat);
     beam.position.set(v.length / 2 + 0.7, 0.08, 0);
-    group.add(beam);
+    group.add(hl, tl, beam);
 
     const wheelGeo = new THREE.BoxGeometry(0.28, 0.24, 0.82);
-    const w1 = new THREE.Mesh(wheelGeo, wheelMat);
-    w1.position.set(-v.length * 0.3, 0.14, 0);
-    const w2 = new THREE.Mesh(wheelGeo, wheelMat);
-    w2.position.set(v.length * 0.3, 0.14, 0);
-    group.add(w1, w2);
+    const hubGeo = new THREE.BoxGeometry(0.14, 0.12, 0.86);
+    const wheelOffsets = v.type === 'truck' ? [-0.36, -0.1, 0.32] : [-0.3, 0.3];
+    for (const factor of wheelOffsets) {
+      const w = new THREE.Mesh(wheelGeo, wheelMat);
+      w.position.set(v.length * factor, 0.14, 0);
+      const hub = new THREE.Mesh(hubGeo, chromeMat);
+      hub.position.set(v.length * factor, 0.14, 0);
+      group.add(w, hub);
+    }
 
     group.rotation.y = vehicleScreenRotationY(v.speed);
     return group;
@@ -1595,21 +2426,82 @@ class MeshFactory {
 }
 
 // --- Module: src/view/sceneManager.ts ---
+const BIOME_ATMOSPHERES         
+            
+   
+                
+                     
+                       
+                         
+                             
+                     
+                         
+                          
+   
+  = {
+  [Biome.FOREST]: {
+    sky: 0x87ceeb,
+    fogColor: 0x87ceeb,
+    fogDensity: 0.012,
+    ambientColor: 0xffffff,
+    ambientIntensity: 0.68,
+    dirColor: 0xfffbeb,
+    dirIntensity: 1.1,
+    particleColor: 0xbef264,
+  },
+  [Biome.WINTER]: {
+    sky: 0xcbd5e1,
+    fogColor: 0xdbeafe,
+    fogDensity: 0.018,
+    ambientColor: 0xe0f2fe,
+    ambientIntensity: 0.78,
+    dirColor: 0xf8fafc,
+    dirIntensity: 0.95,
+    particleColor: 0xffffff,
+  },
+  [Biome.DESERT]: {
+    sky: 0xfde68a,
+    fogColor: 0xfcd34d,
+    fogDensity: 0.015,
+    ambientColor: 0xffedd5,
+    ambientIntensity: 0.75,
+    dirColor: 0xfef08a,
+    dirIntensity: 1.22,
+    particleColor: 0xfbbf24,
+  },
+  [Biome.NEON]: {
+    sky: 0x0f172a,
+    fogColor: 0x1e1b4b,
+    fogDensity: 0.016,
+    ambientColor: 0x818cf8,
+    ambientIntensity: 0.58,
+    dirColor: 0x38bdf8,
+    dirIntensity: 0.92,
+    particleColor: 0x22d3ee,
+  },
+};
 class SceneManager {
           scene             ;
           camera                          ;
           renderer                     ;
+          ambientLight                    ;
           dirLight                        ;
+          fog               ;
           playerMesh             ;
           currentSkin         = 'chicken';
           renderedLanes = new Map                      ();
           shakeIntensity = 0;
           particles             = [];
+          ambientParticles                    = [];
+          logImpacts = new Map                   ();
+          prevRidingLogId                = null;
           lastHoppingState = false;
 
   constructor(container             ) {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb);
+    this.fog = new THREE.FogExp2(0x87ceeb, 0.012);
+    this.scene.fog = this.fog;
 
     const aspect = window.innerWidth / window.innerHeight;
     const viewSize = 11;
@@ -1629,7 +2521,8 @@ class SceneManager {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(this.renderer.domElement);
 
-    this.scene.add(new THREE.AmbientLight(0xffffff, 0.68));
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.68);
+    this.scene.add(this.ambientLight);
 
     this.dirLight = new THREE.DirectionalLight(0xfffbeb, 1.1);
     this.dirLight.position.set(14, 24, -12);
@@ -1644,6 +2537,7 @@ class SceneManager {
 
     this.playerMesh = MeshFactory.createCharacter('chicken');
     this.scene.add(this.playerMesh);
+    this.initAmbientParticles(32);
 
     window.addEventListener('resize', () => this.onResize());
   }
@@ -1737,6 +2631,70 @@ class SceneManager {
     }
   }
 
+          initAmbientParticles(count        )       {
+    const geo = new THREE.BoxGeometry(0.12, 0.12, 0.12);
+    for (let i = 0; i < count; i++) {
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0xbef264,
+        transparent: true,
+        opacity: 0.8,
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      this.scene.add(mesh);
+      this.ambientParticles.push({
+        mesh,
+        offsetX: (Math.random() - 0.5) * 26,
+        offsetY: 0.4 + Math.random() * 5.5,
+        offsetZ: (Math.random() - 0.5) * 24,
+        phase: Math.random() * Math.PI * 2,
+        speedY: 0.6 + Math.random() * 1.2,
+        swayAmp: 0.4 + Math.random() * 0.8,
+      });
+    }
+  }
+
+          updateAmbientParticles(dt        , biome           , camZ        , nowSec        )       {
+    const preset = BIOME_ATMOSPHERES[biome] ?? BIOME_ATMOSPHERES[Biome.FOREST];
+    for (const ap of this.ambientParticles) {
+      const mat = ap.mesh.material                           ;
+      mat.color.setHex(preset.particleColor);
+
+      if (biome === Biome.WINTER) {
+        // Falling snow with horizontal wind drift
+        ap.offsetY -= ap.speedY * 1.6 * dt;
+        if (ap.offsetY < 0.1) ap.offsetY = 6.0;
+        const swayX = Math.sin(nowSec * 0.6 + ap.phase) * ap.swayAmp;
+        ap.mesh.position.set(ap.offsetX + swayX, ap.offsetY, camZ + 4 + ap.offsetZ);
+        ap.mesh.scale.setScalar(0.95);
+        mat.opacity = 0.85;
+      } else if (biome === Biome.NEON) {
+        // Rising digital neon sparks
+        ap.offsetY += ap.speedY * 1.2 * dt;
+        if (ap.offsetY > 6.0) ap.offsetY = 0.2;
+        ap.mesh.position.set(
+          ap.offsetX + Math.cos(nowSec * 0.8 + ap.phase) * 0.3,
+          ap.offsetY,
+          camZ + 4 + ap.offsetZ
+        );
+        const pulse = 0.6 + 0.4 * Math.sin(nowSec * 2.5 + ap.phase);
+        ap.mesh.scale.setScalar(pulse);
+        mat.opacity = 0.75;
+      } else {
+        // Floating fireflies (forest) or warm sand motes (desert)
+        const bobY = Math.sin(nowSec * 0.9 + ap.phase) * 0.55;
+        const swayX = Math.cos(nowSec * 0.5 + ap.phase) * ap.swayAmp;
+        ap.mesh.position.set(
+          ap.offsetX + swayX,
+          Math.max(0.25, (ap.offsetY % 3.2) + 0.5 + bobY),
+          camZ + 4 + ap.offsetZ
+        );
+        const glow = 0.55 + 0.45 * Math.sin(nowSec * 2.0 + ap.phase);
+        ap.mesh.scale.setScalar(glow);
+        mat.opacity = 0.45 + glow * 0.45;
+      }
+    }
+  }
+
           onResize()       {
     const aspect = window.innerWidth / window.innerHeight;
     const viewSize = 11;
@@ -1755,25 +2713,33 @@ class SceneManager {
     const vehicleMeshes = new Map                        ();
     const logMeshes = new Map                        ();
     const coinMeshes = new Map                        ();
-    const isSnow = Math.floor(Math.max(0, lane.index) / 35) % 3 === 2;
+    const waterRipples               = [];
+    const waterfallSplashes               = [];
+    const biome            = lane.biome ?? Biome.FOREST;
+    const isEven = lane.index % 2 === 0;
 
-    let stripColor = isSnow ? 0xf1f5f9 : 0x4ade80;
+    let stripColor = 0x4ade80;
     let stripHeight = 0.24;
 
     if (lane.type === LaneType.GRASS) {
-      if (isSnow) {
-        stripColor = lane.index % 2 === 0 ? 0xf8fafc : 0xe2e8f0;
+      if (biome === Biome.WINTER) {
+        stripColor = isEven ? 0xf8fafc : 0xe2e8f0;
+      } else if (biome === Biome.DESERT) {
+        stripColor = isEven ? 0xfde68a : 0xfcd34d;
+      } else if (biome === Biome.NEON) {
+        stripColor = isEven ? 0x1e1b4b : 0x311042;
       } else {
-        stripColor = lane.index % 2 === 0 ? 0x4ade80 : 0x22c55e;
+        stripColor = isEven ? 0x4ade80 : 0x22c55e;
       }
     } else if (lane.type === LaneType.ROAD) {
-      stripColor = 0x334155;
+      stripColor = biome === Biome.NEON ? 0x0f172a : biome === Biome.DESERT ? 0x57534e : 0x334155;
       stripHeight = 0.16;
     } else if (lane.type === LaneType.RIVER) {
-      stripColor = 0x0284c7;
+      stripColor =
+        biome === Biome.NEON ? 0x4338ca : biome === Biome.WINTER ? 0x0369a1 : biome === Biome.DESERT ? 0x0d9488 : 0x0284c7;
       stripHeight = 0.08;
     } else if (lane.type === LaneType.RAILWAY) {
-      stripColor = 0x475569;
+      stripColor = biome === Biome.NEON ? 0x1e293b : 0x475569;
       stripHeight = 0.2;
     }
 
@@ -1789,14 +2755,33 @@ class SceneManager {
       const roadMarkings = MeshFactory.createRoadMarkings();
       group.add(roadMarkings);
     } else if (lane.type === LaneType.RIVER) {
+      // Animated current foam ripples across river surface
+      const rippleMat = new THREE.MeshBasicMaterial({
+        color: biome === Biome.NEON ? 0x22d3ee : 0xbae6fd,
+        transparent: true,
+        opacity: 0.55,
+      });
+      for (let rx = -14; rx <= 14; rx += 4.5) {
+        const ripple = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.02, 0.12), rippleMat);
+        ripple.position.set(rx, 0.01, (rx % 2 === 0 ? 1 : -1) * 0.24);
+        group.add(ripple);
+        waterRipples.push(ripple);
+      }
+
       // Cascading waterfalls at the left and right borders of the river
       const leftWaterfall = MeshFactory.createWaterfallEdge('left');
       leftWaterfall.position.set(worldToScreenX(-10.2), 0, 0);
       const rightWaterfall = MeshFactory.createWaterfallEdge('right');
       rightWaterfall.position.set(worldToScreenX(10.2), 0, 0);
       group.add(leftWaterfall, rightWaterfall);
+      leftWaterfall.traverse((obj) => {
+        if (obj instanceof THREE.Mesh && obj.position.y < -0.5) waterfallSplashes.push(obj);
+      });
+      rightWaterfall.traverse((obj) => {
+        if (obj instanceof THREE.Mesh && obj.position.y < -0.5) waterfallSplashes.push(obj);
+      });
     } else if (lane.type === LaneType.RAILWAY) {
-      const railMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
+      const railMat = new THREE.MeshLambertMaterial({ color: biome === Biome.NEON ? 0x38bdf8 : 0xcbd5e1 });
       const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
       r1.position.set(0, 0.03, -0.26);
       const r2 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
@@ -1810,7 +2795,7 @@ class SceneManager {
 
     for (const item of details) {
       const treeX = item.x;
-      const mesh = MeshFactory.createObstacle(item.kind, lane.index * 31 + treeX, isSnow);
+      const mesh = MeshFactory.createObstacle(item.kind, lane.index * 31 + treeX, biome);
       mesh.position.x = worldToScreenX(treeX);
       group.add(mesh);
     }
@@ -1850,7 +2835,16 @@ class SceneManager {
       group.add(trainMesh);
     }
 
-    return { group, vehicleMeshes, logMeshes, coinMeshes, trainMesh, signalLight };
+    return {
+      group,
+      vehicleMeshes,
+      logMeshes,
+      coinMeshes,
+      trainMesh,
+      signalLight,
+      waterRipples,
+      waterfallSplashes,
+    };
   }
 
   sync(engine            , dt         = 0.016)       {
@@ -1863,13 +2857,29 @@ class SceneManager {
     }
 
     const p = engine.getPlayer();
-    const biomePhase = Math.floor(Math.max(0, p.row) / 35) % 3;
-    const skyHex = biomePhase === 1 ? 0x1e1b4b : biomePhase === 2 ? 0xcbd5e1 : 0x87ceeb;
-    (this.scene.background               ).setHex(skyHex);
+    const currentBiome            = engine.getBiome();
+    const targetAtmos = BIOME_ATMOSPHERES[currentBiome] ?? BIOME_ATMOSPHERES[Biome.FOREST];
+    const lerpFactor = Math.min(1, 1 - Math.exp(-dt * 3.2));
+
+    (this.scene.background               ).lerp(new THREE.Color(targetAtmos.sky), lerpFactor);
+    this.fog.color.lerp(new THREE.Color(targetAtmos.fogColor), lerpFactor);
+    this.fog.density += (targetAtmos.fogDensity - this.fog.density) * lerpFactor;
+    this.ambientLight.color.lerp(new THREE.Color(targetAtmos.ambientColor), lerpFactor);
+    this.ambientLight.intensity += (targetAtmos.ambientIntensity - this.ambientLight.intensity) * lerpFactor;
+    this.dirLight.color.lerp(new THREE.Color(targetAtmos.dirColor), lerpFactor);
+    this.dirLight.intensity += (targetAtmos.dirIntensity - this.dirLight.intensity) * lerpFactor;
 
     const activeLanes = engine.getActiveLanes();
     const activeIndices = new Set        ();
     const nowSec = performance.now() * 0.004;
+
+    // Update log landing impact timers
+    for (const [logId, impact] of this.logImpacts.entries()) {
+      impact.age += dt;
+      if (impact.age > 1.2) {
+        this.logImpacts.delete(logId);
+      }
+    }
 
     for (const lane of activeLanes) {
       activeIndices.add(lane.index);
@@ -1885,11 +2895,43 @@ class SceneManager {
         if (m) m.position.x = worldToScreenX(v.x);
       }
 
+      if (rendered.waterRipples) {
+        const flowDir = -lane.direction;
+        for (let i = 0; i < rendered.waterRipples.length; i++) {
+          const rp = rendered.waterRipples[i];
+          rp.position.x += flowDir * Math.abs(lane.speed) * 0.85 * dt;
+          if (rp.position.x > 15) rp.position.x = -15;
+          else if (rp.position.x < -15) rp.position.x = 15;
+          rp.scale.x = 0.85 + 0.3 * Math.sin(nowSec * 1.8 + i);
+        }
+      }
+
+      if (rendered.waterfallSplashes) {
+        for (let i = 0; i < rendered.waterfallSplashes.length; i++) {
+          const sp = rendered.waterfallSplashes[i];
+          sp.scale.y = 0.92 + 0.14 * Math.sin(nowSec * 3.0 + i * 1.3);
+        }
+      }
+
       for (const log of lane.logs) {
         const m = rendered.logMeshes.get(log.id);
         if (m) {
           m.position.x = worldToScreenX(log.x);
-          m.position.y = p.ridingLogId === log.id ? -0.06 : 0;
+          const waveBob = Math.sin(nowSec * 0.9 + log.id * 0.7) * 0.024;
+          const isRidden = p.ridingLogId === log.id;
+          const impact = this.logImpacts.get(log.id);
+          let impactDip = 0;
+          let impactRoll = Math.sin(nowSec * 0.7 + log.id) * 0.02;
+          let impactPitch = 0;
+          if (impact) {
+            const decay = Math.exp(-impact.age * 6.0);
+            impactDip = -0.14 * decay * Math.cos(impact.age * 18.0);
+            impactRoll += impact.tiltDir * 0.14 * decay * Math.sin(impact.age * 16.0);
+            impactPitch = 0.11 * decay * Math.sin(impact.age * 14.0);
+          }
+          m.position.y = (isRidden ? -0.06 : 0) + waveBob + impactDip;
+          m.rotation.z = impactRoll;
+          m.rotation.x = impactPitch;
         }
       }
 
@@ -1919,26 +2961,43 @@ class SceneManager {
       }
     }
 
-    // Landing detection for surface puff particles
+    // Landing detection for surface puff particles & log landing impact wobble
     if (this.lastHoppingState && !p.isHopping && !p.isDead) {
       const landedLane = engine.getLane(p.row);
-      const isSnow = Math.floor(Math.max(0, p.row) / 35) % 3 === 2;
+      const laneBiome = landedLane.biome ?? currentBiome;
       let puffColor = 0xffffff;
       if (landedLane.type === LaneType.GRASS) {
-        puffColor = isSnow ? 0xffffff : 0x86efac;
+        puffColor =
+          laneBiome === Biome.WINTER
+            ? 0xffffff
+            : laneBiome === Biome.DESERT
+              ? 0xfde68a
+              : laneBiome === Biome.NEON
+                ? 0x22d3ee
+                : 0x86efac;
       } else if (landedLane.type === LaneType.ROAD) {
         puffColor = 0x94a3b8;
       } else if (landedLane.type === LaneType.RIVER) {
-        puffColor = 0xfde047; // Wood bark flakes on log
+        puffColor = 0x38bdf8;
+        if (p.ridingLogId !== null) {
+          const logObj = landedLane.logs.find((l) => l.id === p.ridingLogId);
+          const relOffset = logObj ? Math.max(-1, Math.min(1, (p.x - logObj.x) / (logObj.length * 0.5))) : 0;
+          this.logImpacts.set(p.ridingLogId, { age: 0, tiltDir: relOffset || 0.5 });
+        }
       } else if (landedLane.type === LaneType.RAILWAY) {
         puffColor = 0xd1d5db;
       }
-      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 5);
+      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 6);
     }
     this.lastHoppingState = p.isHopping;
+    this.prevRidingLogId = p.ridingLogId;
 
     const hopHeight = p.isHopping ? 4 * 0.75 * p.hopProgress * (1 - p.hopProgress) : 0;
-    const baseOffsetY = p.ridingLogId !== null ? 0.08 : 0;
+    const activeImpact = p.ridingLogId !== null ? this.logImpacts.get(p.ridingLogId) : undefined;
+    const logSpringY = activeImpact
+      ? -0.1 * Math.exp(-activeImpact.age * 6.0) * Math.cos(activeImpact.age * 18.0)
+      : 0;
+    const baseOffsetY = (p.ridingLogId !== null ? 0.08 : 0) + logSpringY;
     this.playerMesh.position.set(worldToScreenX(p.x), baseOffsetY + hopHeight, p.row);
 
     if (p.facing === MoveDirection.FORWARD) this.playerMesh.rotation.y = 0;
@@ -1957,9 +3016,10 @@ class SceneManager {
       this.playerMesh.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
     }
 
-    this.updateParticles(dt);
-
     const camZ = engine.getCameraZ();
+    this.updateParticles(dt);
+    this.updateAmbientParticles(dt, currentBiome, camZ, nowSec);
+
     let shakeX = 0;
     let shakeZ = 0;
     if (this.shakeIntensity > 0.01) {
@@ -1982,6 +3042,7 @@ class SceneManager {
       this.scene.remove(rendered.group);
     }
     this.renderedLanes.clear();
+    this.logImpacts.clear();
 
     for (const p of this.particles) {
       this.scene.remove(p.mesh);
@@ -2016,7 +3077,9 @@ const pauseMenuBtn = document.getElementById('pause-menu-btn') ;
 // Settings Modal Elements
 const settingsModal = document.getElementById('settings-modal') ;
 const settingSoundToggle = document.getElementById('setting-sound-toggle')                           ;
+const settingMusicToggle = document.getElementById('setting-music-toggle')                           ;
 const settingsCloseBtn = document.getElementById('settings-close-btn') ;
+const toastContainerEl = document.getElementById('toast-container');
 
 // Gacha Modal Elements
 const gachaModal = document.getElementById('gacha-modal') ;
@@ -2030,6 +3093,9 @@ const gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list') ;
 const leaderboardModal = document.getElementById('leaderboard-modal') ;
 const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn') ;
 const leaderboardBestScoreEl = document.getElementById('leaderboard-best-score') ;
+const leaderboardNameInput = document.getElementById('leaderboard-name-input')                           ;
+const leaderboardSaveNameBtn = document.getElementById('leaderboard-save-name-btn');
+const leaderboardRowsEl = document.getElementById('leaderboard-rows');
 
 // Game Over Modal Elements
 const gameOverModal = document.getElementById('game-over-modal') ;
@@ -2048,12 +3114,131 @@ let isPlaying = false;
 let isPaused = false;
 let wasDead = false;
 let lastCoins = engine.getCoins();
+let runStartHighScore = engine.getHighScore();
+let notifiedNewHighScoreThisRun = false;
 let settingsReturnTo                   = 'menu';
+
+const unlockedAchievements = new Set        (
+  JSON.parse(localStorage.getItem('crossy_road_pro_achievements_v1') || '[]')
+);
+
+function showToast(icon        , title        , desc        )       {
+  if (!toastContainerEl) return;
+  const item = document.createElement('div');
+  item.className = 'toast-item';
+  item.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-desc">${desc}</div></div>`;
+  toastContainerEl.appendChild(item);
+  setTimeout(() => { item.remove(); }, 3600);
+}
+
+function unlockAchievement(id        , icon        , title        , desc        )       {
+  if (unlockedAchievements.has(id)) return;
+  unlockedAchievements.add(id);
+  localStorage.setItem('crossy_road_pro_achievements_v1', JSON.stringify(Array.from(unlockedAchievements)));
+  showToast(icon, `Достижение: ${title}`, desc);
+}
+
+// Background Music Controller (delegates to AudioSynth if supported, with WebAudio fallback)
+const audioAny = audio                                      ;
+let musicEnabled = typeof audioAny.isMusicEnabled === 'function'
+  ? Boolean((audioAny.isMusicEnabled                 )())
+  : localStorage.getItem('crossy_setting_music') !== 'false';
+let bgmInterval                = null;
+let bgmNoteIdx = 0;
+const BGM_NOTES = [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66, 349.23];
+
+function syncBackgroundMusic()       {
+  if (typeof audioAny.setMusicEnabled === 'function') {
+    (audioAny.setMusicEnabled                        )(musicEnabled);
+    return;
+  }
+  if (bgmInterval !== null) {
+    window.clearInterval(bgmInterval);
+    bgmInterval = null;
+  }
+  if (!musicEnabled || !audio.isSoundEnabled()) return;
+  bgmInterval = window.setInterval(() => {
+    if (!isPlaying || isPaused || !musicEnabled || !audio.isSoundEnabled()) return;
+    const AudioCtx = window.AudioContext || (window                                                          ).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = (audio                                     ).ctx;
+    if (!ctx || ctx.state !== 'running') return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(BGM_NOTES[bgmNoteIdx % BGM_NOTES.length], ctx.currentTime);
+    bgmNoteIdx += 1;
+    gain.gain.setValueAtTime(0.035, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.002, ctx.currentTime + 0.28);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+  }, 340);
+}
 
 if (settingSoundToggle) {
   settingSoundToggle.checked = audio.isSoundEnabled();
   settingSoundToggle.addEventListener('change', () => {
     audio.setSoundEnabled(settingSoundToggle.checked);
+    syncBackgroundMusic();
+  });
+}
+
+if (settingMusicToggle) {
+  settingMusicToggle.checked = musicEnabled;
+  settingMusicToggle.addEventListener('change', () => {
+    musicEnabled = settingMusicToggle.checked;
+    localStorage.setItem('crossy_setting_music', String(musicEnabled));
+    syncBackgroundMusic();
+  });
+}
+syncBackgroundMusic();
+
+const tracker = engine.getScoreTracker();
+let playerName = tracker.getPlayerName() || 'Игрок';
+if (leaderboardNameInput) leaderboardNameInput.value = playerName;
+
+function recordRunToLeaderboard(score        )       {
+  if (score <= 0) return;
+  const runRes = tracker.recordRun(score);
+  if (runRes.overtakenBots.length > 0) {
+    showToast('🏁', 'Соперник позади!', `Вы обошли: ${runRes.overtakenBots.slice(0, 2).join(', ')}`);
+  }
+  for (const ach of tracker.getAchievements()) {
+    if (ach.unlocked) {
+      unlockAchievement(ach.id, ach.badge, ach.title, ach.description);
+    }
+  }
+}
+
+function renderLeaderboardUI()       {
+  if (!leaderboardRowsEl) return;
+  const entries = tracker.getLeaderboard();
+  leaderboardRowsEl.innerHTML = entries
+    .slice(0, 8)
+    .map((entry) => {
+      const skinMeta = ALL_SKINS.find((s) => s.id === entry.skinId);
+      const badge = skinMeta?.badge ?? (entry.isBot ? '🤖' : '👤');
+      return `
+      <div class="lb-row ${!entry.isBot ? 'current-player' : ''}">
+        <span>#${entry.rank} ${!entry.isBot ? '(Вы)' : ''}</span>
+        <span>${badge} ${entry.playerName}</span>
+        <span>${entry.score}</span>
+      </div>
+    `;
+    })
+    .join('');
+}
+
+if (leaderboardSaveNameBtn && leaderboardNameInput) {
+  leaderboardSaveNameBtn.addEventListener('click', () => {
+    const clean = leaderboardNameInput.value.trim().slice(0, 18) || 'Игрок';
+    playerName = clean;
+    leaderboardNameInput.value = clean;
+    tracker.setPlayerName(clean);
+    renderLeaderboardUI();
+    showToast('👤', 'Профиль обновлён', `Имя игрока сохранено: ${clean}`);
   });
 }
 
@@ -2061,20 +3246,29 @@ function updateMenuStats()       {
   if (menuHighScoreEl) menuHighScoreEl.textContent = String(engine.getHighScore());
   if (menuCoinsEl) menuCoinsEl.textContent = String(engine.getCoins());
   if (leaderboardBestScoreEl) leaderboardBestScoreEl.textContent = String(engine.getHighScore());
+  renderLeaderboardUI();
 }
+
+const UI_SKIN_RARITY                                                 = {
+  chicken: { label: 'Обычный', css: 'rarity-common' },
+  cyber_duck: { label: 'Редкий', css: 'rarity-rare' },
+  shadow_ninja: { label: 'Эпический', css: 'rarity-epic' },
+  frost_penguin: { label: 'Легендарный', css: 'rarity-legendary' },
+};
 
 function renderSkinsUI()       {
   const unlocked = engine.getUnlockedSkins();
   const active = engine.getSelectedSkin();
-  const remaining = ALL_SKINS.length - unlocked.length;
 
   if (gachaModalSkinListEl) {
     gachaModalSkinListEl.innerHTML = '';
     ALL_SKINS.forEach((skin) => {
       const isUnlocked = unlocked.includes(skin.id);
+      const rarity = UI_SKIN_RARITY[skin.id] ?? { label: 'Эпический', css: 'rarity-epic' };
       const card = document.createElement('div');
       card.className = `gacha-skin-card ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
       card.innerHTML = `
+        <div class="rarity-badge ${rarity.css}">${rarity.label}</div>
         <div class="gacha-skin-badge">${isUnlocked ? skin.badge : '🔒'}</div>
         <div class="gacha-skin-name">${isUnlocked ? skin.name : 'Секретный скин'}</div>
         <div class="gacha-skin-tag">${active === skin.id ? 'ВЫБРАН' : isUnlocked ? 'ДОСТУПЕН' : 'ЗАКРЫТ'}</div>
@@ -2082,7 +3276,7 @@ function renderSkinsUI()       {
       if (isUnlocked) {
         card.addEventListener('click', () => {
           if (engine.selectSkin(skin.id)) {
-            audio.playCoin();
+            audio.playSkinVoice(skin.id);
             renderSkinsUI();
           }
         });
@@ -2093,8 +3287,8 @@ function renderSkinsUI()       {
 
   if (gachaModalCoinsEl) gachaModalCoinsEl.textContent = String(engine.getCoins());
   if (gachaModalRollBtn) {
-    gachaModalRollBtn.textContent = remaining > 0 ? `Крутить за ${WORLD_CONFIG.GACHA_COST} 🪙` : 'Все скины собраны!';
-    (gachaModalRollBtn                     ).disabled = remaining === 0;
+    gachaModalRollBtn.textContent = `Крутить за ${WORLD_CONFIG.GACHA_COST} 🪙`;
+    (gachaModalRollBtn                     ).disabled = false;
   }
   updateMenuStats();
 }
@@ -2102,15 +3296,26 @@ function renderSkinsUI()       {
 function handleGachaRoll()       {
   const res = engine.rollGacha();
   if (res.success && res.skinId) {
-    audio.playGacha();
+    audio.playGachaRoll();
+    const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
+    audio.playGachaUnlock(isRare);
     const meta = ALL_SKINS.find((s) => s.id === res.skinId);
-    const msg = `🎉 Выбит новый скин: ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
-    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
+    const rarity = UI_SKIN_RARITY[res.skinId] ?? { label: 'Эпический', css: 'rarity-epic' };
+    if (res.isDuplicate) {
+      const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
+      if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
+      showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
+    } else {
+      const msg = `🎉 Выбит скин (${rarity.label}): ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+      if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
+      showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
+    }
+    unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
+    if (engine.getUnlockedSkins().length >= ALL_SKINS.length) {
+      unlockAchievement('gacha_all', '👑', 'Полная коллекция', 'Собраны все воксельные скины!');
+    }
     lastCoins = engine.getCoins();
     renderSkinsUI();
-  } else if (res.reason === 'ALL_UNLOCKED') {
-    const msg = '✨ Вы уже собрали все 4 скина!';
-    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
   } else {
     const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${engine.getCoins()} 🪙)`;
     if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
@@ -2140,6 +3345,8 @@ function startGame()       {
   settingsModal.classList.add('hidden');
   wasDead = false;
   isPaused = false;
+  runStartHighScore = engine.getHighScore();
+  notifiedNewHighScoreThisRun = false;
   sceneManager.clearAll();
   engine.reset(Date.now());
   lastCoins = engine.getCoins();
@@ -2231,6 +3438,7 @@ function triggerMove(dir                                                  )     
 
   if (engine.queueMove(dir)) {
     audio.playHop(engine.getComboMultiplier(), surface);
+    audio.playSkinVoice(engine.getSelectedSkin());
   }
 }
 
@@ -2283,6 +3491,16 @@ window.addEventListener('keydown', (e) => {
 
   // If Leaderboard modal is open
   if (!leaderboardModal.classList.contains('hidden')) {
+    if (document.activeElement === leaderboardNameInput) {
+      if (e.code === 'Enter' && leaderboardSaveNameBtn) {
+        e.preventDefault();
+        leaderboardSaveNameBtn.click();
+        leaderboardNameInput?.blur();
+      } else if (e.code === 'Escape') {
+        leaderboardNameInput?.blur();
+      }
+      return;
+    }
     if (e.code === 'Escape' || e.code === 'Enter') {
       leaderboardModal.classList.add('hidden');
     }
@@ -2348,10 +3566,25 @@ function animate(now        )       {
   if (currentCoins > lastCoins) {
     audio.playCoin();
     lastCoins = currentCoins;
+    if (currentCoins >= 25) unlockAchievement('coin_25', '🪙', 'Нумизмат', 'Собрано 25 монет!');
+    if (currentCoins >= 100) unlockAchievement('coin_100', '💰', 'Готов к Гаче', 'Накоплено 100 монет на прокрут!');
     renderSkinsUI();
   }
 
-  if (scoreEl) scoreEl.textContent = String(engine.getScore());
+  const currentScore = engine.getScore();
+  if (isPlaying && currentScore > 0) {
+    if (currentScore > runStartHighScore && runStartHighScore > 0 && !notifiedNewHighScoreThisRun) {
+      notifiedNewHighScoreThisRun = true;
+      audio.playNewHighScore();
+      showToast('🏆', 'Новый рекорд!', `Вы побили прошлый рекорд (${runStartHighScore})!`);
+    }
+    if (currentScore >= 15) unlockAchievement('score_15', '🐣', 'Первые шаги', 'Набрано 15 очков за забег!');
+    if (currentScore >= 50) unlockAchievement('score_50', '🔥', 'Мастер трассы', 'Набрано 50 очков за забег!');
+    if (currentScore >= 100) unlockAchievement('score_100', '👑', 'Легенда перекрёстков', 'Набрано 100 очков!');
+    if (engine.getComboMultiplier() >= 3) unlockAchievement('combo_3', '⚡', 'Комбо x3', 'Максимальный темп прыжков!');
+  }
+
+  if (scoreEl) scoreEl.textContent = String(currentScore);
   if (coinsEl) coinsEl.textContent = String(currentCoins);
 
   if (warningVignetteEl) {
@@ -2366,6 +3599,7 @@ function animate(now        )       {
   const p = engine.getPlayer();
   if (isPlaying && p.isDead && !wasDead) {
     wasDead = true;
+    recordRunToLeaderboard(currentScore);
     sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
     if (p.deathReason === DeathReason.WATER) {
       audio.playSplash();
