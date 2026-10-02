@@ -66,11 +66,11 @@ export function getCameraFrustumNdcY(playerX: number, playerRow: number, camZ: n
   const sx = -playerX + 0.35;
   const sy = 0.65;
   const sz = playerRow + 0.35;
-  const dx = sx + 7.5;
-  const dy = sy - 12.5;
-  const dz = sz - camZ + 7.5;
+  const dx = sx - WORLD_CONFIG.CAMERA_OFFSET.X;
+  const dy = sy - WORLD_CONFIG.CAMERA_OFFSET.Y;
+  const dz = sz - camZ - WORLD_CONFIG.CAMERA_OFFSET.Z;
   const vy = dx * 0.42426406871192857 + dy * 0.7071067811865476 + dz * 0.565685424949238;
-  return vy / 11;
+  return vy / WORLD_CONFIG.FRUSTUM_SIZE;
 }
 
 /**

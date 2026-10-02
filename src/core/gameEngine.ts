@@ -73,6 +73,20 @@ export class GameEngine {
         this.lanes.set(r, this.generator.generateLane(r, effectiveScore));
       }
     }
+    this.evictOldLanes();
+  }
+
+  private evictOldLanes(): void {
+    const evictionThreshold = Math.floor(this.cameraZ - 30);
+    for (const row of this.lanes.keys()) {
+      if (row < evictionThreshold) {
+        this.lanes.delete(row);
+      }
+    }
+  }
+
+  getLoadedLanesCount(): number {
+    return this.lanes.size;
   }
 
   getPlayer(): PlayerState {
@@ -427,6 +441,8 @@ export class GameEngine {
     } else {
       this.cameraGraceTimer = 0;
     }
+
+    this.evictOldLanes();
   }
 
   private killPlayer(reason: typeof DeathReason[keyof typeof DeathReason]): void {

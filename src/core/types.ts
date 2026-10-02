@@ -155,4 +155,10 @@ export const WORLD_CONFIG = {
   BASE_CAMERA_SPEED: 0.85,
   GACHA_COST: 100,
   BIOME_INTERVAL: 25,
+  CAMERA_OFFSET: {
+    X: -7.5,
+    Y: 12.5,
+    Z: -7.5,
+  },
+  FRUSTUM_SIZE: 11,
 } as const;

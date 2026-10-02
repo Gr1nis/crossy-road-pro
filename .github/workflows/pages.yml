@@ -31,6 +31,15 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Run automated test suite
+        run: node --experimental-strip-types --test tests/laneGenerator.test.ts tests/scoreTracker.test.ts tests/arcadeProUpdate.test.ts tests/bugfixes.adversarial.test.ts tests/gameEngine.adversarial.test.ts
+
       - name: Build single-file bundle & index.html
         run: node scripts/build.mjs
 

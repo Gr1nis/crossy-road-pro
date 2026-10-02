@@ -166,4 +166,42 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
       assert.equal(engine.isBehindCameraEdge(), false, `Row -${r} must still be within visible screen frustum`);
     }
   });
+
+  it('Invariant 8 (Memory Leak Prevention & Sliding Window Lane Eviction): advancing 120+ rows evicts old rows from active lanes and bounds loaded lane memory', () => {
+    const engine = new GameEngine(42);
+
+    // Simulate advancing player and camera forward 125 rows
+    for (let r = 1; r <= 125; r++) {
+      const lane = engine.getLane(r);
+      lane.type = LaneType.GRASS;
+      lane.obstacles = [];
+      engine.queueMove(MoveDirection.FORWARD);
+      engine.step(WORLD_CONFIG.HOP_DURATION + 0.05);
+      engine.step(0.1);
+    }
+
+    assert.ok(engine.getPlayer().row >= 120, 'Player should have advanced 120+ rows');
+    assert.ok(engine.getCameraZ() > 45, 'Camera Z should have scrolled past row 45');
+
+    const activeLanes = engine.getActiveLanes();
+    assert.ok(activeLanes.length > 0, 'Active lanes should not be empty');
+    assert.ok(activeLanes.length <= 70, 'Active lanes window must remain bounded (<= 70)');
+
+    const hasOldLanes = activeLanes.some((lane) => lane.index < 10);
+    assert.equal(hasOldLanes, false, 'Old lanes (index < 10) must be evicted from active lanes when camera > 45');
+
+    const getLoadedCount = Reflect.get(engine, 'getLoadedLanesCount') as (() => number) | undefined;
+    const internalLanes = Reflect.get(engine, 'lanes') as Map<number, unknown> | undefined;
+
+    const loadedLanesCount: number =
+      typeof getLoadedCount === 'function'
+        ? getLoadedCount.call(engine)
+        : (internalLanes instanceof Map ? internalLanes.size : activeLanes.length);
+
+    assert.ok(
+      loadedLanesCount <= 70,
+      `Loaded lanes count must not grow proportionally with traversed rows (expected <= 70, got ${loadedLanesCount})`
+    );
+  });
 });
+
