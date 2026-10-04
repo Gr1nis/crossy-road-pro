@@ -139,12 +139,15 @@ export class SceneManager {
     this.scene.fog = this.fog;
 
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = Math.max(11, 10.5 / aspect);
+    const halfWidth = Math.max(10.5, 11 * aspect);
+    const totalHeight = (halfWidth * 2) / aspect;
+    const bottom = -11;
+    const top = bottom + totalHeight;
     this.camera = new THREE.OrthographicCamera(
-      -viewSize * aspect,
-      viewSize * aspect,
-      viewSize,
-      -viewSize,
+      -halfWidth,
+      halfWidth,
+      top,
+      bottom,
       -30,
       80
     );
@@ -332,11 +335,14 @@ export class SceneManager {
 
   private onResize(): void {
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = Math.max(11, 10.5 / aspect);
-    this.camera.left = -viewSize * aspect;
-    this.camera.right = viewSize * aspect;
-    this.camera.top = viewSize;
-    this.camera.bottom = -viewSize;
+    const halfWidth = Math.max(10.5, 11 * aspect);
+    const totalHeight = (halfWidth * 2) / aspect;
+    const bottom = -11;
+    const top = bottom + totalHeight;
+    this.camera.left = -halfWidth;
+    this.camera.right = halfWidth;
+    this.camera.top = top;
+    this.camera.bottom = bottom;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
