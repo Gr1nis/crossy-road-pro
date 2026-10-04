@@ -1,26 +1,32 @@
-export class AudioSynth {
-  private ctx: AudioContext | null = null;
-  private soundEnabled: boolean = true;
-  private musicEnabled: boolean = true;
-  private musicVolume: number = 0.22;
-  private isMusicPlaying: boolean = false;
-  private musicTimerId: ReturnType<typeof setInterval> | null = null;
-  private musicStep: number = 0;
-  private isPaused: boolean = false;
+export class SoundManager {
+  public ctx: AudioContext | null = null;
   public masterGainNode: GainNode | null = null;
   public bgmGainNode: GainNode | null = null;
   public sfxGainNode: GainNode | null = null;
   public bgmFilterNode: BiquadFilterNode | null = null;
 
+  private isMusicPlaying = false;
+  private musicTimerId: ReturnType<typeof setInterval> | null = null;
+  private musicStep = 0;
+  private isPaused = false;
+  private isGameOver = false;
+
+  private sfxVolume = 1.0;
+  private sfxMuted = false;
+  private musicVolume = 0.22;
+  private musicMuted = false;
+  private masterVolume = 1.0;
+  private masterMuted = false;
+
   constructor() {
     if (typeof window !== 'undefined') {
       const savedSound = localStorage.getItem('crossy_setting_sound');
       if (savedSound !== null) {
-        this.soundEnabled = savedSound !== 'false';
+        this.sfxMuted = savedSound === 'false';
       }
       const savedMusic = localStorage.getItem('crossy_setting_music');
       if (savedMusic !== null) {
-        this.musicEnabled = savedMusic !== 'false';
+        this.musicMuted = savedMusic === 'false';
       }
       this.setupUserGestureListener();
     }
@@ -33,7 +39,7 @@ export class AudioSynth {
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().catch(() => {});
       }
-      if (this.musicEnabled && !this.isMusicPlaying) {
+      if (!this.musicMuted && !this.isMusicPlaying && !this.isGameOver) {
         this.startMusic();
       }
       const events = ['click', 'keydown', 'pointerdown', 'touchstart'];
@@ -43,63 +49,29 @@ export class AudioSynth {
     events.forEach((ev) => window.addEventListener(ev, onGesture, { passive: true }));
   }
 
-  isSoundEnabled(): boolean {
-    return this.soundEnabled;
-  }
-
-  setSoundEnabled(enabled: boolean): void {
-    this.soundEnabled = enabled;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('crossy_setting_sound', String(enabled));
-    }
-    if (this.sfxGainNode && this.ctx) {
-      this.sfxGainNode.gain.setValueAtTime(enabled ? 1.0 : 0.0, this.ctx.currentTime);
-    }
-  }
-
-  isMusicEnabled(): boolean {
-    return this.musicEnabled;
-  }
-
-  setMusicEnabled(enabled: boolean): void {
-    this.musicEnabled = enabled;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('crossy_setting_music', String(enabled));
-    }
-    if (this.bgmGainNode && this.ctx) {
-      const target = enabled ? (this.isPaused ? this.musicVolume * 0.75 : this.musicVolume) : 0;
-      this.bgmGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
-    }
-    if (enabled) {
-      this.startMusic();
-    } else {
-      this.stopMusic();
-    }
-  }
-
-  private ensureContext(ignoreSoundFlag: boolean = false): AudioContext | null {
+  public ensureContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-        this.masterGainNode = this.ctx.createGain();
-        this.masterGainNode.gain.setValueAtTime(1.0, this.ctx.currentTime);
-        this.masterGainNode.connect(this.ctx.destination);
+      if (!AudioCtx) return null;
+      this.ctx = new AudioCtx();
 
-        this.sfxGainNode = this.ctx.createGain();
-        this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
-        this.sfxGainNode.connect(this.masterGainNode);
+      this.masterGainNode = this.ctx.createGain();
+      this.masterGainNode.gain.setValueAtTime(this.masterMuted ? 0 : this.masterVolume, this.ctx.currentTime);
+      this.masterGainNode.connect(this.ctx.destination);
 
-        this.bgmGainNode = this.ctx.createGain();
-        this.bgmGainNode.gain.setValueAtTime(this.musicEnabled ? this.musicVolume : 0.0, this.ctx.currentTime);
-        this.bgmGainNode.connect(this.masterGainNode);
+      this.sfxGainNode = this.ctx.createGain();
+      this.sfxGainNode.gain.setValueAtTime(this.sfxMuted ? 0 : this.sfxVolume, this.ctx.currentTime);
+      this.sfxGainNode.connect(this.masterGainNode);
 
-        this.bgmFilterNode = this.ctx.createBiquadFilter();
-        this.bgmFilterNode.type = 'lowpass';
-        this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
-        this.bgmFilterNode.connect(this.bgmGainNode);
-      }
+      this.bgmGainNode = this.ctx.createGain();
+      this.bgmGainNode.gain.setValueAtTime(this.musicMuted ? 0 : this.musicVolume, this.ctx.currentTime);
+      this.bgmGainNode.connect(this.masterGainNode);
+
+      this.bgmFilterNode = this.ctx.createBiquadFilter();
+      this.bgmFilterNode.type = 'lowpass';
+      this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
+      this.bgmFilterNode.connect(this.bgmGainNode);
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
@@ -107,33 +79,176 @@ export class AudioSynth {
     return this.ctx;
   }
 
-  onPause(): void {
+  public setSfxVolume(volume: number): void {
+    this.sfxVolume = Math.max(0, Math.min(1, volume));
+    if (this.sfxGainNode && this.ctx) {
+      this.sfxGainNode.gain.setValueAtTime(this.sfxMuted ? 0 : this.sfxVolume, this.ctx.currentTime);
+    }
+  }
+
+  public getSfxVolume(): number {
+    return this.sfxVolume;
+  }
+
+  public setSfxMuted(muted: boolean): void {
+    this.sfxMuted = muted;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crossy_setting_sound', String(!muted));
+    }
+    if (this.sfxGainNode && this.ctx) {
+      this.sfxGainNode.gain.setValueAtTime(muted ? 0 : this.sfxVolume, this.ctx.currentTime);
+    }
+  }
+
+  public isSfxMuted(): boolean {
+    return this.sfxMuted;
+  }
+
+  public setMusicVolume(volume: number): void {
+    this.musicVolume = Math.max(0, Math.min(1, volume));
+    if (this.bgmGainNode && this.ctx) {
+      const target = this.musicMuted ? 0 : (this.isPaused ? this.musicVolume * 0.75 : this.musicVolume);
+      this.bgmGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
+    }
+  }
+
+  public getMusicVolume(): number {
+    return this.musicVolume;
+  }
+
+  public setMusicMuted(muted: boolean): void {
+    this.musicMuted = muted;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crossy_setting_music', String(!muted));
+    }
+    if (this.bgmGainNode && this.ctx) {
+      const target = muted ? 0 : (this.isPaused ? this.musicVolume * 0.75 : this.musicVolume);
+      this.bgmGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
+    }
+    if (!muted && !this.isMusicPlaying && !this.isGameOver) {
+      this.startMusic();
+    }
+  }
+
+  public isMusicMuted(): boolean {
+    return this.musicMuted;
+  }
+
+  public setMasterVolume(volume: number): void {
+    this.masterVolume = Math.max(0, Math.min(1, volume));
+    if (this.masterGainNode && this.ctx) {
+      this.masterGainNode.gain.setValueAtTime(this.masterMuted ? 0 : this.masterVolume, this.ctx.currentTime);
+    }
+  }
+
+  public getMasterVolume(): number {
+    return this.masterVolume;
+  }
+
+  public setMasterMuted(muted: boolean): void {
+    this.masterMuted = muted;
+    if (this.masterGainNode && this.ctx) {
+      this.masterGainNode.gain.setValueAtTime(muted ? 0 : this.masterVolume, this.ctx.currentTime);
+    }
+  }
+
+  public isMasterMuted(): boolean {
+    return this.masterMuted;
+  }
+
+  public isSoundEnabled(): boolean {
+    return !this.sfxMuted && this.sfxVolume > 0;
+  }
+
+  public setSoundEnabled(enabled: boolean): void {
+    this.setSfxMuted(!enabled);
+  }
+
+  public isMusicEnabled(): boolean {
+    return !this.musicMuted && this.musicVolume > 0;
+  }
+
+  public setMusicEnabled(enabled: boolean): void {
+    this.setMusicMuted(!enabled);
+  }
+
+  public setPaused(paused: boolean): void {
+    if (paused) {
+      this.onPause();
+    } else {
+      this.onResume();
+    }
+  }
+
+  public pauseMusic(): void {
+    this.onPause();
+  }
+
+  public resumeMusic(): void {
+    this.onResume();
+  }
+
+  public isPlayingMusic(): boolean {
+    return this.isMusicPlaying;
+  }
+
+  public getIsMusicPlaying(): boolean {
+    return this.isMusicPlaying;
+  }
+
+  public onPause(): void {
     this.isPaused = true;
     if (this.ctx && this.bgmFilterNode && this.bgmGainNode) {
       const now = this.ctx.currentTime;
       this.bgmFilterNode.frequency.setTargetAtTime(950, now, 0.1);
-      const target = this.musicEnabled ? this.musicVolume * 0.75 : 0;
+      const target = this.musicMuted ? 0 : this.musicVolume * 0.75;
       this.bgmGainNode.gain.setTargetAtTime(target, now, 0.1);
+    }
+    if (!this.isMusicPlaying && !this.musicMuted) {
+      this.startMusic();
     }
   }
 
-  onResume(): void {
+  public onResume(): void {
     this.isPaused = false;
     if (this.ctx && this.bgmFilterNode && this.bgmGainNode) {
       const now = this.ctx.currentTime;
       this.bgmFilterNode.frequency.setTargetAtTime(20000, now, 0.1);
-      const target = this.musicEnabled ? this.musicVolume : 0;
+      const target = this.musicMuted ? 0 : this.musicVolume;
       this.bgmGainNode.gain.setTargetAtTime(target, now, 0.1);
+    }
+    if (!this.isMusicPlaying && !this.musicMuted) {
+      this.startMusic();
     }
   }
 
-  startMusic(): void {
-    if (!this.musicEnabled || this.isMusicPlaying) return;
-    const ctx = this.ensureContext(true);
+  public onGameOver(): void {
+    this.isGameOver = true;
+    if (this.ctx && this.bgmGainNode) {
+      this.bgmGainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 0.15);
+    }
+  }
+
+  public onReturnToMenu(): void {
+    this.isGameOver = false;
+    this.isPaused = false;
+    if (this.ctx && this.bgmFilterNode && this.bgmGainNode) {
+      const now = this.ctx.currentTime;
+      this.bgmFilterNode.frequency.setTargetAtTime(20000, now, 0.05);
+      const target = this.musicMuted ? 0 : this.musicVolume;
+      this.bgmGainNode.gain.setTargetAtTime(target, now, 0.05);
+    }
+    if (!this.isMusicPlaying && !this.musicMuted) {
+      this.startMusic();
+    }
+  }
+
+  public startMusic(): void {
+    if (this.musicMuted || this.isMusicPlaying || this.isGameOver) return;
+    const ctx = this.ensureContext();
     if (!ctx) return;
 
     this.isMusicPlaying = true;
-    // Unobtrusive pentatonic chiptune-lite groove (16-step sequence, 220ms per step)
     const bassNotes = [
       130.81, 0, 130.81, 164.81,
       174.61, 0, 174.61, 196.0,
@@ -148,8 +263,8 @@ export class AudioSynth {
     ];
 
     this.musicTimerId = setInterval(() => {
-      if (!this.isMusicPlaying || !this.musicEnabled) return;
-      const activeCtx = this.ensureContext(true);
+      if (!this.isMusicPlaying || this.musicMuted || !this.bgmFilterNode) return;
+      const activeCtx = this.ensureContext();
       if (!activeCtx || activeCtx.state !== 'running') return;
 
       const step = this.musicStep % 16;
@@ -162,10 +277,10 @@ export class AudioSynth {
         const bGain = activeCtx.createGain();
         bOsc.type = 'triangle';
         bOsc.frequency.setValueAtTime(bassFreq, now);
-        bGain.gain.setValueAtTime(0.055 * this.musicVolume, now);
+        bGain.gain.setValueAtTime(0.055, now);
         bGain.gain.exponentialRampToValueAtTime(0.002, now + 0.18);
         bOsc.connect(bGain);
-        bGain.connect(this.bgmFilterNode ?? activeCtx.destination);
+        bGain.connect(this.bgmFilterNode);
         bOsc.start(now);
         bOsc.stop(now + 0.19);
       }
@@ -176,17 +291,17 @@ export class AudioSynth {
         const lGain = activeCtx.createGain();
         lOsc.type = 'sine';
         lOsc.frequency.setValueAtTime(leadFreq, now);
-        lGain.gain.setValueAtTime(0.038 * this.musicVolume, now);
+        lGain.gain.setValueAtTime(0.038, now);
         lGain.gain.exponentialRampToValueAtTime(0.002, now + 0.16);
         lOsc.connect(lGain);
-        lGain.connect(this.bgmFilterNode ?? activeCtx.destination);
+        lGain.connect(this.bgmFilterNode);
         lOsc.start(now);
         lOsc.stop(now + 0.17);
       }
     }, 220);
   }
 
-  stopMusic(): void {
+  public stopMusic(): void {
     this.isMusicPlaying = false;
     if (this.musicTimerId !== null) {
       clearInterval(this.musicTimerId);
@@ -194,9 +309,9 @@ export class AudioSynth {
     }
   }
 
-  playHop(comboMultiplier: number = 1, surface: 'grass' | 'road' | 'log' | 'rail' = 'grass'): void {
+  public playHop(comboMultiplier: number = 1, surface: 'grass' | 'road' | 'log' | 'rail' = 'grass'): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const pitchScale = 1 + (Math.max(1, comboMultiplier) - 1) * 0.14;
     const now = ctx.currentTime;
@@ -204,28 +319,24 @@ export class AudioSynth {
     const gain = ctx.createGain();
 
     if (surface === 'log') {
-      // Warm hollow wooden clack
       osc.type = 'sine';
       osc.frequency.setValueAtTime(440 * pitchScale, now);
       osc.frequency.exponentialRampToValueAtTime(220 * pitchScale, now + 0.07);
       gain.gain.setValueAtTime(0.25, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.075);
     } else if (surface === 'road') {
-      // Crisp asphalt tap
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(380 * pitchScale, now);
       osc.frequency.exponentialRampToValueAtTime(620 * pitchScale, now + 0.065);
       gain.gain.setValueAtTime(0.18, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
     } else if (surface === 'rail') {
-      // Metallic ping
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(520 * pitchScale, now);
       osc.frequency.exponentialRampToValueAtTime(780 * pitchScale, now + 0.08);
       gain.gain.setValueAtTime(0.14, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.085);
     } else {
-      // Soft bouncy grass hop
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(310 * pitchScale, now);
       osc.frequency.exponentialRampToValueAtTime(560 * pitchScale, now + 0.09);
@@ -234,34 +345,34 @@ export class AudioSynth {
     }
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode);
     osc.start(now);
     osc.stop(now + 0.1);
   }
 
-  playCoin(): void {
+  public playCoin(): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(987.77, now); // B5
-    osc.frequency.setValueAtTime(1318.51, now + 0.06); // E6
+    osc.frequency.setValueAtTime(987.77, now);
+    osc.frequency.setValueAtTime(1318.51, now + 0.06);
 
     gain.gain.setValueAtTime(0.2, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode);
     osc.start(now);
     osc.stop(now + 0.23);
   }
 
-  playGacha(): void {
+  public playGacha(): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const now = ctx.currentTime;
     const notes = [523.25, 659.25, 783.99, 1046.5];
@@ -275,15 +386,15 @@ export class AudioSynth {
       gain.gain.exponentialRampToValueAtTime(0.005, now + idx * 0.08 + 0.18);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode!);
       osc.start(now + idx * 0.08);
       osc.stop(now + idx * 0.08 + 0.19);
     });
   }
 
-  playTrainWhistle(): void {
+  public playTrainWhistle(): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const now = ctx.currentTime;
     [440, 554.37].forEach((freq) => {
@@ -297,15 +408,15 @@ export class AudioSynth {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode!);
       osc.start(now);
       osc.stop(now + 0.46);
     });
   }
 
-  playCrash(): void {
+  public playCrash(): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -317,14 +428,14 @@ export class AudioSynth {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode);
     osc.start();
     osc.stop(ctx.currentTime + 0.3);
   }
 
-  playSplash(): void {
+  public playSplash(): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -336,14 +447,14 @@ export class AudioSynth {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode);
     osc.start();
     osc.stop(ctx.currentTime + 0.26);
   }
 
-  playSkinVoice(skinId: string = 'chicken'): void {
+  public playSkinVoice(skinId: string = 'chicken'): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
@@ -351,41 +462,25 @@ export class AudioSynth {
     const id = skinId.toLowerCase();
 
     if (id.includes('duck')) {
-      // Cyber-Duck: nasal synth quack with digital pitch inflection
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(640, now);
       osc.frequency.exponentialRampToValueAtTime(410, now + 0.045);
       osc.frequency.exponentialRampToValueAtTime(530, now + 0.09);
       gain.gain.setValueAtTime(0.09, now);
       gain.gain.exponentialRampToValueAtTime(0.005, now + 0.095);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.1);
     } else if (id.includes('ninja') || id.includes('shadow')) {
-      // Shadow-Ninja: stealthy swift blade/breath accent
       osc.type = 'sine';
       osc.frequency.setValueAtTime(1480, now);
       osc.frequency.exponentialRampToValueAtTime(420, now + 0.055);
       gain.gain.setValueAtTime(0.085, now);
       gain.gain.exponentialRampToValueAtTime(0.004, now + 0.06);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.065);
     } else if (id.includes('penguin') || id.includes('frost')) {
-      // Frost-Penguin: crystalline icy chirp
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, now);
       osc.frequency.exponentialRampToValueAtTime(1320, now + 0.065);
       gain.gain.setValueAtTime(0.11, now);
       gain.gain.exponentialRampToValueAtTime(0.005, now + 0.075);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.08);
     } else {
-      // Classic Chicken (and custom skins): playful bawk-cluck inflection
       let hash = 0;
       for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
       const offset = id === 'chicken' ? 1 : 0.85 + ((Math.abs(hash) % 35) / 100);
@@ -395,16 +490,17 @@ export class AudioSynth {
       osc.frequency.exponentialRampToValueAtTime(610 * offset, now + 0.075);
       gain.gain.setValueAtTime(0.11, now);
       gain.gain.exponentialRampToValueAtTime(0.005, now + 0.08);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.085);
     }
+
+    osc.connect(gain);
+    gain.connect(this.sfxGainNode);
+    osc.start(now);
+    osc.stop(now + 0.1);
   }
 
-  playGachaRoll(): void {
+  public playGachaRoll(): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const now = ctx.currentTime;
     const ticks = [330, 392, 440, 523.25, 587.33, 659.25];
@@ -417,15 +513,15 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.09, t);
       gain.gain.exponentialRampToValueAtTime(0.005, t + 0.045);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode!);
       osc.start(t);
       osc.stop(t + 0.05);
     });
   }
 
-  playGachaUnlock(isRare: boolean = false): void {
+  public playGachaUnlock(isRare: boolean = false): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const now = ctx.currentTime;
     const notes = isRare
@@ -440,15 +536,15 @@ export class AudioSynth {
       gain.gain.setValueAtTime(isRare ? 0.15 : 0.16, t);
       gain.gain.exponentialRampToValueAtTime(0.005, t + 0.22);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode!);
       osc.start(t);
       osc.stop(t + 0.23);
     });
   }
 
-  playNewHighScore(): void {
+  public playNewHighScore(): void {
     const ctx = this.ensureContext();
-    if (!ctx) return;
+    if (!ctx || !this.sfxGainNode) return;
 
     const now = ctx.currentTime;
     const fanfare = [
@@ -466,9 +562,12 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.2, t);
       gain.gain.exponentialRampToValueAtTime(0.005, t + dur);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode!);
       osc.start(t);
       osc.stop(t + dur + 0.01);
     });
   }
 }
+
+export { SoundManager as AudioSynth };
+export default SoundManager;
