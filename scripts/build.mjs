@@ -128,9 +128,12 @@ const htmlContent = `<!DOCTYPE html>
     .lb-name-input:focus { border-color: #38bdf8; }
     .lb-save-btn { background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; border-radius: 12px; padding: 0 16px; color: #fff; font-weight: 800; font-size: 13px; cursor: pointer; }
     .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 14px; margin: 12px 0 18px; text-align: left; max-height: 240px; overflow-y: auto; }
-    .lb-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
+    .lb-row { display: grid; grid-template-columns: 85px 1fr 95px; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
     .lb-row.header { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #334155; }
     .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.12); border-radius: 8px; font-weight: 800; }
+    .lb-col-rank { text-align: left; }
+    .lb-col-player { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lb-col-score { text-align: right; font-variant-numeric: tabular-nums; }
     .placeholder-badge { display: inline-block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
 
     /* Toast Notifications */
@@ -287,12 +290,13 @@ const htmlContent = `<!DOCTYPE html>
 
       <div class="leaderboard-preview-box">
         <div class="lb-row header">
-          <span>Ранг</span>
-          <span>Игрок</span>
-          <span>Очки (Лучший: <span id="leaderboard-best-score">0</span>)</span>
+          <span class="lb-col-rank">Ранг</span>
+          <span class="lb-col-player">Игрок</span>
+          <span class="lb-col-score">Очки</span>
         </div>
         <div id="leaderboard-rows"></div>
       </div>
+      <span id="leaderboard-best-score" style="display: none;">0</span>
 
       <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
     </div>

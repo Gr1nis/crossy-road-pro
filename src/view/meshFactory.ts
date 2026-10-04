@@ -599,4 +599,18 @@ export class MeshFactory {
 
     return group;
   }
+
+  static createLaneDivider(): THREE.Group {
+    const group = new THREE.Group();
+    const dividerMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
+
+    for (let x = -8.5; x <= 8.5; x += 1.6) {
+      const dash = new THREE.Mesh(dashGeo, dividerMat);
+      dash.position.set(x, 0.015, 0.5);
+      group.add(dash);
+    }
+
+    return group;
+  }
 }

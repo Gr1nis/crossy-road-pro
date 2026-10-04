@@ -43,6 +43,8 @@
 - **WebGL Memory Management**: Рекурсивный `disposeHierarchy()` геометрий и материалов при сдвиге камеры, сборе монет, зачистке партиклов и сбросе уровня.
 - **Leaderboard Deduplication & PB**: Ровно 1 запись на игрока в таблице лидеров с авто-реконсиляцией рекорда при старте.
 - **Clean Voxel Visuals**: Непрозрачные воксельные водопады без Z-fighting и шума; чистый асфальт без визуальной каши пунктира под машинами.
+- **Multi-Lane Road Dividers**: Аккуратный белый пунктирный разделитель на межполосной границе $Z = +0.5$, появляющийся только между смежными автомобильными полосами (`ROAD`).
+- **Leaderboard CSS Grid Centering**: 3-колоночная сетка (`85px 1fr 95px`) с идеальным вертикальным центрированием никнеймов и соосностью заголовков независимо от бейджа `(Вы)` и длины имени.
 - **Yandex Games Viewport & Snappy Camera Death**: Динамический `viewSize = Math.max(11, 10.5 / aspect)` для полной видимости поля 18 клеток на смартфонах; сокращение таймаута гибели от камеры до 0.4s с плавной виньеткой.
 
 ---
@@ -63,6 +65,6 @@
 
 ## 5. Verification Status
 - **TypeScript**: `npx tsc --noEmit` — 0 errors.
-- **Test Suite**: `npm test` — **42 / 42 GREEN** across 6 test suites.
+- **Test Suite**: `npm test` — **44 / 44 GREEN** across 6 test suites.
 - **Bundle**: `node --check dist/bundle.js` — 0 errors.
 - **Offline HTML**: `index.html` самодостаточен, мобильный вьюпорт и жесты настроены.

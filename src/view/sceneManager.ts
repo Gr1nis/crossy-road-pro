@@ -341,7 +341,7 @@ export class SceneManager {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-  private buildLaneGroup(lane: Lane): RenderedLane {
+  private buildLaneGroup(lane: Lane, hasNextRoad: boolean = false): RenderedLane {
     const group = new THREE.Group();
     group.position.z = lane.index;
 
@@ -388,6 +388,9 @@ export class SceneManager {
     if (lane.type === LaneType.ROAD) {
       const roadMarkings = MeshFactory.createRoadMarkings();
       group.add(roadMarkings);
+      if (hasNextRoad) {
+        group.add(MeshFactory.createLaneDivider());
+      }
     } else if (lane.type === LaneType.RIVER) {
       // Animated current foam ripples across river surface
       const rippleMat = new THREE.MeshBasicMaterial({
@@ -516,7 +519,9 @@ export class SceneManager {
       activeIndices.add(lane.index);
       let rendered = this.renderedLanes.get(lane.index);
       if (!rendered) {
-        rendered = this.buildLaneGroup(lane);
+        const nextLane = engine.getLane(lane.index + 1);
+        const hasNextRoad = nextLane?.type === LaneType.ROAD;
+        rendered = this.buildLaneGroup(lane, hasNextRoad);
         this.scene.add(rendered.group);
         this.renderedLanes.set(lane.index, rendered);
       }

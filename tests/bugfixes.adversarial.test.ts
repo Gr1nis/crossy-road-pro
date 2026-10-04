@@ -169,4 +169,86 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
       'meshFactory.ts must not contain yellow center dash markings'
     );
   });
+
+  it('Bug 8 (Multi-Lane Road Divider Markings): MeshFactory creates dashed lane divider at z = 0.5 and SceneManager adds it for consecutive roads', () => {
+    const meshFactorySrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/view/meshFactory.ts'),
+      'utf8'
+    );
+    assert.ok(
+      meshFactorySrc.includes('createLaneDivider(): THREE.Group'),
+      'meshFactory.ts must declare createLaneDivider(): THREE.Group'
+    );
+    assert.ok(
+      meshFactorySrc.includes('BoxGeometry(0.65, 0.02, 0.08)'),
+      'createLaneDivider must create dashes with dimensions (0.65, 0.02, 0.08)'
+    );
+    assert.ok(
+      meshFactorySrc.includes('dash.position.set(x, 0.015, 0.5)'),
+      'createLaneDivider must place dashes at y=0.015 and z=0.5'
+    );
+
+    const sceneManagerSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/view/sceneManager.ts'),
+      'utf8'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('buildLaneGroup(lane: Lane, hasNextRoad: boolean = false)'),
+      'sceneManager.ts must have buildLaneGroup accept hasNextRoad flag'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('MeshFactory.createLaneDivider()'),
+      'sceneManager.ts must invoke MeshFactory.createLaneDivider() for consecutive road lanes'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('const nextLane = engine.getLane(lane.index + 1);'),
+      'sceneManager.ts must query next lane type in sync()'
+    );
+  });
+
+  it('Bug 9 (Leaderboard CSS Grid & Player Name Centering): build.mjs and uiManager use 3-column grid and dedicated column classes', () => {
+    const buildSrc = fs.readFileSync(
+      path.join(process.cwd(), 'scripts/build.mjs'),
+      'utf8'
+    );
+    assert.ok(
+      buildSrc.includes('grid-template-columns: 85px 1fr 95px;'),
+      'scripts/build.mjs must configure .lb-row with 3-column CSS Grid (85px 1fr 95px)'
+    );
+    assert.ok(
+      buildSrc.includes('.lb-col-rank { text-align: left; }'),
+      'scripts/build.mjs must define .lb-col-rank'
+    );
+    assert.ok(
+      buildSrc.includes('.lb-col-player { text-align: center;'),
+      'scripts/build.mjs must define .lb-col-player centered'
+    );
+    assert.ok(
+      buildSrc.includes('.lb-col-score { text-align: right;'),
+      'scripts/build.mjs must define .lb-col-score right-aligned'
+    );
+    assert.ok(
+      buildSrc.includes('<span class="lb-col-rank">Ранг</span>') &&
+      buildSrc.includes('<span class="lb-col-player">Игрок</span>') &&
+      buildSrc.includes('<span class="lb-col-score">Очки</span>'),
+      'scripts/build.mjs leaderboard header must use column classes'
+    );
+
+    const uiManagerSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/app/uiManager.ts'),
+      'utf8'
+    );
+    assert.ok(
+      uiManagerSrc.includes('<span class="lb-col-rank">'),
+      'uiManager.ts must render rank in .lb-col-rank'
+    );
+    assert.ok(
+      uiManagerSrc.includes('<span class="lb-col-player">'),
+      'uiManager.ts must render player badge and name in .lb-col-player'
+    );
+    assert.ok(
+      uiManagerSrc.includes('<span class="lb-col-score">'),
+      'uiManager.ts must render score in .lb-col-score'
+    );
+  });
 });

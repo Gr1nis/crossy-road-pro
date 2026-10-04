@@ -288,9 +288,9 @@ export class UIManager {
         const badge = skinMeta?.badge ?? (entry.isBot ? '🤖' : '👤');
         return `
       <div class="lb-row ${!entry.isBot ? 'current-player' : ''}">
-        <span>#${entry.rank} ${!entry.isBot ? '(Вы)' : ''}</span>
-        <span>${badge} ${entry.playerName}</span>
-        <span>${entry.score}</span>
+        <span class="lb-col-rank">#${entry.rank} ${!entry.isBot ? '<small style="color:#38bdf8;font-weight:700;">(Вы)</small>' : ''}</span>
+        <span class="lb-col-player">${badge} ${entry.playerName}</span>
+        <span class="lb-col-score">${entry.score}</span>
       </div>
     `;
       })

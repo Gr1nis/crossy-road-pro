@@ -67,9 +67,12 @@
     .lb-name-input:focus { border-color: #38bdf8; }
     .lb-save-btn { background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; border-radius: 12px; padding: 0 16px; color: #fff; font-weight: 800; font-size: 13px; cursor: pointer; }
     .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 14px; margin: 12px 0 18px; text-align: left; max-height: 240px; overflow-y: auto; }
-    .lb-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
+    .lb-row { display: grid; grid-template-columns: 85px 1fr 95px; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
     .lb-row.header { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #334155; }
     .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.12); border-radius: 8px; font-weight: 800; }
+    .lb-col-rank { text-align: left; }
+    .lb-col-player { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lb-col-score { text-align: right; font-variant-numeric: tabular-nums; }
     .placeholder-badge { display: inline-block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
 
     /* Toast Notifications */
@@ -226,12 +229,13 @@
 
       <div class="leaderboard-preview-box">
         <div class="lb-row header">
-          <span>Ранг</span>
-          <span>Игрок</span>
-          <span>Очки (Лучший: <span id="leaderboard-best-score">0</span>)</span>
+          <span class="lb-col-rank">Ранг</span>
+          <span class="lb-col-player">Игрок</span>
+          <span class="lb-col-score">Очки</span>
         </div>
         <div id="leaderboard-rows"></div>
       </div>
+      <span id="leaderboard-best-score" style="display: none;">0</span>
 
       <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
     </div>
@@ -2780,6 +2784,20 @@ class MeshFactory {
 
     return group;
   }
+
+  static createLaneDivider()              {
+    const group = new THREE.Group();
+    const dividerMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
+
+    for (let x = -8.5; x <= 8.5; x += 1.6) {
+      const dash = new THREE.Mesh(dashGeo, dividerMat);
+      dash.position.set(x, 0.015, 0.5);
+      group.add(dash);
+    }
+
+    return group;
+  }
 }
 
 // --- Module: src/view/sceneManager.ts ---
@@ -3085,7 +3103,7 @@ class SceneManager {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-          buildLaneGroup(lane      )               {
+          buildLaneGroup(lane      , hasNextRoad          = false)               {
     const group = new THREE.Group();
     group.position.z = lane.index;
 
@@ -3132,6 +3150,9 @@ class SceneManager {
     if (lane.type === LaneType.ROAD) {
       const roadMarkings = MeshFactory.createRoadMarkings();
       group.add(roadMarkings);
+      if (hasNextRoad) {
+        group.add(MeshFactory.createLaneDivider());
+      }
     } else if (lane.type === LaneType.RIVER) {
       // Animated current foam ripples across river surface
       const rippleMat = new THREE.MeshBasicMaterial({
@@ -3260,7 +3281,9 @@ class SceneManager {
       activeIndices.add(lane.index);
       let rendered = this.renderedLanes.get(lane.index);
       if (!rendered) {
-        rendered = this.buildLaneGroup(lane);
+        const nextLane = engine.getLane(lane.index + 1);
+        const hasNextRoad = nextLane?.type === LaneType.ROAD;
+        rendered = this.buildLaneGroup(lane, hasNextRoad);
         this.scene.add(rendered.group);
         this.renderedLanes.set(lane.index, rendered);
       }
@@ -3691,9 +3714,9 @@ class UIManager {
         const badge = skinMeta?.badge ?? (entry.isBot ? '🤖' : '👤');
         return `
       <div class="lb-row ${!entry.isBot ? 'current-player' : ''}">
-        <span>#${entry.rank} ${!entry.isBot ? '(Вы)' : ''}</span>
-        <span>${badge} ${entry.playerName}</span>
-        <span>${entry.score}</span>
+        <span class="lb-col-rank">#${entry.rank} ${!entry.isBot ? '<small style="color:#38bdf8;font-weight:700;">(Вы)</small>' : ''}</span>
+        <span class="lb-col-player">${badge} ${entry.playerName}</span>
+        <span class="lb-col-score">${entry.score}</span>
       </div>
     `;
       })
