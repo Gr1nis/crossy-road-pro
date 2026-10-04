@@ -104,6 +104,8 @@ const htmlContent = `<!DOCTYPE html>
     .menu-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
     .menu-btn:active { transform: translateY(0); }
     .menu-btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 19px; }
+    .menu-btn-emerald { background: linear-gradient(135deg, #059669, #0d9488); color: #fff; }
+    .btn-badge { background: rgba(0, 0, 0, 0.35); padding: 2px 8px; border-radius: 999px; font-size: 13px; margin-left: 6px; font-weight: 800; border: 1px solid rgba(255, 255, 255, 0.2); }
     .menu-btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; }
     .menu-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; }
     .menu-btn-slate { background: linear-gradient(135deg, #475569, #334155); color: #f8fafc; }
@@ -140,6 +142,34 @@ const htmlContent = `<!DOCTYPE html>
     .lb-col-player { text-align: center; color: #f8fafc; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .lb-col-score { text-align: right; font-variant-numeric: tabular-nums; }
     .placeholder-badge { display: inline-block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
+
+    /* Achievements Modal & Cards */
+    .modal-card-achievements { max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; padding: 26px 22px; }
+    .ach-desc-main { color: #cbd5e1; margin-bottom: 12px; font-size: 14px; }
+    .ach-summary-card { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 12px 16px; margin-bottom: 12px; text-align: left; }
+    .ach-summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 800; color: #94a3b8; }
+    .ach-summary-header strong { color: #facc15; font-size: 14px; }
+    .ach-progress-bar-bg { width: 100%; height: 10px; background: #1e293b; border-radius: 999px; overflow: hidden; }
+    .ach-progress-bar-bg.small { height: 6px; flex: 1; }
+    .ach-progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+    .ach-progress-bar-fill.gold { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .ach-progress-bar-fill.blue { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+    .achievements-list-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 10px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch; }
+    .ach-card { display: flex; align-items: center; gap: 12px; background: rgba(30, 41, 59, 0.7); border: 1.5px solid #334155; border-radius: 14px; padding: 10px 12px; transition: border-color 0.15s ease; }
+    .ach-card.unlocked { border-color: rgba(250, 204, 21, 0.4); background: rgba(245, 158, 11, 0.08); }
+    .ach-card.locked { opacity: 0.65; }
+    .ach-badge-col { flex-shrink: 0; }
+    .ach-badge-icon { font-size: 26px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; }
+    .ach-card.unlocked .ach-badge-icon { border-color: #f59e0b; background: rgba(245, 158, 11, 0.15); box-shadow: 0 0 10px rgba(245, 158, 11, 0.25); }
+    .ach-info-col { flex: 1; min-width: 0; }
+    .ach-title-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .ach-title { font-size: 13px; font-weight: 800; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ach-status-badge { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+    .ach-status-badge.done { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .ach-status-badge.pending { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #475569; }
+    .ach-desc { font-size: 11px; color: #cbd5e1; margin: 2px 0 6px; line-height: 1.3; }
+    .ach-progress-row { display: flex; align-items: center; gap: 8px; }
+    .ach-progress-num { font-size: 11px; font-weight: 800; color: #94a3b8; min-width: 44px; text-align: right; }
 
     /* Toast Notifications */
     #toast-container { position: fixed; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
@@ -267,6 +297,7 @@ const htmlContent = `<!DOCTYPE html>
 
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
+        <button id="menu-achievements-btn" class="menu-btn menu-btn-emerald">🏅 Достижения <span id="menu-achievements-badge" class="btn-badge">0/10</span></button>
         <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 ГАЧА-АВТОМАТ</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
         <button id="menu-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
@@ -365,6 +396,28 @@ const htmlContent = `<!DOCTYPE html>
       <span id="leaderboard-best-score" style="display: none;">0</span>
 
       <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно Достижений (Achievements Modal) -->
+  <div id="achievements-modal" class="modal hidden">
+    <div class="modal-card modal-card-achievements">
+      <h2 style="color: #34d399;">🏅 ДОСТИЖЕНИЯ</h2>
+      <p class="ach-desc-main">Выполняйте испытания и открывайте новые награды!</p>
+
+      <div class="ach-summary-card">
+        <div class="ach-summary-header">
+          <span>ОБЩИЙ ПРОГРЕСС</span>
+          <strong id="ach-summary-text">0 из 10 (0%)</strong>
+        </div>
+        <div class="ach-progress-bar-bg">
+          <div id="ach-summary-bar" class="ach-progress-bar-fill gold" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div id="achievements-list" class="achievements-list-box"></div>
+
+      <button id="achievements-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
     </div>
   </div>
 

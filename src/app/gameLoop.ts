@@ -177,6 +177,8 @@ export class GameLoop {
   public handleCloseModal(): void {
     if (this.ui.isSettingsOpen()) {
       this.ui.closeSettings();
+    } else if (this.ui.isAchievementsOpen()) {
+      this.ui.closeAchievements();
     } else if (this.ui.isGachaOpen()) {
       this.ui.closeGacha();
     } else if (this.ui.isLeaderboardOpen()) {
@@ -198,9 +200,29 @@ export class GameLoop {
     }
   }
 
+  public syncAchievements(): void {
+    const tracker = this.engine.getScoreTracker();
+    tracker.evaluateAchievements({
+      forwardStreak: this.engine.getForwardStreak(),
+      runCoins: this.engine.getRunCoins(),
+    });
+    const list = tracker.getAchievements({
+      forwardStreak: this.engine.getForwardStreak(),
+      runCoins: this.engine.getRunCoins(),
+    });
+    for (const ach of list) {
+      if (ach.unlocked && !this.unlockedAchievements.has(ach.id)) {
+        this.unlockAchievement(ach.id, ach.badge, ach.title, ach.description);
+      }
+    }
+    const summary = tracker.getAchievementsSummary();
+    this.ui.renderAchievements(list, summary);
+  }
+
   public updateMenuStats(): void {
     this.ui.updateMenuStats(this.engine.getHighScore(), this.engine.getCoins());
     this.ui.renderLeaderboard(this.engine.getScoreTracker().getLeaderboard());
+    this.syncAchievements();
   }
 
   public renderSkinsUI(): void {
@@ -234,11 +256,7 @@ export class GameLoop {
     if (runRes.overtakenBots.length > 0) {
       this.ui.showToast('🏁', 'Соперник позади!', `Вы обошли: ${runRes.overtakenBots.slice(0, 2).join(', ')}`);
     }
-    for (const ach of tracker.getAchievements()) {
-      if (ach.unlocked) {
-        this.unlockAchievement(ach.id, ach.badge, ach.title, ach.description);
-      }
-    }
+    this.syncAchievements();
   }
 
   public animate(now: number): void {
@@ -254,8 +272,7 @@ export class GameLoop {
     if (currentCoins > this.lastCoins) {
       this.audio.playCoin();
       this.lastCoins = currentCoins;
-      if (currentCoins >= 25) this.unlockAchievement('coin_25', '🪙', 'Нумизмат', 'Собрано 25 монет!');
-      if (currentCoins >= 100) this.unlockAchievement('coin_100', '💰', 'Готов к Гаче', 'Накоплено 100 монет на прокрут!');
+      this.syncAchievements();
       this.renderSkinsUI();
     }
 
@@ -266,10 +283,7 @@ export class GameLoop {
         this.audio.playNewHighScore();
         this.ui.showToast('🏆', 'Новый рекорд!', `Вы побили прошлый рекорд (${this.runStartHighScore})!`);
       }
-      if (currentScore >= 15) this.unlockAchievement('score_15', '🐣', 'Первые шаги', 'Набрано 15 очков за забег!');
-      if (currentScore >= 50) this.unlockAchievement('score_50', '🔥', 'Мастер трассы', 'Набрано 50 очков за забег!');
-      if (currentScore >= 100) this.unlockAchievement('score_100', '👑', 'Легенда перекрёстков', 'Набрано 100 очков!');
-      if (this.engine.getComboMultiplier() >= 3) this.unlockAchievement('combo_3', '⚡', 'Комбо x3', 'Максимальный темп прыжков!');
+      this.syncAchievements();
     }
 
     this.ui.updateScore(currentScore);
@@ -335,6 +349,7 @@ export class GameLoop {
       isMainMenuOpen: () => this.ui.isMainMenuOpen(),
       isGachaOpen: () => this.ui.isGachaOpen(),
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
+      isAchievementsOpen: () => this.ui.isAchievementsOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,

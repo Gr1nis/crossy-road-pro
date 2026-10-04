@@ -1,4 +1,5 @@
 import { ALL_SKINS } from '../core/types.ts';
+import type { Achievement } from '../core/achievements.ts';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -41,10 +42,13 @@ export class UIManager {
   private readonly settingsModal: HTMLElement | null;
   private readonly gachaModal: HTMLElement | null;
   private readonly leaderboardModal: HTMLElement | null;
+  private readonly achievementsModal: HTMLElement | null;
   private readonly gameOverModal: HTMLElement | null;
 
   // Buttons & Controls
   private readonly menuPlayBtn: HTMLElement | null;
+  private readonly menuAchievementsBtn: HTMLElement | null;
+  private readonly menuAchievementsBadgeEl: HTMLElement | null;
   private readonly menuGachaBtn: HTMLElement | null;
   private readonly menuLeaderboardBtn: HTMLElement | null;
   private readonly menuSettingsBtn: HTMLElement | null;
@@ -71,6 +75,11 @@ export class UIManager {
   private readonly leaderboardSaveNameBtn: HTMLElement | null;
   private readonly leaderboardRowsEl: HTMLElement | null;
 
+  private readonly achievementsCloseBtn: HTMLElement | null;
+  private readonly achSummaryTextEl: HTMLElement | null;
+  private readonly achSummaryBarEl: HTMLElement | null;
+  private readonly achievementsListEl: HTMLElement | null;
+
   private readonly deathReasonEl: HTMLElement | null;
   private readonly restartBtn: HTMLElement | null;
   private readonly toMenuBtn: HTMLElement | null;
@@ -92,9 +101,12 @@ export class UIManager {
     this.settingsModal = document.getElementById('settings-modal');
     this.gachaModal = document.getElementById('gacha-modal');
     this.leaderboardModal = document.getElementById('leaderboard-modal');
+    this.achievementsModal = document.getElementById('achievements-modal');
     this.gameOverModal = document.getElementById('game-over-modal');
 
     this.menuPlayBtn = document.getElementById('menu-play-btn');
+    this.menuAchievementsBtn = document.getElementById('menu-achievements-btn');
+    this.menuAchievementsBadgeEl = document.getElementById('menu-achievements-badge');
     this.menuGachaBtn = document.getElementById('menu-gacha-btn');
     this.menuLeaderboardBtn = document.getElementById('menu-leaderboard-btn');
     this.menuSettingsBtn = document.getElementById('menu-settings-btn');
@@ -121,6 +133,11 @@ export class UIManager {
     this.leaderboardSaveNameBtn = document.getElementById('leaderboard-save-name-btn');
     this.leaderboardRowsEl = document.getElementById('leaderboard-rows');
 
+    this.achievementsCloseBtn = document.getElementById('achievements-close-btn');
+    this.achSummaryTextEl = document.getElementById('ach-summary-text');
+    this.achSummaryBarEl = document.getElementById('ach-summary-bar');
+    this.achievementsListEl = document.getElementById('achievements-list');
+
     this.deathReasonEl = document.getElementById('death-reason');
     this.restartBtn = document.getElementById('restart-btn');
     this.toMenuBtn = document.getElementById('to-menu-btn');
@@ -129,6 +146,8 @@ export class UIManager {
   }
 
   private setupInternalNavigation(): void {
+    this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
+    this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
     this.gachaModalCloseBtn?.addEventListener('click', () => this.closeGacha());
     this.menuLeaderboardBtn?.addEventListener('click', () => this.openLeaderboard());
@@ -147,6 +166,7 @@ export class UIManager {
     this.settingsModal?.classList.add('hidden');
     this.gachaModal?.classList.add('hidden');
     this.leaderboardModal?.classList.add('hidden');
+    this.achievementsModal?.classList.add('hidden');
     this.gameOverModal?.classList.add('hidden');
   }
 
@@ -198,6 +218,14 @@ export class UIManager {
     this.leaderboardModal?.classList.add('hidden');
   }
 
+  openAchievements(): void {
+    this.achievementsModal?.classList.remove('hidden');
+  }
+
+  closeAchievements(): void {
+    this.achievementsModal?.classList.add('hidden');
+  }
+
   showGameOver(reasonText: string): void {
     if (this.deathReasonEl) {
       this.deathReasonEl.textContent = reasonText;
@@ -223,6 +251,10 @@ export class UIManager {
 
   isLeaderboardOpen(): boolean {
     return Boolean(this.leaderboardModal && !this.leaderboardModal.classList.contains('hidden'));
+  }
+
+  isAchievementsOpen(): boolean {
+    return Boolean(this.achievementsModal && !this.achievementsModal.classList.contains('hidden'));
   }
 
   isGameOverOpen(): boolean {
@@ -391,6 +423,59 @@ export class UIManager {
   setGachaRollButtonText(text: string): void {
     if (this.gachaModalRollBtn) {
       this.gachaModalRollBtn.textContent = text;
+    }
+  }
+
+  updateAchievementsBadge(unlocked: number, total: number): void {
+    if (this.menuAchievementsBadgeEl) {
+      this.menuAchievementsBadgeEl.textContent = `${unlocked}/${total}`;
+    }
+  }
+
+  clickOpenAchievements(): void {
+    this.menuAchievementsBtn?.click();
+  }
+
+  renderAchievements(
+    achievements: Achievement[],
+    summary: { total: number; unlockedCount: number; percent: number }
+  ): void {
+    this.updateAchievementsBadge(summary.unlockedCount, summary.total);
+
+    if (this.achSummaryTextEl) {
+      this.achSummaryTextEl.textContent = `Открыто: ${summary.unlockedCount} из ${summary.total} (${summary.percent}%)`;
+    }
+    if (this.achSummaryBarEl) {
+      this.achSummaryBarEl.style.width = `${summary.percent}%`;
+    }
+    if (!this.achievementsListEl) return;
+    this.achievementsListEl.innerHTML = '';
+
+    for (const ach of achievements) {
+      const card = document.createElement('div');
+      card.className = `ach-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
+      const statusText = ach.unlocked
+        ? `✅ Открыто ${ach.unlockedAt ? '(' + ach.unlockedAt + ')' : ''}`
+        : '🔒 В процессе';
+      card.innerHTML = `
+        <div class="ach-badge-col">
+          <div class="ach-badge-icon">${ach.badge}</div>
+        </div>
+        <div class="ach-info-col">
+          <div class="ach-title-row">
+            <span class="ach-title">${ach.title}</span>
+            <span class="ach-status-badge ${ach.unlocked ? 'done' : 'pending'}">${statusText}</span>
+          </div>
+          <div class="ach-desc">${ach.description}</div>
+          <div class="ach-progress-row">
+            <div class="ach-progress-bar-bg small">
+              <div class="ach-progress-bar-fill ${ach.unlocked ? 'gold' : 'blue'}" style="width: ${ach.progressPercent}%;"></div>
+            </div>
+            <span class="ach-progress-num">${ach.currentProgress} / ${ach.maxProgress}</span>
+          </div>
+        </div>
+      `;
+      this.achievementsListEl.appendChild(card);
     }
   }
 }

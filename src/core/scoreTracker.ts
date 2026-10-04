@@ -14,6 +14,7 @@ import {
   AchievementTracker,
   type AchievementId,
   type Achievement,
+  type AchievementEvaluationContext,
   ACHIEVEMENT_DEFINITIONS,
 } from './achievements.ts';
 
@@ -70,6 +71,8 @@ interface SavedProfile {
   playerRuns?: Array<Omit<LeaderboardEntry, 'rank'>>;
   unlockedAchievements?: AchievementId[];
   trainsSurvived?: number;
+  logsHopped?: number;
+  gachaRolls?: number;
 }
 
 export class ScoreTracker {
@@ -197,7 +200,17 @@ export class ScoreTracker {
         const loadedTrains = typeof data.trainsSurvived === 'number' && Number.isFinite(data.trainsSurvived) && data.trainsSurvived >= 0
           ? Math.floor(data.trainsSurvived)
           : 0;
-        this.achievements = new AchievementTracker(loadedAch, loadedTrains);
+        const loadedLogs = typeof data.logsHopped === 'number' && Number.isFinite(data.logsHopped) && data.logsHopped >= 0
+          ? Math.floor(data.logsHopped)
+          : 0;
+        const loadedGacha = typeof data.gachaRolls === 'number' && Number.isFinite(data.gachaRolls) && data.gachaRolls >= 0
+          ? Math.floor(data.gachaRolls)
+          : 0;
+        this.achievements = new AchievementTracker(loadedAch, {
+          trains: loadedTrains,
+          logs: loadedLogs,
+          gacha: loadedGacha,
+        });
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -218,6 +231,8 @@ export class ScoreTracker {
         playerRuns: this.playerRuns,
         unlockedAchievements: this.achievements.getUnlockedIds(),
         trainsSurvived: this.achievements.getTrainsSurvived(),
+        logsHopped: this.achievements.getLogsHopped(),
+        gachaRolls: this.achievements.getGachaRolls(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
@@ -225,14 +240,15 @@ export class ScoreTracker {
     }
   }
 
-  private evaluateAchievements(): void {
+  evaluateAchievements(additions?: Partial<AchievementEvaluationContext>): Achievement[] {
     const topBotScore = DEFAULT_BOT_RIVALS[0]?.score ?? 250;
-    this.achievements.evaluate({
+    return this.achievements.evaluate({
       score: Math.max(this.currentScore, this.highScore),
       coins: this.wallet.getCoins(),
       unlockedSkinsCount: this.inventory.getUnlockedSkins().length,
       allSkinsCount: ALL_SKINS.length,
       isTop1: this.highScore > topBotScore,
+      ...additions,
     });
   }
 
@@ -313,6 +329,7 @@ export class ScoreTracker {
     }
     const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forced);
     if (result.success) {
+      this.achievements.recordGachaRoll();
       if (!result.isDuplicate && result.skinId) {
         this.inventory.selectSkin(result.skinId);
       }
@@ -456,7 +473,27 @@ export class ScoreTracker {
     return this.achievements.isUnlocked(id);
   }
 
-  getAchievements(): Achievement[] {
-    return this.achievements.getAchievements();
+  recordLogHopped(count: number = 1): number {
+    if (!Number.isFinite(count) || count <= 0) return this.achievements.getLogsHopped();
+    const res = this.achievements.recordLogHopped(count);
+    this.evaluateAchievements();
+    this.saveToStorage();
+    return res;
+  }
+
+  getLogsHopped(): number {
+    return this.achievements.getLogsHopped();
+  }
+
+  getGachaRolls(): number {
+    return this.achievements.getGachaRolls();
+  }
+
+  getAchievementsSummary(): { total: number; unlockedCount: number; percent: number } {
+    return this.achievements.getSummary();
+  }
+
+  getAchievements(ctx?: Partial<AchievementEvaluationContext>): Achievement[] {
+    return this.achievements.getAchievements(ctx);
   }
 }

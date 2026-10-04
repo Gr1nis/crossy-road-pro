@@ -185,7 +185,8 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
 
     // Verify persistence across reload
     const reloaded = new ScoreTracker(storage);
-    assert.equal(reloaded.getAchievements().every((a) => a.unlocked), true);
+    const expectedUnlocked = ['first_50_steps', 'train_conqueror', 'rich_hopper', 'collector', 'leaderboard_champion'];
+    assert.equal(expectedUnlocked.every((id) => reloaded.isAchievementUnlocked(id as any)), true);
   });
 
   it('Property 7 (Leaderboard Deduplication & Single Personal Best): records multiple runs for same player without duplicating entries, keeping only PB', () => {

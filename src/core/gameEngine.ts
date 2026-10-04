@@ -39,6 +39,8 @@ export class GameEngine {
   private comboTimer = 0;
   private highestRowThisRun = 0;
   private gachaNonce = 0;
+  private forwardStreak = 0;
+  private runCoins = 0;
 
   constructor(seed: number = 42, storage?: StorageAdapter) {
     this.generator = new LaneGenerator(seed);
@@ -251,10 +253,17 @@ export class GameEngine {
       let nextRow = Math.round(this.player.row);
       let nextX = this.player.x;
 
-      if (dir === MoveDirection.FORWARD) nextRow += 1;
-      else if (dir === MoveDirection.BACKWARD) nextRow -= 1;
-      else if (dir === MoveDirection.LEFT) nextX -= 1;
-      else if (dir === MoveDirection.RIGHT) nextX += 1;
+      if (dir === MoveDirection.FORWARD) {
+        nextRow += 1;
+        this.forwardStreak += 1;
+      } else if (dir === MoveDirection.BACKWARD) {
+        nextRow -= 1;
+        this.forwardStreak = 0;
+      } else if (dir === MoveDirection.LEFT) {
+        nextX -= 1;
+      } else if (dir === MoveDirection.RIGHT) {
+        nextX += 1;
+      }
 
       const destLane = this.getLane(nextRow);
 
@@ -295,6 +304,7 @@ export class GameEngine {
     const idx = lane.coins.indexOf(roundedX);
     if (idx !== -1) {
       lane.coins.splice(idx, 1);
+      this.runCoins += 1;
       this.scoreTracker.addCoins(1);
     }
   }
@@ -392,6 +402,7 @@ export class GameEngine {
             // Magnetize to the nearest discrete segment slot on the log
             this.player.x = snapToLogSlot(this.player.x, support);
             this.player.targetX = this.player.x;
+            this.scoreTracker.recordLogHopped();
           } else {
             this.killPlayer(DeathReason.WATER);
             return;
@@ -466,6 +477,14 @@ export class GameEngine {
     this.evictOldLanes();
   }
 
+  getForwardStreak(): number {
+    return this.forwardStreak;
+  }
+
+  getRunCoins(): number {
+    return this.runCoins;
+  }
+
   private killPlayer(reason: typeof DeathReason[keyof typeof DeathReason]): void {
     this.player.isDead = true;
     this.player.deathReason = reason;
@@ -473,6 +492,10 @@ export class GameEngine {
     this.comboStreak = 0;
     this.comboTimer = 0;
     this.cameraGraceTimer = 0;
+    this.scoreTracker.evaluateAchievements({
+      forwardStreak: this.forwardStreak,
+      runCoins: this.runCoins,
+    });
   }
 
   reset(newSeed: number = Date.now()): void {
@@ -486,6 +509,8 @@ export class GameEngine {
     this.comboStreak = 0;
     this.comboTimer = 0;
     this.highestRowThisRun = 0;
+    this.forwardStreak = 0;
+    this.runCoins = 0;
     this.ensureLanesAround(0);
   }
 }

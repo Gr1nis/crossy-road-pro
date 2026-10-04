@@ -43,6 +43,8 @@
     .menu-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
     .menu-btn:active { transform: translateY(0); }
     .menu-btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-size: 19px; }
+    .menu-btn-emerald { background: linear-gradient(135deg, #059669, #0d9488); color: #fff; }
+    .btn-badge { background: rgba(0, 0, 0, 0.35); padding: 2px 8px; border-radius: 999px; font-size: 13px; margin-left: 6px; font-weight: 800; border: 1px solid rgba(255, 255, 255, 0.2); }
     .menu-btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; }
     .menu-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; }
     .menu-btn-slate { background: linear-gradient(135deg, #475569, #334155); color: #f8fafc; }
@@ -79,6 +81,34 @@
     .lb-col-player { text-align: center; color: #f8fafc; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .lb-col-score { text-align: right; font-variant-numeric: tabular-nums; }
     .placeholder-badge { display: inline-block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
+
+    /* Achievements Modal & Cards */
+    .modal-card-achievements { max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; padding: 26px 22px; }
+    .ach-desc-main { color: #cbd5e1; margin-bottom: 12px; font-size: 14px; }
+    .ach-summary-card { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 12px 16px; margin-bottom: 12px; text-align: left; }
+    .ach-summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 800; color: #94a3b8; }
+    .ach-summary-header strong { color: #facc15; font-size: 14px; }
+    .ach-progress-bar-bg { width: 100%; height: 10px; background: #1e293b; border-radius: 999px; overflow: hidden; }
+    .ach-progress-bar-bg.small { height: 6px; flex: 1; }
+    .ach-progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+    .ach-progress-bar-fill.gold { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .ach-progress-bar-fill.blue { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+    .achievements-list-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 10px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch; }
+    .ach-card { display: flex; align-items: center; gap: 12px; background: rgba(30, 41, 59, 0.7); border: 1.5px solid #334155; border-radius: 14px; padding: 10px 12px; transition: border-color 0.15s ease; }
+    .ach-card.unlocked { border-color: rgba(250, 204, 21, 0.4); background: rgba(245, 158, 11, 0.08); }
+    .ach-card.locked { opacity: 0.65; }
+    .ach-badge-col { flex-shrink: 0; }
+    .ach-badge-icon { font-size: 26px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; }
+    .ach-card.unlocked .ach-badge-icon { border-color: #f59e0b; background: rgba(245, 158, 11, 0.15); box-shadow: 0 0 10px rgba(245, 158, 11, 0.25); }
+    .ach-info-col { flex: 1; min-width: 0; }
+    .ach-title-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .ach-title { font-size: 13px; font-weight: 800; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ach-status-badge { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+    .ach-status-badge.done { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .ach-status-badge.pending { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #475569; }
+    .ach-desc { font-size: 11px; color: #cbd5e1; margin: 2px 0 6px; line-height: 1.3; }
+    .ach-progress-row { display: flex; align-items: center; gap: 8px; }
+    .ach-progress-num { font-size: 11px; font-weight: 800; color: #94a3b8; min-width: 44px; text-align: right; }
 
     /* Toast Notifications */
     #toast-container { position: fixed; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
@@ -206,6 +236,7 @@
 
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
+        <button id="menu-achievements-btn" class="menu-btn menu-btn-emerald">🏅 Достижения <span id="menu-achievements-badge" class="btn-badge">0/10</span></button>
         <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 ГАЧА-АВТОМАТ</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
         <button id="menu-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
@@ -304,6 +335,28 @@
       <span id="leaderboard-best-score" style="display: none;">0</span>
 
       <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно Достижений (Achievements Modal) -->
+  <div id="achievements-modal" class="modal hidden">
+    <div class="modal-card modal-card-achievements">
+      <h2 style="color: #34d399;">🏅 ДОСТИЖЕНИЯ</h2>
+      <p class="ach-desc-main">Выполняйте испытания и открывайте новые награды!</p>
+
+      <div class="ach-summary-card">
+        <div class="ach-summary-header">
+          <span>ОБЩИЙ ПРОГРЕСС</span>
+          <strong id="ach-summary-text">0 из 10 (0%)</strong>
+        </div>
+        <div class="ach-progress-bar-bg">
+          <div id="ach-summary-bar" class="ach-progress-bar-fill gold" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div id="achievements-list" class="achievements-list-box"></div>
+
+      <button id="achievements-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
     </div>
   </div>
 
@@ -724,63 +777,45 @@ class GachaMachine {
 }
 
 // --- Module: src/core/achievements.ts ---
-const ACHIEVEMENT_DEFINITIONS                                                              = [
-  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣' },
-  { id: 'collector', title: 'Коллекционер', description: 'Откройте все скины в Гача-автомате', badge: '🎭' },
-  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆' },
-  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰' },
-  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑' },
+const ACHIEVEMENT_DEFINITIONS                                       = [
+  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣', maxProgress: 50 },
+  { id: 'centurion', title: 'Центурион', description: 'Достигните 100 очков за один забег', badge: '🏛️', maxProgress: 100 },
+  { id: 'collector', title: 'Коллекционер', description: 'Откройте все 4 скина в Гача-автомате', badge: '🎭', maxProgress: 4 },
+  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆', maxProgress: 5 },
+  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰', maxProgress: 200 },
+  { id: 'coin_hoarder', title: 'Монетный магнат', description: 'Соберите 30 монет за один забег', badge: '🪙', maxProgress: 30 },
+  { id: 'gacha_roller', title: 'Азартный игрок', description: 'Совершите 3 прокрутки в Гача-автомате', badge: '🎰', maxProgress: 3 },
+  { id: 'river_navigator', title: 'Речной волк', description: 'Совершите 10 прыжков по брёвнам', badge: '🪵', maxProgress: 10 },
+  { id: 'speedy_crosser', title: 'Без оглядки', description: 'Сделайте 30 шагов вперед без движения назад', badge: '🏃', maxProgress: 30 },
+  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑', maxProgress: 1 },
 ];
-
-                                               
-                
-                
-                             
-                        
-                  
- 
-
-/**
- * AchievementTracker manages player achievements and tracks unlock conditions.
- * Decoupled from storage, view, and game loop.
- */
 class AchievementTracker {
           unlocked = new Set               ();
           dates = new Map                       ();
           trainsSurvived = 0;
+          logsHopped = 0;
+          gachaRolls = 0;
+          lastContext                               = {};
 
   constructor(
     initialUnlocked                  = [],
-    initialTrainsSurvived         = 0,
+    initialCounters                                                              = {},
     initialDates                                                             
   ) {
     if (Array.isArray(initialUnlocked)) {
-      for (const id of initialUnlocked) {
-        this.unlocked.add(id);
-      }
+      for (const id of initialUnlocked) this.unlocked.add(id);
     }
-    if (Number.isFinite(initialTrainsSurvived) && initialTrainsSurvived >= 0) {
-      this.trainsSurvived = Math.floor(initialTrainsSurvived);
-    }
+    const counters = typeof initialCounters === 'number' ? { trains: initialCounters } : initialCounters;
+    this.trainsSurvived = Math.max(0, Math.floor(counters.trains ?? 0));
+    this.logsHopped = Math.max(0, Math.floor(counters.logs ?? 0));
+    this.gachaRolls = Math.max(0, Math.floor(counters.gacha ?? 0));
     if (initialDates) {
       if (initialDates instanceof Map) {
-        for (const [k, v] of initialDates) {
-          this.dates.set(k, v);
-        }
+        for (const [k, v] of initialDates) this.dates.set(k, v);
       } else {
-        for (const [k, v] of Object.entries(initialDates)) {
-          this.dates.set(k                 , v);
-        }
+        for (const [k, v] of Object.entries(initialDates)) this.dates.set(k                 , v);
       }
     }
-  }
-
-  getAchievements()                {
-    return ACHIEVEMENT_DEFINITIONS.map((def) => ({
-      ...def,
-      unlocked: this.unlocked.has(def.id),
-      unlockedAt: this.dates.get(def.id),
-    }));
   }
 
   isUnlocked(id               )          {
@@ -788,9 +823,7 @@ class AchievementTracker {
   }
 
   unlock(id               , date         )          {
-    if (this.unlocked.has(id)) {
-      return false;
-    }
+    if (this.unlocked.has(id)) return false;
     this.unlocked.add(id);
     this.dates.set(id, date ?? new Date().toISOString().slice(0, 10));
     return true;
@@ -800,48 +833,112 @@ class AchievementTracker {
     return Array.from(this.unlocked);
   }
 
-  getTrainsSurvived()         {
+  getTrainsSurvived()         { return this.trainsSurvived; }
+  getLogsHopped()         { return this.logsHopped; }
+  getGachaRolls()         { return this.gachaRolls; }
+
+  recordTrainSurvived(count = 1)         {
+    this.trainsSurvived += Math.max(1, Math.floor(count));
+    if (this.trainsSurvived >= 5) this.unlock('train_conqueror');
     return this.trainsSurvived;
   }
 
-  recordTrainSurvived(count         = 1)         {
-    const inc = Number.isFinite(count) && count > 0 ? Math.floor(count) : 1;
-    this.trainsSurvived += inc;
-    if (this.trainsSurvived >= 5) {
-      this.unlock('train_conqueror');
-    }
-    return this.trainsSurvived;
+  recordLogHopped(count = 1)         {
+    this.logsHopped += Math.max(1, Math.floor(count));
+    if (this.logsHopped >= 10) this.unlock('river_navigator');
+    return this.logsHopped;
   }
 
-  evaluate(context                              )                {
-    const newlyUnlocked                = [];
+  recordGachaRoll(count = 1)         {
+    this.gachaRolls += Math.max(1, Math.floor(count));
+    if (this.gachaRolls >= 3) this.unlock('gacha_roller');
+    return this.gachaRolls;
+  }
 
-    if (context.score >= 50 && this.unlock('first_50_steps')) {
-      const def = this.getAchievements().find((a) => a.id === 'first_50_steps');
-      if (def) newlyUnlocked.push(def);
+  getAchievements(ctx                               )                {
+    if (ctx) this.lastContext = { ...this.lastContext, ...ctx };
+    const c = this.lastContext;
+
+    return ACHIEVEMENT_DEFINITIONS.map((def) => {
+      const isUnl = this.unlocked.has(def.id);
+      let rawVal = 0;
+      switch (def.id) {
+        case 'first_50_steps': rawVal = Math.max(0, c.score ?? 0); break;
+        case 'centurion': rawVal = Math.max(0, c.score ?? 0); break;
+        case 'collector': rawVal = Math.max(0, c.unlockedSkinsCount ?? 0); break;
+        case 'train_conqueror': rawVal = this.trainsSurvived; break;
+        case 'rich_hopper': rawVal = Math.max(0, c.coins ?? 0); break;
+        case 'coin_hoarder': rawVal = Math.max(0, c.runCoins ?? 0); break;
+        case 'gacha_roller': rawVal = this.gachaRolls; break;
+        case 'river_navigator': rawVal = this.logsHopped; break;
+        case 'speedy_crosser': rawVal = Math.max(0, c.forwardStreak ?? 0); break;
+        case 'leaderboard_champion': rawVal = c.isTop1 ? 1 : 0; break;
+      }
+      const cur = isUnl ? def.maxProgress : Math.min(def.maxProgress, Math.max(0, rawVal));
+      const pct = isUnl ? 100 : Math.min(100, Math.max(0, Math.round((cur / def.maxProgress) * 100)));
+      return {
+        ...def,
+        unlocked: isUnl,
+        unlockedAt: this.dates.get(def.id),
+        currentProgress: cur,
+        progressPercent: pct,
+      };
+    });
+  }
+
+  getSummary()                                                            {
+    const total = ACHIEVEMENT_DEFINITIONS.length;
+    const unlockedCount = this.unlocked.size;
+    const percent = total > 0 ? Math.round((unlockedCount / total) * 100) : 0;
+    return { total, unlockedCount, percent };
+  }
+
+  evaluate(ctx                              )                {
+    this.lastContext = { ...this.lastContext, ...ctx };
+    const newly                = [];
+    const check = (id               , condition         ) => {
+      if (condition && this.unlock(id)) {
+        const found = this.getAchievements().find((a) => a.id === id);
+        if (found) newly.push(found);
+      }
+    };
+
+    check('first_50_steps', (ctx.score ?? 0) >= 50);
+    check('centurion', (ctx.score ?? 0) >= 100);
+    check('collector', (ctx.unlockedSkinsCount ?? 0) >= (ctx.allSkinsCount ?? 4));
+    check('train_conqueror', this.trainsSurvived >= 5);
+    check('rich_hopper', (ctx.coins ?? 0) >= 200);
+    check('coin_hoarder', (ctx.runCoins ?? 0) >= 30);
+    check('gacha_roller', this.gachaRolls >= 3);
+    check('river_navigator', this.logsHopped >= 10);
+    check('speedy_crosser', (ctx.forwardStreak ?? 0) >= 30);
+    check('leaderboard_champion', Boolean(ctx.isTop1));
+
+    return newly;
+  }
+
+  serialize()         {
+    return JSON.stringify({
+      unlocked: Array.from(this.unlocked),
+      dates: Object.fromEntries(this.dates),
+      trains: this.trainsSurvived,
+      logs: this.logsHopped,
+      gacha: this.gachaRolls,
+    });
+  }
+
+  static deserialize(json        )                     {
+    try {
+      const data = JSON.parse(json);
+      if (!data || typeof data !== 'object') return new AchievementTracker();
+      return new AchievementTracker(
+        Array.isArray(data.unlocked) ? data.unlocked : [],
+        { trains: data.trains, logs: data.logs, gacha: data.gacha },
+        data.dates
+      );
+    } catch {
+      return new AchievementTracker();
     }
-
-    if (context.unlockedSkinsCount >= context.allSkinsCount && this.unlock('collector')) {
-      const def = this.getAchievements().find((a) => a.id === 'collector');
-      if (def) newlyUnlocked.push(def);
-    }
-
-    if (this.trainsSurvived >= 5 && this.unlock('train_conqueror')) {
-      const def = this.getAchievements().find((a) => a.id === 'train_conqueror');
-      if (def) newlyUnlocked.push(def);
-    }
-
-    if (context.coins >= 200 && this.unlock('rich_hopper')) {
-      const def = this.getAchievements().find((a) => a.id === 'rich_hopper');
-      if (def) newlyUnlocked.push(def);
-    }
-
-    if (context.isTop1 && this.unlock('leaderboard_champion')) {
-      const def = this.getAchievements().find((a) => a.id === 'leaderboard_champion');
-      if (def) newlyUnlocked.push(def);
-    }
-
-    return newlyUnlocked;
   }
 }
 
@@ -988,7 +1085,17 @@ class ScoreTracker {
         const loadedTrains = typeof data.trainsSurvived === 'number' && Number.isFinite(data.trainsSurvived) && data.trainsSurvived >= 0
           ? Math.floor(data.trainsSurvived)
           : 0;
-        this.achievements = new AchievementTracker(loadedAch, loadedTrains);
+        const loadedLogs = typeof data.logsHopped === 'number' && Number.isFinite(data.logsHopped) && data.logsHopped >= 0
+          ? Math.floor(data.logsHopped)
+          : 0;
+        const loadedGacha = typeof data.gachaRolls === 'number' && Number.isFinite(data.gachaRolls) && data.gachaRolls >= 0
+          ? Math.floor(data.gachaRolls)
+          : 0;
+        this.achievements = new AchievementTracker(loadedAch, {
+          trains: loadedTrains,
+          logs: loadedLogs,
+          gacha: loadedGacha,
+        });
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -1009,6 +1116,8 @@ class ScoreTracker {
         playerRuns: this.playerRuns,
         unlockedAchievements: this.achievements.getUnlockedIds(),
         trainsSurvived: this.achievements.getTrainsSurvived(),
+        logsHopped: this.achievements.getLogsHopped(),
+        gachaRolls: this.achievements.getGachaRolls(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
@@ -1016,14 +1125,15 @@ class ScoreTracker {
     }
   }
 
-          evaluateAchievements()       {
+  evaluateAchievements(additions                                        )                {
     const topBotScore = DEFAULT_BOT_RIVALS[0]?.score ?? 250;
-    this.achievements.evaluate({
+    return this.achievements.evaluate({
       score: Math.max(this.currentScore, this.highScore),
       coins: this.wallet.getCoins(),
       unlockedSkinsCount: this.inventory.getUnlockedSkins().length,
       allSkinsCount: ALL_SKINS.length,
       isTop1: this.highScore > topBotScore,
+      ...additions,
     });
   }
 
@@ -1104,6 +1214,7 @@ class ScoreTracker {
     }
     const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forced);
     if (result.success) {
+      this.achievements.recordGachaRoll();
       if (!result.isDuplicate && result.skinId) {
         this.inventory.selectSkin(result.skinId);
       }
@@ -1247,8 +1358,28 @@ class ScoreTracker {
     return this.achievements.isUnlocked(id);
   }
 
-  getAchievements()                {
-    return this.achievements.getAchievements();
+  recordLogHopped(count         = 1)         {
+    if (!Number.isFinite(count) || count <= 0) return this.achievements.getLogsHopped();
+    const res = this.achievements.recordLogHopped(count);
+    this.evaluateAchievements();
+    this.saveToStorage();
+    return res;
+  }
+
+  getLogsHopped()         {
+    return this.achievements.getLogsHopped();
+  }
+
+  getGachaRolls()         {
+    return this.achievements.getGachaRolls();
+  }
+
+  getAchievementsSummary()                                                            {
+    return this.achievements.getSummary();
+  }
+
+  getAchievements(ctx                                        )                {
+    return this.achievements.getAchievements(ctx);
   }
 }
 
@@ -1436,6 +1567,8 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
           comboTimer = 0;
           highestRowThisRun = 0;
           gachaNonce = 0;
+          forwardStreak = 0;
+          runCoins = 0;
 
   constructor(seed         = 42, storage                 ) {
     this.generator = new LaneGenerator(seed);
@@ -1648,10 +1781,17 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
       let nextRow = Math.round(this.player.row);
       let nextX = this.player.x;
 
-      if (dir === MoveDirection.FORWARD) nextRow += 1;
-      else if (dir === MoveDirection.BACKWARD) nextRow -= 1;
-      else if (dir === MoveDirection.LEFT) nextX -= 1;
-      else if (dir === MoveDirection.RIGHT) nextX += 1;
+      if (dir === MoveDirection.FORWARD) {
+        nextRow += 1;
+        this.forwardStreak += 1;
+      } else if (dir === MoveDirection.BACKWARD) {
+        nextRow -= 1;
+        this.forwardStreak = 0;
+      } else if (dir === MoveDirection.LEFT) {
+        nextX -= 1;
+      } else if (dir === MoveDirection.RIGHT) {
+        nextX += 1;
+      }
 
       const destLane = this.getLane(nextRow);
 
@@ -1692,6 +1832,7 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     const idx = lane.coins.indexOf(roundedX);
     if (idx !== -1) {
       lane.coins.splice(idx, 1);
+      this.runCoins += 1;
       this.scoreTracker.addCoins(1);
     }
   }
@@ -1789,6 +1930,7 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
             // Magnetize to the nearest discrete segment slot on the log
             this.player.x = snapToLogSlot(this.player.x, support);
             this.player.targetX = this.player.x;
+            this.scoreTracker.recordLogHopped();
           } else {
             this.killPlayer(DeathReason.WATER);
             return;
@@ -1863,6 +2005,14 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     this.evictOldLanes();
   }
 
+  getForwardStreak()         {
+    return this.forwardStreak;
+  }
+
+  getRunCoins()         {
+    return this.runCoins;
+  }
+
           killPlayer(reason                                              )       {
     this.player.isDead = true;
     this.player.deathReason = reason;
@@ -1870,6 +2020,10 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     this.comboStreak = 0;
     this.comboTimer = 0;
     this.cameraGraceTimer = 0;
+    this.scoreTracker.evaluateAchievements({
+      forwardStreak: this.forwardStreak,
+      runCoins: this.runCoins,
+    });
   }
 
   reset(newSeed         = Date.now())       {
@@ -1883,6 +2037,8 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     this.comboStreak = 0;
     this.comboTimer = 0;
     this.highestRowThisRun = 0;
+    this.forwardStreak = 0;
+    this.runCoins = 0;
     this.ensureLanesAround(0);
   }
 }
@@ -3707,10 +3863,13 @@ class UIManager {
                    settingsModal                    ;
                    gachaModal                    ;
                    leaderboardModal                    ;
+                   achievementsModal                    ;
                    gameOverModal                    ;
 
   // Buttons & Controls
                    menuPlayBtn                    ;
+                   menuAchievementsBtn                    ;
+                   menuAchievementsBadgeEl                    ;
                    menuGachaBtn                    ;
                    menuLeaderboardBtn                    ;
                    menuSettingsBtn                    ;
@@ -3737,6 +3896,11 @@ class UIManager {
                    leaderboardSaveNameBtn                    ;
                    leaderboardRowsEl                    ;
 
+                   achievementsCloseBtn                    ;
+                   achSummaryTextEl                    ;
+                   achSummaryBarEl                    ;
+                   achievementsListEl                    ;
+
                    deathReasonEl                    ;
                    restartBtn                    ;
                    toMenuBtn                    ;
@@ -3758,9 +3922,12 @@ class UIManager {
     this.settingsModal = document.getElementById('settings-modal');
     this.gachaModal = document.getElementById('gacha-modal');
     this.leaderboardModal = document.getElementById('leaderboard-modal');
+    this.achievementsModal = document.getElementById('achievements-modal');
     this.gameOverModal = document.getElementById('game-over-modal');
 
     this.menuPlayBtn = document.getElementById('menu-play-btn');
+    this.menuAchievementsBtn = document.getElementById('menu-achievements-btn');
+    this.menuAchievementsBadgeEl = document.getElementById('menu-achievements-badge');
     this.menuGachaBtn = document.getElementById('menu-gacha-btn');
     this.menuLeaderboardBtn = document.getElementById('menu-leaderboard-btn');
     this.menuSettingsBtn = document.getElementById('menu-settings-btn');
@@ -3787,6 +3954,11 @@ class UIManager {
     this.leaderboardSaveNameBtn = document.getElementById('leaderboard-save-name-btn');
     this.leaderboardRowsEl = document.getElementById('leaderboard-rows');
 
+    this.achievementsCloseBtn = document.getElementById('achievements-close-btn');
+    this.achSummaryTextEl = document.getElementById('ach-summary-text');
+    this.achSummaryBarEl = document.getElementById('ach-summary-bar');
+    this.achievementsListEl = document.getElementById('achievements-list');
+
     this.deathReasonEl = document.getElementById('death-reason');
     this.restartBtn = document.getElementById('restart-btn');
     this.toMenuBtn = document.getElementById('to-menu-btn');
@@ -3795,6 +3967,8 @@ class UIManager {
   }
 
           setupInternalNavigation()       {
+    this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
+    this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
     this.gachaModalCloseBtn?.addEventListener('click', () => this.closeGacha());
     this.menuLeaderboardBtn?.addEventListener('click', () => this.openLeaderboard());
@@ -3813,6 +3987,7 @@ class UIManager {
     this.settingsModal?.classList.add('hidden');
     this.gachaModal?.classList.add('hidden');
     this.leaderboardModal?.classList.add('hidden');
+    this.achievementsModal?.classList.add('hidden');
     this.gameOverModal?.classList.add('hidden');
   }
 
@@ -3864,6 +4039,14 @@ class UIManager {
     this.leaderboardModal?.classList.add('hidden');
   }
 
+  openAchievements()       {
+    this.achievementsModal?.classList.remove('hidden');
+  }
+
+  closeAchievements()       {
+    this.achievementsModal?.classList.add('hidden');
+  }
+
   showGameOver(reasonText        )       {
     if (this.deathReasonEl) {
       this.deathReasonEl.textContent = reasonText;
@@ -3889,6 +4072,10 @@ class UIManager {
 
   isLeaderboardOpen()          {
     return Boolean(this.leaderboardModal && !this.leaderboardModal.classList.contains('hidden'));
+  }
+
+  isAchievementsOpen()          {
+    return Boolean(this.achievementsModal && !this.achievementsModal.classList.contains('hidden'));
   }
 
   isGameOverOpen()          {
@@ -4059,6 +4246,59 @@ class UIManager {
       this.gachaModalRollBtn.textContent = text;
     }
   }
+
+  updateAchievementsBadge(unlocked        , total        )       {
+    if (this.menuAchievementsBadgeEl) {
+      this.menuAchievementsBadgeEl.textContent = `${unlocked}/${total}`;
+    }
+  }
+
+  clickOpenAchievements()       {
+    this.menuAchievementsBtn?.click();
+  }
+
+  renderAchievements(
+    achievements               ,
+    summary                                                           
+  )       {
+    this.updateAchievementsBadge(summary.unlockedCount, summary.total);
+
+    if (this.achSummaryTextEl) {
+      this.achSummaryTextEl.textContent = `Открыто: ${summary.unlockedCount} из ${summary.total} (${summary.percent}%)`;
+    }
+    if (this.achSummaryBarEl) {
+      this.achSummaryBarEl.style.width = `${summary.percent}%`;
+    }
+    if (!this.achievementsListEl) return;
+    this.achievementsListEl.innerHTML = '';
+
+    for (const ach of achievements) {
+      const card = document.createElement('div');
+      card.className = `ach-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
+      const statusText = ach.unlocked
+        ? `✅ Открыто ${ach.unlockedAt ? '(' + ach.unlockedAt + ')' : ''}`
+        : '🔒 В процессе';
+      card.innerHTML = `
+        <div class="ach-badge-col">
+          <div class="ach-badge-icon">${ach.badge}</div>
+        </div>
+        <div class="ach-info-col">
+          <div class="ach-title-row">
+            <span class="ach-title">${ach.title}</span>
+            <span class="ach-status-badge ${ach.unlocked ? 'done' : 'pending'}">${statusText}</span>
+          </div>
+          <div class="ach-desc">${ach.description}</div>
+          <div class="ach-progress-row">
+            <div class="ach-progress-bar-bg small">
+              <div class="ach-progress-bar-fill ${ach.unlocked ? 'gold' : 'blue'}" style="width: ${ach.progressPercent}%;"></div>
+            </div>
+            <span class="ach-progress-num">${ach.currentProgress} / ${ach.maxProgress}</span>
+          </div>
+        </div>
+      `;
+      this.achievementsListEl.appendChild(card);
+    }
+  }
 }
 
 // --- Module: src/app/inputManager.ts ---
@@ -4184,6 +4424,14 @@ class InputManager {
         return;
       }
 
+      if (e.code === 'Escape' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      }
+      return;
+    }
+
+    if (this.modalState.isAchievementsOpen?.()) {
       if (e.code === 'Escape' || e.code === 'Enter') {
         e.preventDefault();
         this.callbacks.onCloseModal();
@@ -4433,6 +4681,8 @@ const DEATH_LABELS                         = {
          handleCloseModal()       {
     if (this.ui.isSettingsOpen()) {
       this.ui.closeSettings();
+    } else if (this.ui.isAchievementsOpen()) {
+      this.ui.closeAchievements();
     } else if (this.ui.isGachaOpen()) {
       this.ui.closeGacha();
     } else if (this.ui.isLeaderboardOpen()) {
@@ -4454,9 +4704,29 @@ const DEATH_LABELS                         = {
     }
   }
 
+         syncAchievements()       {
+    const tracker = this.engine.getScoreTracker();
+    tracker.evaluateAchievements({
+      forwardStreak: this.engine.getForwardStreak(),
+      runCoins: this.engine.getRunCoins(),
+    });
+    const list = tracker.getAchievements({
+      forwardStreak: this.engine.getForwardStreak(),
+      runCoins: this.engine.getRunCoins(),
+    });
+    for (const ach of list) {
+      if (ach.unlocked && !this.unlockedAchievements.has(ach.id)) {
+        this.unlockAchievement(ach.id, ach.badge, ach.title, ach.description);
+      }
+    }
+    const summary = tracker.getAchievementsSummary();
+    this.ui.renderAchievements(list, summary);
+  }
+
          updateMenuStats()       {
     this.ui.updateMenuStats(this.engine.getHighScore(), this.engine.getCoins());
     this.ui.renderLeaderboard(this.engine.getScoreTracker().getLeaderboard());
+    this.syncAchievements();
   }
 
          renderSkinsUI()       {
@@ -4490,11 +4760,7 @@ const DEATH_LABELS                         = {
     if (runRes.overtakenBots.length > 0) {
       this.ui.showToast('🏁', 'Соперник позади!', `Вы обошли: ${runRes.overtakenBots.slice(0, 2).join(', ')}`);
     }
-    for (const ach of tracker.getAchievements()) {
-      if (ach.unlocked) {
-        this.unlockAchievement(ach.id, ach.badge, ach.title, ach.description);
-      }
-    }
+    this.syncAchievements();
   }
 
          animate(now        )       {
@@ -4510,8 +4776,7 @@ const DEATH_LABELS                         = {
     if (currentCoins > this.lastCoins) {
       this.audio.playCoin();
       this.lastCoins = currentCoins;
-      if (currentCoins >= 25) this.unlockAchievement('coin_25', '🪙', 'Нумизмат', 'Собрано 25 монет!');
-      if (currentCoins >= 100) this.unlockAchievement('coin_100', '💰', 'Готов к Гаче', 'Накоплено 100 монет на прокрут!');
+      this.syncAchievements();
       this.renderSkinsUI();
     }
 
@@ -4522,10 +4787,7 @@ const DEATH_LABELS                         = {
         this.audio.playNewHighScore();
         this.ui.showToast('🏆', 'Новый рекорд!', `Вы побили прошлый рекорд (${this.runStartHighScore})!`);
       }
-      if (currentScore >= 15) this.unlockAchievement('score_15', '🐣', 'Первые шаги', 'Набрано 15 очков за забег!');
-      if (currentScore >= 50) this.unlockAchievement('score_50', '🔥', 'Мастер трассы', 'Набрано 50 очков за забег!');
-      if (currentScore >= 100) this.unlockAchievement('score_100', '👑', 'Легенда перекрёстков', 'Набрано 100 очков!');
-      if (this.engine.getComboMultiplier() >= 3) this.unlockAchievement('combo_3', '⚡', 'Комбо x3', 'Максимальный темп прыжков!');
+      this.syncAchievements();
     }
 
     this.ui.updateScore(currentScore);
@@ -4591,6 +4853,7 @@ const DEATH_LABELS                         = {
       isMainMenuOpen: () => this.ui.isMainMenuOpen(),
       isGachaOpen: () => this.ui.isGachaOpen(),
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
+      isAchievementsOpen: () => this.ui.isAchievementsOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,
