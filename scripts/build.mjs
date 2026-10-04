@@ -325,7 +325,7 @@ const htmlContent = `<!DOCTYPE html>
   <div id="gacha-modal" class="modal hidden">
     <div class="modal-card modal-card-gacha">
       <h2 style="color: #fbbf24;">🎰 ГАЧА-АВТОМАТ</h2>
-      <p>Испытайте удачу и откройте новые воксельные скины!<br>Стоимость одного прокрута — <strong>100 монет</strong>.</p>
+      <p>Испытайте удачу и откройте новые воксельные скины!</p>
 
       <div class="menu-stat-pill gold" style="display: inline-block; margin-bottom: 12px;">
         Ваш баланс: <strong id="gacha-modal-coins">0</strong> 🪙
@@ -336,7 +336,7 @@ const htmlContent = `<!DOCTYPE html>
       <div id="gacha-modal-skin-list" class="gacha-modal-grid"></div>
 
       <div class="menu-btn-stack">
-        <button id="gacha-modal-roll-btn" class="menu-btn menu-btn-amber">Крутить за 100 🪙</button>
+        <button id="gacha-modal-roll-btn" class="menu-btn menu-btn-amber">100 🪙</button>
         <button id="gacha-modal-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
       </div>
     </div>

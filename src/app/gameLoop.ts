@@ -212,7 +212,7 @@ export class GameLoop {
         this.renderSkinsUI();
       }
     });
-    this.ui.setGachaRollButtonText(`Крутить за ${WORLD_CONFIG.GACHA_COST} 🪙`);
+    this.ui.setGachaRollButtonText(`${WORLD_CONFIG.GACHA_COST} 🪙`);
     this.updateMenuStats();
   }
 
