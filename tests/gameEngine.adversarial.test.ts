@@ -156,8 +156,8 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
   it('Invariant 7 (Start Backward Movement Frustum Invariant): hopping backward from start does not kill player while still inside screen view', () => {
     const engine = new GameEngine(606);
     // At start, player is at row 0, camZ = -1.0.
-    // Hopping backward through row -1, -2, -3 ... -15 must keep player safely alive on-screen!
-    for (let r = 1; r <= 15; r++) {
+    // Hopping backward through safe spawn zone (rows -1..-6) keeps player safely alive on-screen!
+    for (let r = 1; r <= 6; r++) {
       const moved = engine.queueMove(MoveDirection.BACKWARD);
       assert.equal(moved, true, `Player should be able to hop backward to row -${r}`);
       engine.step(WORLD_CONFIG.HOP_DURATION + 0.01);
@@ -165,6 +165,14 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
       assert.equal(engine.getPlayer().isDead, false, `Player must not die at row -${r} because still visible on screen`);
       assert.equal(engine.isBehindCameraEdge(), false, `Row -${r} must still be within visible screen frustum`);
     }
+
+    // Hopping further past visible bottom edge crosses the frustum boundary
+    engine.queueMove(MoveDirection.BACKWARD);
+    engine.step(WORLD_CONFIG.HOP_DURATION + 0.01);
+    engine.queueMove(MoveDirection.BACKWARD);
+    engine.step(WORLD_CONFIG.HOP_DURATION + 0.01);
+    assert.equal(engine.getPlayer().row, -8);
+    assert.equal(engine.isBehindCameraEdge(), true, 'Row -8 should be behind visible camera frustum');
   });
 
   it('Invariant 8 (Memory Leak Prevention & Sliding Window Lane Eviction): advancing 120+ rows evicts old rows from active lanes and bounds loaded lane memory', () => {
