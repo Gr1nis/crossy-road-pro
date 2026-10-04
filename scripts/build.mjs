@@ -94,9 +94,10 @@ const htmlContent = `<!DOCTYPE html>
     .modal-card p { color: #cbd5e1; margin-bottom: 24px; font-size: 15px; line-height: 1.5; }
     
     .menu-stats-row { display: flex; justify-content: center; gap: 16px; margin: 18px 0 24px; }
-    .menu-stat-pill { background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-radius: 12px; padding: 8px 16px; font-size: 13px; color: #94a3b8; font-weight: 700; }
-    .menu-stat-pill strong { color: #f8fafc; font-size: 15px; margin-left: 4px; }
-    .menu-stat-pill.gold strong { color: #facc15; }
+    .menu-stat-pill { background: rgba(15, 23, 42, 0.6); border: 1.5px solid #334155; border-radius: 14px; padding: 8px 18px; min-width: 105px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .menu-stat-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 800; line-height: 1.2; margin-bottom: 2px; }
+    .menu-stat-val, .menu-stat-pill strong { font-size: 24px; font-weight: 900; line-height: 1.1; color: #f8fafc; margin: 0; }
+    .menu-stat-pill.gold strong, .menu-stat-pill.gold .menu-stat-val { color: #facc15; }
     
     .menu-btn-stack { display: flex; flex-direction: column; gap: 12px; }
     .menu-btn { width: 100%; border: none; padding: 15px 24px; font-size: 17px; font-weight: 800; border-radius: 14px; cursor: pointer; transition: transform 0.1s ease, filter 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); }
@@ -108,6 +109,8 @@ const htmlContent = `<!DOCTYPE html>
     .menu-btn-slate { background: linear-gradient(135deg, #475569, #334155); color: #f8fafc; }
     .menu-btn-secondary { background: #334155; color: #e2e8f0; }
 
+    .modal-card-gacha { max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; -webkit-overflow-scrolling: touch; }
+    #gacha-modal h2 { font-size: clamp(18px, 4vw, 28px); color: #fbbf24; }
     .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
     .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
@@ -123,16 +126,18 @@ const htmlContent = `<!DOCTYPE html>
     .rarity-epic { background: rgba(192, 132, 252, 0.22); color: #c084fc; border: 1px solid #9333ea; box-shadow: 0 0 8px rgba(168, 85, 247, 0.3); }
     .rarity-legendary { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.3)); color: #fbbf24; border: 1px solid #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
-    .lb-name-form { display: flex; gap: 8px; margin-bottom: 12px; }
+    .modal-card-leaderboard { max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+    #leaderboard-modal h2 { font-size: clamp(18px, 4vw, 28px); }
+    .lb-name-form { display: flex; gap: 8px; margin-bottom: 12px; flex-shrink: 0; }
     .lb-name-input { flex: 1; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 10px 14px; color: #f8fafc; font-size: 14px; font-weight: 700; outline: none; }
     .lb-name-input:focus { border-color: #38bdf8; }
-    .lb-save-btn { background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; border-radius: 12px; padding: 0 16px; color: #fff; font-weight: 800; font-size: 13px; cursor: pointer; }
-    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 14px; margin: 12px 0 18px; text-align: left; max-height: 240px; overflow-y: auto; }
+    .lb-save-btn { background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; border-radius: 12px; padding: 0 16px; color: #fff; font-weight: 800; font-size: 13px; cursor: pointer; flex-shrink: 0; }
+    .leaderboard-preview-box { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 14px; margin: 12px 0 18px; text-align: left; max-height: 240px; overflow-y: auto; flex: 1 1 auto; min-height: 100px; -webkit-overflow-scrolling: touch; }
     .lb-row { display: grid; grid-template-columns: 85px 1fr 95px; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; font-weight: 600; }
     .lb-row.header { color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #334155; }
     .lb-row.current-player { color: #38bdf8; background: rgba(56, 189, 248, 0.12); border-radius: 8px; font-weight: 800; }
     .lb-col-rank { text-align: left; }
-    .lb-col-player { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lb-col-player { text-align: center; color: #f8fafc; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .lb-col-score { text-align: right; font-variant-numeric: tabular-nums; }
     .placeholder-badge { display: inline-block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
 
@@ -144,20 +149,75 @@ const htmlContent = `<!DOCTYPE html>
     .toast-desc { font-size: 12px; color: #e2e8f0; margin-top: 2px; font-weight: 600; }
     @keyframes toastIn { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
 
-    /* Settings Modal Styles */
+    /* Settings Modal Styles & Range Slider Support */
     .settings-group { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 16px 20px; margin: 20px 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
-    .settings-row { display: flex; justify-content: space-between; align-items: center; }
+    .settings-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 36px; }
     .settings-label { font-size: 15px; font-weight: 700; color: #f8fafc; }
     .settings-subtext { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0; margin: 2px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .2s; border-radius: 28px; }
-    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .2s; border-radius: 50%; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .2s ease; border-radius: 28px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .2s ease; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
     input:checked + .slider { background-color: #10b981; }
     input:checked + .slider:before { transform: translateX(22px); }
 
+    /* Range slider styles (no clipping, centered thumb) */
+    input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; margin: 0; padding: 0 4px; cursor: pointer; display: block; box-sizing: border-box; }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; background: #334155; border-radius: 4px; border: none; }
+    input[type=range]::-moz-range-track { width: 100%; height: 8px; background: #334155; border-radius: 4px; border: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); cursor: pointer; margin-top: -6px; transition: transform 0.15s ease, background-color 0.15s ease; box-sizing: border-box; }
+    input[type=range]::-moz-range-thumb { height: 20px; width: 20px; border: none; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); cursor: pointer; transition: transform 0.15s ease, background-color 0.15s ease; box-sizing: border-box; }
+    input[type=range]:active::-webkit-slider-thumb { transform: scale(1.1); background: #38bdf8; }
+    input[type=range]:active::-moz-range-thumb { transform: scale(1.1); background: #38bdf8; }
+
     .info-links { position: fixed; bottom: 20px; left: 24px; display: flex; gap: 10px; z-index: 15; }
     .info-link { background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 12px; color: #e2e8f0; text-decoration: none; font-size: 13px; font-weight: 700; }
+
+    /* Mobile Responsive Overrides */
+    @media (max-width: 640px) {
+      .hud { top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); }
+      .hud-stats { gap: 6px; }
+      .score-card { padding: 6px 10px; border-radius: 12px; border-width: 1.5px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); }
+      .score-label { font-size: 9px; letter-spacing: 0.04em; }
+      .score-number { font-size: 16px; }
+      .hud-circle-btn { width: 36px; height: 36px; border-radius: 10px; font-size: 15px; }
+
+      .modal-card { padding: 20px 16px; border-radius: 20px; max-width: 95%; max-height: 90vh; }
+      .modal-card h1 { font-size: clamp(24px, 7vw, 32px); }
+      .modal-card h2 { font-size: clamp(18px, 5vw, 24px); }
+      .modal-card p { font-size: 13px; margin-bottom: 14px; }
+      .menu-btn { padding: 12px 18px; font-size: 15px; border-radius: 12px; }
+      .menu-btn-primary { font-size: 16px; }
+      
+      .menu-stats-row { gap: 10px; margin: 12px 0 16px; }
+      .menu-stat-pill { padding: 6px 14px; min-width: 90px; }
+      .menu-stat-val, .menu-stat-pill strong { font-size: 20px; }
+
+      .modal-card-leaderboard { max-height: 85vh !important; padding: 16px 14px !important; }
+      .modal-card-leaderboard .lb-desc { display: none; }
+      .lb-name-form { margin-bottom: 8px; }
+      .lb-name-input { padding: 8px 10px; font-size: 13px; }
+      .lb-save-btn { padding: 0 12px; font-size: 12px; }
+      .leaderboard-preview-box { padding: 6px 8px; margin: 6px 0 10px; max-height: calc(85vh - 200px); }
+      .lb-row { grid-template-columns: 56px 1fr 50px !important; gap: 6px !important; padding: 6px 4px !important; font-size: 12px !important; }
+      .lb-row.header { font-size: 10px !important; }
+      .lb-col-rank { font-size: 11px; }
+      .lb-col-player { text-align: left !important; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+      .lb-col-score { font-size: 12px; font-weight: 800; color: #38bdf8; }
+
+      .modal-card-gacha { max-height: 90vh !important; padding: 16px 14px !important; }
+      .gacha-modal-grid { gap: 6px; margin: 8px 0; }
+      .gacha-skin-card { padding: 8px 6px; }
+      .gacha-skin-badge { font-size: 24px; margin: 2px 0; }
+      .gacha-skin-name { font-size: 11px; }
+
+      .settings-group { padding: 12px 14px; margin: 14px 0; gap: 10px; }
+      .settings-label { font-size: 14px; }
+      .settings-subtext { font-size: 11px; }
+
+      .info-links { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -179,7 +239,7 @@ const htmlContent = `<!DOCTYPE html>
     </div>
 
     <div class="hud-actions">
-      <button id="pause-btn" class="hud-circle-btn" title="Пауза [Esc / P]">⏸</button>
+      <button id="pause-btn" class="hud-circle-btn" title="Пауза">⏸</button>
     </div>
   </div>
 
@@ -195,13 +255,19 @@ const htmlContent = `<!DOCTYPE html>
       <p>Классическая воксельная аркада с поездами, реками и скинами</p>
 
       <div class="menu-stats-row">
-        <div class="menu-stat-pill">Рекорд: <strong id="menu-high-score">0</strong></div>
-        <div class="menu-stat-pill gold">Монеты: <strong id="menu-coins">0</strong> 🪙</div>
+        <div class="menu-stat-pill">
+          <span class="menu-stat-title">РЕКОРД</span>
+          <strong id="menu-high-score" class="menu-stat-val">0</strong>
+        </div>
+        <div class="menu-stat-pill gold">
+          <span class="menu-stat-title">МОНЕТЫ</span>
+          <strong id="menu-coins" class="menu-stat-val">0</strong>
+        </div>
       </div>
 
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
-        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Гача-автомат (100 🪙)</button>
+        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 ГАЧА-АВТОМАТ</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
         <button id="menu-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
       </div>
@@ -215,7 +281,7 @@ const htmlContent = `<!DOCTYPE html>
       <p>Игра приостановлена. Выберите действие:</p>
 
       <div class="menu-btn-stack">
-        <button id="pause-resume-btn" class="menu-btn menu-btn-primary">▶ Продолжить (Esc / P)</button>
+        <button id="pause-resume-btn" class="menu-btn menu-btn-primary">▶ Продолжить</button>
         <button id="pause-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
         <button id="pause-menu-btn" class="menu-btn menu-btn-secondary">🏠 Обратно в главное меню</button>
       </div>
@@ -257,7 +323,7 @@ const htmlContent = `<!DOCTYPE html>
 
   <!-- Модальное окно Гача-автомата -->
   <div id="gacha-modal" class="modal hidden">
-    <div class="modal-card">
+    <div class="modal-card modal-card-gacha">
       <h2 style="color: #fbbf24;">🎰 ГАЧА-АВТОМАТ</h2>
       <p>Испытайте удачу и откройте новые воксельные скины!<br>Стоимость одного прокрута — <strong>100 монет</strong>.</p>
 
@@ -278,10 +344,10 @@ const htmlContent = `<!DOCTYPE html>
 
   <!-- Модальное окно Таблицы лидеров -->
   <div id="leaderboard-modal" class="modal hidden">
-    <div class="modal-card">
+    <div class="modal-card modal-card-leaderboard">
       <span class="placeholder-badge">LIVE ТОП ЗАБЕГОВ</span>
       <h2 style="color: #c084fc;">🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
-      <p>Введите своё имя и соревнуйтесь за первое место в рейтинге лучших забегов!</p>
+      <p class="lb-desc">Введите своё имя и соревнуйтесь за первое место в рейтинге лучших забегов!</p>
 
       <div class="lb-name-form">
         <input type="text" id="leaderboard-name-input" class="lb-name-input" maxlength="18" placeholder="Ваше имя игрока..." value="Игрок" />
@@ -308,8 +374,8 @@ const htmlContent = `<!DOCTYPE html>
       <h2>Игра окончена!</h2>
       <p id="death-reason">Вас сбил автомобиль!</p>
       <div class="menu-btn-stack">
-        <button id="restart-btn" class="menu-btn menu-btn-primary">Играть снова (Space)</button>
-        <button id="to-menu-btn" class="menu-btn menu-btn-secondary">Главное меню (Esc)</button>
+        <button id="restart-btn" class="menu-btn menu-btn-primary">Играть снова</button>
+        <button id="to-menu-btn" class="menu-btn menu-btn-secondary">Главное меню</button>
       </div>
     </div>
   </div>
