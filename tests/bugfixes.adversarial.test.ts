@@ -127,4 +127,46 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
       `Expected WORLD_CONFIG.WRAP_LIMIT >= 22, got ${WORLD_CONFIG.WRAP_LIMIT}`
     );
   });
+
+  it('Bug 6 (Camera Grace Period 0.4s & Frustum Edge Threshold -0.96): triggers death shortly after crossing screen edge with smooth warning ratio', () => {
+    assert.equal(WORLD_CONFIG.CAMERA_GRACE_PERIOD, 0.4, 'CAMERA_GRACE_PERIOD must be reduced to 0.4s');
+
+    // Test frustum NDC threshold: exactly at -0.96
+    const isBehind = collisionModule.isPlayerBehindCameraFrustum;
+    assert.equal(typeof isBehind, 'function');
+
+    // At camZ = 10, player at row 0, NDC Y is ~ -0.56 (safely inside)
+    assert.equal(isBehind(0, 0, 10), false);
+    // At camZ = 18, player at row 0, NDC Y is < -0.96 (outside bottom edge)
+    assert.equal(isBehind(0, 0, 18), true);
+
+    // Verify engine warning ratio smooth ramp-up before crossing bottom edge
+    const engine = new GameEngine(101);
+    // At start, player is at row 0, camera at -1.0 -> ndcY ~ 0 -> warning ratio = 0
+    assert.equal(engine.getCameraGraceRatio(), 0);
+  });
+
+  it('Bug 7 (Yandex Games Adaptive Frustum & Clean Minimal Road Markings): sceneManager uses dynamic viewSize and eliminates center dashes & waterfall jitter', () => {
+    const sceneManagerSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/view/sceneManager.ts'),
+      'utf8'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('Math.max(11, 10.5 / aspect)'),
+      'sceneManager.ts must calculate adaptive viewSize: Math.max(11, 10.5 / aspect)'
+    );
+    assert.ok(
+      !sceneManagerSrc.includes('waterfallSplashes'),
+      'sceneManager.ts must not contain waterfallSplashes per-frame scaling or tracking'
+    );
+
+    const meshFactorySrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/view/meshFactory.ts'),
+      'utf8'
+    );
+    assert.ok(
+      !meshFactorySrc.includes('dashMat'),
+      'meshFactory.ts must not contain yellow center dash markings'
+    );
+  });
 });

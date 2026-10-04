@@ -187,4 +187,58 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     const reloaded = new ScoreTracker(storage);
     assert.equal(reloaded.getAchievements().every((a) => a.unlocked), true);
   });
+
+  it('Property 7 (Leaderboard Deduplication & Single Personal Best): records multiple runs for same player without duplicating entries, keeping only PB', () => {
+    const storage = new MemoryStorage();
+    const tracker = new ScoreTracker(storage, 'SpeedyRunner');
+
+    // Run 1: 50 pts
+    tracker.recordRun(50);
+    // Run 2: 120 pts (new PB)
+    tracker.recordRun(120);
+    // Run 3: 85 pts (lower than PB, should NOT downgrade or duplicate)
+    tracker.recordRun(85);
+    // Run 4: 210 pts (new PB)
+    tracker.recordRun(210);
+    // Run 5: 190 pts (lower than PB)
+    tracker.recordRun(190);
+
+    const board = tracker.getLeaderboard();
+    const playerEntries = board.filter((e) => e.playerName === 'SpeedyRunner' && !e.isBot);
+    assert.equal(playerEntries.length, 1, 'Player should have strictly 1 entry (Personal Best) in leaderboard');
+    assert.equal(playerEntries[0].score, 210, 'Player entry score must be their personal best 210');
+
+    const runs = tracker.getPlayerRuns();
+    assert.equal(runs.length, 1, 'playerRuns array should contain strictly 1 entry for this player');
+    assert.equal(runs[0].score, 210);
+  });
+
+  it('Property 8 (Storage Discrepancy & HighScore Deduplication): reconciles highScore > playerRuns and cleans legacy duplicates', () => {
+    const storage = new MemoryStorage();
+    // Simulate legacy storage state with duplicate entries and highScore higher than playerRuns score
+    storage.setItem('crossy_road_pro_high_score', '256');
+    const legacyProfile = {
+      highScore: 256,
+      playerName: 'HeroChicken',
+      playerRuns: [
+        { playerName: 'HeroChicken', score: 92, skinId: 'chicken', date: '2026-09-01', isBot: false },
+        { playerName: 'HeroChicken', score: 45, skinId: 'chicken', date: '2026-08-30', isBot: false },
+        { playerName: 'HeroChicken', score: 80, skinId: 'cyber_duck', date: '2026-09-02', isBot: false },
+      ],
+    };
+    storage.setItem('crossy_road_pro_profile_v1', JSON.stringify(legacyProfile));
+
+    const tracker = new ScoreTracker(storage);
+    assert.equal(tracker.getHighScore(), 256);
+
+    const board = tracker.getLeaderboard();
+    const heroEntries = board.filter((e) => e.playerName === 'HeroChicken' && !e.isBot);
+    assert.equal(heroEntries.length, 1, 'Legacy duplicates must be deduplicated into 1 entry');
+    assert.equal(heroEntries[0].score, 256, 'Player entry must be updated to match highScore (256)');
+
+    const playerRuns = tracker.getPlayerRuns();
+    assert.equal(playerRuns.length, 1);
+    assert.equal(playerRuns[0].score, 256);
+  });
 });
+

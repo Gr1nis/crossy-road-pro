@@ -12,7 +12,6 @@ interface RenderedLane {
   trainMesh?: THREE.Object3D;
   signalLight?: THREE.Mesh;
   waterRipples?: THREE.Mesh[];
-  waterfallSplashes?: THREE.Mesh[];
 }
 
 interface Particle {
@@ -140,7 +139,7 @@ export class SceneManager {
     this.scene.fog = this.fog;
 
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = 11;
+    const viewSize = Math.max(11, 10.5 / aspect);
     this.camera = new THREE.OrthographicCamera(
       -viewSize * aspect,
       viewSize * aspect,
@@ -333,7 +332,7 @@ export class SceneManager {
 
   private onResize(): void {
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = 11;
+    const viewSize = Math.max(11, 10.5 / aspect);
     this.camera.left = -viewSize * aspect;
     this.camera.right = viewSize * aspect;
     this.camera.top = viewSize;
@@ -350,7 +349,6 @@ export class SceneManager {
     const logMeshes = new Map<number, THREE.Object3D>();
     const coinMeshes = new Map<number, THREE.Object3D>();
     const waterRipples: THREE.Mesh[] = [];
-    const waterfallSplashes: THREE.Mesh[] = [];
     const biome: BiomeType = lane.biome ?? Biome.FOREST;
     const isEven = lane.index % 2 === 0;
 
@@ -410,12 +408,6 @@ export class SceneManager {
       const rightWaterfall = MeshFactory.createWaterfallEdge('right');
       rightWaterfall.position.set(worldToScreenX(10.2), 0, 0);
       group.add(leftWaterfall, rightWaterfall);
-      leftWaterfall.traverse((obj) => {
-        if (obj instanceof THREE.Mesh && obj.position.y < -0.5) waterfallSplashes.push(obj);
-      });
-      rightWaterfall.traverse((obj) => {
-        if (obj instanceof THREE.Mesh && obj.position.y < -0.5) waterfallSplashes.push(obj);
-      });
     } else if (lane.type === LaneType.RAILWAY) {
       const railMat = new THREE.MeshLambertMaterial({ color: biome === Biome.NEON ? 0x38bdf8 : 0xcbd5e1 });
       const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
@@ -479,7 +471,6 @@ export class SceneManager {
       trainMesh,
       signalLight,
       waterRipples,
-      waterfallSplashes,
     };
   }
 
@@ -543,13 +534,6 @@ export class SceneManager {
           if (rp.position.x > 15) rp.position.x = -15;
           else if (rp.position.x < -15) rp.position.x = 15;
           rp.scale.x = 0.85 + 0.3 * Math.sin(nowSec * 1.8 + i);
-        }
-      }
-
-      if (rendered.waterfallSplashes) {
-        for (let i = 0; i < rendered.waterfallSplashes.length; i++) {
-          const sp = rendered.waterfallSplashes[i];
-          sp.scale.y = 0.92 + 0.14 * Math.sin(nowSec * 3.0 + i * 1.3);
         }
       }
 

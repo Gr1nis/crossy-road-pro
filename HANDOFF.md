@@ -41,11 +41,14 @@
 - **Input Focus Protection**: При фокусе в поле ввода текста (`leaderboard-name-input`) клавиши WASD/Space не триггерят движение персонажа.
 - **Touch Gesture Engine**: Легковесный детектор тапов и свайпов в `src/app/inputManager.ts`: быстрый тап (<400ms, <26px) делает прыжок вперед, свайпы во все 4 стороны управляют направлением, клики по UI/модалкам изолированы.
 - **WebGL Memory Management**: Рекурсивный `disposeHierarchy()` геометрий и материалов при сдвиге камеры, сборе монет, зачистке партиклов и сбросе уровня.
+- **Leaderboard Deduplication & PB**: Ровно 1 запись на игрока в таблице лидеров с авто-реконсиляцией рекорда при старте.
+- **Clean Voxel Visuals**: Непрозрачные воксельные водопады без Z-fighting и шума; чистый асфальт без визуальной каши пунктира под машинами.
+- **Yandex Games Viewport & Snappy Camera Death**: Динамический `viewSize = Math.max(11, 10.5 / aspect)` для полной видимости поля 18 клеток на смартфонах; сокращение таймаута гибели от камеры до 0.4s с плавной виньеткой.
 
 ---
 
 ## 4. Current State & Immediate Next Steps (`[ ]`)
-Завершена **Фаза 2 (Мобильный ввод + Оптимизация рендеринга)**. Следующий этап — **Фаза 3 (Интеграция с Yandex Games SDK & Монетизация)**:
+Завершена **Фаза 2 (Мобильный ввод, оптимизация рендеринга и точечные исправления)**. Следующий этап — **Фаза 3 (Интеграция с Yandex Games SDK & Монетизация)**:
 
 - `[ ]` **Поток 3A (Yandex Games SDK Bridge)**:
   - Создать `src/app/yandexBridge.ts` с безопасным моком для локального запуска без интернета.
@@ -60,6 +63,6 @@
 
 ## 5. Verification Status
 - **TypeScript**: `npx tsc --noEmit` — 0 errors.
-- **Test Suite**: `npm test` — **38 / 38 GREEN** across 6 test suites.
+- **Test Suite**: `npm test` — **42 / 42 GREEN** across 6 test suites.
 - **Bundle**: `node --check dist/bundle.js` — 0 errors.
 - **Offline HTML**: `index.html` самодостаточен, мобильный вьюпорт и жесты настроены.

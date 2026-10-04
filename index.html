@@ -298,7 +298,7 @@ const LaneType = {
   PLAYER_WIDTH: 0.65,
   LOG_MARGIN: 0.12,
   CAMERA_BACK_LIMIT: 18.0,
-  CAMERA_GRACE_PERIOD: 1.25,
+  CAMERA_GRACE_PERIOD: 0.4,
   BASE_CAMERA_SPEED: 0.85,
   GACHA_COST: 100,
   BIOME_INTERVAL: 25,
@@ -399,10 +399,10 @@ function checkVehicleCollision(playerX        , vehicles           )            
 }
 
 /**
- * Returns true only when the player's 3D mesh has completely crossed below
- * the visible bottom edge of the screen (NDC Y < -1.0).
+ * Returns true when the player touches or crosses below the visible
+ * bottom edge of the screen (NDC Y < -0.96).
  */function isPlayerBehindCameraFrustum(playerX        , playerRow        , camZ        )          {
-  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -1.0;
+  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -0.96;
 }
 
 // --- Module: src/core/wallet.ts ---
@@ -822,20 +822,53 @@ class ScoreTracker {
           this.playerName = data.playerName.trim();
         }
         if (Array.isArray(data.playerRuns)) {
-          this.playerRuns = data.playerRuns
-            .filter(
-              (r)                                      =>
-                Boolean(r) &&
-                typeof r.playerName === 'string' &&
-                typeof r.score === 'number' &&
-                Number.isFinite(r.score) &&
-                r.score >= 0 &&
-                validSkinIds.has(r.skinId) &&
-                typeof r.date === 'string'
-            )
-            .map((r) => ({ ...r, score: Math.floor(r.score), isBot: false }))
-            .slice(0, MAX_LEADERBOARD_ENTRIES);
+          const mapByName = new Map                                        ();
+          for (const r of data.playerRuns) {
+            if (
+              Boolean(r) &&
+              typeof r.playerName === 'string' &&
+              typeof r.score === 'number' &&
+              Number.isFinite(r.score) &&
+              r.score >= 0 &&
+              validSkinIds.has(r.skinId) &&
+              typeof r.date === 'string'
+            ) {
+              const name = r.playerName.trim();
+              if (!name) continue;
+              const cleanScore = Math.floor(r.score);
+              const existing = mapByName.get(name);
+              if (!existing || cleanScore > existing.score) {
+                mapByName.set(name, {
+                  playerName: name,
+                  score: cleanScore,
+                  skinId: r.skinId,
+                  date: r.date,
+                  isBot: false,
+                });
+              }
+            }
+          }
+          this.playerRuns = Array.from(mapByName.values());
         }
+        if (this.highScore > 0) {
+          const existing = this.playerRuns.find((r) => r.playerName === this.playerName);
+          if (existing) {
+            if (this.highScore > existing.score) {
+              existing.score = this.highScore;
+              existing.skinId = this.inventory.getSelectedSkin();
+            }
+          } else {
+            this.playerRuns.push({
+              playerName: this.playerName,
+              score: this.highScore,
+              skinId: this.inventory.getSelectedSkin(),
+              date: new Date().toISOString().slice(0, 10),
+              isBot: false,
+            });
+          }
+        }
+        this.playerRuns.sort((a, b) => b.score - a.score);
+        this.playerRuns = this.playerRuns.slice(0, MAX_LEADERBOARD_ENTRIES);
         const validAchIds = new Set        (ACHIEVEMENT_DEFINITIONS.map((a) => a.id));
         const loadedAch                  = [];
         if (Array.isArray(data.unlockedAchievements)) {
@@ -980,7 +1013,22 @@ class ScoreTracker {
   setPlayerName(name        )       {
     const clean = name.trim();
     if (clean.length > 0) {
+      const oldName = this.playerName;
       this.playerName = clean.slice(0, 24);
+      const oldEntry = this.playerRuns.find((r) => r.playerName === oldName);
+      if (oldEntry) {
+        const targetEntry = this.playerRuns.find((r) => r.playerName === this.playerName);
+        if (targetEntry && targetEntry !== oldEntry) {
+          if (oldEntry.score > targetEntry.score) {
+            targetEntry.score = oldEntry.score;
+            targetEntry.skinId = oldEntry.skinId;
+            targetEntry.date = oldEntry.date;
+          }
+          this.playerRuns = this.playerRuns.filter((r) => r !== oldEntry);
+        } else {
+          oldEntry.playerName = this.playerName;
+        }
+      }
       this.saveToStorage();
     }
   }
@@ -1030,13 +1078,22 @@ class ScoreTracker {
     const entrySkin = meta?.skinId ?? this.inventory.getSelectedSkin();
 
     if (cleanScore > 0) {
-      this.playerRuns.unshift({
-        playerName: entryName,
-        score: cleanScore,
-        skinId: entrySkin,
-        date: entryDate,
-        isBot: false,
-      });
+      const existing = this.playerRuns.find((r) => r.playerName === entryName);
+      if (existing) {
+        if (cleanScore > existing.score) {
+          existing.score = cleanScore;
+          existing.skinId = entrySkin;
+          existing.date = entryDate;
+        }
+      } else {
+        this.playerRuns.push({
+          playerName: entryName,
+          score: cleanScore,
+          skinId: entrySkin,
+          date: entryDate,
+          isBot: false,
+        });
+      }
       this.playerRuns.sort((a, b) => b.score - a.score);
       this.playerRuns = this.playerRuns.slice(0, MAX_LEADERBOARD_ENTRIES);
     }
@@ -1048,7 +1105,7 @@ class ScoreTracker {
     });
 
     const found = updated.find(
-      (e) => !e.isBot && e.score === cleanScore && e.playerName === entryName && e.skinId === entrySkin
+      (e) => !e.isBot && e.playerName === entryName
     );
     this.evaluateAchievements();
     this.saveToStorage();
@@ -1390,7 +1447,17 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
   }
 
   getCameraGraceRatio()         {
-    return Math.min(1, this.cameraGraceTimer / WORLD_CONFIG.CAMERA_GRACE_PERIOD);
+    if (this.cameraGraceTimer > 0) {
+      return Math.min(1, 0.5 + 0.5 * (this.cameraGraceTimer / WORLD_CONFIG.CAMERA_GRACE_PERIOD));
+    }
+    const ndcY = this.getPlayerNdcY();
+    const approachStart = -0.8;
+    const approachEnd = -0.96;
+    if (ndcY < approachStart) {
+      const t = Math.min(1, Math.max(0, (approachStart - ndcY) / (approachStart - approachEnd)));
+      return t * 0.5;
+    }
+    return 0;
   }
 
   getScore()         {
@@ -2676,25 +2743,23 @@ class MeshFactory {
     cliff.receiveShadow = true;
     group.add(cliff);
 
-    // Falling water column
+    // Solid voxel falling water column
     const waterFallMat = new THREE.MeshLambertMaterial({
       color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.88,
     });
-    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.9), waterFallMat);
+    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.94), waterFallMat);
     const fallOffset = side === 'left' ? -0.22 : 0.22;
     fall.position.set(fallOffset, -1.15, 0);
     group.add(fall);
 
-    // Foam mist crest at the top
-    const foamMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.94), foamMat);
-    foamTop.position.set(fallOffset, -0.05, 0);
+    // Dense voxel foam crest at the top
+    const foamMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.98), foamMat);
+    foamTop.position.set(fallOffset, -0.04, 0);
     group.add(foamTop);
 
-    // Splash bottom block
-    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.96), foamMat);
+    // Dense splash bottom block
+    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.22, 0.98), foamMat);
     splash.position.set(fallOffset, -2.15, 0);
     group.add(splash);
 
@@ -2704,23 +2769,14 @@ class MeshFactory {
   static createRoadMarkings()              {
     const group = new THREE.Group();
     const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
-    const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); // Amber center dashes
 
-    // Continuous solid white shoulder lines at boundary edges
+    // Clean solid shoulder lines at boundary edges
     const solidEdgeGeo = new THREE.BoxGeometry(0.12, 0.02, 1.0);
     const leftSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
     leftSolid.position.set(worldToScreenX(-9.5), 0.015, 0);
     const rightSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
     rightSolid.position.set(worldToScreenX(9.5), 0.015, 0);
     group.add(leftSolid, rightSolid);
-
-    // Dashed center lane markings
-    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.1);
-    for (let x = -9; x <= 9; x += 1.8) {
-      const dash = new THREE.Mesh(dashGeo, dashMat);
-      dash.position.set(worldToScreenX(x), 0.015, 0);
-      group.add(dash);
-    }
 
     return group;
   }
@@ -2827,7 +2883,7 @@ class SceneManager {
     this.scene.fog = this.fog;
 
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = 11;
+    const viewSize = Math.max(11, 10.5 / aspect);
     this.camera = new THREE.OrthographicCamera(
       -viewSize * aspect,
       viewSize * aspect,
@@ -3020,7 +3076,7 @@ class SceneManager {
 
           onResize()       {
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = 11;
+    const viewSize = Math.max(11, 10.5 / aspect);
     this.camera.left = -viewSize * aspect;
     this.camera.right = viewSize * aspect;
     this.camera.top = viewSize;
@@ -3037,7 +3093,6 @@ class SceneManager {
     const logMeshes = new Map                        ();
     const coinMeshes = new Map                        ();
     const waterRipples               = [];
-    const waterfallSplashes               = [];
     const biome            = lane.biome ?? Biome.FOREST;
     const isEven = lane.index % 2 === 0;
 
@@ -3097,12 +3152,6 @@ class SceneManager {
       const rightWaterfall = MeshFactory.createWaterfallEdge('right');
       rightWaterfall.position.set(worldToScreenX(10.2), 0, 0);
       group.add(leftWaterfall, rightWaterfall);
-      leftWaterfall.traverse((obj) => {
-        if (obj instanceof THREE.Mesh && obj.position.y < -0.5) waterfallSplashes.push(obj);
-      });
-      rightWaterfall.traverse((obj) => {
-        if (obj instanceof THREE.Mesh && obj.position.y < -0.5) waterfallSplashes.push(obj);
-      });
     } else if (lane.type === LaneType.RAILWAY) {
       const railMat = new THREE.MeshLambertMaterial({ color: biome === Biome.NEON ? 0x38bdf8 : 0xcbd5e1 });
       const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
@@ -3166,7 +3215,6 @@ class SceneManager {
       trainMesh,
       signalLight,
       waterRipples,
-      waterfallSplashes,
     };
   }
 
@@ -3230,13 +3278,6 @@ class SceneManager {
           if (rp.position.x > 15) rp.position.x = -15;
           else if (rp.position.x < -15) rp.position.x = 15;
           rp.scale.x = 0.85 + 0.3 * Math.sin(nowSec * 1.8 + i);
-        }
-      }
-
-      if (rendered.waterfallSplashes) {
-        for (let i = 0; i < rendered.waterfallSplashes.length; i++) {
-          const sp = rendered.waterfallSplashes[i];
-          sp.scale.y = 0.92 + 0.14 * Math.sin(nowSec * 3.0 + i * 1.3);
         }
       }
 
@@ -3610,7 +3651,7 @@ class UIManager {
   setWarningVignette(graceRatio        )       {
     if (!this.warningVignetteEl) return;
     if (graceRatio > 0) {
-      const opacity = Math.min(1, Math.max(0.3, 0.3 + graceRatio * 0.7));
+      const opacity = Math.min(1, Math.max(0.05, graceRatio));
       this.warningVignetteEl.style.opacity = String(opacity);
     } else {
       this.warningVignetteEl.style.opacity = '0';

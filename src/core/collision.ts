@@ -74,9 +74,9 @@ export function getCameraFrustumNdcY(playerX: number, playerRow: number, camZ: n
 }
 
 /**
- * Returns true only when the player's 3D mesh has completely crossed below
- * the visible bottom edge of the screen (NDC Y < -1.0).
+ * Returns true when the player touches or crosses below the visible
+ * bottom edge of the screen (NDC Y < -0.96).
  */
 export function isPlayerBehindCameraFrustum(playerX: number, playerRow: number, camZ: number): boolean {
-  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -1.0;
+  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -0.96;
 }

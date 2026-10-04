@@ -248,7 +248,7 @@ export class UIManager {
   setWarningVignette(graceRatio: number): void {
     if (!this.warningVignetteEl) return;
     if (graceRatio > 0) {
-      const opacity = Math.min(1, Math.max(0.3, 0.3 + graceRatio * 0.7));
+      const opacity = Math.min(1, Math.max(0.05, graceRatio));
       this.warningVignetteEl.style.opacity = String(opacity);
     } else {
       this.warningVignetteEl.style.opacity = '0';

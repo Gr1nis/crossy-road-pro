@@ -562,25 +562,23 @@ export class MeshFactory {
     cliff.receiveShadow = true;
     group.add(cliff);
 
-    // Falling water column
+    // Solid voxel falling water column
     const waterFallMat = new THREE.MeshLambertMaterial({
       color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.88,
     });
-    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.9), waterFallMat);
+    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.94), waterFallMat);
     const fallOffset = side === 'left' ? -0.22 : 0.22;
     fall.position.set(fallOffset, -1.15, 0);
     group.add(fall);
 
-    // Foam mist crest at the top
-    const foamMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.94), foamMat);
-    foamTop.position.set(fallOffset, -0.05, 0);
+    // Dense voxel foam crest at the top
+    const foamMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.98), foamMat);
+    foamTop.position.set(fallOffset, -0.04, 0);
     group.add(foamTop);
 
-    // Splash bottom block
-    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.96), foamMat);
+    // Dense splash bottom block
+    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.22, 0.98), foamMat);
     splash.position.set(fallOffset, -2.15, 0);
     group.add(splash);
 
@@ -590,23 +588,14 @@ export class MeshFactory {
   static createRoadMarkings(): THREE.Group {
     const group = new THREE.Group();
     const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
-    const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); // Amber center dashes
 
-    // Continuous solid white shoulder lines at boundary edges
+    // Clean solid shoulder lines at boundary edges
     const solidEdgeGeo = new THREE.BoxGeometry(0.12, 0.02, 1.0);
     const leftSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
     leftSolid.position.set(worldToScreenX(-9.5), 0.015, 0);
     const rightSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
     rightSolid.position.set(worldToScreenX(9.5), 0.015, 0);
     group.add(leftSolid, rightSolid);
-
-    // Dashed center lane markings
-    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.1);
-    for (let x = -9; x <= 9; x += 1.8) {
-      const dash = new THREE.Mesh(dashGeo, dashMat);
-      dash.position.set(worldToScreenX(x), 0.015, 0);
-      group.add(dash);
-    }
 
     return group;
   }

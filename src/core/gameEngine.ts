@@ -157,7 +157,17 @@ export class GameEngine {
   }
 
   getCameraGraceRatio(): number {
-    return Math.min(1, this.cameraGraceTimer / WORLD_CONFIG.CAMERA_GRACE_PERIOD);
+    if (this.cameraGraceTimer > 0) {
+      return Math.min(1, 0.5 + 0.5 * (this.cameraGraceTimer / WORLD_CONFIG.CAMERA_GRACE_PERIOD));
+    }
+    const ndcY = this.getPlayerNdcY();
+    const approachStart = -0.8;
+    const approachEnd = -0.96;
+    if (ndcY < approachStart) {
+      const t = Math.min(1, Math.max(0, (approachStart - ndcY) / (approachStart - approachEnd)));
+      return t * 0.5;
+    }
+    return 0;
   }
 
   getScore(): number {

@@ -138,20 +138,53 @@ export class ScoreTracker {
           this.playerName = data.playerName.trim();
         }
         if (Array.isArray(data.playerRuns)) {
-          this.playerRuns = data.playerRuns
-            .filter(
-              (r): r is Omit<LeaderboardEntry, 'rank'> =>
-                Boolean(r) &&
-                typeof r.playerName === 'string' &&
-                typeof r.score === 'number' &&
-                Number.isFinite(r.score) &&
-                r.score >= 0 &&
-                validSkinIds.has(r.skinId) &&
-                typeof r.date === 'string'
-            )
-            .map((r) => ({ ...r, score: Math.floor(r.score), isBot: false }))
-            .slice(0, MAX_LEADERBOARD_ENTRIES);
+          const mapByName = new Map<string, Omit<LeaderboardEntry, 'rank'>>();
+          for (const r of data.playerRuns) {
+            if (
+              Boolean(r) &&
+              typeof r.playerName === 'string' &&
+              typeof r.score === 'number' &&
+              Number.isFinite(r.score) &&
+              r.score >= 0 &&
+              validSkinIds.has(r.skinId) &&
+              typeof r.date === 'string'
+            ) {
+              const name = r.playerName.trim();
+              if (!name) continue;
+              const cleanScore = Math.floor(r.score);
+              const existing = mapByName.get(name);
+              if (!existing || cleanScore > existing.score) {
+                mapByName.set(name, {
+                  playerName: name,
+                  score: cleanScore,
+                  skinId: r.skinId,
+                  date: r.date,
+                  isBot: false,
+                });
+              }
+            }
+          }
+          this.playerRuns = Array.from(mapByName.values());
         }
+        if (this.highScore > 0) {
+          const existing = this.playerRuns.find((r) => r.playerName === this.playerName);
+          if (existing) {
+            if (this.highScore > existing.score) {
+              existing.score = this.highScore;
+              existing.skinId = this.inventory.getSelectedSkin();
+            }
+          } else {
+            this.playerRuns.push({
+              playerName: this.playerName,
+              score: this.highScore,
+              skinId: this.inventory.getSelectedSkin(),
+              date: new Date().toISOString().slice(0, 10),
+              isBot: false,
+            });
+          }
+        }
+        this.playerRuns.sort((a, b) => b.score - a.score);
+        this.playerRuns = this.playerRuns.slice(0, MAX_LEADERBOARD_ENTRIES);
         const validAchIds = new Set<string>(ACHIEVEMENT_DEFINITIONS.map((a) => a.id));
         const loadedAch: AchievementId[] = [];
         if (Array.isArray(data.unlockedAchievements)) {
@@ -296,7 +329,22 @@ export class ScoreTracker {
   setPlayerName(name: string): void {
     const clean = name.trim();
     if (clean.length > 0) {
+      const oldName = this.playerName;
       this.playerName = clean.slice(0, 24);
+      const oldEntry = this.playerRuns.find((r) => r.playerName === oldName);
+      if (oldEntry) {
+        const targetEntry = this.playerRuns.find((r) => r.playerName === this.playerName);
+        if (targetEntry && targetEntry !== oldEntry) {
+          if (oldEntry.score > targetEntry.score) {
+            targetEntry.score = oldEntry.score;
+            targetEntry.skinId = oldEntry.skinId;
+            targetEntry.date = oldEntry.date;
+          }
+          this.playerRuns = this.playerRuns.filter((r) => r !== oldEntry);
+        } else {
+          oldEntry.playerName = this.playerName;
+        }
+      }
       this.saveToStorage();
     }
   }
@@ -346,13 +394,22 @@ export class ScoreTracker {
     const entrySkin = meta?.skinId ?? this.inventory.getSelectedSkin();
 
     if (cleanScore > 0) {
-      this.playerRuns.unshift({
-        playerName: entryName,
-        score: cleanScore,
-        skinId: entrySkin,
-        date: entryDate,
-        isBot: false,
-      });
+      const existing = this.playerRuns.find((r) => r.playerName === entryName);
+      if (existing) {
+        if (cleanScore > existing.score) {
+          existing.score = cleanScore;
+          existing.skinId = entrySkin;
+          existing.date = entryDate;
+        }
+      } else {
+        this.playerRuns.push({
+          playerName: entryName,
+          score: cleanScore,
+          skinId: entrySkin,
+          date: entryDate,
+          isBot: false,
+        });
+      }
       this.playerRuns.sort((a, b) => b.score - a.score);
       this.playerRuns = this.playerRuns.slice(0, MAX_LEADERBOARD_ENTRIES);
     }
@@ -364,7 +421,7 @@ export class ScoreTracker {
     });
 
     const found = updated.find(
-      (e) => !e.isBot && e.score === cleanScore && e.playerName === entryName && e.skinId === entrySkin
+      (e) => !e.isBot && e.playerName === entryName
     );
     this.evaluateAchievements();
     this.saveToStorage();
