@@ -1,33 +1,42 @@
-import { ALL_SKINS, WORLD_CONFIG, type SkinId, type StorageAdapter } from './types.ts';
+import { ALL_SKINS, type SkinId, type StorageAdapter } from './types.ts';
+import { CoinWallet } from './wallet.ts';
+import { SkinInventory } from './skinInventory.ts';
+import {
+  GachaMachine,
+  SkinRarity,
+  type SkinRarityValue,
+  GACHA_DUPLICATE_CASHBACK,
+  SKIN_RARITY_MAP,
+  SKIN_RARITY_WEIGHTS,
+  type GachaRollResult,
+} from './gachaMachine.ts';
+import {
+  AchievementTracker,
+  type AchievementId,
+  type Achievement,
+  ACHIEVEMENT_DEFINITIONS,
+} from './achievements.ts';
+
+// Re-exports for backward compatibility
+export {
+  SkinRarity,
+  type SkinRarityValue,
+  GACHA_DUPLICATE_CASHBACK,
+  SKIN_RARITY_MAP,
+  SKIN_RARITY_WEIGHTS,
+  type GachaRollResult,
+  GachaMachine,
+  CoinWallet,
+  SkinInventory,
+  type AchievementId,
+  type Achievement,
+  ACHIEVEMENT_DEFINITIONS,
+  AchievementTracker,
+};
 
 const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
 const PROFILE_KEY = 'crossy_road_pro_profile_v1';
-
-export const SkinRarity = {
-  COMMON: 'Common',
-  RARE: 'Rare',
-  EPIC: 'Epic',
-  LEGENDARY: 'Legendary',
-} as const;
-
-export type SkinRarityValue = (typeof SkinRarity)[keyof typeof SkinRarity];
-
-export const GACHA_DUPLICATE_CASHBACK = 40;
 export const MAX_LEADERBOARD_ENTRIES = 10;
-
-export const SKIN_RARITY_MAP: Record<SkinId, SkinRarityValue> = {
-  chicken: SkinRarity.COMMON,
-  cyber_duck: SkinRarity.RARE,
-  shadow_ninja: SkinRarity.EPIC,
-  frost_penguin: SkinRarity.LEGENDARY,
-};
-
-export const SKIN_RARITY_WEIGHTS: Record<SkinRarityValue, number> = {
-  [SkinRarity.COMMON]: 50,
-  [SkinRarity.RARE]: 30,
-  [SkinRarity.EPIC]: 15,
-  [SkinRarity.LEGENDARY]: 5,
-};
 
 export interface LeaderboardEntry {
   rank: number;
@@ -36,22 +45,6 @@ export interface LeaderboardEntry {
   skinId: SkinId;
   date: string;
   isBot: boolean;
-}
-
-export type AchievementId =
-  | 'first_50_steps'
-  | 'collector'
-  | 'train_conqueror'
-  | 'rich_hopper'
-  | 'leaderboard_champion';
-
-export interface Achievement {
-  id: AchievementId;
-  title: string;
-  description: string;
-  badge: string;
-  unlocked: boolean;
-  unlockedAt?: string;
 }
 
 export const DEFAULT_BOT_RIVALS: ReadonlyArray<Omit<LeaderboardEntry, 'rank'>> = [
@@ -66,23 +59,6 @@ export const DEFAULT_BOT_RIVALS: ReadonlyArray<Omit<LeaderboardEntry, 'rank'>> =
   { playerName: 'TrainDodger', score: 35, skinId: 'shadow_ninja', date: '2026-09-25', isBot: true },
   { playerName: 'RookieFeather', score: 18, skinId: 'chicken', date: '2026-09-26', isBot: true },
 ];
-
-export const ACHIEVEMENT_DEFINITIONS: ReadonlyArray<Omit<Achievement, 'unlocked' | 'unlockedAt'>> = [
-  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣' },
-  { id: 'collector', title: 'Коллекционер', description: 'Откройте все скины в Гача-автомате', badge: '🎭' },
-  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆' },
-  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰' },
-  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑' },
-];
-
-export interface GachaRollResult {
-  success: boolean;
-  skinId?: SkinId;
-  rarity?: SkinRarityValue;
-  isDuplicate?: boolean;
-  cashback?: number;
-  reason?: string;
-}
 
 interface SavedProfile {
   highScore: number;
@@ -100,18 +76,22 @@ export class ScoreTracker {
   private currentScore = 0;
   private highScore = 0;
   private bestRow = 0;
-  private coins = 0;
-  private unlockedSkins: SkinId[] = ['chicken'];
-  private selectedSkin: SkinId = 'chicken';
   private playerName = 'Игрок';
   private playerRuns: Array<Omit<LeaderboardEntry, 'rank'>> = [];
-  private unlockedAchievements = new Set<AchievementId>();
-  private achievementDates = new Map<AchievementId, string>();
-  private trainsSurvived = 0;
   private storage?: StorageAdapter;
+
+  private wallet: CoinWallet;
+  private inventory: SkinInventory;
+  private gacha: GachaMachine;
+  private achievements: AchievementTracker;
 
   constructor(storage?: StorageAdapter, initialPlayerName?: string) {
     this.storage = storage;
+    this.wallet = new CoinWallet(0);
+    this.inventory = new SkinInventory(['chicken'], 'chicken');
+    this.gacha = new GachaMachine();
+    this.achievements = new AchievementTracker();
+
     if (initialPlayerName && initialPlayerName.trim().length > 0) {
       this.playerName = initialPlayerName.trim();
     }
@@ -140,16 +120,20 @@ export class ScoreTracker {
           this.bestRow = Math.floor(data.bestRow);
         }
         if (typeof data.coins === 'number' && Number.isFinite(data.coins) && data.coins >= 0) {
-          this.coins = Math.floor(data.coins);
+          this.wallet.setCoins(data.coins);
         }
         const validSkinIds = new Set<string>(ALL_SKINS.map((s) => s.id));
+        let loadedUnlocked: SkinId[] = ['chicken'];
         if (Array.isArray(data.unlockedSkins)) {
           const filtered = data.unlockedSkins.filter((s): s is SkinId => validSkinIds.has(s));
-          this.unlockedSkins = Array.from(new Set<SkinId>(['chicken', ...filtered]));
+          loadedUnlocked = Array.from(new Set<SkinId>(['chicken', ...filtered]));
         }
-        if (typeof data.selectedSkin === 'string' && this.unlockedSkins.includes(data.selectedSkin as SkinId)) {
-          this.selectedSkin = data.selectedSkin as SkinId;
+        let loadedSelected: SkinId = 'chicken';
+        if (typeof data.selectedSkin === 'string' && loadedUnlocked.includes(data.selectedSkin as SkinId)) {
+          loadedSelected = data.selectedSkin as SkinId;
         }
+        this.inventory = new SkinInventory(loadedUnlocked, loadedSelected);
+
         if (typeof data.playerName === 'string' && data.playerName.trim().length > 0) {
           this.playerName = data.playerName.trim();
         }
@@ -169,16 +153,18 @@ export class ScoreTracker {
             .slice(0, MAX_LEADERBOARD_ENTRIES);
         }
         const validAchIds = new Set<string>(ACHIEVEMENT_DEFINITIONS.map((a) => a.id));
+        const loadedAch: AchievementId[] = [];
         if (Array.isArray(data.unlockedAchievements)) {
           for (const id of data.unlockedAchievements) {
             if (validAchIds.has(id)) {
-              this.unlockedAchievements.add(id as AchievementId);
+              loadedAch.push(id as AchievementId);
             }
           }
         }
-        if (typeof data.trainsSurvived === 'number' && Number.isFinite(data.trainsSurvived) && data.trainsSurvived >= 0) {
-          this.trainsSurvived = Math.floor(data.trainsSurvived);
-        }
+        const loadedTrains = typeof data.trainsSurvived === 'number' && Number.isFinite(data.trainsSurvived) && data.trainsSurvived >= 0
+          ? Math.floor(data.trainsSurvived)
+          : 0;
+        this.achievements = new AchievementTracker(loadedAch, loadedTrains);
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -192,18 +178,29 @@ export class ScoreTracker {
       const payload: SavedProfile = {
         highScore: this.highScore,
         bestRow: this.bestRow,
-        coins: this.coins,
-        unlockedSkins: this.unlockedSkins,
-        selectedSkin: this.selectedSkin,
+        coins: this.wallet.getCoins(),
+        unlockedSkins: this.inventory.getUnlockedSkins(),
+        selectedSkin: this.inventory.getSelectedSkin(),
         playerName: this.playerName,
         playerRuns: this.playerRuns,
-        unlockedAchievements: Array.from(this.unlockedAchievements),
-        trainsSurvived: this.trainsSurvived,
+        unlockedAchievements: this.achievements.getUnlockedIds(),
+        trainsSurvived: this.achievements.getTrainsSurvived(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
       // Ignore storage quota errors
     }
+  }
+
+  private evaluateAchievements(): void {
+    const topBotScore = DEFAULT_BOT_RIVALS[0]?.score ?? 250;
+    this.achievements.evaluate({
+      score: Math.max(this.currentScore, this.highScore),
+      coins: this.wallet.getCoins(),
+      unlockedSkinsCount: this.inventory.getUnlockedSkins().length,
+      allSkinsCount: ALL_SKINS.length,
+      isTop1: this.highScore > topBotScore,
+    });
   }
 
   updateRow(row: number, multiplier: number = 1): void {
@@ -235,88 +232,61 @@ export class ScoreTracker {
     return this.bestRow;
   }
 
+  resetCurrentScore(): void {
+    if (this.currentScore > 0) {
+      this.recordRun(this.currentScore);
+    }
+    this.currentScore = 0;
+  }
+
   getCoins(): number {
-    return this.coins;
+    return this.wallet.getCoins();
   }
 
   addCoins(amount: number): void {
     if (!Number.isFinite(amount) || amount <= 0) return;
-    this.coins += Math.floor(amount);
+    this.wallet.addCoins(amount);
     this.evaluateAchievements();
     this.saveToStorage();
   }
 
   getUnlockedSkins(): SkinId[] {
-    return [...this.unlockedSkins];
+    return this.inventory.getUnlockedSkins();
   }
 
   getSelectedSkin(): SkinId {
-    return this.selectedSkin;
+    return this.inventory.getSelectedSkin();
   }
 
   getSkinRarity(skinId: SkinId): SkinRarityValue {
-    return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
+    return this.gacha.getSkinRarity(skinId);
   }
 
   selectSkin(skinId: SkinId): boolean {
-    if (!this.unlockedSkins.includes(skinId)) return false;
-    this.selectedSkin = skinId;
-    this.saveToStorage();
-    return true;
-  }
-
-  private pickSkinByRoll(randomInput: number): SkinId {
-    if (!Number.isInteger(randomInput) && randomInput > 0 && randomInput < 1) {
-      const rollPct = randomInput * 100;
-      if (rollPct < 50) return 'chicken';
-      if (rollPct < 80) return 'cyber_duck';
-      if (rollPct < 95) return 'shadow_ninja';
-      return 'frost_penguin';
+    const success = this.inventory.selectSkin(skinId);
+    if (success) {
+      this.saveToStorage();
     }
-    const intVal = Math.floor(randomInput);
-    if (intVal > 0) {
-      const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.unlockedSkins.includes(id));
-      if (locked.length > 0) {
-        return locked[(intVal - 1) % locked.length];
-      }
-    }
-    const idx = Math.abs(intVal) % ALL_SKINS.length;
-    return ALL_SKINS[idx].id;
+    return success;
   }
 
   rollGacha(randomIndex: number = 0, forceSkinId?: SkinId): GachaRollResult {
-    if (this.coins < WORLD_CONFIG.GACHA_COST) {
-      return { success: false, reason: 'NOT_ENOUGH_COINS' };
+    let forced = forceSkinId;
+    if (!forced && Number.isInteger(randomIndex) && randomIndex > 0) {
+      const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.inventory.isUnlocked(id));
+      if (locked.length > 0) {
+        forced = locked[(Math.floor(randomIndex) - 1) % locked.length];
+      }
     }
-    this.coins -= WORLD_CONFIG.GACHA_COST;
-    const chosen = forceSkinId ?? this.pickSkinByRoll(randomIndex);
-    const rarity = this.getSkinRarity(chosen);
-    const isDuplicate = this.unlockedSkins.includes(chosen);
-
-    if (isDuplicate) {
-      this.coins += GACHA_DUPLICATE_CASHBACK;
+    const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forced);
+    if (result.success) {
+      if (!result.isDuplicate && result.skinId) {
+        this.inventory.selectSkin(result.skinId);
+      }
       this.evaluateAchievements();
       this.saveToStorage();
-      return {
-        success: true,
-        skinId: chosen,
-        rarity,
-        isDuplicate: true,
-        cashback: GACHA_DUPLICATE_CASHBACK,
-      };
     }
-
-    this.unlockedSkins.push(chosen);
-    this.selectedSkin = chosen;
-    this.evaluateAchievements();
-    this.saveToStorage();
-    return {
-      success: true,
-      skinId: chosen,
-      rarity,
-      isDuplicate: false,
-      cashback: 0,
-    };
+    return result;
   }
 
   getPlayerName(): string {
@@ -329,6 +299,30 @@ export class ScoreTracker {
       this.playerName = clean.slice(0, 24);
       this.saveToStorage();
     }
+  }
+
+  getPlayerRuns(): LeaderboardEntry[] {
+    return this.playerRuns.map((r, idx) => ({ ...r, rank: idx + 1 }));
+  }
+
+  getLeaderboard(): LeaderboardEntry[] {
+    const combined: Array<Omit<LeaderboardEntry, 'rank'>> = [...this.playerRuns, ...DEFAULT_BOT_RIVALS];
+    combined.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.isBot !== b.isBot) return a.isBot ? 1 : -1;
+      return 0;
+    });
+    return combined.slice(0, MAX_LEADERBOARD_ENTRIES).map((entry, idx) => ({
+      ...entry,
+      rank: idx + 1,
+    }));
+  }
+
+  getNextRival(referenceScore: number = this.currentScore): LeaderboardEntry | null {
+    const board = this.getLeaderboard();
+    const botsAhead = board.filter((e) => e.isBot && e.score > referenceScore);
+    if (botsAhead.length === 0) return null;
+    return botsAhead[botsAhead.length - 1];
   }
 
   recordRun(
@@ -349,7 +343,7 @@ export class ScoreTracker {
 
     const entryDate = meta?.date ?? new Date().toISOString().slice(0, 10);
     const entryName = meta?.playerName?.trim() || this.playerName;
-    const entrySkin = meta?.skinId ?? this.selectedSkin;
+    const entrySkin = meta?.skinId ?? this.inventory.getSelectedSkin();
 
     if (cleanScore > 0) {
       this.playerRuns.unshift({
@@ -382,84 +376,30 @@ export class ScoreTracker {
     };
   }
 
-  getPlayerRuns(): LeaderboardEntry[] {
-    return this.playerRuns.map((r, idx) => ({ ...r, rank: idx + 1 }));
-  }
-
-  getLeaderboard(): LeaderboardEntry[] {
-    const combined: Array<Omit<LeaderboardEntry, 'rank'>> = [...this.playerRuns, ...DEFAULT_BOT_RIVALS];
-    combined.sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      if (a.isBot !== b.isBot) return a.isBot ? 1 : -1;
-      return 0;
-    });
-    return combined.slice(0, MAX_LEADERBOARD_ENTRIES).map((entry, idx) => ({
-      ...entry,
-      rank: idx + 1,
-    }));
-  }
-
-  getNextRival(referenceScore: number = this.currentScore): LeaderboardEntry | null {
-    const board = this.getLeaderboard();
-    const botsAhead = board.filter((e) => e.isBot && e.score > referenceScore);
-    if (botsAhead.length === 0) return null;
-    return botsAhead[botsAhead.length - 1];
-  }
-
   recordTrainSurvived(count: number = 1): void {
     if (!Number.isFinite(count) || count <= 0) return;
-    this.trainsSurvived += Math.floor(count);
+    this.achievements.recordTrainSurvived(count);
     this.evaluateAchievements();
     this.saveToStorage();
   }
 
   getTrainsSurvived(): number {
-    return this.trainsSurvived;
+    return this.achievements.getTrainsSurvived();
   }
 
   unlockAchievement(id: AchievementId, date?: string): boolean {
-    if (this.unlockedAchievements.has(id)) return false;
-    this.unlockedAchievements.add(id);
-    this.achievementDates.set(id, date ?? new Date().toISOString().slice(0, 10));
-    this.saveToStorage();
-    return true;
+    const success = this.achievements.unlock(id, date);
+    if (success) {
+      this.saveToStorage();
+    }
+    return success;
   }
 
   isAchievementUnlocked(id: AchievementId): boolean {
-    return this.unlockedAchievements.has(id);
+    return this.achievements.isUnlocked(id);
   }
 
   getAchievements(): Achievement[] {
-    return ACHIEVEMENT_DEFINITIONS.map((def) => ({
-      ...def,
-      unlocked: this.unlockedAchievements.has(def.id),
-      unlockedAt: this.achievementDates.get(def.id),
-    }));
-  }
-
-  private evaluateAchievements(): void {
-    if (this.currentScore >= 50 || this.highScore >= 50) {
-      this.unlockedAchievements.add('first_50_steps');
-    }
-    if (this.unlockedSkins.length >= ALL_SKINS.length) {
-      this.unlockedAchievements.add('collector');
-    }
-    if (this.trainsSurvived >= 5) {
-      this.unlockedAchievements.add('train_conqueror');
-    }
-    if (this.coins >= 200) {
-      this.unlockedAchievements.add('rich_hopper');
-    }
-    const topBotScore = DEFAULT_BOT_RIVALS[0]?.score ?? 250;
-    if (this.highScore > topBotScore) {
-      this.unlockedAchievements.add('leaderboard_champion');
-    }
-  }
-
-  resetCurrentScore(): void {
-    if (this.currentScore > 0) {
-      this.recordRun(this.currentScore);
-    }
-    this.currentScore = 0;
+    return this.achievements.getAchievements();
   }
 }

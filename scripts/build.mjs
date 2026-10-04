@@ -21,12 +21,19 @@ const moduleOrder = [
   'src/core/types.ts',
   'src/core/prng.ts',
   'src/core/collision.ts',
+  'src/core/wallet.ts',
+  'src/core/skinInventory.ts',
+  'src/core/gachaMachine.ts',
+  'src/core/achievements.ts',
   'src/core/scoreTracker.ts',
   'src/core/laneGenerator.ts',
   'src/core/gameEngine.ts',
   'src/view/audioSynth.ts',
   'src/view/meshFactory.ts',
   'src/view/sceneManager.ts',
+  'src/app/uiManager.ts',
+  'src/app/inputManager.ts',
+  'src/app/gameLoop.ts',
   'src/main.ts',
 ];
 
@@ -37,10 +44,11 @@ for (const relPath of moduleOrder) {
   const tsSource = fs.readFileSync(fullPath, 'utf8');
   let jsCode = stripTypes(tsSource);
 
-  // Remove local relative imports and THREE imports (hoisted to top)
+  // Remove local relative imports, export blocks, and un-prefix export keyword
   jsCode = jsCode
     .replace(/^\s*import\s+[\s\S]*?from\s+['"][^'"]+['"];?\s*$/gm, '')
-    .replace(/^\s*export\s+(class|function|const)/gm, '$1');
+    .replace(/^\s*export\s*\{[\s\S]*?\};?\s*$/gm, '')
+    .replace(/^\s*export\s+(class|function|const|let|var)/gm, '$1');
 
   combinedJs += `// --- Module: ${relPath} ---\n${jsCode.trim()}\n\n`;
 }

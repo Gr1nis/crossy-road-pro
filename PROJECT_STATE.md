@@ -29,10 +29,10 @@
 7. **Pause Invariant**: Игра надёжно приостанавливает физический шаг симуляции `engine.step(dt)` при вызове паузы (кнопка ⏸ или `Esc`/`P`).
 
 ## 4. Текущий этап и Next Up
-- **Текущий этап**: **Фаза 0 (Стабилизация и критические фиксы) завершена на 100%**:
-  - Sliding window eviction старых полос в `GameEngine` (`cameraZ - 30`).
-  - Камерные константы вынесены в `WORLD_CONFIG` (`CAMERA_OFFSET`, `FRUSTUM_SIZE`) и синхронизированы с `collision.ts`.
-  - Удалён неиспользуемый `vitest`, настроен нативный `node --experimental-strip-types --test` в `package.json`.
-  - CI-пайплайн `.github/workflows/pages.yml` дополнен гейткипером `tsc --noEmit` и прогоном тестов перед деплоем.
-  - Набор тестов расширен до **31 теста — 100% GREEN**.
-- **Next Up**: **Фаза 1 (Рефакторинг SRP)** — декомпозиция `ScoreTracker` (5 модулей) и `main.ts` (4 модуля).
+- **Текущий этап**: **Фаза 1 (Рефакторинг SRP) завершена на 100%**:
+  - `ScoreTracker` разделен на 5 узкоспециализированных модулей: `wallet.ts`, `skinInventory.ts`, `gachaMachine.ts`, `achievements.ts` и `scoreTracker.ts` (фасад с сохранением 100% обратной совместимости).
+  - `main.ts` разгружен с 570+ строк до 26 строк чистого bootstrap-кода; логика вынесена в `uiManager.ts`, `inputManager.ts`, `gameLoop.ts`.
+  - Пайплайн сборки `scripts/build.mjs` обновлен и генерирует автономный `index.html` и `dist/bundle.js`.
+  - Все **31 из 31 тестов GREEN**, `tsc --noEmit` — 0 ошибок.
+- **Next Up**: **Фаза 2 (Мобильный ввод + Производительность рендеринга)** — touch swipe / tap-to-hop, safe area CSS, deep dispose и instancing для Three.js.
+

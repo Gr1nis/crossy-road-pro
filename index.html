@@ -405,24 +405,346 @@ function checkVehicleCollision(playerX        , vehicles           )            
   return getCameraFrustumNdcY(playerX, playerRow, camZ) < -1.0;
 }
 
-// --- Module: src/core/scoreTracker.ts ---
-const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
-const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
+// --- Module: src/core/wallet.ts ---
+/**
+ * CoinWallet manages player currency balance with strict validation.
+ * Decoupled from storage, view, and game loop.
+ */
+class CoinWallet {
+          coins        ;
+
+  constructor(initialCoins         = 0) {
+    this.coins = Number.isFinite(initialCoins) && initialCoins >= 0
+      ? Math.floor(initialCoins)
+      : 0;
+  }
+
+  getCoins()         {
+    return this.coins;
+  }
+
+  setCoins(amount        )       {
+    if (!Number.isFinite(amount) || amount < 0) {
+      return;
+    }
+    this.coins = Math.floor(amount);
+  }
+
+  addCoins(amount        )         {
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return this.coins;
+    }
+    this.coins += Math.floor(amount);
+    return this.coins;
+  }
+
+  canAfford(amount        )          {
+    if (!Number.isFinite(amount) || amount < 0) {
+      return false;
+    }
+    return this.coins >= Math.floor(amount);
+  }
+
+  spendCoins(amount        )          {
+    if (!this.canAfford(amount)) {
+      return false;
+    }
+    this.coins -= Math.floor(amount);
+    return true;
+  }
+}
+
+// --- Module: src/core/skinInventory.ts ---
+const DEFAULT_SKIN         = 'chicken';
+const VALID_SKIN_IDS                      = new Set(ALL_SKINS.map((s) => s.id));
+
+/**
+ * SkinInventory manages unlocked skins and the currently equipped skin.
+ * Decoupled from storage, view, and game loop.
+ */
+class SkinInventory {
+          unlocked             ;
+          selected        ;
+
+  constructor(
+    initialUnlocked           = [DEFAULT_SKIN],
+    initialSelected         = DEFAULT_SKIN
+  ) {
+    this.unlocked = new Set        ();
+    this.unlocked.add(DEFAULT_SKIN);
+
+    if (Array.isArray(initialUnlocked)) {
+      for (const skin of initialUnlocked) {
+        if (VALID_SKIN_IDS.has(skin)) {
+          this.unlocked.add(skin);
+        }
+      }
+    }
+
+    if (VALID_SKIN_IDS.has(initialSelected) && this.unlocked.has(initialSelected)) {
+      this.selected = initialSelected;
+    } else {
+      this.selected = DEFAULT_SKIN;
+    }
+  }
+
+  getUnlockedSkins()           {
+    return Array.from(this.unlocked);
+  }
+
+  isUnlocked(skinId        )          {
+    return this.unlocked.has(skinId);
+  }
+
+  getSelectedSkin()         {
+    return this.selected;
+  }
+
+  selectSkin(skinId        )          {
+    if (!this.unlocked.has(skinId)) {
+      return false;
+    }
+    this.selected = skinId;
+    return true;
+  }
+
+  unlockSkin(skinId        )          {
+    if (!VALID_SKIN_IDS.has(skinId) || this.unlocked.has(skinId)) {
+      return false;
+    }
+    this.unlocked.add(skinId);
+    return true;
+  }
+}
+
+// --- Module: src/core/gachaMachine.ts ---
+const SkinRarity = {
   COMMON: 'Common',
   RARE: 'Rare',
   EPIC: 'Epic',
   LEGENDARY: 'Legendary',
-}         ;const GACHA_DUPLICATE_CASHBACK = 40;const MAX_LEADERBOARD_ENTRIES = 10;const SKIN_RARITY_MAP                                  = {
+}         ;
+const GACHA_DUPLICATE_CASHBACK = 40;
+const SKIN_RARITY_MAP                                  = {
   chicken: SkinRarity.COMMON,
   cyber_duck: SkinRarity.RARE,
   shadow_ninja: SkinRarity.EPIC,
   frost_penguin: SkinRarity.LEGENDARY,
-};const SKIN_RARITY_WEIGHTS                                  = {
+};
+const SKIN_RARITY_WEIGHTS                                  = {
   [SkinRarity.COMMON]: 50,
   [SkinRarity.RARE]: 30,
   [SkinRarity.EPIC]: 15,
   [SkinRarity.LEGENDARY]: 5,
-};const DEFAULT_BOT_RIVALS                                                = [
+};
+
+                                  
+                   
+                  
+                           
+                        
+                    
+                  
+ 
+
+function mulberry32(seed        )         {
+  let s = (Math.floor(seed) + 0x6d2b79f5) | 0;
+  let t = Math.imul(s ^ (s >>> 15), 1 | s);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return (t >>> 0) / 4294967296;
+}
+
+/**
+ * GachaMachine handles skin rolls based on rarity weights, PRNG, and duplicates cashback.
+ * Decoupled from storage, view, and game loop.
+ */
+class GachaMachine {
+  getSkinRarity(skinId        )                  {
+    return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
+  }
+
+  pickSkin(seedOrNonce        )         {
+    const rand = !Number.isInteger(seedOrNonce) && seedOrNonce > 0 && seedOrNonce < 1
+      ? seedOrNonce
+      : mulberry32(seedOrNonce);
+
+    const rollPct = rand * 100;
+    if (rollPct < 50) return 'chicken';
+    if (rollPct < 80) return 'cyber_duck';
+    if (rollPct < 95) return 'shadow_ninja';
+    return 'frost_penguin';
+  }
+
+  roll(
+    seedOrNonce        ,
+    wallet            ,
+    inventory               ,
+    forceSkinId         
+  )                  {
+    if (!wallet.canAfford(WORLD_CONFIG.GACHA_COST)) {
+      return { success: false, reason: 'NOT_ENOUGH_COINS' };
+    }
+
+    const spent = wallet.spendCoins(WORLD_CONFIG.GACHA_COST);
+    if (!spent) {
+      return { success: false, reason: 'NOT_ENOUGH_COINS' };
+    }
+
+    const chosenSkin         = forceSkinId ?? this.pickSkin(seedOrNonce);
+    const rarity = this.getSkinRarity(chosenSkin);
+    const isDuplicate = inventory.isUnlocked(chosenSkin);
+
+    if (isDuplicate) {
+      wallet.addCoins(GACHA_DUPLICATE_CASHBACK);
+      return {
+        success: true,
+        skinId: chosenSkin,
+        rarity,
+        isDuplicate: true,
+        cashback: GACHA_DUPLICATE_CASHBACK,
+      };
+    }
+
+    inventory.unlockSkin(chosenSkin);
+    return {
+      success: true,
+      skinId: chosenSkin,
+      rarity,
+      isDuplicate: false,
+      cashback: 0,
+    };
+  }
+}
+
+// --- Module: src/core/achievements.ts ---
+const ACHIEVEMENT_DEFINITIONS                                                              = [
+  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣' },
+  { id: 'collector', title: 'Коллекционер', description: 'Откройте все скины в Гача-автомате', badge: '🎭' },
+  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆' },
+  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰' },
+  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑' },
+];
+
+                                               
+                
+                
+                             
+                        
+                  
+ 
+
+/**
+ * AchievementTracker manages player achievements and tracks unlock conditions.
+ * Decoupled from storage, view, and game loop.
+ */
+class AchievementTracker {
+          unlocked = new Set               ();
+          dates = new Map                       ();
+          trainsSurvived = 0;
+
+  constructor(
+    initialUnlocked                  = [],
+    initialTrainsSurvived         = 0,
+    initialDates                                                             
+  ) {
+    if (Array.isArray(initialUnlocked)) {
+      for (const id of initialUnlocked) {
+        this.unlocked.add(id);
+      }
+    }
+    if (Number.isFinite(initialTrainsSurvived) && initialTrainsSurvived >= 0) {
+      this.trainsSurvived = Math.floor(initialTrainsSurvived);
+    }
+    if (initialDates) {
+      if (initialDates instanceof Map) {
+        for (const [k, v] of initialDates) {
+          this.dates.set(k, v);
+        }
+      } else {
+        for (const [k, v] of Object.entries(initialDates)) {
+          this.dates.set(k                 , v);
+        }
+      }
+    }
+  }
+
+  getAchievements()                {
+    return ACHIEVEMENT_DEFINITIONS.map((def) => ({
+      ...def,
+      unlocked: this.unlocked.has(def.id),
+      unlockedAt: this.dates.get(def.id),
+    }));
+  }
+
+  isUnlocked(id               )          {
+    return this.unlocked.has(id);
+  }
+
+  unlock(id               , date         )          {
+    if (this.unlocked.has(id)) {
+      return false;
+    }
+    this.unlocked.add(id);
+    this.dates.set(id, date ?? new Date().toISOString().slice(0, 10));
+    return true;
+  }
+
+  getUnlockedIds()                  {
+    return Array.from(this.unlocked);
+  }
+
+  getTrainsSurvived()         {
+    return this.trainsSurvived;
+  }
+
+  recordTrainSurvived(count         = 1)         {
+    const inc = Number.isFinite(count) && count > 0 ? Math.floor(count) : 1;
+    this.trainsSurvived += inc;
+    if (this.trainsSurvived >= 5) {
+      this.unlock('train_conqueror');
+    }
+    return this.trainsSurvived;
+  }
+
+  evaluate(context                              )                {
+    const newlyUnlocked                = [];
+
+    if (context.score >= 50 && this.unlock('first_50_steps')) {
+      const def = this.getAchievements().find((a) => a.id === 'first_50_steps');
+      if (def) newlyUnlocked.push(def);
+    }
+
+    if (context.unlockedSkinsCount >= context.allSkinsCount && this.unlock('collector')) {
+      const def = this.getAchievements().find((a) => a.id === 'collector');
+      if (def) newlyUnlocked.push(def);
+    }
+
+    if (this.trainsSurvived >= 5 && this.unlock('train_conqueror')) {
+      const def = this.getAchievements().find((a) => a.id === 'train_conqueror');
+      if (def) newlyUnlocked.push(def);
+    }
+
+    if (context.coins >= 200 && this.unlock('rich_hopper')) {
+      const def = this.getAchievements().find((a) => a.id === 'rich_hopper');
+      if (def) newlyUnlocked.push(def);
+    }
+
+    if (context.isTop1 && this.unlock('leaderboard_champion')) {
+      const def = this.getAchievements().find((a) => a.id === 'leaderboard_champion');
+      if (def) newlyUnlocked.push(def);
+    }
+
+    return newlyUnlocked;
+  }
+}
+
+// --- Module: src/core/scoreTracker.ts ---
+// Re-exports for backward compatibility
+
+const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';
+const MAX_LEADERBOARD_ENTRIES = 10;
+const DEFAULT_BOT_RIVALS                                                = [
   { playerName: 'CyberKaiser', score: 250, skinId: 'shadow_ninja', date: '2026-09-20', isBot: true },
   { playerName: 'ArcticFlash', score: 210, skinId: 'frost_penguin', date: '2026-09-21', isBot: true },
   { playerName: 'NeonQuack', score: 175, skinId: 'cyber_duck', date: '2026-09-22', isBot: true },
@@ -433,28 +755,27 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
   { playerName: 'TurboCluck', score: 55, skinId: 'chicken', date: '2026-09-25', isBot: true },
   { playerName: 'TrainDodger', score: 35, skinId: 'shadow_ninja', date: '2026-09-25', isBot: true },
   { playerName: 'RookieFeather', score: 18, skinId: 'chicken', date: '2026-09-26', isBot: true },
-];const ACHIEVEMENT_DEFINITIONS                                                              = [
-  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣' },
-  { id: 'collector', title: 'Коллекционер', description: 'Откройте все скины в Гача-автомате', badge: '🎭' },
-  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆' },
-  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰' },
-  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑' },
-];class ScoreTracker {
+];
+class ScoreTracker {
           currentScore = 0;
           highScore = 0;
           bestRow = 0;
-          coins = 0;
-          unlockedSkins           = ['chicken'];
-          selectedSkin         = 'chicken';
           playerName = 'Игрок';
           playerRuns                                        = [];
-          unlockedAchievements = new Set               ();
-          achievementDates = new Map                       ();
-          trainsSurvived = 0;
           storage                 ;
+
+          wallet            ;
+          inventory               ;
+          gacha              ;
+          achievements                    ;
 
   constructor(storage                 , initialPlayerName         ) {
     this.storage = storage;
+    this.wallet = new CoinWallet(0);
+    this.inventory = new SkinInventory(['chicken'], 'chicken');
+    this.gacha = new GachaMachine();
+    this.achievements = new AchievementTracker();
+
     if (initialPlayerName && initialPlayerName.trim().length > 0) {
       this.playerName = initialPlayerName.trim();
     }
@@ -483,16 +804,20 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
           this.bestRow = Math.floor(data.bestRow);
         }
         if (typeof data.coins === 'number' && Number.isFinite(data.coins) && data.coins >= 0) {
-          this.coins = Math.floor(data.coins);
+          this.wallet.setCoins(data.coins);
         }
         const validSkinIds = new Set        (ALL_SKINS.map((s) => s.id));
+        let loadedUnlocked           = ['chicken'];
         if (Array.isArray(data.unlockedSkins)) {
           const filtered = data.unlockedSkins.filter((s)              => validSkinIds.has(s));
-          this.unlockedSkins = Array.from(new Set        (['chicken', ...filtered]));
+          loadedUnlocked = Array.from(new Set        (['chicken', ...filtered]));
         }
-        if (typeof data.selectedSkin === 'string' && this.unlockedSkins.includes(data.selectedSkin          )) {
-          this.selectedSkin = data.selectedSkin          ;
+        let loadedSelected         = 'chicken';
+        if (typeof data.selectedSkin === 'string' && loadedUnlocked.includes(data.selectedSkin          )) {
+          loadedSelected = data.selectedSkin          ;
         }
+        this.inventory = new SkinInventory(loadedUnlocked, loadedSelected);
+
         if (typeof data.playerName === 'string' && data.playerName.trim().length > 0) {
           this.playerName = data.playerName.trim();
         }
@@ -512,16 +837,18 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
             .slice(0, MAX_LEADERBOARD_ENTRIES);
         }
         const validAchIds = new Set        (ACHIEVEMENT_DEFINITIONS.map((a) => a.id));
+        const loadedAch                  = [];
         if (Array.isArray(data.unlockedAchievements)) {
           for (const id of data.unlockedAchievements) {
             if (validAchIds.has(id)) {
-              this.unlockedAchievements.add(id                 );
+              loadedAch.push(id                 );
             }
           }
         }
-        if (typeof data.trainsSurvived === 'number' && Number.isFinite(data.trainsSurvived) && data.trainsSurvived >= 0) {
-          this.trainsSurvived = Math.floor(data.trainsSurvived);
-        }
+        const loadedTrains = typeof data.trainsSurvived === 'number' && Number.isFinite(data.trainsSurvived) && data.trainsSurvived >= 0
+          ? Math.floor(data.trainsSurvived)
+          : 0;
+        this.achievements = new AchievementTracker(loadedAch, loadedTrains);
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -535,18 +862,29 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
       const payload               = {
         highScore: this.highScore,
         bestRow: this.bestRow,
-        coins: this.coins,
-        unlockedSkins: this.unlockedSkins,
-        selectedSkin: this.selectedSkin,
+        coins: this.wallet.getCoins(),
+        unlockedSkins: this.inventory.getUnlockedSkins(),
+        selectedSkin: this.inventory.getSelectedSkin(),
         playerName: this.playerName,
         playerRuns: this.playerRuns,
-        unlockedAchievements: Array.from(this.unlockedAchievements),
-        trainsSurvived: this.trainsSurvived,
+        unlockedAchievements: this.achievements.getUnlockedIds(),
+        trainsSurvived: this.achievements.getTrainsSurvived(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
       // Ignore storage quota errors
     }
+  }
+
+          evaluateAchievements()       {
+    const topBotScore = DEFAULT_BOT_RIVALS[0]?.score ?? 250;
+    this.achievements.evaluate({
+      score: Math.max(this.currentScore, this.highScore),
+      coins: this.wallet.getCoins(),
+      unlockedSkinsCount: this.inventory.getUnlockedSkins().length,
+      allSkinsCount: ALL_SKINS.length,
+      isTop1: this.highScore > topBotScore,
+    });
   }
 
   updateRow(row        , multiplier         = 1)       {
@@ -578,88 +916,61 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
     return this.bestRow;
   }
 
+  resetCurrentScore()       {
+    if (this.currentScore > 0) {
+      this.recordRun(this.currentScore);
+    }
+    this.currentScore = 0;
+  }
+
   getCoins()         {
-    return this.coins;
+    return this.wallet.getCoins();
   }
 
   addCoins(amount        )       {
     if (!Number.isFinite(amount) || amount <= 0) return;
-    this.coins += Math.floor(amount);
+    this.wallet.addCoins(amount);
     this.evaluateAchievements();
     this.saveToStorage();
   }
 
   getUnlockedSkins()           {
-    return [...this.unlockedSkins];
+    return this.inventory.getUnlockedSkins();
   }
 
   getSelectedSkin()         {
-    return this.selectedSkin;
+    return this.inventory.getSelectedSkin();
   }
 
   getSkinRarity(skinId        )                  {
-    return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
+    return this.gacha.getSkinRarity(skinId);
   }
 
   selectSkin(skinId        )          {
-    if (!this.unlockedSkins.includes(skinId)) return false;
-    this.selectedSkin = skinId;
-    this.saveToStorage();
-    return true;
-  }
-
-          pickSkinByRoll(randomInput        )         {
-    if (!Number.isInteger(randomInput) && randomInput > 0 && randomInput < 1) {
-      const rollPct = randomInput * 100;
-      if (rollPct < 50) return 'chicken';
-      if (rollPct < 80) return 'cyber_duck';
-      if (rollPct < 95) return 'shadow_ninja';
-      return 'frost_penguin';
+    const success = this.inventory.selectSkin(skinId);
+    if (success) {
+      this.saveToStorage();
     }
-    const intVal = Math.floor(randomInput);
-    if (intVal > 0) {
-      const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.unlockedSkins.includes(id));
-      if (locked.length > 0) {
-        return locked[(intVal - 1) % locked.length];
-      }
-    }
-    const idx = Math.abs(intVal) % ALL_SKINS.length;
-    return ALL_SKINS[idx].id;
+    return success;
   }
 
   rollGacha(randomIndex         = 0, forceSkinId         )                  {
-    if (this.coins < WORLD_CONFIG.GACHA_COST) {
-      return { success: false, reason: 'NOT_ENOUGH_COINS' };
+    let forced = forceSkinId;
+    if (!forced && Number.isInteger(randomIndex) && randomIndex > 0) {
+      const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.inventory.isUnlocked(id));
+      if (locked.length > 0) {
+        forced = locked[(Math.floor(randomIndex) - 1) % locked.length];
+      }
     }
-    this.coins -= WORLD_CONFIG.GACHA_COST;
-    const chosen = forceSkinId ?? this.pickSkinByRoll(randomIndex);
-    const rarity = this.getSkinRarity(chosen);
-    const isDuplicate = this.unlockedSkins.includes(chosen);
-
-    if (isDuplicate) {
-      this.coins += GACHA_DUPLICATE_CASHBACK;
+    const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forced);
+    if (result.success) {
+      if (!result.isDuplicate && result.skinId) {
+        this.inventory.selectSkin(result.skinId);
+      }
       this.evaluateAchievements();
       this.saveToStorage();
-      return {
-        success: true,
-        skinId: chosen,
-        rarity,
-        isDuplicate: true,
-        cashback: GACHA_DUPLICATE_CASHBACK,
-      };
     }
-
-    this.unlockedSkins.push(chosen);
-    this.selectedSkin = chosen;
-    this.evaluateAchievements();
-    this.saveToStorage();
-    return {
-      success: true,
-      skinId: chosen,
-      rarity,
-      isDuplicate: false,
-      cashback: 0,
-    };
+    return result;
   }
 
   getPlayerName()         {
@@ -672,6 +983,30 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
       this.playerName = clean.slice(0, 24);
       this.saveToStorage();
     }
+  }
+
+  getPlayerRuns()                     {
+    return this.playerRuns.map((r, idx) => ({ ...r, rank: idx + 1 }));
+  }
+
+  getLeaderboard()                     {
+    const combined                                        = [...this.playerRuns, ...DEFAULT_BOT_RIVALS];
+    combined.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.isBot !== b.isBot) return a.isBot ? 1 : -1;
+      return 0;
+    });
+    return combined.slice(0, MAX_LEADERBOARD_ENTRIES).map((entry, idx) => ({
+      ...entry,
+      rank: idx + 1,
+    }));
+  }
+
+  getNextRival(referenceScore         = this.currentScore)                          {
+    const board = this.getLeaderboard();
+    const botsAhead = board.filter((e) => e.isBot && e.score > referenceScore);
+    if (botsAhead.length === 0) return null;
+    return botsAhead[botsAhead.length - 1];
   }
 
   recordRun(
@@ -692,7 +1027,7 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
 
     const entryDate = meta?.date ?? new Date().toISOString().slice(0, 10);
     const entryName = meta?.playerName?.trim() || this.playerName;
-    const entrySkin = meta?.skinId ?? this.selectedSkin;
+    const entrySkin = meta?.skinId ?? this.inventory.getSelectedSkin();
 
     if (cleanScore > 0) {
       this.playerRuns.unshift({
@@ -725,91 +1060,35 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const SkinRarity = {
     };
   }
 
-  getPlayerRuns()                     {
-    return this.playerRuns.map((r, idx) => ({ ...r, rank: idx + 1 }));
-  }
-
-  getLeaderboard()                     {
-    const combined                                        = [...this.playerRuns, ...DEFAULT_BOT_RIVALS];
-    combined.sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      if (a.isBot !== b.isBot) return a.isBot ? 1 : -1;
-      return 0;
-    });
-    return combined.slice(0, MAX_LEADERBOARD_ENTRIES).map((entry, idx) => ({
-      ...entry,
-      rank: idx + 1,
-    }));
-  }
-
-  getNextRival(referenceScore         = this.currentScore)                          {
-    const board = this.getLeaderboard();
-    const botsAhead = board.filter((e) => e.isBot && e.score > referenceScore);
-    if (botsAhead.length === 0) return null;
-    return botsAhead[botsAhead.length - 1];
-  }
-
   recordTrainSurvived(count         = 1)       {
     if (!Number.isFinite(count) || count <= 0) return;
-    this.trainsSurvived += Math.floor(count);
+    this.achievements.recordTrainSurvived(count);
     this.evaluateAchievements();
     this.saveToStorage();
   }
 
   getTrainsSurvived()         {
-    return this.trainsSurvived;
+    return this.achievements.getTrainsSurvived();
   }
 
   unlockAchievement(id               , date         )          {
-    if (this.unlockedAchievements.has(id)) return false;
-    this.unlockedAchievements.add(id);
-    this.achievementDates.set(id, date ?? new Date().toISOString().slice(0, 10));
-    this.saveToStorage();
-    return true;
+    const success = this.achievements.unlock(id, date);
+    if (success) {
+      this.saveToStorage();
+    }
+    return success;
   }
 
   isAchievementUnlocked(id               )          {
-    return this.unlockedAchievements.has(id);
+    return this.achievements.isUnlocked(id);
   }
 
   getAchievements()                {
-    return ACHIEVEMENT_DEFINITIONS.map((def) => ({
-      ...def,
-      unlocked: this.unlockedAchievements.has(def.id),
-      unlockedAt: this.achievementDates.get(def.id),
-    }));
-  }
-
-          evaluateAchievements()       {
-    if (this.currentScore >= 50 || this.highScore >= 50) {
-      this.unlockedAchievements.add('first_50_steps');
-    }
-    if (this.unlockedSkins.length >= ALL_SKINS.length) {
-      this.unlockedAchievements.add('collector');
-    }
-    if (this.trainsSurvived >= 5) {
-      this.unlockedAchievements.add('train_conqueror');
-    }
-    if (this.coins >= 200) {
-      this.unlockedAchievements.add('rich_hopper');
-    }
-    const topBotScore = DEFAULT_BOT_RIVALS[0]?.score ?? 250;
-    if (this.highScore > topBotScore) {
-      this.unlockedAchievements.add('leaderboard_champion');
-    }
-  }
-
-  resetCurrentScore()       {
-    if (this.currentScore > 0) {
-      this.recordRun(this.currentScore);
-    }
-    this.currentScore = 0;
+    return this.achievements.getAchievements();
   }
 }
 
 // --- Module: src/core/laneGenerator.ts ---
-export { Biome, BIOME_INTERVAL, BIOME_ORDER, getBiomeForScore,                };
-
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
 const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGenerator {
                    baseSeed        ;
@@ -3074,497 +3353,528 @@ class SceneManager {
   }
 }
 
-// --- Module: src/main.ts ---
-const container = document.getElementById('game-container') ;
-const scoreEl = document.getElementById('score-value') ;
-const coinsEl = document.getElementById('coins-value') ;
-const pauseBtn = document.getElementById('pause-btn') ;
-const warningVignetteEl = document.getElementById('warning-vignette');
-
-// Main Menu Elements
-const mainMenuModal = document.getElementById('main-menu-modal') ;
-const menuPlayBtn = document.getElementById('menu-play-btn') ;
-const menuGachaBtn = document.getElementById('menu-gacha-btn') ;
-const menuLeaderboardBtn = document.getElementById('menu-leaderboard-btn') ;
-const menuSettingsBtn = document.getElementById('menu-settings-btn') ;
-const menuHighScoreEl = document.getElementById('menu-high-score') ;
-const menuCoinsEl = document.getElementById('menu-coins') ;
-
-// Pause Modal Elements
-const pauseModal = document.getElementById('pause-modal') ;
-const pauseResumeBtn = document.getElementById('pause-resume-btn') ;
-const pauseSettingsBtn = document.getElementById('pause-settings-btn') ;
-const pauseMenuBtn = document.getElementById('pause-menu-btn') ;
-
-// Settings Modal Elements
-const settingsModal = document.getElementById('settings-modal') ;
-const settingSoundToggle = document.getElementById('setting-sound-toggle')                           ;
-const settingMusicToggle = document.getElementById('setting-music-toggle')                           ;
-const settingsCloseBtn = document.getElementById('settings-close-btn') ;
-const toastContainerEl = document.getElementById('toast-container');
-
-// Gacha Modal Elements
-const gachaModal = document.getElementById('gacha-modal') ;
-const gachaModalRollBtn = document.getElementById('gacha-modal-roll-btn') ;
-const gachaModalCloseBtn = document.getElementById('gacha-modal-close-btn') ;
-const gachaModalCoinsEl = document.getElementById('gacha-modal-coins') ;
-const gachaModalStatusEl = document.getElementById('gacha-modal-status') ;
-const gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list') ;
-
-// Leaderboard Modal Elements
-const leaderboardModal = document.getElementById('leaderboard-modal') ;
-const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn') ;
-const leaderboardBestScoreEl = document.getElementById('leaderboard-best-score') ;
-const leaderboardNameInput = document.getElementById('leaderboard-name-input')                           ;
-const leaderboardSaveNameBtn = document.getElementById('leaderboard-save-name-btn');
-const leaderboardRowsEl = document.getElementById('leaderboard-rows');
-
-// Game Over Modal Elements
-const gameOverModal = document.getElementById('game-over-modal') ;
-const deathReasonEl = document.getElementById('death-reason') ;
-const restartBtn = document.getElementById('restart-btn') ;
-const toMenuBtn = document.getElementById('to-menu-btn') ;
-
-const urlSeed = Number(new URLSearchParams(window.location.search).get('seed'));
-const initialSeed = Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : Date.now();
-
-const engine = new GameEngine(initialSeed, window.localStorage);
-const sceneManager = new SceneManager(container);
-const audio = new AudioSynth();
-
-let isPlaying = false;
-let isPaused = false;
-let wasDead = false;
-let lastCoins = engine.getCoins();
-let runStartHighScore = engine.getHighScore();
-let notifiedNewHighScoreThisRun = false;
-let settingsReturnTo                   = 'menu';
-
-const unlockedAchievements = new Set        (
-  JSON.parse(localStorage.getItem('crossy_road_pro_achievements_v1') || '[]')
-);
-
-function showToast(icon        , title        , desc        )       {
-  if (!toastContainerEl) return;
-  const item = document.createElement('div');
-  item.className = 'toast-item';
-  item.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-desc">${desc}</div></div>`;
-  toastContainerEl.appendChild(item);
-  setTimeout(() => { item.remove(); }, 3600);
-}
-
-function unlockAchievement(id        , icon        , title        , desc        )       {
-  if (unlockedAchievements.has(id)) return;
-  unlockedAchievements.add(id);
-  localStorage.setItem('crossy_road_pro_achievements_v1', JSON.stringify(Array.from(unlockedAchievements)));
-  showToast(icon, `Достижение: ${title}`, desc);
-}
-
-// Background Music Controller (delegates to AudioSynth if supported, with WebAudio fallback)
-const audioAny = audio                                      ;
-let musicEnabled = typeof audioAny.isMusicEnabled === 'function'
-  ? Boolean((audioAny.isMusicEnabled                 )())
-  : localStorage.getItem('crossy_setting_music') !== 'false';
-let bgmInterval                = null;
-let bgmNoteIdx = 0;
-const BGM_NOTES = [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66, 349.23];
-
-function syncBackgroundMusic()       {
-  if (typeof audioAny.setMusicEnabled === 'function') {
-    (audioAny.setMusicEnabled                        )(musicEnabled);
-    return;
-  }
-  if (bgmInterval !== null) {
-    window.clearInterval(bgmInterval);
-    bgmInterval = null;
-  }
-  if (!musicEnabled || !audio.isSoundEnabled()) return;
-  bgmInterval = window.setInterval(() => {
-    if (!isPlaying || isPaused || !musicEnabled || !audio.isSoundEnabled()) return;
-    const AudioCtx = window.AudioContext || (window                                                          ).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = (audio                                     ).ctx;
-    if (!ctx || ctx.state !== 'running') return;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(BGM_NOTES[bgmNoteIdx % BGM_NOTES.length], ctx.currentTime);
-    bgmNoteIdx += 1;
-    gain.gain.setValueAtTime(0.035, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.002, ctx.currentTime + 0.28);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
-  }, 340);
-}
-
-if (settingSoundToggle) {
-  settingSoundToggle.checked = audio.isSoundEnabled();
-  settingSoundToggle.addEventListener('change', () => {
-    audio.setSoundEnabled(settingSoundToggle.checked);
-    syncBackgroundMusic();
-  });
-}
-
-if (settingMusicToggle) {
-  settingMusicToggle.checked = musicEnabled;
-  settingMusicToggle.addEventListener('change', () => {
-    musicEnabled = settingMusicToggle.checked;
-    localStorage.setItem('crossy_setting_music', String(musicEnabled));
-    syncBackgroundMusic();
-  });
-}
-syncBackgroundMusic();
-
-const tracker = engine.getScoreTracker();
-let playerName = tracker.getPlayerName() || 'Игрок';
-if (leaderboardNameInput) leaderboardNameInput.value = playerName;
-
-function recordRunToLeaderboard(score        )       {
-  if (score <= 0) return;
-  const runRes = tracker.recordRun(score);
-  if (runRes.overtakenBots.length > 0) {
-    showToast('🏁', 'Соперник позади!', `Вы обошли: ${runRes.overtakenBots.slice(0, 2).join(', ')}`);
-  }
-  for (const ach of tracker.getAchievements()) {
-    if (ach.unlocked) {
-      unlockAchievement(ach.id, ach.badge, ach.title, ach.description);
-    }
-  }
-}
-
-function renderLeaderboardUI()       {
-  if (!leaderboardRowsEl) return;
-  const entries = tracker.getLeaderboard();
-  leaderboardRowsEl.innerHTML = entries
-    .slice(0, 8)
-    .map((entry) => {
-      const skinMeta = ALL_SKINS.find((s) => s.id === entry.skinId);
-      const badge = skinMeta?.badge ?? (entry.isBot ? '🤖' : '👤');
-      return `
-      <div class="lb-row ${!entry.isBot ? 'current-player' : ''}">
-        <span>#${entry.rank} ${!entry.isBot ? '(Вы)' : ''}</span>
-        <span>${badge} ${entry.playerName}</span>
-        <span>${entry.score}</span>
-      </div>
-    `;
-    })
-    .join('');
-}
-
-if (leaderboardSaveNameBtn && leaderboardNameInput) {
-  leaderboardSaveNameBtn.addEventListener('click', () => {
-    const clean = leaderboardNameInput.value.trim().slice(0, 18) || 'Игрок';
-    playerName = clean;
-    leaderboardNameInput.value = clean;
-    tracker.setPlayerName(clean);
-    renderLeaderboardUI();
-    showToast('👤', 'Профиль обновлён', `Имя игрока сохранено: ${clean}`);
-  });
-}
-
-function updateMenuStats()       {
-  if (menuHighScoreEl) menuHighScoreEl.textContent = String(engine.getHighScore());
-  if (menuCoinsEl) menuCoinsEl.textContent = String(engine.getCoins());
-  if (leaderboardBestScoreEl) leaderboardBestScoreEl.textContent = String(engine.getHighScore());
-  renderLeaderboardUI();
-}
-
+// --- Module: src/app/uiManager.ts ---
 const UI_SKIN_RARITY                                                 = {
   chicken: { label: 'Обычный', css: 'rarity-common' },
   cyber_duck: { label: 'Редкий', css: 'rarity-rare' },
   shadow_ninja: { label: 'Эпический', css: 'rarity-epic' },
   frost_penguin: { label: 'Легендарный', css: 'rarity-legendary' },
 };
+class UIManager {
+  // HUD
+                   scoreEl                    ;
+                   coinsEl                    ;
+                   pauseBtn                    ;
+                   warningVignetteEl                    ;
+                   toastContainerEl                    ;
 
-function renderSkinsUI()       {
-  const unlocked = engine.getUnlockedSkins();
-  const active = engine.getSelectedSkin();
+  // Modals
+                   mainMenuModal                    ;
+                   pauseModal                    ;
+                   settingsModal                    ;
+                   gachaModal                    ;
+                   leaderboardModal                    ;
+                   gameOverModal                    ;
 
-  if (gachaModalSkinListEl) {
-    gachaModalSkinListEl.innerHTML = '';
+  // Buttons & Controls
+                   menuPlayBtn                    ;
+                   menuGachaBtn                    ;
+                   menuLeaderboardBtn                    ;
+                   menuSettingsBtn                    ;
+                   menuHighScoreEl                    ;
+                   menuCoinsEl                    ;
+
+                   pauseResumeBtn                    ;
+                   pauseSettingsBtn                    ;
+                   pauseMenuBtn                    ;
+
+                   settingSoundToggle                         ;
+                   settingMusicToggle                         ;
+                   settingsCloseBtn                    ;
+
+                   gachaModalRollBtn                    ;
+                   gachaModalCloseBtn                    ;
+                   gachaModalCoinsEl                    ;
+                   gachaModalStatusEl                    ;
+                   gachaModalSkinListEl                    ;
+
+                   leaderboardCloseBtn                    ;
+                   leaderboardBestScoreEl                    ;
+                   leaderboardNameInput                         ;
+                   leaderboardSaveNameBtn                    ;
+                   leaderboardRowsEl                    ;
+
+                   deathReasonEl                    ;
+                   restartBtn                    ;
+                   toMenuBtn                    ;
+
+  // State
+          lastScore = -1;
+          lastCoins = -1;
+          settingsReturnTo                   = 'menu';
+
+  constructor() {
+    this.scoreEl = document.getElementById('score-value');
+    this.coinsEl = document.getElementById('coins-value');
+    this.pauseBtn = document.getElementById('pause-btn');
+    this.warningVignetteEl = document.getElementById('warning-vignette');
+    this.toastContainerEl = document.getElementById('toast-container');
+
+    this.mainMenuModal = document.getElementById('main-menu-modal');
+    this.pauseModal = document.getElementById('pause-modal');
+    this.settingsModal = document.getElementById('settings-modal');
+    this.gachaModal = document.getElementById('gacha-modal');
+    this.leaderboardModal = document.getElementById('leaderboard-modal');
+    this.gameOverModal = document.getElementById('game-over-modal');
+
+    this.menuPlayBtn = document.getElementById('menu-play-btn');
+    this.menuGachaBtn = document.getElementById('menu-gacha-btn');
+    this.menuLeaderboardBtn = document.getElementById('menu-leaderboard-btn');
+    this.menuSettingsBtn = document.getElementById('menu-settings-btn');
+    this.menuHighScoreEl = document.getElementById('menu-high-score');
+    this.menuCoinsEl = document.getElementById('menu-coins');
+
+    this.pauseResumeBtn = document.getElementById('pause-resume-btn');
+    this.pauseSettingsBtn = document.getElementById('pause-settings-btn');
+    this.pauseMenuBtn = document.getElementById('pause-menu-btn');
+
+    this.settingSoundToggle = document.getElementById('setting-sound-toggle')                           ;
+    this.settingMusicToggle = document.getElementById('setting-music-toggle')                           ;
+    this.settingsCloseBtn = document.getElementById('settings-close-btn');
+
+    this.gachaModalRollBtn = document.getElementById('gacha-modal-roll-btn');
+    this.gachaModalCloseBtn = document.getElementById('gacha-modal-close-btn');
+    this.gachaModalCoinsEl = document.getElementById('gacha-modal-coins');
+    this.gachaModalStatusEl = document.getElementById('gacha-modal-status');
+    this.gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list');
+
+    this.leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
+    this.leaderboardBestScoreEl = document.getElementById('leaderboard-best-score');
+    this.leaderboardNameInput = document.getElementById('leaderboard-name-input')                           ;
+    this.leaderboardSaveNameBtn = document.getElementById('leaderboard-save-name-btn');
+    this.leaderboardRowsEl = document.getElementById('leaderboard-rows');
+
+    this.deathReasonEl = document.getElementById('death-reason');
+    this.restartBtn = document.getElementById('restart-btn');
+    this.toMenuBtn = document.getElementById('to-menu-btn');
+
+    this.setupInternalNavigation();
+  }
+
+          setupInternalNavigation()       {
+    this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
+    this.gachaModalCloseBtn?.addEventListener('click', () => this.closeGacha());
+    this.menuLeaderboardBtn?.addEventListener('click', () => this.openLeaderboard());
+    this.leaderboardCloseBtn?.addEventListener('click', () => this.closeLeaderboard());
+    this.menuSettingsBtn?.addEventListener('click', () => this.openSettings('menu'));
+    this.pauseSettingsBtn?.addEventListener('click', () => {
+      this.closePause();
+      this.openSettings('pause');
+    });
+    this.settingsCloseBtn?.addEventListener('click', () => this.closeSettings());
+  }
+
+  hideAllModals()       {
+    this.mainMenuModal?.classList.add('hidden');
+    this.pauseModal?.classList.add('hidden');
+    this.settingsModal?.classList.add('hidden');
+    this.gachaModal?.classList.add('hidden');
+    this.leaderboardModal?.classList.add('hidden');
+    this.gameOverModal?.classList.add('hidden');
+  }
+
+  openMainMenu()       {
+    this.hideAllModals();
+    this.mainMenuModal?.classList.remove('hidden');
+  }
+
+  closeMainMenu()       {
+    this.mainMenuModal?.classList.add('hidden');
+  }
+
+  openPause()       {
+    this.pauseModal?.classList.remove('hidden');
+  }
+
+  closePause()       {
+    this.pauseModal?.classList.add('hidden');
+  }
+
+  openSettings(returnTo                   = 'menu')       {
+    this.settingsReturnTo = returnTo;
+    this.settingsModal?.classList.remove('hidden');
+  }
+
+  closeSettings()                   {
+    this.settingsModal?.classList.add('hidden');
+    if (this.settingsReturnTo === 'pause') {
+      this.pauseModal?.classList.remove('hidden');
+    } else {
+      this.mainMenuModal?.classList.remove('hidden');
+    }
+    return this.settingsReturnTo;
+  }
+
+  openGacha()       {
+    this.gachaModal?.classList.remove('hidden');
+  }
+
+  closeGacha()       {
+    this.gachaModal?.classList.add('hidden');
+  }
+
+  openLeaderboard()       {
+    this.leaderboardModal?.classList.remove('hidden');
+  }
+
+  closeLeaderboard()       {
+    this.leaderboardModal?.classList.add('hidden');
+  }
+
+  showGameOver(reasonText        )       {
+    if (this.deathReasonEl) {
+      this.deathReasonEl.textContent = reasonText;
+    }
+    this.gameOverModal?.classList.remove('hidden');
+  }
+
+  isMainMenuOpen()          {
+    return Boolean(this.mainMenuModal && !this.mainMenuModal.classList.contains('hidden'));
+  }
+
+  isPauseOpen()          {
+    return Boolean(this.pauseModal && !this.pauseModal.classList.contains('hidden'));
+  }
+
+  isSettingsOpen()          {
+    return Boolean(this.settingsModal && !this.settingsModal.classList.contains('hidden'));
+  }
+
+  isGachaOpen()          {
+    return Boolean(this.gachaModal && !this.gachaModal.classList.contains('hidden'));
+  }
+
+  isLeaderboardOpen()          {
+    return Boolean(this.leaderboardModal && !this.leaderboardModal.classList.contains('hidden'));
+  }
+
+  isGameOverOpen()          {
+    return Boolean(this.gameOverModal && !this.gameOverModal.classList.contains('hidden'));
+  }
+
+  updateScore(score        )       {
+    if (this.lastScore === score) return;
+    this.lastScore = score;
+    if (this.scoreEl) {
+      this.scoreEl.textContent = String(score);
+    }
+  }
+
+  updateCoins(coins        )       {
+    if (this.lastCoins === coins) return;
+    this.lastCoins = coins;
+    if (this.coinsEl) {
+      this.coinsEl.textContent = String(coins);
+    }
+  }
+
+  setWarningVignette(graceRatio        )       {
+    if (!this.warningVignetteEl) return;
+    if (graceRatio > 0) {
+      const opacity = Math.min(1, Math.max(0.3, 0.3 + graceRatio * 0.7));
+      this.warningVignetteEl.style.opacity = String(opacity);
+    } else {
+      this.warningVignetteEl.style.opacity = '0';
+    }
+  }
+
+  showToast(icon        , title        , desc        , durationMs = 3600)       {
+    if (!this.toastContainerEl) return;
+    const item = document.createElement('div');
+    item.className = 'toast-item';
+    item.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-desc">${desc}</div></div>`;
+    this.toastContainerEl.appendChild(item);
+    window.setTimeout(() => {
+      item.remove();
+    }, durationMs);
+  }
+
+  updateGachaStatus(message        )       {
+    if (this.gachaModalStatusEl) {
+      this.gachaModalStatusEl.textContent = message;
+    }
+  }
+
+  updateMenuStats(highScore        , coins        )       {
+    if (this.menuHighScoreEl) this.menuHighScoreEl.textContent = String(highScore);
+    if (this.menuCoinsEl) this.menuCoinsEl.textContent = String(coins);
+    if (this.leaderboardBestScoreEl) this.leaderboardBestScoreEl.textContent = String(highScore);
+    if (this.gachaModalCoinsEl) this.gachaModalCoinsEl.textContent = String(coins);
+  }
+
+  renderLeaderboard(entries                    )       {
+    if (!this.leaderboardRowsEl) return;
+    this.leaderboardRowsEl.innerHTML = entries
+      .slice(0, 8)
+      .map((entry) => {
+        const skinMeta = ALL_SKINS.find((s) => s.id === entry.skinId);
+        const badge = skinMeta?.badge ?? (entry.isBot ? '🤖' : '👤');
+        return `
+      <div class="lb-row ${!entry.isBot ? 'current-player' : ''}">
+        <span>#${entry.rank} ${!entry.isBot ? '(Вы)' : ''}</span>
+        <span>${badge} ${entry.playerName}</span>
+        <span>${entry.score}</span>
+      </div>
+    `;
+      })
+      .join('');
+  }
+
+  renderSkins(unlocked          , selected        , onSelectSkin                      )       {
+    if (!this.gachaModalSkinListEl) return;
+    this.gachaModalSkinListEl.innerHTML = '';
+
     ALL_SKINS.forEach((skin) => {
       const isUnlocked = unlocked.includes(skin.id);
       const rarity = UI_SKIN_RARITY[skin.id] ?? { label: 'Эпический', css: 'rarity-epic' };
       const card = document.createElement('div');
-      card.className = `gacha-skin-card ${active === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
+      card.className = `gacha-skin-card ${selected === skin.id ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
       card.innerHTML = `
         <div class="rarity-badge ${rarity.css}">${rarity.label}</div>
         <div class="gacha-skin-badge">${isUnlocked ? skin.badge : '🔒'}</div>
         <div class="gacha-skin-name">${isUnlocked ? skin.name : 'Секретный скин'}</div>
-        <div class="gacha-skin-tag">${active === skin.id ? 'ВЫБРАН' : isUnlocked ? 'ДОСТУПЕН' : 'ЗАКРЫТ'}</div>
+        <div class="gacha-skin-tag">${selected === skin.id ? 'ВЫБРАН' : isUnlocked ? 'ДОСТУПЕН' : 'ЗАКРЫТ'}</div>
       `;
       if (isUnlocked) {
-        card.addEventListener('click', () => {
-          if (engine.selectSkin(skin.id)) {
-            audio.playSkinVoice(skin.id);
-            renderSkinsUI();
-          }
-        });
+        card.addEventListener('click', () => onSelectSkin(skin.id));
       }
-      gachaModalSkinListEl.appendChild(card);
+      this.gachaModalSkinListEl?.appendChild(card);
     });
   }
 
-  if (gachaModalCoinsEl) gachaModalCoinsEl.textContent = String(engine.getCoins());
-  if (gachaModalRollBtn) {
-    gachaModalRollBtn.textContent = `Крутить за ${WORLD_CONFIG.GACHA_COST} 🪙`;
-    (gachaModalRollBtn                     ).disabled = false;
-  }
-  updateMenuStats();
-}
+  bindActions(handlers           )       {
+    this.menuPlayBtn?.addEventListener('click', handlers.onPlay);
+    this.pauseBtn?.addEventListener('click', handlers.onPause);
+    this.pauseResumeBtn?.addEventListener('click', handlers.onResume);
+    this.pauseMenuBtn?.addEventListener('click', handlers.onToMenu);
+    this.toMenuBtn?.addEventListener('click', handlers.onToMenu);
+    this.restartBtn?.addEventListener('click', handlers.onRestart);
+    this.gachaModalRollBtn?.addEventListener('click', handlers.onRollGacha);
 
-function handleGachaRoll()       {
-  const res = engine.rollGacha();
-  if (res.success && res.skinId) {
-    audio.playGachaRoll();
-    const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
-    audio.playGachaUnlock(isRare);
-    const meta = ALL_SKINS.find((s) => s.id === res.skinId);
-    const rarity = UI_SKIN_RARITY[res.skinId] ?? { label: 'Эпический', css: 'rarity-epic' };
-    if (res.isDuplicate) {
-      const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
-      if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
-      showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
-    } else {
-      const msg = `🎉 Выбит скин (${rarity.label}): ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
-      if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
-      showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
+    this.leaderboardSaveNameBtn?.addEventListener('click', () => {
+      const raw = this.leaderboardNameInput?.value ?? '';
+      const clean = raw.trim().slice(0, 18) || 'Игрок';
+      if (this.leaderboardNameInput) {
+        this.leaderboardNameInput.value = clean;
+      }
+      handlers.onSaveName(clean);
+    });
+
+    this.settingSoundToggle?.addEventListener('change', () => {
+      if (this.settingSoundToggle) {
+        handlers.onToggleSound(this.settingSoundToggle.checked);
+      }
+    });
+
+    this.settingMusicToggle?.addEventListener('change', () => {
+      if (this.settingMusicToggle) {
+        handlers.onToggleMusic(this.settingMusicToggle.checked);
+      }
+    });
+  }
+
+  setSoundToggle(enabled         )       {
+    if (this.settingSoundToggle) {
+      this.settingSoundToggle.checked = enabled;
     }
-    unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
-    if (engine.getUnlockedSkins().length >= ALL_SKINS.length) {
-      unlockAchievement('gacha_all', '👑', 'Полная коллекция', 'Собраны все воксельные скины!');
+  }
+
+  setMusicToggle(enabled         )       {
+    if (this.settingMusicToggle) {
+      this.settingMusicToggle.checked = enabled;
     }
-    lastCoins = engine.getCoins();
-    renderSkinsUI();
-  } else {
-    const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${engine.getCoins()} 🪙)`;
-    if (gachaModalStatusEl) gachaModalStatusEl.textContent = msg;
   }
-}
 
-if (gachaModalRollBtn) gachaModalRollBtn.addEventListener('click', handleGachaRoll);
-
-function openMainMenu()       {
-  isPlaying = false;
-  isPaused = false;
-  mainMenuModal.classList.remove('hidden');
-  pauseModal.classList.add('hidden');
-  gameOverModal.classList.add('hidden');
-  gachaModal.classList.add('hidden');
-  leaderboardModal.classList.add('hidden');
-  settingsModal.classList.add('hidden');
-  updateMenuStats();
-}
-
-function startGame()       {
-  mainMenuModal.classList.add('hidden');
-  pauseModal.classList.add('hidden');
-  gameOverModal.classList.add('hidden');
-  gachaModal.classList.add('hidden');
-  leaderboardModal.classList.add('hidden');
-  settingsModal.classList.add('hidden');
-  wasDead = false;
-  isPaused = false;
-  runStartHighScore = engine.getHighScore();
-  notifiedNewHighScoreThisRun = false;
-  sceneManager.clearAll();
-  engine.reset(Date.now());
-  lastCoins = engine.getCoins();
-  isPlaying = true;
-  renderSkinsUI();
-}
-
-function pauseGame()       {
-  if (!isPlaying || engine.getPlayer().isDead || isPaused) return;
-  isPaused = true;
-  pauseModal.classList.remove('hidden');
-}
-
-function resumeGame()       {
-  if (!isPaused) return;
-  isPaused = false;
-  pauseModal.classList.add('hidden');
-  lastTime = performance.now();
-}
-
-function openSettings(from                  )       {
-  settingsReturnTo = from;
-  settingsModal.classList.remove('hidden');
-}
-
-function closeSettings()       {
-  settingsModal.classList.add('hidden');
-  if (settingsReturnTo === 'pause') {
-    pauseModal.classList.remove('hidden');
-  } else {
-    mainMenuModal.classList.remove('hidden');
-  }
-}
-
-if (menuPlayBtn) menuPlayBtn.addEventListener('click', startGame);
-
-if (menuGachaBtn) {
-  menuGachaBtn.addEventListener('click', () => {
-    if (gachaModalStatusEl) gachaModalStatusEl.textContent = `1 прокрут = ${WORLD_CONFIG.GACHA_COST} монет`;
-    gachaModal.classList.remove('hidden');
-    renderSkinsUI();
-  });
-}
-
-if (gachaModalCloseBtn) {
-  gachaModalCloseBtn.addEventListener('click', () => {
-    gachaModal.classList.add('hidden');
-  });
-}
-
-if (menuLeaderboardBtn) {
-  menuLeaderboardBtn.addEventListener('click', () => {
-    leaderboardModal.classList.remove('hidden');
-    updateMenuStats();
-  });
-}
-
-if (leaderboardCloseBtn) {
-  leaderboardCloseBtn.addEventListener('click', () => {
-    leaderboardModal.classList.add('hidden');
-  });
-}
-
-if (menuSettingsBtn) {
-  menuSettingsBtn.addEventListener('click', () => openSettings('menu'));
-}
-
-if (pauseBtn) pauseBtn.addEventListener('click', pauseGame);
-if (pauseResumeBtn) pauseResumeBtn.addEventListener('click', resumeGame);
-if (pauseSettingsBtn) pauseSettingsBtn.addEventListener('click', () => {
-  pauseModal.classList.add('hidden');
-  openSettings('pause');
-});
-if (pauseMenuBtn) pauseMenuBtn.addEventListener('click', openMainMenu);
-
-if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettings);
-
-if (toMenuBtn) toMenuBtn.addEventListener('click', openMainMenu);
-if (restartBtn) restartBtn.addEventListener('click', startGame);
-
-function triggerMove(dir                                                  )       {
-  if (!isPlaying || isPaused || engine.getPlayer().isDead) return;
-  const targetRow = engine.getPlayer().row + (dir === MoveDirection.FORWARD ? 1 : dir === MoveDirection.BACKWARD ? -1 : 0);
-  const lane = engine.getLane(targetRow);
-  let surface                                    = 'grass';
-  if (lane.type === 'ROAD') surface = 'road';
-  else if (lane.type === 'RIVER') surface = 'log';
-  else if (lane.type === 'RAILWAY') surface = 'rail';
-
-  if (engine.queueMove(dir)) {
-    audio.playHop(engine.getComboMultiplier(), surface);
-    audio.playSkinVoice(engine.getSelectedSkin());
-  }
-}
-
-window.addEventListener('keydown', (e) => {
-  // If settings modal is open
-  if (!settingsModal.classList.contains('hidden')) {
-    if (e.code === 'Escape' || e.code === 'Enter') {
-      e.preventDefault();
-      closeSettings();
+  setPlayerName(name        )       {
+    if (this.leaderboardNameInput) {
+      this.leaderboardNameInput.value = name;
     }
-    return;
   }
 
-  // If pause modal is open
-  if (!pauseModal.classList.contains('hidden')) {
-    if (e.code === 'Escape' || e.code === 'KeyP' || e.code === 'Space' || e.code === 'Enter') {
-      e.preventDefault();
-      resumeGame();
+  getPlayerName()         {
+    return this.leaderboardNameInput?.value.trim().slice(0, 18) || 'Игрок';
+  }
+
+  isNameInputFocused()          {
+    return document.activeElement === this.leaderboardNameInput;
+  }
+
+  blurNameInput()       {
+    this.leaderboardNameInput?.blur();
+  }
+
+  clickSaveName()       {
+    this.leaderboardSaveNameBtn?.click();
+  }
+
+  clickRollGacha()       {
+    this.gachaModalRollBtn?.click();
+  }
+
+  setGachaRollButtonText(text        )       {
+    if (this.gachaModalRollBtn) {
+      this.gachaModalRollBtn.textContent = text;
     }
-    return;
+  }
+}
+
+// --- Module: src/app/inputManager.ts ---
+class InputManager {
+                   callbacks                ;
+                   modalState                    ;
+          isAttached = false;
+
+  constructor(callbacks                , modalState                    ) {
+    this.callbacks = callbacks;
+    this.modalState = modalState;
   }
 
-  // If in game, Escape or 'P' toggles pause
-  if (isPlaying && !engine.getPlayer().isDead) {
-    if (e.code === 'Escape' || e.code === 'KeyP') {
-      e.preventDefault();
-      pauseGame();
+         attach()       {
+    if (this.isAttached) return;
+    window.addEventListener('keydown', this.handleKeyDown);
+    this.isAttached = true;
+  }
+
+         detach()       {
+    if (!this.isAttached) return;
+    window.removeEventListener('keydown', this.handleKeyDown);
+    this.isAttached = false;
+  }
+
+         handleKeyDown = (e               )       => {
+    if (this.callbacks.isInputBlocked?.()) {
       return;
     }
-  }
 
-  // If Main Menu is open
-  if (!mainMenuModal.classList.contains('hidden')) {
-    if (e.code === 'Space' || e.code === 'Enter') {
-      e.preventDefault();
-      startGame();
-    }
-    return;
-  }
-
-  // If Gacha modal is open
-  if (!gachaModal.classList.contains('hidden')) {
-    if (e.code === 'Escape') {
-      gachaModal.classList.add('hidden');
-    } else if (e.code === 'KeyG' || e.code === 'Enter') {
-      handleGachaRoll();
-    }
-    return;
-  }
-
-  // If Leaderboard modal is open
-  if (!leaderboardModal.classList.contains('hidden')) {
-    if (document.activeElement === leaderboardNameInput) {
-      if (e.code === 'Enter' && leaderboardSaveNameBtn) {
+    // Modal priority: Settings -> Pause -> Gacha -> Leaderboard -> Main Menu -> Game Over
+    if (this.modalState.isSettingsOpen()) {
+      if (e.code === 'Escape' || e.code === 'Enter') {
         e.preventDefault();
-        leaderboardSaveNameBtn.click();
-        leaderboardNameInput?.blur();
-      } else if (e.code === 'Escape') {
-        leaderboardNameInput?.blur();
+        this.callbacks.onCloseModal();
       }
       return;
     }
-    if (e.code === 'Escape' || e.code === 'Enter') {
-      leaderboardModal.classList.add('hidden');
+
+    if (this.modalState.isPauseOpen()) {
+      if (e.code === 'Escape' || e.code === 'KeyP' || e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onResumeGame();
+      }
+      return;
     }
-    return;
-  }
 
-  // Game over state
-  if (engine.getPlayer().isDead) {
-    if (e.code === 'Space' || e.code === 'Enter') {
-      startGame();
-    } else if (e.code === 'Escape') {
-      openMainMenu();
+    if (this.modalState.isGachaOpen()) {
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      } else if (e.code === 'KeyG' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onGachaRoll();
+      }
+      return;
     }
-    return;
-  }
 
-  // Active gameplay movement
-  switch (e.code) {
-    case 'KeyW':
-    case 'ArrowUp':
-    case 'Space':
-      e.preventDefault();
-      triggerMove(MoveDirection.FORWARD);
-      break;
-    case 'KeyS':
-    case 'ArrowDown':
-      e.preventDefault();
-      triggerMove(MoveDirection.BACKWARD);
-      break;
-    case 'KeyA':
-    case 'ArrowLeft':
-      e.preventDefault();
-      triggerMove(MoveDirection.LEFT);
-      break;
-    case 'KeyD':
-    case 'ArrowRight':
-      e.preventDefault();
-      triggerMove(MoveDirection.RIGHT);
-      break;
-  }
-});
+    if (this.modalState.isLeaderboardOpen()) {
+      if (this.modalState.isNameInputFocused?.()) {
+        if (e.code === 'Enter') {
+          e.preventDefault();
+          this.callbacks.onSavePlayerName?.();
+        } else if (e.code === 'Escape') {
+          e.preventDefault();
+          this.callbacks.onCloseModal();
+        }
+        return;
+      }
 
+      if (e.code === 'Escape' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      }
+      return;
+    }
+
+    if (this.modalState.isMainMenuOpen()) {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onStartGame();
+      }
+      return;
+    }
+
+    if (this.modalState.isGameOverOpen()) {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onRestartGame();
+      } else if (e.code === 'Escape') {
+        e.preventDefault();
+        this.callbacks.onToMenu();
+      }
+      return;
+    }
+
+    if (this.modalState.isNameInputFocused?.()) {
+      if (e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onSavePlayerName?.();
+      }
+      return;
+    }
+
+    if (!this.modalState.isPlaying()) {
+      return;
+    }
+
+    // In-game pause toggle
+    if (e.code === 'Escape' || e.code === 'KeyP') {
+      e.preventDefault();
+      this.callbacks.onPauseGame();
+      return;
+    }
+
+    // Active gameplay movement
+    switch (e.code) {
+      case 'KeyW':
+      case 'ArrowUp':
+      case 'Space':
+        e.preventDefault();
+        this.callbacks.onMove(MoveDirection.FORWARD);
+        break;
+      case 'KeyS':
+      case 'ArrowDown':
+        e.preventDefault();
+        this.callbacks.onMove(MoveDirection.BACKWARD);
+        break;
+      case 'KeyA':
+      case 'ArrowLeft':
+        e.preventDefault();
+        this.callbacks.onMove(MoveDirection.LEFT);
+        break;
+      case 'KeyD':
+      case 'ArrowRight':
+        e.preventDefault();
+        this.callbacks.onMove(MoveDirection.RIGHT);
+        break;
+    }
+  };
+
+         triggerMove(dir                    )       {
+    if (this.callbacks.isInputBlocked?.()) return;
+    if (!this.modalState.isPlaying()) return;
+    this.callbacks.onMove(dir);
+  }
+}
+
+// --- Module: src/app/gameLoop.ts ---
 const DEATH_LABELS                         = {
   [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
   [DeathReason.TRAIN]: 'Вас снёс скоростной экспресс на переезде!',
@@ -3572,75 +3882,349 @@ const DEATH_LABELS                         = {
   [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
   [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
 };
+class GameLoop {
+         isPlaying = false;
+         isPaused = false;
+         wasDead = false;
 
-let lastTime = performance.now();
+                   engine            ;
+                   sceneManager              ;
+                   audio            ;
+                   ui           ;
 
-function animate(now        )       {
-  const dt = Math.min((now - lastTime) / 1000, 0.1);
-  lastTime = now;
+          lastCoins        ;
+          runStartHighScore        ;
+          notifiedNewHighScoreThisRun = false;
+          lastTime = 0;
+                   unlockedAchievements = new Set        ();
 
-  if (isPlaying && !isPaused) {
-    engine.step(dt);
-  }
-  sceneManager.sync(engine, dt);
+  constructor(
+    engine            ,
+    sceneManager              ,
+    audio            ,
+    ui           
+  ) {
+    this.engine = engine;
+    this.sceneManager = sceneManager;
+    this.audio = audio;
+    this.ui = ui;
+    this.animate = this.animate.bind(this);
+    this.lastCoins = this.engine.getCoins();
+    this.runStartHighScore = this.engine.getHighScore();
 
-  const currentCoins = engine.getCoins();
-  if (currentCoins > lastCoins) {
-    audio.playCoin();
-    lastCoins = currentCoins;
-    if (currentCoins >= 25) unlockAchievement('coin_25', '🪙', 'Нумизмат', 'Собрано 25 монет!');
-    if (currentCoins >= 100) unlockAchievement('coin_100', '💰', 'Готов к Гаче', 'Накоплено 100 монет на прокрут!');
-    renderSkinsUI();
-  }
-
-  const currentScore = engine.getScore();
-  if (isPlaying && currentScore > 0) {
-    if (currentScore > runStartHighScore && runStartHighScore > 0 && !notifiedNewHighScoreThisRun) {
-      notifiedNewHighScoreThisRun = true;
-      audio.playNewHighScore();
-      showToast('🏆', 'Новый рекорд!', `Вы побили прошлый рекорд (${runStartHighScore})!`);
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('crossy_road_pro_achievements_v1');
+        if (raw) {
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr)) {
+            arr.forEach((id        ) => this.unlockedAchievements.add(id));
+          }
+        }
+      } catch {
+        // Safe fallback for corrupted storage
+      }
     }
-    if (currentScore >= 15) unlockAchievement('score_15', '🐣', 'Первые шаги', 'Набрано 15 очков за забег!');
-    if (currentScore >= 50) unlockAchievement('score_50', '🔥', 'Мастер трассы', 'Набрано 50 очков за забег!');
-    if (currentScore >= 100) unlockAchievement('score_100', '👑', 'Легенда перекрёстков', 'Набрано 100 очков!');
-    if (engine.getComboMultiplier() >= 3) unlockAchievement('combo_3', '⚡', 'Комбо x3', 'Максимальный темп прыжков!');
+
+    this.ui.setSoundToggle(this.audio.isSoundEnabled());
+    this.ui.setMusicToggle(this.audio.isMusicEnabled());
+    const playerName = this.engine.getScoreTracker().getPlayerName() || 'Игрок';
+    this.ui.setPlayerName(playerName);
   }
 
-  if (scoreEl) scoreEl.textContent = String(currentScore);
-  if (coinsEl) coinsEl.textContent = String(currentCoins);
+         getIsPlaying()          {
+    return this.isPlaying;
+  }
 
-  if (warningVignetteEl) {
-    if (isPlaying && !isPaused && !engine.getPlayer().isDead) {
-      const graceRatio = engine.getCameraGraceRatio();
-      warningVignetteEl.style.opacity = graceRatio > 0 ? String(0.3 + graceRatio * 0.7) : '0';
+         start()       {
+    this.lastTime = performance.now();
+    requestAnimationFrame(this.animate);
+  }
+
+         startGame()       {
+    this.ui.hideAllModals();
+    this.wasDead = false;
+    this.isPaused = false;
+    this.runStartHighScore = this.engine.getHighScore();
+    this.notifiedNewHighScoreThisRun = false;
+    this.sceneManager.clearAll();
+    this.engine.reset(Date.now());
+    this.lastCoins = this.engine.getCoins();
+    this.isPlaying = true;
+    this.lastTime = performance.now();
+    this.renderSkinsUI();
+    this.syncBackgroundMusic();
+  }
+
+         pauseGame()       {
+    if (!this.isPlaying || this.engine.getPlayer().isDead || this.isPaused) return;
+    this.isPaused = true;
+    this.ui.openPause();
+    this.syncBackgroundMusic();
+  }
+
+         resumeGame()       {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    this.ui.closePause();
+    this.lastTime = performance.now();
+    this.syncBackgroundMusic();
+  }
+
+         openMainMenu()       {
+    this.isPlaying = false;
+    this.isPaused = false;
+    this.ui.openMainMenu();
+    this.updateMenuStats();
+    this.syncBackgroundMusic();
+  }
+
+         triggerMove(dir                    )       {
+    if (!this.isPlaying || this.isPaused || this.engine.getPlayer().isDead) return;
+    const targetRow = this.engine.getPlayer().row + (dir === MoveDirection.FORWARD ? 1 : dir === MoveDirection.BACKWARD ? -1 : 0);
+    const lane = this.engine.getLane(targetRow);
+    let surface                                    = 'grass';
+    if (lane.type === 'ROAD') surface = 'road';
+    else if (lane.type === 'RIVER') surface = 'log';
+    else if (lane.type === 'RAILWAY') surface = 'rail';
+
+    if (this.engine.queueMove(dir)) {
+      this.audio.playHop(this.engine.getComboMultiplier(), surface);
+      this.audio.playSkinVoice(this.engine.getSelectedSkin());
+    }
+  }
+
+         handleGachaRoll()       {
+    const res = this.engine.rollGacha();
+    if (res.success && res.skinId) {
+      this.audio.playGachaRoll();
+      const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
+      this.audio.playGachaUnlock(isRare);
+      const meta = ALL_SKINS.find((s) => s.id === res.skinId);
+      const rarity = UI_SKIN_RARITY[res.skinId] ?? { label: 'Эпический', css: 'rarity-epic' };
+      if (res.isDuplicate) {
+        const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
+        this.ui.updateGachaStatus(msg);
+        this.ui.showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
+      } else {
+        const msg = `🎉 Выбит скин (${rarity.label}): ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+        this.ui.updateGachaStatus(msg);
+        this.ui.showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
+      }
+      this.unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
+      if (this.engine.getUnlockedSkins().length >= ALL_SKINS.length) {
+        this.unlockAchievement('gacha_all', '👑', 'Полная коллекция', 'Собраны все воксельные скины!');
+      }
+      this.lastCoins = this.engine.getCoins();
+      this.renderSkinsUI();
     } else {
-      warningVignetteEl.style.opacity = '0';
+      const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${this.engine.getCoins()} 🪙)`;
+      this.ui.updateGachaStatus(msg);
     }
   }
 
-  const p = engine.getPlayer();
-  if (isPlaying && p.isDead && !wasDead) {
-    wasDead = true;
-    recordRunToLeaderboard(currentScore);
-    sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
-    if (p.deathReason === DeathReason.WATER) {
-      audio.playSplash();
+         savePlayerName(name        )       {
+    const clean = name.trim().slice(0, 18) || 'Игрок';
+    this.engine.getScoreTracker().setPlayerName(clean);
+    this.ui.setPlayerName(clean);
+    this.updateMenuStats();
+    this.ui.showToast('👤', 'Профиль обновлён', `Имя игрока сохранено: ${clean}`);
+  }
+
+         toggleSound(enabled         )       {
+    this.audio.setSoundEnabled(enabled);
+    this.ui.setSoundToggle(enabled);
+    this.syncBackgroundMusic();
+  }
+
+         toggleMusic(enabled         )       {
+    this.audio.setMusicEnabled(enabled);
+    this.ui.setMusicToggle(enabled);
+    this.syncBackgroundMusic();
+  }
+
+         handleCloseModal()       {
+    if (this.ui.isSettingsOpen()) {
+      this.ui.closeSettings();
+    } else if (this.ui.isGachaOpen()) {
+      this.ui.closeGacha();
+    } else if (this.ui.isLeaderboardOpen()) {
+      this.ui.closeLeaderboard();
+    }
+  }
+
+         syncBackgroundMusic()       {
+    const shouldPlay = this.isPlaying && !this.isPaused && !this.engine.getPlayer().isDead && this.audio.isMusicEnabled() && this.audio.isSoundEnabled();
+    if (shouldPlay) {
+      this.audio.startMusic();
     } else {
-      audio.playCrash();
-      sceneManager.triggerShake(p.deathReason === DeathReason.TRAIN ? 0.9 : 0.45);
+      this.audio.stopMusic();
     }
-    if (deathReasonEl) deathReasonEl.textContent = DEATH_LABELS[p.deathReason] ?? 'Игра окончена';
-    if (gameOverModal) gameOverModal.classList.remove('hidden');
-    updateMenuStats();
   }
 
-  requestAnimationFrame(animate);
+         updateMenuStats()       {
+    this.ui.updateMenuStats(this.engine.getHighScore(), this.engine.getCoins());
+    this.ui.renderLeaderboard(this.engine.getScoreTracker().getLeaderboard());
+  }
+
+         renderSkinsUI()       {
+    const unlocked = this.engine.getUnlockedSkins();
+    const active = this.engine.getSelectedSkin();
+    this.ui.renderSkins(unlocked, active, (skinId        ) => {
+      if (this.engine.selectSkin(skinId          )) {
+        this.audio.playSkinVoice(skinId);
+        this.renderSkinsUI();
+      }
+    });
+    this.ui.setGachaRollButtonText(`Крутить за ${WORLD_CONFIG.GACHA_COST} 🪙`);
+    this.updateMenuStats();
+  }
+
+          unlockAchievement(id        , icon        , title        , desc        )       {
+    if (this.unlockedAchievements.has(id)) return;
+    this.unlockedAchievements.add(id);
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('crossy_road_pro_achievements_v1', JSON.stringify(Array.from(this.unlockedAchievements)));
+      } catch {}
+    }
+    this.ui.showToast(icon, `Достижение: ${title}`, desc);
+  }
+
+          recordRunToLeaderboard(score        )       {
+    if (score <= 0) return;
+    const tracker = this.engine.getScoreTracker();
+    const runRes = tracker.recordRun(score);
+    if (runRes.overtakenBots.length > 0) {
+      this.ui.showToast('🏁', 'Соперник позади!', `Вы обошли: ${runRes.overtakenBots.slice(0, 2).join(', ')}`);
+    }
+    for (const ach of tracker.getAchievements()) {
+      if (ach.unlocked) {
+        this.unlockAchievement(ach.id, ach.badge, ach.title, ach.description);
+      }
+    }
+  }
+
+         animate(now        )       {
+    const dt = Math.min((now - this.lastTime) / 1000, 0.1);
+    this.lastTime = now;
+
+    if (this.isPlaying && !this.isPaused) {
+      this.engine.step(dt);
+    }
+    this.sceneManager.sync(this.engine, dt);
+
+    const currentCoins = this.engine.getCoins();
+    if (currentCoins > this.lastCoins) {
+      this.audio.playCoin();
+      this.lastCoins = currentCoins;
+      if (currentCoins >= 25) this.unlockAchievement('coin_25', '🪙', 'Нумизмат', 'Собрано 25 монет!');
+      if (currentCoins >= 100) this.unlockAchievement('coin_100', '💰', 'Готов к Гаче', 'Накоплено 100 монет на прокрут!');
+      this.renderSkinsUI();
+    }
+
+    const currentScore = this.engine.getScore();
+    if (this.isPlaying && currentScore > 0) {
+      if (currentScore > this.runStartHighScore && this.runStartHighScore > 0 && !this.notifiedNewHighScoreThisRun) {
+        this.notifiedNewHighScoreThisRun = true;
+        this.audio.playNewHighScore();
+        this.ui.showToast('🏆', 'Новый рекорд!', `Вы побили прошлый рекорд (${this.runStartHighScore})!`);
+      }
+      if (currentScore >= 15) this.unlockAchievement('score_15', '🐣', 'Первые шаги', 'Набрано 15 очков за забег!');
+      if (currentScore >= 50) this.unlockAchievement('score_50', '🔥', 'Мастер трассы', 'Набрано 50 очков за забег!');
+      if (currentScore >= 100) this.unlockAchievement('score_100', '👑', 'Легенда перекрёстков', 'Набрано 100 очков!');
+      if (this.engine.getComboMultiplier() >= 3) this.unlockAchievement('combo_3', '⚡', 'Комбо x3', 'Максимальный темп прыжков!');
+    }
+
+    this.ui.updateScore(currentScore);
+    this.ui.updateCoins(currentCoins);
+
+    if (this.isPlaying && !this.isPaused && !this.engine.getPlayer().isDead) {
+      this.ui.setWarningVignette(this.engine.getCameraGraceRatio());
+    } else {
+      this.ui.setWarningVignette(0);
+    }
+
+    const p = this.engine.getPlayer();
+    if (this.isPlaying && p.isDead && !this.wasDead) {
+      this.wasDead = true;
+      this.recordRunToLeaderboard(currentScore);
+      this.sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
+      if (p.deathReason === DeathReason.WATER) {
+        this.audio.playSplash();
+      } else {
+        this.audio.playCrash();
+        this.sceneManager.triggerShake(p.deathReason === DeathReason.TRAIN ? 0.9 : 0.45);
+      }
+      this.ui.showGameOver(DEATH_LABELS[p.deathReason] ?? 'Игра окончена');
+      this.updateMenuStats();
+      this.syncBackgroundMusic();
+    }
+
+    requestAnimationFrame(this.animate);
+  }
+
+         getUIActions()            {
+    return {
+      onPlay: () => this.startGame(),
+      onPause: () => this.pauseGame(),
+      onResume: () => this.resumeGame(),
+      onToMenu: () => this.openMainMenu(),
+      onRestart: () => this.startGame(),
+      onRollGacha: () => this.handleGachaRoll(),
+      onSaveName: (name        ) => this.savePlayerName(name),
+      onToggleSound: (enabled         ) => this.toggleSound(enabled),
+      onToggleMusic: (enabled         ) => this.toggleMusic(enabled),
+    };
+  }
+
+         getInputCallbacks()                 {
+    return {
+      onMove: (dir                    ) => this.triggerMove(dir),
+      onStartGame: () => this.startGame(),
+      onPauseGame: () => this.pauseGame(),
+      onResumeGame: () => this.resumeGame(),
+      onRestartGame: () => this.startGame(),
+      onToMenu: () => this.openMainMenu(),
+      onGachaRoll: () => this.handleGachaRoll(),
+      onCloseModal: () => this.handleCloseModal(),
+      onSavePlayerName: () => this.ui.clickSaveName(),
+    };
+  }
+
+         getModalStateProvider()                     {
+    return {
+      isSettingsOpen: () => this.ui.isSettingsOpen(),
+      isPauseOpen: () => this.ui.isPauseOpen(),
+      isMainMenuOpen: () => this.ui.isMainMenuOpen(),
+      isGachaOpen: () => this.ui.isGachaOpen(),
+      isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
+      isGameOverOpen: () => this.ui.isGameOverOpen(),
+      isNameInputFocused: () => this.ui.isNameInputFocused(),
+      isPlaying: () => this.isPlaying,
+    };
+  }
 }
 
-// Initial state: show Main Menu
-renderSkinsUI();
-openMainMenu();
-requestAnimationFrame(animate);
+// --- Module: src/main.ts ---
+const container = document.getElementById('game-container') ;
+const urlSeed = Number(new URLSearchParams(window.location.search).get('seed'));
+const initialSeed = Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : Date.now();
+
+const engine = new GameEngine(initialSeed, window.localStorage);
+const sceneManager = new SceneManager(container);
+const audio = new AudioSynth();
+const ui = new UIManager();
+const gameLoop = new GameLoop(engine, sceneManager, audio, ui);
+
+ui.bindActions(gameLoop.getUIActions());
+const inputManager = new InputManager(gameLoop.getInputCallbacks(), gameLoop.getModalStateProvider());
+inputManager.attach();
+
+ui.openMainMenu();
+gameLoop.updateMenuStats();
+gameLoop.renderSkinsUI();
+gameLoop.start();
 
 
   </script>
