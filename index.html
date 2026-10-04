@@ -2,15 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Crossy Road 3D — Vibe-Pro Edition</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; }
-    #game-container { width: 100%; height: 100%; position: relative; }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; touch-action: none; -webkit-touch-callout: none; }
+    #game-container { width: 100%; height: 100%; position: relative; touch-action: none; }
     
     /* Clean Minimal In-Game HUD: Coins, Distance & Pause button only */
-    .hud { position: fixed; top: 20px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
+    .hud { position: fixed; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
     .hud-stats { display: flex; gap: 14px; }
     .score-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.22); padding: 10px 22px; border-radius: 16px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
     .score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 800; }
@@ -2797,6 +2797,28 @@ class SceneManager {
           logImpacts = new Map                   ();
           prevRidingLogId                = null;
           lastHoppingState = false;
+          cachedSkyColor = new THREE.Color();
+          cachedFogColor = new THREE.Color();
+          cachedAmbientColor = new THREE.Color();
+          cachedDirColor = new THREE.Color();
+
+          disposeHierarchy(obj                )       {
+    obj.traverse((child) => {
+      const mesh = child              ;
+      if (mesh.isMesh) {
+        if (mesh.geometry) {
+          mesh.geometry.dispose();
+        }
+        if (mesh.material) {
+          if (Array.isArray(mesh.material)) {
+            for (const mat of mesh.material) mat.dispose();
+          } else {
+            mesh.material.dispose();
+          }
+        }
+      }
+    });
+  }
 
   constructor(container             ) {
     this.scene = new THREE.Scene();
@@ -2916,7 +2938,7 @@ class SceneManager {
       p.life += dt;
       if (p.life >= p.maxLife) {
         this.scene.remove(p.mesh);
-        p.mesh.geometry.dispose();
+        this.disposeHierarchy(p.mesh);
         this.particles.splice(i, 1);
         continue;
       }
@@ -3162,12 +3184,16 @@ class SceneManager {
     const targetAtmos = BIOME_ATMOSPHERES[currentBiome] ?? BIOME_ATMOSPHERES[Biome.FOREST];
     const lerpFactor = Math.min(1, 1 - Math.exp(-dt * 3.2));
 
-    (this.scene.background               ).lerp(new THREE.Color(targetAtmos.sky), lerpFactor);
-    this.fog.color.lerp(new THREE.Color(targetAtmos.fogColor), lerpFactor);
+    this.cachedSkyColor.setHex(targetAtmos.sky);
+    (this.scene.background               ).lerp(this.cachedSkyColor, lerpFactor);
+    this.cachedFogColor.setHex(targetAtmos.fogColor);
+    this.fog.color.lerp(this.cachedFogColor, lerpFactor);
     this.fog.density += (targetAtmos.fogDensity - this.fog.density) * lerpFactor;
-    this.ambientLight.color.lerp(new THREE.Color(targetAtmos.ambientColor), lerpFactor);
+    this.cachedAmbientColor.setHex(targetAtmos.ambientColor);
+    this.ambientLight.color.lerp(this.cachedAmbientColor, lerpFactor);
     this.ambientLight.intensity += (targetAtmos.ambientIntensity - this.ambientLight.intensity) * lerpFactor;
-    this.dirLight.color.lerp(new THREE.Color(targetAtmos.dirColor), lerpFactor);
+    this.cachedDirColor.setHex(targetAtmos.dirColor);
+    this.dirLight.color.lerp(this.cachedDirColor, lerpFactor);
     this.dirLight.intensity += (targetAtmos.dirIntensity - this.dirLight.intensity) * lerpFactor;
 
     const activeLanes = engine.getActiveLanes();
@@ -3239,6 +3265,7 @@ class SceneManager {
       for (const [cx, coinMesh] of rendered.coinMeshes.entries()) {
         if (!lane.coins?.includes(cx)) {
           rendered.group.remove(coinMesh);
+          this.disposeHierarchy(coinMesh);
           rendered.coinMeshes.delete(cx);
         } else {
           coinMesh.rotation.y = nowSec;
@@ -3258,6 +3285,7 @@ class SceneManager {
     for (const [idx, rendered] of this.renderedLanes.entries()) {
       if (!activeIndices.has(idx)) {
         this.scene.remove(rendered.group);
+        this.disposeHierarchy(rendered.group);
         this.renderedLanes.delete(idx);
       }
     }
@@ -3341,13 +3369,14 @@ class SceneManager {
   clearAll()       {
     for (const rendered of this.renderedLanes.values()) {
       this.scene.remove(rendered.group);
+      this.disposeHierarchy(rendered.group);
     }
     this.renderedLanes.clear();
     this.logImpacts.clear();
 
     for (const p of this.particles) {
       this.scene.remove(p.mesh);
-      p.mesh.geometry.dispose();
+      this.disposeHierarchy(p.mesh);
     }
     this.particles = [];
   }
@@ -3733,6 +3762,10 @@ class InputManager {
                    callbacks                ;
                    modalState                    ;
           isAttached = false;
+          touchStartX = 0;
+          touchStartY = 0;
+          touchStartTime = 0;
+          touchIsInteractive = false;
 
   constructor(callbacks                , modalState                    ) {
     this.callbacks = callbacks;
@@ -3742,14 +3775,65 @@ class InputManager {
          attach()       {
     if (this.isAttached) return;
     window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    window.addEventListener('touchend', this.handleTouchEnd, { passive: true });
     this.isAttached = true;
   }
 
          detach()       {
     if (!this.isAttached) return;
     window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('touchstart', this.handleTouchStart);
+    window.removeEventListener('touchmove', this.handleTouchMove);
+    window.removeEventListener('touchend', this.handleTouchEnd);
     this.isAttached = false;
   }
+
+         handleTouchStart = (e            )       => {
+    if (e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    this.touchStartX = touch.clientX;
+    this.touchStartY = touch.clientY;
+    this.touchStartTime = performance.now();
+    const target = e.target                      ;
+    this.touchIsInteractive = Boolean(target?.closest('button, input, select, textarea, a, .modal-card'));
+  };
+
+         handleTouchMove = (e            )       => {
+    if (!this.touchIsInteractive && this.modalState.isPlaying()) {
+      if (e.cancelable) e.preventDefault();
+    }
+  };
+
+         handleTouchEnd = (e            )       => {
+    if (this.touchIsInteractive) return;
+    if (this.callbacks.isInputBlocked?.()) return;
+    if (!this.modalState.isPlaying()) return;
+
+    if (e.changedTouches.length === 0) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - this.touchStartX;
+    const dy = touch.clientY - this.touchStartY;
+    const dist = Math.hypot(dx, dy);
+    const dt = performance.now() - this.touchStartTime;
+
+    const SWIPE_THRESHOLD = 26;
+    const TAP_MAX_DURATION = 400;
+
+    if (dist < SWIPE_THRESHOLD && dt < TAP_MAX_DURATION) {
+      this.callbacks.onMove(MoveDirection.FORWARD);
+      return;
+    }
+
+    if (dist >= SWIPE_THRESHOLD) {
+      if (Math.abs(dx) > Math.abs(dy)) {
+        this.callbacks.onMove(dx > 0 ? MoveDirection.RIGHT : MoveDirection.LEFT);
+      } else {
+        this.callbacks.onMove(dy < 0 ? MoveDirection.FORWARD : MoveDirection.BACKWARD);
+      }
+    }
+  };
 
          handleKeyDown = (e               )       => {
     if (this.callbacks.isInputBlocked?.()) {

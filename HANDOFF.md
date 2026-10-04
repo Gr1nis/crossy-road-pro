@@ -35,29 +35,31 @@
 ---
 
 ## 3. Key Architectural Decisions
-- **Zero-Dependency Core**: Папка `src/core/` никогда не импортирует Three.js или DOM-типы. Все 31 тест запускаются нативно через Node.js.
+- **Zero-Dependency Core**: Папка `src/core/` никогда не импортирует Three.js или DOM-типы. Все 38 тестов запускаются нативно через Node.js.
 - **Flat Bundle Assembly**: `scripts/build.mjs` конкатенирует все модули в один плоский `<script type="module">` в `index.html`. Все имена классов и функций на верхнем уровне должны быть глобально уникальны.
 - **Dirty Checking в UI**: Текстовые узлы очков и монет обновляются в DOM только при реальном изменении значений, исключая просадки FPS.
 - **Input Focus Protection**: При фокусе в поле ввода текста (`leaderboard-name-input`) клавиши WASD/Space не триггерят движение персонажа.
+- **Touch Gesture Engine**: Легковесный детектор тапов и свайпов в `src/app/inputManager.ts`: быстрый тап (<400ms, <26px) делает прыжок вперед, свайпы во все 4 стороны управляют направлением, клики по UI/модалкам изолированы.
+- **WebGL Memory Management**: Рекурсивный `disposeHierarchy()` геометрий и материалов при сдвиге камеры, сборе монет, зачистке партиклов и сбросе уровня.
 
 ---
 
 ## 4. Current State & Immediate Next Steps (`[ ]`)
-Проект готов к началу **Фазы 2 — Мобильный ввод + Производительность рендеринга**:
+Завершена **Фаза 2 (Мобильный ввод + Оптимизация рендеринга)**. Следующий этап — **Фаза 3 (Интеграция с Yandex Games SDK & Монетизация)**:
 
-- `[ ]` **Поток 2A (Rendering Performance & Three.js Memory)**:
-  - Добавить рекурсивный `dispose()` геометрий и материалов при удалении старых полос в `src/view/sceneManager.ts`.
-  - Кешировать per-frame объекты (`THREE.Color`, векторы) в полях классов вместо `new` в цикле `sync()`.
-  - Использовать `InstancedMesh` или geometry pooling для повторяющихся объектов (деревья, валуны) в `src/view/meshFactory.ts`.
-- `[ ]` **Поток 2B (Mobile Touch & Swipe Controls)**:
-  - Добавить детектор свайпов (`touchstart`, `touchmove`, `touchend`) и tap-to-hop в `src/app/inputManager.ts`.
-  - Блокировать паразитные системные жесты (pull-to-refresh, pinch-zoom) на мобильных устройствах.
-  - Адаптивный CSS для мобильных экранов (`viewport-fit=cover`, safe-area-inset) в шаблоне `scripts/build.mjs`.
+- `[ ]` **Поток 3A (Yandex Games SDK Bridge)**:
+  - Создать `src/app/yandexBridge.ts` с безопасным моком для локального запуска без интернета.
+  - Инициализация `YaGames.init()` и передача информации об окружении (`isMobile`, `lang`, `deviceType`).
+  - Синхронизация прогресса игрока (монеты, рекорды, скины, ачивки) с `ysdk.getPlayer().setData()` / `getData()`.
+- `[ ]` **Поток 3B (Монетизация & Реклама)**:
+  - Межстраничная полноэкранная реклама (`showFullscreenAdv`) с кулдауном между смертями игрока.
+  - Реклама за вознаграждение (`showRewardedVideo`): возрождение 1 раз за забег (`revive`) с сохранением комбо и дистанции.
+  - Награда за просмотр рекламы в главном меню (+50 бесплатных монет на гача-рулетку).
 
 ---
 
 ## 5. Verification Status
 - **TypeScript**: `npx tsc --noEmit` — 0 errors.
-- **Test Suite**: `npm test` — **31 / 31 GREEN**.
+- **Test Suite**: `npm test` — **38 / 38 GREEN** across 6 test suites.
 - **Bundle**: `node --check dist/bundle.js` — 0 errors.
-- **GitHub Actions**: Все проверки и деплой на GitHub Pages завершаются успешно (зеленая галочка).
+- **Offline HTML**: `index.html` самодостаточен, мобильный вьюпорт и жесты настроены.

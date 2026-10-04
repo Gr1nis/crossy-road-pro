@@ -28,6 +28,10 @@ export class InputManager {
   private readonly callbacks: InputCallbacks;
   private readonly modalState: ModalStateProvider;
   private isAttached = false;
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private touchStartTime = 0;
+  private touchIsInteractive = false;
 
   constructor(callbacks: InputCallbacks, modalState: ModalStateProvider) {
     this.callbacks = callbacks;
@@ -37,14 +41,65 @@ export class InputManager {
   public attach(): void {
     if (this.isAttached) return;
     window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    window.addEventListener('touchend', this.handleTouchEnd, { passive: true });
     this.isAttached = true;
   }
 
   public detach(): void {
     if (!this.isAttached) return;
     window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('touchstart', this.handleTouchStart);
+    window.removeEventListener('touchmove', this.handleTouchMove);
+    window.removeEventListener('touchend', this.handleTouchEnd);
     this.isAttached = false;
   }
+
+  public handleTouchStart = (e: TouchEvent): void => {
+    if (e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    this.touchStartX = touch.clientX;
+    this.touchStartY = touch.clientY;
+    this.touchStartTime = performance.now();
+    const target = e.target as HTMLElement | null;
+    this.touchIsInteractive = Boolean(target?.closest('button, input, select, textarea, a, .modal-card'));
+  };
+
+  public handleTouchMove = (e: TouchEvent): void => {
+    if (!this.touchIsInteractive && this.modalState.isPlaying()) {
+      if (e.cancelable) e.preventDefault();
+    }
+  };
+
+  public handleTouchEnd = (e: TouchEvent): void => {
+    if (this.touchIsInteractive) return;
+    if (this.callbacks.isInputBlocked?.()) return;
+    if (!this.modalState.isPlaying()) return;
+
+    if (e.changedTouches.length === 0) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - this.touchStartX;
+    const dy = touch.clientY - this.touchStartY;
+    const dist = Math.hypot(dx, dy);
+    const dt = performance.now() - this.touchStartTime;
+
+    const SWIPE_THRESHOLD = 26;
+    const TAP_MAX_DURATION = 400;
+
+    if (dist < SWIPE_THRESHOLD && dt < TAP_MAX_DURATION) {
+      this.callbacks.onMove(MoveDirection.FORWARD);
+      return;
+    }
+
+    if (dist >= SWIPE_THRESHOLD) {
+      if (Math.abs(dx) > Math.abs(dy)) {
+        this.callbacks.onMove(dx > 0 ? MoveDirection.RIGHT : MoveDirection.LEFT);
+      } else {
+        this.callbacks.onMove(dy < 0 ? MoveDirection.FORWARD : MoveDirection.BACKWARD);
+      }
+    }
+  };
 
   public handleKeyDown = (e: KeyboardEvent): void => {
     if (this.callbacks.isInputBlocked?.()) {

@@ -110,6 +110,28 @@ export class SceneManager {
   private logImpacts = new Map<number, LogImpact>();
   private prevRidingLogId: number | null = null;
   private lastHoppingState = false;
+  private cachedSkyColor = new THREE.Color();
+  private cachedFogColor = new THREE.Color();
+  private cachedAmbientColor = new THREE.Color();
+  private cachedDirColor = new THREE.Color();
+
+  private disposeHierarchy(obj: THREE.Object3D): void {
+    obj.traverse((child) => {
+      const mesh = child as THREE.Mesh;
+      if (mesh.isMesh) {
+        if (mesh.geometry) {
+          mesh.geometry.dispose();
+        }
+        if (mesh.material) {
+          if (Array.isArray(mesh.material)) {
+            for (const mat of mesh.material) mat.dispose();
+          } else {
+            mesh.material.dispose();
+          }
+        }
+      }
+    });
+  }
 
   constructor(container: HTMLElement) {
     this.scene = new THREE.Scene();
@@ -229,7 +251,7 @@ export class SceneManager {
       p.life += dt;
       if (p.life >= p.maxLife) {
         this.scene.remove(p.mesh);
-        p.mesh.geometry.dispose();
+        this.disposeHierarchy(p.mesh);
         this.particles.splice(i, 1);
         continue;
       }
@@ -475,12 +497,16 @@ export class SceneManager {
     const targetAtmos = BIOME_ATMOSPHERES[currentBiome] ?? BIOME_ATMOSPHERES[Biome.FOREST];
     const lerpFactor = Math.min(1, 1 - Math.exp(-dt * 3.2));
 
-    (this.scene.background as THREE.Color).lerp(new THREE.Color(targetAtmos.sky), lerpFactor);
-    this.fog.color.lerp(new THREE.Color(targetAtmos.fogColor), lerpFactor);
+    this.cachedSkyColor.setHex(targetAtmos.sky);
+    (this.scene.background as THREE.Color).lerp(this.cachedSkyColor, lerpFactor);
+    this.cachedFogColor.setHex(targetAtmos.fogColor);
+    this.fog.color.lerp(this.cachedFogColor, lerpFactor);
     this.fog.density += (targetAtmos.fogDensity - this.fog.density) * lerpFactor;
-    this.ambientLight.color.lerp(new THREE.Color(targetAtmos.ambientColor), lerpFactor);
+    this.cachedAmbientColor.setHex(targetAtmos.ambientColor);
+    this.ambientLight.color.lerp(this.cachedAmbientColor, lerpFactor);
     this.ambientLight.intensity += (targetAtmos.ambientIntensity - this.ambientLight.intensity) * lerpFactor;
-    this.dirLight.color.lerp(new THREE.Color(targetAtmos.dirColor), lerpFactor);
+    this.cachedDirColor.setHex(targetAtmos.dirColor);
+    this.dirLight.color.lerp(this.cachedDirColor, lerpFactor);
     this.dirLight.intensity += (targetAtmos.dirIntensity - this.dirLight.intensity) * lerpFactor;
 
     const activeLanes = engine.getActiveLanes();
@@ -552,6 +578,7 @@ export class SceneManager {
       for (const [cx, coinMesh] of rendered.coinMeshes.entries()) {
         if (!lane.coins?.includes(cx)) {
           rendered.group.remove(coinMesh);
+          this.disposeHierarchy(coinMesh);
           rendered.coinMeshes.delete(cx);
         } else {
           coinMesh.rotation.y = nowSec;
@@ -571,6 +598,7 @@ export class SceneManager {
     for (const [idx, rendered] of this.renderedLanes.entries()) {
       if (!activeIndices.has(idx)) {
         this.scene.remove(rendered.group);
+        this.disposeHierarchy(rendered.group);
         this.renderedLanes.delete(idx);
       }
     }
@@ -654,13 +682,14 @@ export class SceneManager {
   clearAll(): void {
     for (const rendered of this.renderedLanes.values()) {
       this.scene.remove(rendered.group);
+      this.disposeHierarchy(rendered.group);
     }
     this.renderedLanes.clear();
     this.logImpacts.clear();
 
     for (const p of this.particles) {
       this.scene.remove(p.mesh);
-      p.mesh.geometry.dispose();
+      this.disposeHierarchy(p.mesh);
     }
     this.particles = [];
   }
