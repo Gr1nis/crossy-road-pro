@@ -1848,6 +1848,11 @@ class AudioSynth {
           isMusicPlaying          = false;
           musicTimerId                                        = null;
           musicStep         = 0;
+          isPaused          = false;
+         masterGainNode                  = null;
+         bgmGainNode                  = null;
+         sfxGainNode                  = null;
+         bgmFilterNode                          = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -1859,7 +1864,25 @@ class AudioSynth {
       if (savedMusic !== null) {
         this.musicEnabled = savedMusic !== 'false';
       }
+      this.setupUserGestureListener();
     }
+  }
+
+          setupUserGestureListener()       {
+    if (typeof window === 'undefined') return;
+    const onGesture = () => {
+      this.ensureContext();
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+      if (this.musicEnabled && !this.isMusicPlaying) {
+        this.startMusic();
+      }
+      const events = ['click', 'keydown', 'pointerdown', 'touchstart'];
+      events.forEach((ev) => window.removeEventListener(ev, onGesture));
+    };
+    const events = ['click', 'keydown', 'pointerdown', 'touchstart'];
+    events.forEach((ev) => window.addEventListener(ev, onGesture, { passive: true }));
   }
 
   isSoundEnabled()          {
@@ -1871,8 +1894,8 @@ class AudioSynth {
     if (typeof window !== 'undefined') {
       localStorage.setItem('crossy_setting_sound', String(enabled));
     }
-    if (!enabled) {
-      this.stopMusic();
+    if (this.sfxGainNode && this.ctx) {
+      this.sfxGainNode.gain.setValueAtTime(enabled ? 1.0 : 0.0, this.ctx.currentTime);
     }
   }
 
@@ -1885,7 +1908,11 @@ class AudioSynth {
     if (typeof window !== 'undefined') {
       localStorage.setItem('crossy_setting_music', String(enabled));
     }
-    if (enabled && this.soundEnabled) {
+    if (this.bgmGainNode && this.ctx) {
+      const target = enabled ? (this.isPaused ? this.musicVolume * 0.75 : this.musicVolume) : 0;
+      this.bgmGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
+    }
+    if (enabled) {
       this.startMusic();
     } else {
       this.stopMusic();
@@ -1893,11 +1920,27 @@ class AudioSynth {
   }
 
           ensureContext(ignoreSoundFlag          = false)                      {
-    if (typeof window === 'undefined' || (!ignoreSoundFlag && !this.soundEnabled)) return null;
+    if (typeof window === 'undefined') return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window                                                          ).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
+        this.masterGainNode = this.ctx.createGain();
+        this.masterGainNode.gain.setValueAtTime(1.0, this.ctx.currentTime);
+        this.masterGainNode.connect(this.ctx.destination);
+
+        this.sfxGainNode = this.ctx.createGain();
+        this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
+        this.sfxGainNode.connect(this.masterGainNode);
+
+        this.bgmGainNode = this.ctx.createGain();
+        this.bgmGainNode.gain.setValueAtTime(this.musicEnabled ? this.musicVolume : 0.0, this.ctx.currentTime);
+        this.bgmGainNode.connect(this.masterGainNode);
+
+        this.bgmFilterNode = this.ctx.createBiquadFilter();
+        this.bgmFilterNode.type = 'lowpass';
+        this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
+        this.bgmFilterNode.connect(this.bgmGainNode);
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
@@ -1906,8 +1949,28 @@ class AudioSynth {
     return this.ctx;
   }
 
+  onPause()       {
+    this.isPaused = true;
+    if (this.ctx && this.bgmFilterNode && this.bgmGainNode) {
+      const now = this.ctx.currentTime;
+      this.bgmFilterNode.frequency.setTargetAtTime(950, now, 0.1);
+      const target = this.musicEnabled ? this.musicVolume * 0.75 : 0;
+      this.bgmGainNode.gain.setTargetAtTime(target, now, 0.1);
+    }
+  }
+
+  onResume()       {
+    this.isPaused = false;
+    if (this.ctx && this.bgmFilterNode && this.bgmGainNode) {
+      const now = this.ctx.currentTime;
+      this.bgmFilterNode.frequency.setTargetAtTime(20000, now, 0.1);
+      const target = this.musicEnabled ? this.musicVolume : 0;
+      this.bgmGainNode.gain.setTargetAtTime(target, now, 0.1);
+    }
+  }
+
   startMusic()       {
-    if (!this.musicEnabled || !this.soundEnabled || this.isMusicPlaying) return;
+    if (!this.musicEnabled || this.isMusicPlaying) return;
     const ctx = this.ensureContext(true);
     if (!ctx) return;
 
@@ -1927,7 +1990,7 @@ class AudioSynth {
     ];
 
     this.musicTimerId = setInterval(() => {
-      if (!this.isMusicPlaying || !this.musicEnabled || !this.soundEnabled) return;
+      if (!this.isMusicPlaying || !this.musicEnabled) return;
       const activeCtx = this.ensureContext(true);
       if (!activeCtx || activeCtx.state !== 'running') return;
 
@@ -1944,7 +2007,7 @@ class AudioSynth {
         bGain.gain.setValueAtTime(0.055 * this.musicVolume, now);
         bGain.gain.exponentialRampToValueAtTime(0.002, now + 0.18);
         bOsc.connect(bGain);
-        bGain.connect(activeCtx.destination);
+        bGain.connect(this.bgmFilterNode ?? activeCtx.destination);
         bOsc.start(now);
         bOsc.stop(now + 0.19);
       }
@@ -1958,7 +2021,7 @@ class AudioSynth {
         lGain.gain.setValueAtTime(0.038 * this.musicVolume, now);
         lGain.gain.exponentialRampToValueAtTime(0.002, now + 0.16);
         lOsc.connect(lGain);
-        lGain.connect(activeCtx.destination);
+        lGain.connect(this.bgmFilterNode ?? activeCtx.destination);
         lOsc.start(now);
         lOsc.stop(now + 0.17);
       }
@@ -2956,8 +3019,7 @@ const BIOME_ATMOSPHERES
     dirIntensity: 0.92,
     particleColor: 0x22d3ee,
   },
-};
-class SceneManager {
+};class SceneManager {
           scene             ;
           camera                          ;
           renderer                     ;
@@ -3003,12 +3065,15 @@ class SceneManager {
     this.scene.fog = this.fog;
 
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = Math.max(11, 10.5 / aspect);
+    const halfWidth = Math.max(10.5, 11 * aspect);
+    const totalHeight = (halfWidth * 2) / aspect;
+    const bottom = -11;
+    const top = bottom + totalHeight;
     this.camera = new THREE.OrthographicCamera(
-      -viewSize * aspect,
-      viewSize * aspect,
-      viewSize,
-      -viewSize,
+      -halfWidth,
+      halfWidth,
+      top,
+      bottom,
       -30,
       80
     );
@@ -3196,11 +3261,14 @@ class SceneManager {
 
           onResize()       {
     const aspect = window.innerWidth / window.innerHeight;
-    const viewSize = Math.max(11, 10.5 / aspect);
-    this.camera.left = -viewSize * aspect;
-    this.camera.right = viewSize * aspect;
-    this.camera.top = viewSize;
-    this.camera.bottom = -viewSize;
+    const halfWidth = Math.max(10.5, 11 * aspect);
+    const totalHeight = (halfWidth * 2) / aspect;
+    const bottom = -11;
+    const top = bottom + totalHeight;
+    this.camera.left = -halfWidth;
+    this.camera.right = halfWidth;
+    this.camera.top = top;
+    this.camera.bottom = bottom;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
@@ -4131,8 +4199,7 @@ const DEATH_LABELS                         = {
   [DeathReason.WATER]: 'Вы упали в бурную реку!',
   [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
   [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
-};
-class GameLoop {
+};class GameLoop {
          isPlaying = false;
          isPaused = false;
          wasDead = false;
@@ -4304,8 +4371,13 @@ class GameLoop {
   }
 
          syncBackgroundMusic()       {
-    const shouldPlay = this.isPlaying && !this.isPaused && !this.engine.getPlayer().isDead && this.audio.isMusicEnabled() && this.audio.isSoundEnabled();
+    const shouldPlay = !this.engine.getPlayer().isDead && this.audio.isMusicEnabled();
     if (shouldPlay) {
+      if (this.isPaused) {
+        this.audio.onPause?.();
+      } else {
+        this.audio.onResume?.();
+      }
       this.audio.startMusic();
     } else {
       this.audio.stopMusic();
