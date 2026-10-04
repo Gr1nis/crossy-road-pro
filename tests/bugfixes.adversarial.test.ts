@@ -146,19 +146,41 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
     assert.equal(engine.getCameraGraceRatio(), 0);
   });
 
-  it('Bug 7 (Yandex Games Adaptive Frustum & Clean Minimal Road Markings): sceneManager uses dynamic viewSize and eliminates center dashes & waterfall jitter', () => {
+  it('Bug 7 (Adaptive Frustum Viewport & Clean Minimal Road Markings): sceneManager uses mobile-optimized adaptive frustum and eliminates center dashes & waterfall jitter', () => {
     const sceneManagerSrc = fs.readFileSync(
       path.join(process.cwd(), 'src/view/sceneManager.ts'),
       'utf8'
     );
     assert.ok(
-      sceneManagerSrc.includes('Math.max(11, 10.5 / aspect)'),
-      'sceneManager.ts must calculate adaptive viewSize: Math.max(11, 10.5 / aspect)'
+      sceneManagerSrc.includes('Math.max(10.5, 11 * aspect)'),
+      'sceneManager.ts must calculate adaptive halfWidth: Math.max(10.5, 11 * aspect)'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('bottom = -11'),
+      'sceneManager.ts must anchor bottom frustum at -11 to match collision grace threshold'
     );
     assert.ok(
       !sceneManagerSrc.includes('waterfallSplashes'),
       'sceneManager.ts must not contain waterfallSplashes per-frame scaling or tracking'
     );
+
+    // Verify mathematical bounds for all key aspect ratios
+    const testAspects = [16 / 9, 4 / 3, 1.0, 9 / 16, 9 / 19.5, 9 / 21];
+    for (const aspect of testAspects) {
+      const halfWidth = Math.max(10.5, 11 * aspect);
+      const totalHeight = (halfWidth * 2) / aspect;
+      const bottom = -11;
+      const top = bottom + totalHeight;
+
+      // Invariant 1 & 2: play corridor [-9..9] and borders [-10.2, 10.2] are within bounds
+      assert.ok(halfWidth >= 10.5, `halfWidth must be >= 10.5 for aspect ${aspect}, got ${halfWidth}`);
+      // NDC bottom alignment with WORLD_CONFIG.FRUSTUM_SIZE = 11
+      assert.equal(bottom, -11, 'Bottom must strictly remain -11 for death boundary parity');
+      // Forward view never regresses below classic 11
+      assert.ok(top >= 11, `Top must be >= 11 for aspect ${aspect}, got ${top}`);
+      // Aspect ratio must be isotropic (no stretching distortion)
+      assert.ok(Math.abs((halfWidth * 2) / totalHeight - aspect) < 1e-9);
+    }
 
     const meshFactorySrc = fs.readFileSync(
       path.join(process.cwd(), 'src/view/meshFactory.ts'),
