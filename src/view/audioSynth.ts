@@ -6,6 +6,11 @@ export class AudioSynth {
   private isMusicPlaying: boolean = false;
   private musicTimerId: ReturnType<typeof setInterval> | null = null;
   private musicStep: number = 0;
+  private isPaused: boolean = false;
+  public masterGainNode: GainNode | null = null;
+  public bgmGainNode: GainNode | null = null;
+  public sfxGainNode: GainNode | null = null;
+  public bgmFilterNode: BiquadFilterNode | null = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -17,7 +22,25 @@ export class AudioSynth {
       if (savedMusic !== null) {
         this.musicEnabled = savedMusic !== 'false';
       }
+      this.setupUserGestureListener();
     }
+  }
+
+  private setupUserGestureListener(): void {
+    if (typeof window === 'undefined') return;
+    const onGesture = () => {
+      this.ensureContext();
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+      if (this.musicEnabled && !this.isMusicPlaying) {
+        this.startMusic();
+      }
+      const events = ['click', 'keydown', 'pointerdown', 'touchstart'];
+      events.forEach((ev) => window.removeEventListener(ev, onGesture));
+    };
+    const events = ['click', 'keydown', 'pointerdown', 'touchstart'];
+    events.forEach((ev) => window.addEventListener(ev, onGesture, { passive: true }));
   }
 
   isSoundEnabled(): boolean {
@@ -29,8 +52,8 @@ export class AudioSynth {
     if (typeof window !== 'undefined') {
       localStorage.setItem('crossy_setting_sound', String(enabled));
     }
-    if (!enabled) {
-      this.stopMusic();
+    if (this.sfxGainNode && this.ctx) {
+      this.sfxGainNode.gain.setValueAtTime(enabled ? 1.0 : 0.0, this.ctx.currentTime);
     }
   }
 
@@ -43,7 +66,11 @@ export class AudioSynth {
     if (typeof window !== 'undefined') {
       localStorage.setItem('crossy_setting_music', String(enabled));
     }
-    if (enabled && this.soundEnabled) {
+    if (this.bgmGainNode && this.ctx) {
+      const target = enabled ? (this.isPaused ? this.musicVolume * 0.75 : this.musicVolume) : 0;
+      this.bgmGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
+    }
+    if (enabled) {
       this.startMusic();
     } else {
       this.stopMusic();
@@ -51,11 +78,27 @@ export class AudioSynth {
   }
 
   private ensureContext(ignoreSoundFlag: boolean = false): AudioContext | null {
-    if (typeof window === 'undefined' || (!ignoreSoundFlag && !this.soundEnabled)) return null;
+    if (typeof window === 'undefined') return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
+        this.masterGainNode = this.ctx.createGain();
+        this.masterGainNode.gain.setValueAtTime(1.0, this.ctx.currentTime);
+        this.masterGainNode.connect(this.ctx.destination);
+
+        this.sfxGainNode = this.ctx.createGain();
+        this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
+        this.sfxGainNode.connect(this.masterGainNode);
+
+        this.bgmGainNode = this.ctx.createGain();
+        this.bgmGainNode.gain.setValueAtTime(this.musicEnabled ? this.musicVolume : 0.0, this.ctx.currentTime);
+        this.bgmGainNode.connect(this.masterGainNode);
+
+        this.bgmFilterNode = this.ctx.createBiquadFilter();
+        this.bgmFilterNode.type = 'lowpass';
+        this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
+        this.bgmFilterNode.connect(this.bgmGainNode);
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
@@ -64,8 +107,28 @@ export class AudioSynth {
     return this.ctx;
   }
 
+  onPause(): void {
+    this.isPaused = true;
+    if (this.ctx && this.bgmFilterNode && this.bgmGainNode) {
+      const now = this.ctx.currentTime;
+      this.bgmFilterNode.frequency.setTargetAtTime(950, now, 0.1);
+      const target = this.musicEnabled ? this.musicVolume * 0.75 : 0;
+      this.bgmGainNode.gain.setTargetAtTime(target, now, 0.1);
+    }
+  }
+
+  onResume(): void {
+    this.isPaused = false;
+    if (this.ctx && this.bgmFilterNode && this.bgmGainNode) {
+      const now = this.ctx.currentTime;
+      this.bgmFilterNode.frequency.setTargetAtTime(20000, now, 0.1);
+      const target = this.musicEnabled ? this.musicVolume : 0;
+      this.bgmGainNode.gain.setTargetAtTime(target, now, 0.1);
+    }
+  }
+
   startMusic(): void {
-    if (!this.musicEnabled || !this.soundEnabled || this.isMusicPlaying) return;
+    if (!this.musicEnabled || this.isMusicPlaying) return;
     const ctx = this.ensureContext(true);
     if (!ctx) return;
 
@@ -85,7 +148,7 @@ export class AudioSynth {
     ];
 
     this.musicTimerId = setInterval(() => {
-      if (!this.isMusicPlaying || !this.musicEnabled || !this.soundEnabled) return;
+      if (!this.isMusicPlaying || !this.musicEnabled) return;
       const activeCtx = this.ensureContext(true);
       if (!activeCtx || activeCtx.state !== 'running') return;
 
@@ -102,7 +165,7 @@ export class AudioSynth {
         bGain.gain.setValueAtTime(0.055 * this.musicVolume, now);
         bGain.gain.exponentialRampToValueAtTime(0.002, now + 0.18);
         bOsc.connect(bGain);
-        bGain.connect(activeCtx.destination);
+        bGain.connect(this.bgmFilterNode ?? activeCtx.destination);
         bOsc.start(now);
         bOsc.stop(now + 0.19);
       }
@@ -116,7 +179,7 @@ export class AudioSynth {
         lGain.gain.setValueAtTime(0.038 * this.musicVolume, now);
         lGain.gain.exponentialRampToValueAtTime(0.002, now + 0.16);
         lOsc.connect(lGain);
-        lGain.connect(activeCtx.destination);
+        lGain.connect(this.bgmFilterNode ?? activeCtx.destination);
         lOsc.start(now);
         lOsc.stop(now + 0.17);
       }

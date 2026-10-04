@@ -185,8 +185,13 @@ export class GameLoop {
   }
 
   public syncBackgroundMusic(): void {
-    const shouldPlay = this.isPlaying && !this.isPaused && !this.engine.getPlayer().isDead && this.audio.isMusicEnabled() && this.audio.isSoundEnabled();
+    const shouldPlay = !this.engine.getPlayer().isDead && this.audio.isMusicEnabled();
     if (shouldPlay) {
+      if (this.isPaused) {
+        this.audio.onPause?.();
+      } else {
+        this.audio.onResume?.();
+      }
       this.audio.startMusic();
     } else {
       this.audio.stopMusic();
