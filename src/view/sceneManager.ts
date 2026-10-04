@@ -665,8 +665,8 @@ export class SceneManager {
     // Mobile horizontal tracking: smoothly follow player.x if corridor exceeds halfWidth
     const maxPan = Math.max(0, 10.0 - this.currentHalfWidth);
     const targetCamX = Math.max(-maxPan, Math.min(maxPan, worldToScreenX(p.x)));
-    const lerpFactor = Math.min(1, dt * 8.0);
-    this.currentCamX += (targetCamX - this.currentCamX) * lerpFactor;
+    const camLerpFactor = Math.min(1, dt * 8.0);
+    this.currentCamX += (targetCamX - this.currentCamX) * camLerpFactor;
 
     let shakeX = 0;
     let shakeZ = 0;
