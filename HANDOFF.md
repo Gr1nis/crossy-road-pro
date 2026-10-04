@@ -1,45 +1,63 @@
-# HANDOFF.md — Cross-Device Session State (Windows → macOS)
+# HANDOFF.md — Cross-Session State & Roadmap
 
-## 1. Last Updated & Goal
-- **Last Updated**: 2026-09-28 (Windows PC → macOS Handoff)
+## 1. Goal & Environment
+- **Current Target**: Port **Crossy Road Pro** to Yandex Games following `development_plan.md` (achieving 100% parity with original Crossy Road: mobile controls, monetization, retention, pre-release polish).
 - **Active Branch**: `master` (`Gr1nis/crossy-road-pro`)
-- **Current Goal**: Parallel 5-stream upgrade (Biomes, Meta/Leaderboard/Gacha Cashback, 3D Voxel Weather & Biomes, WebAudio BGM & Skin Voices, Interactive UI/Toasts) has been audited, integrated, tested (30/30 tests GREEN), and bundled into standalone `index.html` and `dist/bundle.js`. Ready to continue development or deploy on macOS.
+- **Live Build**: [https://gr1nis.github.io/crossy-road-pro/](https://gr1nis.github.io/crossy-road-pro/)
+- **CI/CD Status**: ✅ 100% GREEN in GitHub Actions (`build-and-deploy` passing with automated tests and typecheck).
 
 ---
 
-## 2. Completed in Last Session (`[x]`)
-- `[x]` **Multi-Chat Architecture & File Ownership Split**: Divided work across 5 isolated streams with zero file conflicts:
-  1. **Stream 1 (Core & Biomes)**: `src/core/types.ts`, `src/core/laneGenerator.ts`, `src/core/gameEngine.ts`, `tests/laneGenerator.test.ts` — Added biome rotation every 25 points (`forest` → `winter` → `desert` → `neon`), progressive vehicle/train speeds, and higher traffic density with guaranteed passable corridors.
-  2. **Stream 2 (Meta, Economy & Leaderboard)**: `src/core/scoreTracker.ts`, `tests/scoreTracker.test.ts` — Implemented persistent Top-10 local leaderboard with 10 bot rivals (`DEFAULT_BOT_RIVALS`), overtaken bot tracking (`overtakenBots`), Gacha rarity tiers (`Common`, `Rare`, `Epic`, `Legendary`), `+40` coin duplicate cashback, and 5 core achievements (`first_50_steps`, `collector`, `train_conqueror`, `rich_hopper`, `leaderboard_champion`).
-  3. **Stream 3 (3D Voxel Art & Weather)**: `src/view/meshFactory.ts`, `src/view/sceneManager.ts` — Added biome-aware trees/rocks/bushes, dynamic lighting & exponential fog transitions (`BIOME_ATMOSPHERES`), 32 ambient weather particles (leaves/snow/sand/neon sparks), and elastic log-landing tilt animation (`LogImpact`).
-  4. **Stream 4 (WebAudio Synthesizer & BGM)**: `src/view/audioSynth.ts` — Added procedural 16-step pentatonic chiptune BGM (`startMusic` / `stopMusic` / `setMusicEnabled`), per-skin jump voices (`playSkinVoice` for Chicken, Cyber-Duck, Shadow-Ninja, Frost-Penguin), Gacha roulette SFX (`playGachaRoll`, `playGachaUnlock`), and high-score fanfare (`playNewHighScore`).
-  5. **Stream 5 (UI/HUD & Final Integration)**: `src/main.ts`, `scripts/build.mjs`, `index.html`, `dist/bundle.js` — Built interactive Leaderboard modal (with player nickname input), Music toggle in Settings modal, Gacha rarity badges & cashback toast notifications, and wired `ScoreTracker` + `AudioSynth` into the main game loop.
-- `[x]` **Cross-Stream Integration Fixes**:
-  - Resolved top-level bundle identifier collision (`SKIN_RARITY_MAP` & `LeaderboardEntry` between `src/core/scoreTracker.ts` and `src/main.ts`) by renaming the UI dictionary in `src/main.ts` to `UI_SKIN_RARITY`.
-  - Fixed TypeScript strict narrowing error `TS2367` in `src/core/laneGenerator.ts` (`for (let x: number = WORLD_CONFIG.MIN_X; ...)`).
-  - Exposed `getScoreTracker()` on `GameEngine` and connected `recordRun`, `getLeaderboard`, `setPlayerName`, `playSkinVoice`, `playGachaRoll`, `playGachaUnlock`, and `playNewHighScore` in `src/main.ts`.
-- `[x]` **Verification & Build**:
-  - `npx tsc --noEmit`: **0 errors**.
-  - `node --check dist/bundle.js`: **0 syntax errors**.
-  - `node --test tests/*.test.ts`: **30 / 30 tests PASS** across all 5 suites.
-  - Regenerated standalone `index.html` and `dist/bundle.js` via `node scripts/build.mjs`.
+## 2. Completed in Last Sessions (`[x]`)
+
+### Фаза 0 — Стабилизация и критические фиксы (`[x]`)
+- `[x]` **Memory Leak Fix**: Sliding window eviction старых полос позади `cameraZ - 30` в `src/core/gameEngine.ts` (`evictOldLanes`).
+- `[x]` **Camera Constants Centralization**: `CAMERA_OFFSET` и `FRUSTUM_SIZE` вынесены в `WORLD_CONFIG` (`src/core/types.ts`) и синхронизированы с проекционной формулой в `src/core/collision.ts`.
+- `[x]` **NPM Scripts & CI**: Удалён фантомный `vitest`, настроен нативный `node --experimental-strip-types --test`, добавлен гейткипер в `.github/workflows/pages.yml`.
+- `[x]` **Adversarial Memory Test**: Написан `Invariant 8` в `tests/gameEngine.adversarial.test.ts` (проверка ограничения размера активных полос `<= 70`).
+
+### Фаза 1 — Рефакторинг SRP (`[x]`)
+- `[x]` **Core SRP Decomposition**:
+  - `src/core/wallet.ts` (`CoinWallet` — баланс, списание, начисление).
+  - `src/core/skinInventory.ts` (`SkinInventory` — коллекция, валидация разблокировки).
+  - `src/core/gachaMachine.ts` (`GachaMachine` — шансы редкости, кэшбэк 40 монет).
+  - `src/core/achievements.ts` (`AchievementTracker` — 5 ачивок, условия, прогресс).
+  - `src/core/scoreTracker.ts` — преобразован в легковесный Фасад с сохранением 100% обратной совместимости.
+- `[x]` **App Layer Decoupling**:
+  - `src/app/uiManager.ts` (397 строк — DOM, модалки, тосты, dirty-check для очков/монет).
+  - `src/app/inputManager.ts` (171 строка — клавиатура, иерархия Escape, изоляция фокуса ввода никнейма).
+  - `src/app/gameLoop.ts` (339 строк — RAF loop, FSM состояний, синхронизация Three.js сцены, аудио и виньетки).
+  - `src/main.ts` — сокращен с 570+ строк до 26 строк чистого bootstrap-кода.
+- `[x]` **Build & CI Stability**:
+  - Обновлён `scripts/build.mjs` (все 17 модулей в правильном порядке `moduleOrder`, авто-зачистка блоков `export`).
+  - Добавлен `@types/node` в `devDependencies`, полностью решена проблема падения `Typecheck` в GitHub Actions.
 
 ---
 
-## 3. Key Architectural & Design Decisions
-- **Single-File Bundle Constraint (`scripts/build.mjs`)**: Because `scripts/build.mjs` strips TypeScript types and concatenates all modules in `moduleOrder` into a single `<script type="module">` inside `index.html` and `dist/bundle.js`, top-level `const` / `function` / `class` names must be globally unique across all files in `src/`.
-- **Core vs View Separation**: `src/core/*` never imports Three.js or DOM APIs so all 30 tests run natively in Node (`node --test`).
-- **Gacha Economy**: Gacha remains Roll-able even after unlocking skins so players can test luck or trigger duplicate cashback (`+40` coins), while tracking rarity tiers.
+## 3. Key Architectural Decisions
+- **Zero-Dependency Core**: Папка `src/core/` никогда не импортирует Three.js или DOM-типы. Все 31 тест запускаются нативно через Node.js.
+- **Flat Bundle Assembly**: `scripts/build.mjs` конкатенирует все модули в один плоский `<script type="module">` в `index.html`. Все имена классов и функций на верхнем уровне должны быть глобально уникальны.
+- **Dirty Checking в UI**: Текстовые узлы очков и монет обновляются в DOM только при реальном изменении значений, исключая просадки FPS.
+- **Input Focus Protection**: При фокусе в поле ввода текста (`leaderboard-name-input`) клавиши WASD/Space не триггерят движение персонажа.
 
 ---
 
-## 4. Current State & Exact Next Steps (`[ ]`)
-When resuming on **macOS**:
-1. `[ ]` Run `git pull` on Mac and verify tests locally (`npm test` or `node --test tests/*.test.ts`).
-2. `[ ]` Open `index.html` in browser (or run `npm run dev`) to visually playtest the 4 biome transitions (`forest`, `winter`, `desert`, `neon`), skin voices, BGM toggle, and Leaderboard name editor.
-3. `[ ]` Choose the next feature milestone (e.g., new unlockable skins/obstacles per biome, daily challenges UI modal, or mobile touch/swipe controls toggle).
+## 4. Current State & Immediate Next Steps (`[ ]`)
+Проект готов к началу **Фазы 2 — Мобильный ввод + Производительность рендеринга**:
+
+- `[ ]` **Поток 2A (Rendering Performance & Three.js Memory)**:
+  - Добавить рекурсивный `dispose()` геометрий и материалов при удалении старых полос в `src/view/sceneManager.ts`.
+  - Кешировать per-frame объекты (`THREE.Color`, векторы) в полях классов вместо `new` в цикле `sync()`.
+  - Использовать `InstancedMesh` или geometry pooling для повторяющихся объектов (деревья, валуны) в `src/view/meshFactory.ts`.
+- `[ ]` **Поток 2B (Mobile Touch & Swipe Controls)**:
+  - Добавить детектор свайпов (`touchstart`, `touchmove`, `touchend`) и tap-to-hop в `src/app/inputManager.ts`.
+  - Блокировать паразитные системные жесты (pull-to-refresh, pinch-zoom) на мобильных устройствах.
+  - Адаптивный CSS для мобильных экранов (`viewport-fit=cover`, safe-area-inset) в шаблоне `scripts/build.mjs`.
 
 ---
 
-## 5. Known Issues / Unfinished Debugging
-- **None**: All 30 unit/property/adversarial tests pass (`0 fail`), TypeScript compiles cleanly (`0 errors`), and `dist/bundle.js` + `index.html` are freshly built and verified.
+## 5. Verification Status
+- **TypeScript**: `npx tsc --noEmit` — 0 errors.
+- **Test Suite**: `npm test` — **31 / 31 GREEN**.
+- **Bundle**: `node --check dist/bundle.js` — 0 errors.
+- **GitHub Actions**: Все проверки и деплой на GitHub Pages завершаются успешно (зеленая галочка).
