@@ -195,6 +195,7 @@ export class AudioSynth {
   }
 
   playHop(comboMultiplier: number = 1, surface: 'grass' | 'road' | 'log' | 'rail' = 'grass'): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -234,12 +235,13 @@ export class AudioSynth {
     }
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode ?? ctx.destination);
     osc.start(now);
     osc.stop(now + 0.1);
   }
 
   playCoin(): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -254,12 +256,13 @@ export class AudioSynth {
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode ?? ctx.destination);
     osc.start(now);
     osc.stop(now + 0.23);
   }
 
   playGacha(): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -275,13 +278,14 @@ export class AudioSynth {
       gain.gain.exponentialRampToValueAtTime(0.005, now + idx * 0.08 + 0.18);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now + idx * 0.08);
       osc.stop(now + idx * 0.08 + 0.19);
     });
   }
 
   playTrainWhistle(): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -297,13 +301,14 @@ export class AudioSynth {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.46);
     });
   }
 
   playCrash(): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -317,12 +322,13 @@ export class AudioSynth {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode ?? ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.3);
   }
 
   playSplash(): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -336,12 +342,13 @@ export class AudioSynth {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.sfxGainNode ?? ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.26);
   }
 
   playSkinVoice(skinId: string = 'chicken'): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -359,7 +366,7 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.09, now);
       gain.gain.exponentialRampToValueAtTime(0.005, now + 0.095);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.1);
     } else if (id.includes('ninja') || id.includes('shadow')) {
@@ -370,7 +377,7 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.085, now);
       gain.gain.exponentialRampToValueAtTime(0.004, now + 0.06);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.065);
     } else if (id.includes('penguin') || id.includes('frost')) {
@@ -381,7 +388,7 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.11, now);
       gain.gain.exponentialRampToValueAtTime(0.005, now + 0.075);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.08);
     } else {
@@ -396,13 +403,14 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.11, now);
       gain.gain.exponentialRampToValueAtTime(0.005, now + 0.08);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.085);
     }
   }
 
   playGachaRoll(): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -417,13 +425,14 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.09, t);
       gain.gain.exponentialRampToValueAtTime(0.005, t + 0.045);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(t);
       osc.stop(t + 0.05);
     });
   }
 
   playGachaUnlock(isRare: boolean = false): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -440,13 +449,14 @@ export class AudioSynth {
       gain.gain.setValueAtTime(isRare ? 0.15 : 0.16, t);
       gain.gain.exponentialRampToValueAtTime(0.005, t + 0.22);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(t);
       osc.stop(t + 0.23);
     });
   }
 
   playNewHighScore(): void {
+    if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -466,7 +476,7 @@ export class AudioSynth {
       gain.gain.setValueAtTime(0.2, t);
       gain.gain.exponentialRampToValueAtTime(0.005, t + dur);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(t);
       osc.stop(t + dur + 0.01);
     });
