@@ -405,12 +405,12 @@ export class SceneManager {
         waterRipples.push(ripple);
       }
 
-      // Cascading waterfalls at the left and right borders of the river
-      const leftWaterfall = MeshFactory.createWaterfallEdge('left');
-      leftWaterfall.position.set(worldToScreenX(-10.2), 0, 0);
-      const rightWaterfall = MeshFactory.createWaterfallEdge('right');
-      rightWaterfall.position.set(worldToScreenX(10.2), 0, 0);
-      group.add(leftWaterfall, rightWaterfall);
+      // Clean low riverbank posts & boulders at border edges (no waterfalls, no z-fighting)
+      const leftBank = MeshFactory.createRiverbankEdge('left', biome);
+      leftBank.position.set(worldToScreenX(-10.2), 0, 0);
+      const rightBank = MeshFactory.createRiverbankEdge('right', biome);
+      rightBank.position.set(worldToScreenX(10.2), 0, 0);
+      group.add(leftBank, rightBank);
     } else if (lane.type === LaneType.RAILWAY) {
       const railMat = new THREE.MeshLambertMaterial({ color: biome === Biome.NEON ? 0x38bdf8 : 0xcbd5e1 });
       const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);

@@ -553,36 +553,72 @@ export class MeshFactory {
     return group;
   }
 
-  static createWaterfallEdge(side: 'left' | 'right'): THREE.Group {
+  static createRiverbankEdge(side: 'left' | 'right', biome: BiomeType = 'forest'): THREE.Group {
     const group = new THREE.Group();
-    // Rock cliff bank
-    const cliffMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
-    const cliff = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.4, 1.0), cliffMat);
-    cliff.position.set(0, -1.2, 0);
-    cliff.receiveShadow = true;
-    group.add(cliff);
 
-    // Solid voxel falling water column
-    const waterFallMat = new THREE.MeshLambertMaterial({
-      color: 0x38bdf8,
-    });
-    const fall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.2, 0.94), waterFallMat);
-    const fallOffset = side === 'left' ? -0.22 : 0.22;
-    fall.position.set(fallOffset, -1.15, 0);
-    group.add(fall);
+    // Wood mooring pylon / bollard material based on biome
+    const woodColor =
+      biome === 'winter'
+        ? 0x475569
+        : biome === 'desert'
+          ? 0x92400e
+          : biome === 'neon'
+            ? 0x1e1b4b
+            : 0x78350f;
 
-    // Dense voxel foam crest at the top
-    const foamMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-    const foamTop = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.98), foamMat);
-    foamTop.position.set(fallOffset, -0.04, 0);
-    group.add(foamTop);
+    const capColor =
+      biome === 'winter'
+        ? 0xf1f5f9
+        : biome === 'desert'
+          ? 0xd97706
+          : biome === 'neon'
+            ? 0x06b6d4
+            : 0x451a03;
 
-    // Dense splash bottom block
-    const splash = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.22, 0.98), foamMat);
-    splash.position.set(fallOffset, -2.15, 0);
-    group.add(splash);
+    const rockColor =
+      biome === 'winter'
+        ? 0x94a3b8
+        : biome === 'desert'
+          ? 0xb45309
+          : biome === 'neon'
+            ? 0x312e81
+            : 0x64748b;
+
+    const woodMat = new THREE.MeshLambertMaterial({ color: woodColor });
+    const capMat = new THREE.MeshLambertMaterial({ color: capColor });
+    const rockMat = new THREE.MeshLambertMaterial({ color: rockColor });
+
+    // Mooring pylon (аккуратная деревянная причальная свая)
+    const pylon = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.44, 0.28), woodMat);
+    pylon.position.set(0, 0.16, -0.22);
+    pylon.castShadow = true;
+    pylon.receiveShadow = true;
+    group.add(pylon);
+
+    // Decorative top cap / iron ring
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.32), capMat);
+    cap.position.set(0, 0.4, -0.22);
+    cap.castShadow = true;
+    group.add(cap);
+
+    // Low riverbank boulder (аккуратный гладкий валун) beside the post
+    const boulder = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.22, 0.32), rockMat);
+    const boulderOffsetX = side === 'left' ? 0.2 : -0.2;
+    boulder.position.set(boulderOffsetX, 0.07, 0.2);
+    boulder.castShadow = true;
+    boulder.receiveShadow = true;
+    group.add(boulder);
+
+    // Subtle accent shard on the boulder
+    const shard = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.1, 0.16), capMat);
+    shard.position.set(boulderOffsetX + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22);
+    group.add(shard);
 
     return group;
+  }
+
+  static createWaterfallEdge(side: 'left' | 'right', biome: BiomeType = 'forest'): THREE.Group {
+    return MeshFactory.createRiverbankEdge(side, biome);
   }
 
   static createRoadMarkings(): THREE.Group {
