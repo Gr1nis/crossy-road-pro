@@ -128,21 +128,21 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
     );
   });
 
-  it('Bug 6 (Camera Grace Period 0.4s & Frustum Edge Threshold -0.96): triggers death shortly after crossing screen edge with smooth warning ratio', () => {
+  it('Bug 6 (Camera Grace Period 0.4s & Frustum Edge Threshold -0.98): triggers death shortly after crossing screen edge with smooth warning ratio', () => {
     assert.equal(WORLD_CONFIG.CAMERA_GRACE_PERIOD, 0.4, 'CAMERA_GRACE_PERIOD must be reduced to 0.4s');
 
-    // Test frustum NDC threshold: exactly at -0.96
+    // Test frustum NDC threshold: snappy death shortly after crossing bottom edge
     const isBehind = collisionModule.isPlayerBehindCameraFrustum;
     assert.equal(typeof isBehind, 'function');
 
-    // At camZ = 10, player at row 0, NDC Y is ~ -0.56 (safely inside)
-    assert.equal(isBehind(0, 0, 10), false);
-    // At camZ = 18, player at row 0, NDC Y is < -0.96 (outside bottom edge)
-    assert.equal(isBehind(0, 0, 18), true);
+    // At camZ = 5, player at row 0, player is safely inside screen view
+    assert.equal(isBehind(0, 0, 5), false);
+    // At camZ = 8, player at row 0, player has crossed bottom visible edge (< -0.98)
+    assert.equal(isBehind(0, 0, 8), true);
 
     // Verify engine warning ratio smooth ramp-up before crossing bottom edge
     const engine = new GameEngine(101);
-    // At start, player is at row 0, camera at -1.0 -> ndcY ~ 0 -> warning ratio = 0
+    // At start, player is at row 0, camera at -1.0 -> safely on screen -> warning ratio = 0
     assert.equal(engine.getCameraGraceRatio(), 0);
   });
 
@@ -152,12 +152,12 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
       'utf8'
     );
     assert.ok(
-      sceneManagerSrc.includes('Math.max(10.5, 11 * aspect)'),
-      'sceneManager.ts must calculate adaptive halfWidth: Math.max(10.5, 11 * aspect)'
+      sceneManagerSrc.includes('getCameraFrustumDimensions'),
+      'sceneManager.ts must use getCameraFrustumDimensions for synchronized frustum calculations'
     );
     assert.ok(
-      sceneManagerSrc.includes('bottom = -11'),
-      'sceneManager.ts must anchor bottom frustum at -11 to match collision grace threshold'
+      sceneManagerSrc.includes('targetCamX') && sceneManagerSrc.includes('worldToScreenX'),
+      'sceneManager.ts must implement horizontal camera tracking following player.x'
     );
     assert.ok(
       !sceneManagerSrc.includes('waterfallSplashes'),
@@ -167,19 +167,29 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
     // Verify mathematical bounds for all key aspect ratios
     const testAspects = [16 / 9, 4 / 3, 1.0, 9 / 16, 9 / 19.5, 9 / 21];
     for (const aspect of testAspects) {
-      const halfWidth = Math.max(10.5, 11 * aspect);
-      const totalHeight = (halfWidth * 2) / aspect;
-      const bottom = -11;
-      const top = bottom + totalHeight;
+      const { viewHeight, halfWidth, bottom, top } = collisionModule.getCameraFrustumDimensions(aspect);
 
-      // Invariant 1 & 2: play corridor [-9..9] and borders [-10.2, 10.2] are within bounds
-      assert.ok(halfWidth >= 10.5, `halfWidth must be >= 10.5 for aspect ${aspect}, got ${halfWidth}`);
-      // NDC bottom alignment with WORLD_CONFIG.FRUSTUM_SIZE = 11
-      assert.equal(bottom, -11, 'Bottom must strictly remain -11 for death boundary parity');
-      // Forward view never regresses below classic 11
-      assert.ok(top >= 11, `Top must be >= 11 for aspect ${aspect}, got ${top}`);
+      // On mobile (aspect <= 9/16): viewHeight is in ~14-16 range
+      if (aspect <= 9 / 16) {
+        assert.ok(viewHeight >= 14 && viewHeight <= 16, `viewHeight must be 14-16 on mobile, got ${viewHeight}`);
+      }
+
+      // On desktop (16/9): wide view (viewHeight ~ 22, halfWidth >= 10.5 to fit [-9..9])
+      if (aspect >= 16 / 9) {
+        assert.ok(viewHeight >= 20 && viewHeight <= 22, `viewHeight must be ~22 on desktop, got ${viewHeight}`);
+        assert.ok(halfWidth >= 10.5, `halfWidth must be >= 10.5 on desktop to fit [-9..9], got ${halfWidth}`);
+      }
+
+      // Player visual center (~ -0.44) sits comfortably at ~25-30% from the bottom edge
+      const playerPosPercent = (-0.44 - bottom) / viewHeight;
+      assert.ok(
+        playerPosPercent >= 0.25 && playerPosPercent <= 0.30,
+        `Player must be positioned at 25-30% from bottom edge, got ${(playerPosPercent * 100).toFixed(1)}%`
+      );
+
       // Aspect ratio must be isotropic (no stretching distortion)
-      assert.ok(Math.abs((halfWidth * 2) / totalHeight - aspect) < 1e-9);
+      assert.ok(Math.abs((halfWidth * 2) / viewHeight - aspect) < 1e-9);
+      assert.equal(top - bottom, viewHeight);
     }
 
     const meshFactorySrc = fs.readFileSync(

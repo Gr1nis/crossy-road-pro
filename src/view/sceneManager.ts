@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { vehicleScreenRotationY, worldToScreenX } from '../core/collision.ts';
+import { getCameraFrustumDimensions, vehicleScreenRotationY, worldToScreenX } from '../core/collision.ts';
 import type { GameEngine } from '../core/gameEngine.ts';
 import { Biome, LaneType, MoveDirection, type BiomeType, type Lane, type SkinId } from '../core/types.ts';
 import { MeshFactory } from './meshFactory.ts';
@@ -113,6 +113,9 @@ export class SceneManager {
   private cachedFogColor = new THREE.Color();
   private cachedAmbientColor = new THREE.Color();
   private cachedDirColor = new THREE.Color();
+  private currentCamX = 0;
+  private currentHalfWidth = 4.22;
+  private currentViewHeight = 15.0;
 
   private disposeHierarchy(obj: THREE.Object3D): void {
     obj.traverse((child) => {
@@ -139,10 +142,9 @@ export class SceneManager {
     this.scene.fog = this.fog;
 
     const aspect = window.innerWidth / window.innerHeight;
-    const halfWidth = Math.max(10.5, 11 * aspect);
-    const totalHeight = (halfWidth * 2) / aspect;
-    const bottom = -11;
-    const top = bottom + totalHeight;
+    const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
+    this.currentViewHeight = viewHeight;
+    this.currentHalfWidth = halfWidth;
     this.camera = new THREE.OrthographicCamera(
       -halfWidth,
       halfWidth,
@@ -335,10 +337,9 @@ export class SceneManager {
 
   private onResize(): void {
     const aspect = window.innerWidth / window.innerHeight;
-    const halfWidth = Math.max(10.5, 11 * aspect);
-    const totalHeight = (halfWidth * 2) / aspect;
-    const bottom = -11;
-    const top = bottom + totalHeight;
+    const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
+    this.currentViewHeight = viewHeight;
+    this.currentHalfWidth = halfWidth;
     this.camera.left = -halfWidth;
     this.camera.right = halfWidth;
     this.camera.top = top;
@@ -657,6 +658,16 @@ export class SceneManager {
     this.updateParticles(dt);
     this.updateAmbientParticles(dt, currentBiome, camZ, nowSec);
 
+    // Sync viewport aspect to engine for matching NDC calculations
+    const aspect = window.innerWidth / window.innerHeight;
+    engine.setViewportAspect(aspect);
+
+    // Mobile horizontal tracking: smoothly follow player.x if corridor exceeds halfWidth
+    const maxPan = Math.max(0, 10.0 - this.currentHalfWidth);
+    const targetCamX = Math.max(-maxPan, Math.min(maxPan, worldToScreenX(p.x)));
+    const lerpFactor = Math.min(1, dt * 8.0);
+    this.currentCamX += (targetCamX - this.currentCamX) * lerpFactor;
+
     let shakeX = 0;
     let shakeZ = 0;
     if (this.shakeIntensity > 0.01) {
@@ -667,14 +678,15 @@ export class SceneManager {
       this.shakeIntensity = 0;
     }
 
-    this.camera.position.set(-7.5 + shakeX, 12.5, camZ - 7.5 + shakeZ);
-    this.camera.lookAt(0, 0, camZ + 2.5);
-    this.dirLight.position.set(-12, 22, camZ - 6);
-    this.dirLight.target.position.set(0, 0, camZ + 3);
+    this.camera.position.set(-7.5 + this.currentCamX + shakeX, 12.5, camZ - 7.5 + shakeZ);
+    this.camera.lookAt(this.currentCamX, 0, camZ + 2.5);
+    this.dirLight.position.set(-12 + this.currentCamX, 22, camZ - 6);
+    this.dirLight.target.position.set(this.currentCamX, 0, camZ + 3);
     this.renderer.render(this.scene, this.camera);
   }
 
   clearAll(): void {
+    this.currentCamX = 0;
     for (const rendered of this.renderedLanes.values()) {
       this.scene.remove(rendered.group);
       this.disposeHierarchy(rendered.group);

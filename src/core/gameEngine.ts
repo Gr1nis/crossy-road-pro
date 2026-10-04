@@ -33,6 +33,7 @@ export class GameEngine {
   private player: PlayerState;
   private cameraZ = -1.0;
   private cameraGraceTimer = 0;
+  private viewportAspect = 9 / 16;
   private inputQueue: MoveDirectionValue[] = [];
   private comboStreak = 0;
   private comboTimer = 0;
@@ -144,12 +145,22 @@ export class GameEngine {
     return this.cameraZ;
   }
 
+  setViewportAspect(aspect: number): void {
+    if (Number.isFinite(aspect) && aspect > 0) {
+      this.viewportAspect = aspect;
+    }
+  }
+
+  getViewportAspect(): number {
+    return this.viewportAspect;
+  }
+
   getPlayerNdcY(): number {
-    return getCameraFrustumNdcY(this.player.x, this.player.row, this.cameraZ);
+    return getCameraFrustumNdcY(this.player.x, this.player.row, this.cameraZ, this.viewportAspect);
   }
 
   isBehindCameraEdge(): boolean {
-    return isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+    return isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ, this.viewportAspect);
   }
 
   getCameraGraceTimer(): number {
@@ -161,8 +172,8 @@ export class GameEngine {
       return Math.min(1, 0.5 + 0.5 * (this.cameraGraceTimer / WORLD_CONFIG.CAMERA_GRACE_PERIOD));
     }
     const ndcY = this.getPlayerNdcY();
-    const approachStart = -0.8;
-    const approachEnd = -0.96;
+    const approachStart = -0.88;
+    const approachEnd = -0.98;
     if (ndcY < approachStart) {
       const t = Math.min(1, Math.max(0, (approachStart - ndcY) / (approachStart - approachEnd)));
       return t * 0.5;
@@ -441,7 +452,7 @@ export class GameEngine {
 
     // Only when player has actually crossed behind the visible screen edge,
     // start grace timer so player has time to escape before dying.
-    const isBehindEdge = isPlayerBehindCameraFrustum(this.player.x, this.player.row, this.cameraZ);
+    const isBehindEdge = this.isBehindCameraEdge();
     if (isBehindEdge) {
       this.cameraGraceTimer += dt;
       if (this.cameraGraceTimer >= WORLD_CONFIG.CAMERA_GRACE_PERIOD) {

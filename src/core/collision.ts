@@ -57,26 +57,67 @@ export function vehicleScreenRotationY(speed: number): number {
   return speed > 0 ? Math.PI : 0;
 }
 
+export const CAMERA_CONFIG = {
+  MOBILE_VIEW_HEIGHT: 15.0,
+  DESKTOP_VIEW_HEIGHT: 22.0,
+  PLAYER_SCREEN_Y_RATIO: 0.28,
+  BASE_PLAYER_VIEW_Y: -0.44,
+  MAX_PAN_CORRIDOR_HALF: 10.0,
+  FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
+} as const;
+
+export function getCameraFrustumDimensions(aspect: number = 9 / 16): {
+  viewHeight: number;
+  halfWidth: number;
+  bottom: number;
+  top: number;
+} {
+  const t = Math.max(0, Math.min(1, (aspect - 0.5625) / (1.7778 - 0.5625)));
+  const viewHeight =
+    CAMERA_CONFIG.MOBILE_VIEW_HEIGHT +
+    t * (CAMERA_CONFIG.DESKTOP_VIEW_HEIGHT - CAMERA_CONFIG.MOBILE_VIEW_HEIGHT);
+  const halfWidth = (viewHeight * aspect) / 2;
+  const bottom =
+    CAMERA_CONFIG.BASE_PLAYER_VIEW_Y -
+    CAMERA_CONFIG.PLAYER_SCREEN_Y_RATIO * viewHeight;
+  const top = bottom + viewHeight;
+  return { viewHeight, halfWidth, bottom, top };
+}
+
 /**
  * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
  * of the player character under the isometric orthographic camera.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
  */
-export function getCameraFrustumNdcY(playerX: number, playerRow: number, camZ: number): number {
+export function getCameraFrustumNdcY(
+  playerX: number,
+  playerRow: number,
+  camZ: number,
+  aspect: number = 9 / 16
+): number {
   const sx = -playerX + 0.35;
   const sy = 0.65;
   const sz = playerRow + 0.35;
   const dx = sx - WORLD_CONFIG.CAMERA_OFFSET.X;
   const dy = sy - WORLD_CONFIG.CAMERA_OFFSET.Y;
   const dz = sz - camZ - WORLD_CONFIG.CAMERA_OFFSET.Z;
-  const vy = dx * 0.42426406871192857 + dy * 0.7071067811865476 + dz * 0.565685424949238;
-  return vy / WORLD_CONFIG.FRUSTUM_SIZE;
+  const vy =
+    dx * 0.42426406871192857 +
+    dy * 0.7071067811865476 +
+    dz * 0.565685424949238;
+  const { viewHeight, bottom } = getCameraFrustumDimensions(aspect);
+  return (2 * (vy - bottom)) / viewHeight - 1.0;
 }
 
 /**
  * Returns true when the player touches or crosses below the visible
- * bottom edge of the screen (NDC Y < -0.96).
+ * bottom edge of the screen (NDC Y < -0.98).
  */
-export function isPlayerBehindCameraFrustum(playerX: number, playerRow: number, camZ: number): boolean {
-  return getCameraFrustumNdcY(playerX, playerRow, camZ) < -0.96;
+export function isPlayerBehindCameraFrustum(
+  playerX: number,
+  playerRow: number,
+  camZ: number,
+  aspect: number = 9 / 16
+): boolean {
+  return getCameraFrustumNdcY(playerX, playerRow, camZ, aspect) < CAMERA_CONFIG.FRUSTUM_EDGE_NDC_THRESHOLD;
 }
