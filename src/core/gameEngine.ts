@@ -255,10 +255,8 @@ export class GameEngine {
 
       if (dir === MoveDirection.FORWARD) {
         nextRow += 1;
-        this.forwardStreak += 1;
       } else if (dir === MoveDirection.BACKWARD) {
         nextRow -= 1;
-        this.forwardStreak = 0;
       } else if (dir === MoveDirection.LEFT) {
         nextX -= 1;
       } else if (dir === MoveDirection.RIGHT) {
@@ -285,6 +283,12 @@ export class GameEngine {
       this.player.targetX = nextX;
       this.player.isHopping = true;
       this.player.hopProgress = 0;
+
+      if (dir === MoveDirection.FORWARD) {
+        this.forwardStreak += 1;
+      } else if (dir === MoveDirection.BACKWARD) {
+        this.forwardStreak = 0;
+      }
 
       if (destLane.type === LaneType.RIVER) {
         const targetLog = findSupportingLog(nextX, destLane.logs);
@@ -359,6 +363,9 @@ export class GameEngine {
             tr.isPassing = false;
             tr.isWarning = false;
             tr.timer = 0;
+            if (!this.player.isDead && Math.abs(lane.index - this.player.row) <= 8) {
+              this.scoreTracker.recordTrainSurvived();
+            }
           }
         } else {
           tr.timer += dt;

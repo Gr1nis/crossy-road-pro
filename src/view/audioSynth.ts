@@ -1,3 +1,7 @@
+interface WindowWithWebkitAudio extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 export class AudioSynth {
   private ctx: AudioContext | null = null;
   private soundEnabled: boolean = true;
@@ -80,7 +84,8 @@ export class AudioSynth {
   private ensureContext(ignoreSoundFlag: boolean = false): AudioContext | null {
     if (typeof window === 'undefined') return null;
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext || (window as WindowWithWebkitAudio).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
         this.masterGainNode = this.ctx.createGain();

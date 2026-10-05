@@ -43,17 +43,9 @@ export class GameLoop {
     this.lastCoins = this.engine.getCoins();
     this.runStartHighScore = this.engine.getHighScore();
 
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const raw = localStorage.getItem('crossy_road_pro_achievements_v1');
-        if (raw) {
-          const arr = JSON.parse(raw);
-          if (Array.isArray(arr)) {
-            arr.forEach((id: string) => this.unlockedAchievements.add(id));
-          }
-        }
-      } catch {
-        // Safe fallback for corrupted storage
+    for (const ach of this.engine.getScoreTracker().getAchievements()) {
+      if (ach.unlocked) {
+        this.unlockedAchievements.add(ach.id);
       }
     }
 
@@ -241,11 +233,6 @@ export class GameLoop {
   private unlockAchievement(id: string, icon: string, title: string, desc: string): void {
     if (this.unlockedAchievements.has(id)) return;
     this.unlockedAchievements.add(id);
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem('crossy_road_pro_achievements_v1', JSON.stringify(Array.from(this.unlockedAchievements)));
-      } catch {}
-    }
     this.ui.showToast(icon, `Достижение: ${title}`, desc);
   }
 

@@ -32,7 +32,7 @@
 - CI (`.github/workflows/pages.yml`) must run `tsc --noEmit && npm test` before deploy.
 
 ## Game Design Invariants
-- Frustum death: NDC Y < −1.0 via analytical projection + 1.25s grace period.
+- Frustum death: NDC Y < −1.0 via analytical projection + 0.4s grace period.
 - Log magnetization: discrete 1.0-spaced slots via `snapToLogSlot`.
 - Biome cycle every 25 points: forest → winter → desert → neon.
 - HUD shows only score + coins + pause. Everything else is modal-driven.

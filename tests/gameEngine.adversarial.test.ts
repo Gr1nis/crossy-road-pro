@@ -211,5 +211,96 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
       `Loaded lanes count must not grow proportionally with traversed rows (expected <= 70, got ${loadedLanesCount})`
     );
   });
+
+  it('Invariant 9 (Obstacle Blocking & Forward Streak Invariant): forward step into obstacle does not increment forwardStreak', () => {
+    const engine = new GameEngine(42);
+    const lane1 = engine.getLane(1);
+    lane1.type = LaneType.GRASS;
+    lane1.obstacles = [0];
+
+    // Attempting to hop forward into an obstacle
+    for (let i = 0; i < 5; i++) {
+      engine.queueMove(MoveDirection.FORWARD);
+      engine.step(WORLD_CONFIG.HOP_DURATION + 0.05);
+    }
+
+    assert.equal(engine.getPlayer().row, 0);
+    assert.equal(engine.getForwardStreak(), 0, 'Blocked forward hops must not increment forwardStreak');
+
+    // Clear obstacle and hop forward successfully
+    lane1.obstacles = [];
+    engine.queueMove(MoveDirection.FORWARD);
+    engine.step(WORLD_CONFIG.HOP_DURATION + 0.05);
+    assert.equal(engine.getPlayer().row, 1);
+    assert.equal(engine.getForwardStreak(), 1, 'Successful forward hop increments forwardStreak');
+
+    // Sideways hop does not reset and does not increment streak
+    const lane1Grass = engine.getLane(1);
+    lane1Grass.obstacles = [];
+    engine.queueMove(MoveDirection.RIGHT);
+    engine.step(WORLD_CONFIG.HOP_DURATION + 0.05);
+    assert.equal(engine.getForwardStreak(), 1, 'Sideways hop must keep forwardStreak unchanged');
+
+    // Backward hop resets streak to 0
+    const lane0 = engine.getLane(0);
+    lane0.obstacles = [];
+    engine.queueMove(MoveDirection.BACKWARD);
+    engine.step(WORLD_CONFIG.HOP_DURATION + 0.05);
+    assert.equal(engine.getPlayer().row, 0);
+    assert.equal(engine.getForwardStreak(), 0, 'Backward hop must reset forwardStreak to 0');
+  });
+
+  it('Invariant 10 (Train Survival & Achievement Unlock): train passing alive player increments trainsSurvived and unlocks train_conqueror at 5', () => {
+    const engine = new GameEngine(123);
+    const railLane = engine.getLane(1);
+    railLane.type = LaneType.RAILWAY;
+    railLane.obstacles = [];
+    railLane.train = {
+      timer: 0,
+      period: 5.0,
+      warningDuration: 1.0,
+      isWarning: false,
+      isPassing: false,
+      x: 0,
+      length: 10.0,
+      speed: 40.0,
+    };
+
+    const tracker = engine.getScoreTracker();
+    assert.equal(tracker.getTrainsSurvived(), 0);
+    assert.equal(tracker.isAchievementUnlocked('train_conqueror'), false);
+
+    // Simulate 5 train passes across railway lane near player
+    for (let i = 1; i <= 5; i++) {
+      railLane.train.isPassing = true;
+      railLane.train.x = 0;
+      railLane.train.speed = 50.0;
+
+      // Advance step so train moves beyond WRAP_LIMIT + 12 (approx 34 tiles)
+      engine.step(1.0);
+
+      assert.equal(railLane.train.isPassing, false, `Train pass ${i} should have finished`);
+      assert.equal(tracker.getTrainsSurvived(), i, `trainsSurvived should equal ${i}`);
+    }
+
+    assert.equal(tracker.isAchievementUnlocked('train_conqueror'), true, 'train_conqueror should be unlocked after 5 trains');
+
+    // Far-away train (beyond row 8) does not count
+    const farLane = engine.getLane(20);
+    farLane.type = LaneType.RAILWAY;
+    farLane.train = {
+      timer: 0,
+      period: 5.0,
+      warningDuration: 1.0,
+      isWarning: false,
+      isPassing: true,
+      x: 0,
+      length: 10.0,
+      speed: 50.0,
+    };
+    engine.step(1.0);
+    assert.equal(tracker.getTrainsSurvived(), 5, 'Train outside visibility zone (row 20) should not count');
+  });
 });
+
 

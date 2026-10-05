@@ -94,6 +94,7 @@ const BIOME_ATMOSPHERES: Record<
 };
 
 export class SceneManager {
+  private static readonly puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
   private renderer: THREE.WebGLRenderer;
@@ -103,6 +104,7 @@ export class SceneManager {
   private playerMesh: THREE.Group;
   private currentSkin: SkinId = 'chicken';
   private renderedLanes = new Map<number, RenderedLane>();
+  private activeIndices = new Set<number>();
   private shakeIntensity = 0;
   private particles: Particle[] = [];
   private ambientParticles: AmbientParticle[] = [];
@@ -121,7 +123,7 @@ export class SceneManager {
     obj.traverse((child) => {
       const mesh = child as THREE.Mesh;
       if (mesh.isMesh) {
-        if (mesh.geometry) {
+        if (mesh.geometry && mesh.geometry !== SceneManager.puffGeo) {
           mesh.geometry.dispose();
         }
         if (mesh.material) {
@@ -187,11 +189,10 @@ export class SceneManager {
   }
 
   spawnHopPuff(x: number, y: number, z: number, color: number, count: number = 6): void {
-    const geo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     const mat = new THREE.MeshLambertMaterial({ color });
 
     for (let i = 0; i < count; i++) {
-      const mesh = new THREE.Mesh(geo, mat);
+      const mesh = new THREE.Mesh(SceneManager.puffGeo, mat);
       mesh.position.set(
         worldToScreenX(x) + (Math.random() - 0.5) * 0.35,
         y + 0.05,
@@ -511,7 +512,7 @@ export class SceneManager {
     this.dirLight.intensity += (targetAtmos.dirIntensity - this.dirLight.intensity) * lerpFactor;
 
     const activeLanes = engine.getActiveLanes();
-    const activeIndices = new Set<number>();
+    this.activeIndices.clear();
     const nowSec = performance.now() * 0.004;
 
     // Update log landing impact timers
@@ -523,7 +524,7 @@ export class SceneManager {
     }
 
     for (const lane of activeLanes) {
-      activeIndices.add(lane.index);
+      this.activeIndices.add(lane.index);
       let rendered = this.renderedLanes.get(lane.index);
       if (!rendered) {
         const nextLane = engine.getLane(lane.index + 1);
@@ -592,7 +593,7 @@ export class SceneManager {
     }
 
     for (const [idx, rendered] of this.renderedLanes.entries()) {
-      if (!activeIndices.has(idx)) {
+      if (!this.activeIndices.has(idx)) {
         this.scene.remove(rendered.group);
         this.disposeHierarchy(rendered.group);
         this.renderedLanes.delete(idx);
