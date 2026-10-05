@@ -32,17 +32,19 @@
   - Обновлён `scripts/build.mjs` (все 17 модулей в правильном порядке `moduleOrder`, авто-зачистка блоков `export`).
   - Добавлен `@types/node` в `devDependencies`, полностью решена проблема падения `Typecheck` в GitHub Actions.
 
-### Фаза 2 — Модальное окно и система достижений (`[x]`)
-- `[x]` **Achievements UI & 10 Challenges Pool**:
-  - Добавлена кнопка «🏅 Достижения» с живым бейджем `X/10` в Главное меню.
-  - Разработано модальное окно `#achievements-modal` с общим прогресс-баром и карточками статуса (`✅ Открыто` / `🔒 В процессе`).
-  - Пул испытаний расширен с 5 до 10 уникальных задач (исключено комбо, добавлены шаги, гача, стрик вперед, прыжки по бревнам, монеты за забег).
-  - Написан Adversarial TDD сьют `tests/achievements.test.ts`. Все 48 тестов проходят, `tsc --noEmit` — 0 ошибок.
+### Доработки перед Фазой 3 (Аудит и стабилизация) (`[x]`)
+- `[x]` **Fix Train Survival Achievement**: `recordTrainSurvived()` вызывается в `src/core/gameEngine.ts` при завершении проезда поезда в зоне видимости игрока.
+- `[x]` **Fix Forward Streak Exploit**: Инкремент `forwardStreak` в `gameEngine.ts` перенесен строго после успешной валидации препятствий.
+- `[x]` **Adversarial TDD Suite Expansion**: Добавлены Invariant 9 и Invariant 10 в `tests/gameEngine.adversarial.test.ts` (**50 / 50 GREEN**).
+- `[x]` **Ghost Files Removal**: Полностью удалены неиспользуемые дубликаты `src/ui/uiManager.ts` и `src/audio/soundManager.ts`.
+- `[x]` **Three.js Allocation Optimization**: `activeIndices` вынесен в поле класса `SceneManager` с `.clear()`, устранено создание `new Set` в каждом кадре; геометрия пыли `SceneManager.puffGeo` закеширована.
+- `[x]` **Persistence Unification**: `GameLoop` избавлен от прямого ключа `crossy_road_pro_achievements_v1` и пустых `catch {}`, опирается на профиль `ScoreTracker`.
+- `[x]` **Rules Documentation Sync**: Актуализирован таймаут гибели камеры до 0.4s в `.agents/rules/crossy-road.md`.
 
 ---
 
 ## 3. Key Architectural Decisions
-- **Zero-Dependency Core**: Папка `src/core/` никогда не импортирует Three.js или DOM-типы. Все 38 тестов запускаются нативно через Node.js.
+- **Zero-Dependency Core**: Папка `src/core/` никогда не импортирует Three.js или DOM-типы. Все тесты запускаются нативно через Node.js.
 - **Flat Bundle Assembly**: `scripts/build.mjs` конкатенирует все модули в один плоский `<script type="module">` в `index.html`. Все имена классов и функций на верхнем уровне должны быть глобально уникальны.
 - **Dirty Checking в UI**: Текстовые узлы очков и монет обновляются в DOM только при реальном изменении значений, исключая просадки FPS.
 - **Input Focus Protection**: При фокусе в поле ввода текста (`leaderboard-name-input`) клавиши WASD/Space не триггерят движение персонажа.
@@ -57,7 +59,7 @@
 ---
 
 ## 4. Current State & Immediate Next Steps (`[ ]`)
-Завершена **Фаза 2 (Мобильный ввод, оптимизация рендеринга и точечные исправления)**. Следующий этап — **Фаза 3 (Интеграция с Yandex Games SDK & Монетизация)**:
+Все подготовительные доработки завершены. Следующий этап — **Фаза 3 (Интеграция с Yandex Games SDK & Монетизация)**:
 
 - `[ ]` **Поток 3A (Yandex Games SDK Bridge)**:
   - Создать `src/app/yandexBridge.ts` с безопасным моком для локального запуска без интернета.
@@ -72,6 +74,6 @@
 
 ## 5. Verification Status
 - **TypeScript**: `npx tsc --noEmit` — 0 errors.
-- **Test Suite**: `npm test` — **44 / 44 GREEN** across 6 test suites.
+- **Test Suite**: `npm test` — **50 / 50 GREEN** across 7 test suites.
 - **Bundle**: `node --check dist/bundle.js` — 0 errors.
 - **Offline HTML**: `index.html` самодостаточен, мобильный вьюпорт и жесты настроены.
