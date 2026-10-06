@@ -50,11 +50,28 @@ export function worldToScreenX(x: number): number {
   return x === 0 ? 0 : -x;
 }
 
-/**
- * Returns vehicle Y-rotation so the front of the vehicle faces its movement direction on screen.
- */
 export function vehicleScreenRotationY(speed: number): number {
   return speed > 0 ? Math.PI : 0;
+}
+
+export const RECORD_FLAG_X = 3.8;
+
+export interface RecordFlagPosition {
+  x: number;
+  row: number;
+}
+
+export function getRecordFlagPosition(
+  highScore: number,
+  shoulderX: number = RECORD_FLAG_X
+): RecordFlagPosition | null {
+  if (!Number.isFinite(highScore) || highScore <= 0) {
+    return null;
+  }
+  return {
+    x: shoulderX,
+    row: Math.floor(highScore),
+  };
 }
 
 export const CAMERA_CONFIG = {

@@ -649,4 +649,85 @@ export class MeshFactory {
 
     return group;
   }
+
+  static createRecordFlag(): THREE.Group {
+    const group = new THREE.Group();
+    group.name = 'recordFlag';
+
+    // Materials
+    const baseMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+    const baseTrimMat = new THREE.MeshLambertMaterial({ color: 0xf59e0b });
+    const poleMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+    const goldClothMat = new THREE.MeshLambertMaterial({ color: 0xfbbf24 });
+    const crownMat = new THREE.MeshLambertMaterial({ color: 0xf59e0b });
+    const rubyMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
+
+    // Platform pedestal base on the shoulder
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.7), baseMat);
+    base.position.y = 0.06;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    group.add(base);
+
+    const baseTrim = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.04, 0.76), baseTrimMat);
+    baseTrim.position.y = 0.02;
+    baseTrim.castShadow = true;
+    baseTrim.receiveShadow = true;
+    group.add(baseTrim);
+
+    // Voxel flagpole of height 1.8 blocks
+    const pole = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.8, 0.1), poleMat);
+    pole.position.y = 1.02;
+    pole.castShadow = true;
+    pole.receiveShadow = true;
+    group.add(pole);
+
+    // Pole top finial (golden cap)
+    const finial = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.18), crownMat);
+    finial.position.y = 1.99;
+    finial.castShadow = true;
+    group.add(finial);
+
+    // Golden voxel pennant/cloth with pivot along flagpole edge
+    const clothGroup = new THREE.Group();
+    clothGroup.name = 'flagCloth';
+    clothGroup.position.set(0.05, 1.45, 0);
+
+    const mainCloth = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.44, 0.04), goldClothMat);
+    mainCloth.position.set(0.375, 0, 0);
+    mainCloth.castShadow = true;
+    clothGroup.add(mainCloth);
+
+    // Pennant swallowtail tips
+    const tipUpper = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.042), goldClothMat);
+    tipUpper.position.set(0.85, 0.14, 0);
+    const tipLower = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.042), goldClothMat);
+    tipLower.position.set(0.85, -0.14, 0);
+    clothGroup.add(tipUpper, tipLower);
+
+    // Crown emblem 👑 on flag
+    const crownBase = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.06, 0.07), crownMat);
+    crownBase.position.set(0.375, -0.08, 0);
+    clothGroup.add(crownBase);
+
+    const crownLeft = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.07), crownMat);
+    crownLeft.position.set(0.24, -0.01, 0);
+    const crownMid = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.22, 0.07), crownMat);
+    crownMid.position.set(0.375, 0.02, 0);
+    const crownRight = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.07), crownMat);
+    crownRight.position.set(0.51, -0.01, 0);
+    clothGroup.add(crownLeft, crownMid, crownRight);
+
+    // Ruby gems on crown peaks
+    const rubyLeft = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.08), rubyMat);
+    rubyLeft.position.set(0.24, 0.09, 0);
+    const rubyMid = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.08), rubyMat);
+    rubyMid.position.set(0.375, 0.15, 0);
+    const rubyRight = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.08), rubyMat);
+    rubyRight.position.set(0.51, 0.09, 0);
+    clothGroup.add(rubyLeft, rubyMid, rubyRight);
+
+    group.add(clothGroup);
+    return group;
+  }
 }

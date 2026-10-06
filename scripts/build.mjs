@@ -30,6 +30,7 @@ const moduleOrder = [
   'src/core/gameEngine.ts',
   'src/view/audioSynth.ts',
   'src/view/meshFactory.ts',
+  'src/view/squashStretch.ts',
   'src/view/sceneManager.ts',
   'src/app/uiManager.ts',
   'src/app/inputManager.ts',

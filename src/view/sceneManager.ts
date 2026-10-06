@@ -1,8 +1,13 @@
 import * as THREE from 'three';
 import { getCameraFrustumDimensions, vehicleScreenRotationY, worldToScreenX } from '../core/collision.ts';
 import type { GameEngine } from '../core/gameEngine.ts';
-import { Biome, LaneType, MoveDirection, type BiomeType, type Lane, type SkinId } from '../core/types.ts';
+import { Biome, DeathReason, LaneType, MoveDirection, type BiomeType, type Lane, type SkinId } from '../core/types.ts';
 import { MeshFactory } from './meshFactory.ts';
+import {
+  calculateHopSquashStretch,
+  calculateLandingBounce,
+  LANDING_BOUNCE_DURATION,
+} from './squashStretch.ts';
 
 interface RenderedLane {
   group: THREE.Group;
@@ -111,6 +116,8 @@ export class SceneManager {
   private logImpacts = new Map<number, LogImpact>();
   private prevRidingLogId: number | null = null;
   private lastHoppingState = false;
+  private landingBounceTimer = 0;
+  private landingBounceElapsed = 0;
   private cachedSkyColor = new THREE.Color();
   private cachedFogColor = new THREE.Color();
   private cachedAmbientColor = new THREE.Color();
@@ -118,6 +125,8 @@ export class SceneManager {
   private currentCamX = 0;
   private currentHalfWidth = 4.22;
   private currentViewHeight = 15.0;
+  private recordFlagMesh: THREE.Group | null = null;
+  private recordFlagRow: number | null = null;
 
   private disposeHierarchy(obj: THREE.Object3D): void {
     obj.traverse((child) => {
@@ -247,6 +256,61 @@ export class SceneManager {
         maxLife: 0.55 + Math.random() * 0.35,
       });
     }
+  }
+
+  spawnRecordConfetti(x: number, y: number, z: number): void {
+    const colors = [0xfacc15, 0xfbbf24, 0xf59e0b, 0xffffff, 0xef4444, 0xec4899];
+    const count = 48;
+    for (let i = 0; i < count; i++) {
+      const c = colors[Math.floor(Math.random() * colors.length)];
+      const size = 0.08 + Math.random() * 0.08;
+      const geo = new THREE.BoxGeometry(size, size, size);
+      const mat = new THREE.MeshLambertMaterial({ color: c });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(
+        worldToScreenX(x) + (Math.random() - 0.5) * 0.6,
+        y + (Math.random() - 0.5) * 0.4,
+        z + (Math.random() - 0.5) * 0.6
+      );
+      this.scene.add(mesh);
+
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2.5 + Math.random() * 4.5;
+      this.particles.push({
+        mesh,
+        vx: Math.cos(angle) * speed,
+        vy: 3.5 + Math.random() * 4.5,
+        vz: Math.sin(angle) * speed,
+        life: 0,
+        maxLife: 0.75 + Math.random() * 0.45,
+      });
+    }
+  }
+
+  setRecordFlag(row: number, x: number = 3.8): void {
+    this.removeRecordFlag();
+    if (!Number.isFinite(row) || row <= 0) return;
+    this.recordFlagMesh = MeshFactory.createRecordFlag();
+    this.recordFlagMesh.position.set(worldToScreenX(x), 0, row);
+    this.recordFlagRow = row;
+    this.scene.add(this.recordFlagMesh);
+  }
+
+  removeRecordFlag(): void {
+    if (this.recordFlagMesh) {
+      this.scene.remove(this.recordFlagMesh);
+      this.disposeHierarchy(this.recordFlagMesh);
+      this.recordFlagMesh = null;
+      this.recordFlagRow = null;
+    }
+  }
+
+  getRecordFlag(): THREE.Group | null {
+    return this.recordFlagMesh;
+  }
+
+  getRecordFlagRow(): number | null {
+    return this.recordFlagRow;
   }
 
   private updateParticles(dt: number): void {
@@ -602,6 +666,8 @@ export class SceneManager {
 
     // Landing detection for surface puff particles & log landing impact wobble
     if (this.lastHoppingState && !p.isHopping && !p.isDead) {
+      this.landingBounceTimer = LANDING_BOUNCE_DURATION;
+      this.landingBounceElapsed = 0;
       const landedLane = engine.getLane(p.row);
       const laneBiome = landedLane.biome ?? currentBiome;
       let puffColor = 0xffffff;
@@ -631,6 +697,14 @@ export class SceneManager {
     this.lastHoppingState = p.isHopping;
     this.prevRidingLogId = p.ridingLogId;
 
+    if (p.isHopping) {
+      this.landingBounceTimer = 0;
+      this.landingBounceElapsed = 0;
+    } else if (this.landingBounceTimer > 0) {
+      this.landingBounceElapsed += dt;
+      this.landingBounceTimer = Math.max(0, this.landingBounceTimer - dt);
+    }
+
     const hopHeight = p.isHopping ? 4 * 0.75 * p.hopProgress * (1 - p.hopProgress) : 0;
     const activeImpact = p.ridingLogId !== null ? this.logImpacts.get(p.ridingLogId) : undefined;
     const logSpringY = activeImpact
@@ -645,19 +719,39 @@ export class SceneManager {
     else if (p.facing === MoveDirection.RIGHT) this.playerMesh.rotation.y = -Math.PI / 2;
 
     if (p.isDead) {
-      if (p.deathReason === 'CAR' || p.deathReason === 'TRAIN') {
+      this.landingBounceTimer = 0;
+      if (p.deathReason === DeathReason.CAR) {
+        this.playerMesh.scale.set(1.65, 0.1, 1.65);
+      } else if (p.deathReason === DeathReason.TRAIN) {
+        this.playerMesh.scale.set(1.85, 0.06, 1.85);
+      } else if (p.deathReason === DeathReason.WATER) {
+        const bob = Math.sin(nowSec * 3.5) * 0.03;
+        this.playerMesh.position.y = -0.6 + bob;
+        this.playerMesh.rotation.z = Math.sin(nowSec * 2.0) * 0.06;
+      } else {
         this.playerMesh.scale.set(1.4, 0.15, 1.4);
-      } else if (p.deathReason === 'WATER') {
-        this.playerMesh.position.y = -0.5;
       }
+    } else if (p.isHopping) {
+      const { scaleY, scaleXZ } = calculateHopSquashStretch(p.hopProgress);
+      this.playerMesh.scale.set(scaleXZ, scaleY, scaleXZ);
+    } else if (this.landingBounceTimer > 0) {
+      const { scaleY, scaleXZ } = calculateLandingBounce(this.landingBounceElapsed);
+      this.playerMesh.scale.set(scaleXZ, scaleY, scaleXZ);
     } else {
-      const stretch = p.isHopping ? 1 + Math.sin(p.hopProgress * Math.PI) * 0.22 : 1;
-      this.playerMesh.scale.set(1 / Math.sqrt(stretch), stretch, 1 / Math.sqrt(stretch));
+      this.playerMesh.scale.set(1, 1, 1);
     }
 
     const camZ = engine.getCameraZ();
     this.updateParticles(dt);
     this.updateAmbientParticles(dt, currentBiome, camZ, nowSec);
+
+    // Animate record flag cloth swaying in the wind
+    if (this.recordFlagMesh) {
+      const cloth = this.recordFlagMesh.getObjectByName('flagCloth');
+      if (cloth) {
+        cloth.rotation.y = Math.sin(nowSec * 3) * 0.22;
+      }
+    }
 
     // Sync viewport aspect to engine for matching NDC calculations
     const aspect = window.innerWidth / window.innerHeight;
@@ -688,6 +782,7 @@ export class SceneManager {
 
   clearAll(): void {
     this.currentCamX = 0;
+    this.removeRecordFlag();
     for (const rendered of this.renderedLanes.values()) {
       this.scene.remove(rendered.group);
       this.disposeHierarchy(rendered.group);
@@ -700,5 +795,7 @@ export class SceneManager {
       this.disposeHierarchy(p.mesh);
     }
     this.particles = [];
+    this.landingBounceTimer = 0;
+    this.landingBounceElapsed = 0;
   }
 }

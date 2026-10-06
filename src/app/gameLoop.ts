@@ -1,4 +1,5 @@
 import { GameEngine } from '../core/gameEngine.ts';
+import { RECORD_FLAG_X } from '../core/collision.ts';
 import { ALL_SKINS, DeathReason, MoveDirection, WORLD_CONFIG, type MoveDirectionValue, type SkinId } from '../core/types.ts';
 import { AudioSynth } from '../view/audioSynth.ts';
 import { SceneManager } from '../view/sceneManager.ts';
@@ -71,6 +72,9 @@ export class GameLoop {
     this.runStartHighScore = this.engine.getHighScore();
     this.notifiedNewHighScoreThisRun = false;
     this.sceneManager.clearAll();
+    if (this.runStartHighScore > 0) {
+      this.sceneManager.setRecordFlag(this.runStartHighScore, RECORD_FLAG_X);
+    }
     this.engine.reset(Date.now());
     this.lastCoins = this.engine.getCoins();
     this.isPlaying = true;
@@ -264,25 +268,29 @@ export class GameLoop {
     }
 
     const currentScore = this.engine.getScore();
+    const p = this.engine.getPlayer();
+
+    if (this.isPlaying && this.runStartHighScore > 0 && !this.notifiedNewHighScoreThisRun && p.row >= this.runStartHighScore) {
+      this.notifiedNewHighScoreThisRun = true;
+      this.sceneManager.removeRecordFlag();
+      this.sceneManager.spawnRecordConfetti(RECORD_FLAG_X, 1.0, this.runStartHighScore);
+      this.audio.playRecordFanfare();
+      this.ui.showToast('🏆', 'НОВЫЙ РЕКОРД!', `Преодолён прошлый рекорд (${this.runStartHighScore})!`);
+    }
+
     if (this.isPlaying && currentScore > 0) {
-      if (currentScore > this.runStartHighScore && this.runStartHighScore > 0 && !this.notifiedNewHighScoreThisRun) {
-        this.notifiedNewHighScoreThisRun = true;
-        this.audio.playNewHighScore();
-        this.ui.showToast('🏆', 'Новый рекорд!', `Вы побили прошлый рекорд (${this.runStartHighScore})!`);
-      }
       this.syncAchievements();
     }
 
     this.ui.updateScore(currentScore);
     this.ui.updateCoins(currentCoins);
 
-    if (this.isPlaying && !this.isPaused && !this.engine.getPlayer().isDead) {
+    if (this.isPlaying && !this.isPaused && !p.isDead) {
       this.ui.setWarningVignette(this.engine.getCameraGraceRatio());
     } else {
       this.ui.setWarningVignette(0);
     }
 
-    const p = this.engine.getPlayer();
     if (this.isPlaying && p.isDead && !this.wasDead) {
       this.wasDead = true;
       this.recordRunToLeaderboard(currentScore);

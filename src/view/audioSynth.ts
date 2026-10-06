@@ -461,29 +461,37 @@ export class AudioSynth {
   }
 
   playNewHighScore(): void {
+    this.playRecordFanfare();
+  }
+
+  playRecordFanfare(): void {
     if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const fanfare = [
-      { freq: 523.25, delay: 0.0, dur: 0.11 },
-      { freq: 659.25, delay: 0.1, dur: 0.11 },
-      { freq: 783.99, delay: 0.2, dur: 0.11 },
-      { freq: 1046.5, delay: 0.31, dur: 0.34 },
+    // Triumphant major arpeggio fanfare
+    const notes = [
+      { freq: 523.25, delay: 0.0, dur: 0.12, type: 'triangle' as OscillatorType, gain: 0.2 },
+      { freq: 659.25, delay: 0.08, dur: 0.12, type: 'triangle' as OscillatorType, gain: 0.22 },
+      { freq: 783.99, delay: 0.16, dur: 0.12, type: 'triangle' as OscillatorType, gain: 0.22 },
+      { freq: 1046.5, delay: 0.24, dur: 0.18, type: 'triangle' as OscillatorType, gain: 0.24 },
+      { freq: 1318.51, delay: 0.34, dur: 0.2, type: 'triangle' as OscillatorType, gain: 0.25 },
+      { freq: 1567.98, delay: 0.44, dur: 0.45, type: 'triangle' as OscillatorType, gain: 0.26 },
+      { freq: 1046.5, delay: 0.44, dur: 0.45, type: 'triangle' as OscillatorType, gain: 0.2 },
     ];
-    fanfare.forEach(({ freq, delay, dur }) => {
+    notes.forEach(({ freq, delay, dur, type, gain: noteGain }) => {
       const t = now + delay;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'triangle';
+      osc.type = type;
       osc.frequency.setValueAtTime(freq, t);
-      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.setValueAtTime(noteGain, t);
       gain.gain.exponentialRampToValueAtTime(0.005, t + dur);
       osc.connect(gain);
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(t);
-      osc.stop(t + dur + 0.01);
+      osc.stop(t + dur + 0.02);
     });
   }
 }
