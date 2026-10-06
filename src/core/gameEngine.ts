@@ -68,7 +68,7 @@ export class GameEngine {
 
   private ensureLanesAround(centerRow: number): void {
     const minR = Math.min(centerRow - 8, Math.floor(this.cameraZ) - 26);
-    const maxR = Math.max(centerRow + 28, Math.floor(this.cameraZ) + 28);
+    const maxR = Math.max(centerRow + 38, Math.floor(this.cameraZ) + 38);
     const currentScore = this.scoreTracker.getScore();
     for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
@@ -136,7 +136,7 @@ export class GameEngine {
     this.ensureLanesAround(Math.round(this.player.row));
     const list: Lane[] = [];
     const minRow = Math.min(Math.floor(this.cameraZ) - 24, Math.floor(this.player.row) - 8);
-    const maxRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
+    const maxRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));
     }
@@ -326,7 +326,7 @@ export class GameEngine {
 
     const currentLane = this.getLane(Math.round(this.player.row));
     const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
-    const maxSimRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
 
     for (let r = minSimRow; r <= maxSimRow; r++) {
       const lane = this.getLane(r);

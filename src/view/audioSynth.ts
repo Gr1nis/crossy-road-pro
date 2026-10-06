@@ -210,39 +210,43 @@ export class AudioSynth {
     const gain = ctx.createGain();
 
     if (surface === 'log') {
-      // Warm hollow wooden clack
+      // Warm hollow wooden "tok" (pure sine 380Hz -> 190Hz)
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(220 * pitchScale, now + 0.07);
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.075);
-    } else if (surface === 'road') {
-      // Crisp asphalt tap
-      osc.type = 'triangle';
       osc.frequency.setValueAtTime(380 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(620 * pitchScale, now + 0.065);
-      gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
-    } else if (surface === 'rail') {
-      // Metallic ping
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(520 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(780 * pitchScale, now + 0.08);
-      gain.gain.setValueAtTime(0.14, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.085);
-    } else {
-      // Soft bouncy grass hop
+      osc.frequency.exponentialRampToValueAtTime(190 * pitchScale, now + 0.07);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.075);
+    } else if (surface === 'road') {
+      // Muted neat voxel click without metallic rattle (triangle 320Hz -> 480Hz)
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(310 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(560 * pitchScale, now + 0.09);
-      gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+      osc.frequency.setValueAtTime(320 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(480 * pitchScale, now + 0.06);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.16, now + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.065);
+    } else if (surface === 'rail') {
+      // Delicate glass-metallic chime instead of screaming saw (pure sine 880Hz -> 1046Hz)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(1046.5 * pitchScale, now + 0.08);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.12, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.085);
+    } else {
+      // Soft bouncy grass rubber pop (sine 220Hz -> 360Hz with fast decay 0.07s)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(360 * pitchScale, now + 0.065);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.18, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.07);
     }
 
     osc.connect(gain);
     gain.connect(this.sfxGainNode ?? ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.1);
+    osc.stop(now + 0.09);
   }
 
   playCoin(): void {
@@ -251,19 +255,27 @@ export class AudioSynth {
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(987.77, now); // B5
-    osc.frequency.setValueAtTime(1318.51, now + 0.06); // E6
+    // Crystalline dual-tone chime (B5 -> E6) with soft anti-click attack and velvety decay
+    const notes = [
+      { freq: 987.77, start: now, dur: 0.18, gain: 0.12 }, // B5
+      { freq: 1318.51, start: now + 0.055, dur: 0.24, gain: 0.14 }, // E6
+    ];
 
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+    notes.forEach(({ freq, start, dur, gain: noteGain }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, start);
 
-    osc.connect(gain);
-    gain.connect(this.sfxGainNode ?? ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.23);
+      gain.gain.setValueAtTime(0.001, start);
+      gain.gain.linearRampToValueAtTime(noteGain, start + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(start);
+      osc.stop(start + dur + 0.01);
+    });
   }
 
   playGacha(): void {
@@ -289,27 +301,36 @@ export class AudioSynth {
     });
   }
 
-  playTrainWhistle(): void {
+  playTrainWarning(): void {
     if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    [440, 554.37].forEach((freq) => {
+    // Vintage railway crossing bell: soft bell sines (660Hz / 880Hz) with exponential decay
+    const bells = [
+      { freq: 660, gain: 0.14, dur: 0.32 },
+      { freq: 880, gain: 0.09, dur: 0.24 },
+    ];
+    bells.forEach(({ freq, gain: maxGain, dur }) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sawtooth';
+      osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, now);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.45);
 
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(maxGain, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
       osc.connect(gain);
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.46);
+      osc.stop(now + dur + 0.01);
     });
+  }
+
+  playTrainWhistle(): void {
+    this.playTrainWarning();
   }
 
   playCrash(): void {
@@ -317,19 +338,48 @@ export class AudioSynth {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
+    const now = ctx.currentTime;
+
+    // Soft low-frequency impulse (110Hz -> 35Hz comic 'thud')
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(150, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(42, ctx.currentTime + 0.28);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.exponentialRampToValueAtTime(35, now + 0.22);
 
-    gain.gain.setValueAtTime(0.26, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.002, now + 0.22);
 
     osc.connect(gain);
     gain.connect(this.sfxGainNode ?? ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
+    osc.start(now);
+    osc.stop(now + 0.23);
+
+    // Muted micro-noise puff ('poof-splat')
+    const sampleRate = ctx.sampleRate || 44100;
+    const bufferSize = Math.floor(sampleRate * 0.06);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, sampleRate);
+    const channelData = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      channelData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+    }
+
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(450, now);
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.08, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+    noiseSource.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(this.sfxGainNode ?? ctx.destination);
+    noiseSource.start(now);
+    noiseSource.stop(now + 0.065);
   }
 
   playSplash(): void {
@@ -337,19 +387,30 @@ export class AudioSynth {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
+    const now = ctx.currentTime;
+
+    // Juicy cartoon water bubble "plop" with smoothed highs
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(420, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(95, ctx.currentTime + 0.25);
+    // Subtle initial dip then juicy resonant bubble rise (260Hz -> 580Hz)
+    osc.frequency.setValueAtTime(260, now);
+    osc.frequency.exponentialRampToValueAtTime(580, now + 0.09);
 
-    gain.gain.setValueAtTime(0.24, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(950, now);
 
-    osc.connect(gain);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.002, now + 0.16);
+
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(this.sfxGainNode ?? ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.26);
+    osc.start(now);
+    osc.stop(now + 0.17);
   }
 
   playSkinVoice(skinId: string = 'chicken'): void {

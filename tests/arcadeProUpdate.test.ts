@@ -151,5 +151,11 @@ describe('Arcade Pro Update — Railway, Coins, Rocks/Bushes, Gacha Skins, Combo
     const html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
     assert.equal(html.includes('class="controls-pad"'), false, 'Mobile controls-pad must be removed from index.html');
     assert.equal(html.includes('menu-gacha-btn'), true, 'Gacha machine button must be present in main menu');
+    assert.equal(html.includes('🎰 Автомат скинов'), true, 'Gacha button in main menu must be named 🎰 Автомат скинов');
+    assert.equal(html.includes('🎰 АВТОМАТ СКИНОВ'), true, 'Modal title must be 🎰 АВТОМАТ СКИНОВ');
+    assert.equal(html.includes('Посмотрим, как далеко ты сможешь зайти!'), true, 'Main menu slogan must be updated');
+    assert.equal(html.includes('gacha-modal-status'), false, 'Element #gacha-modal-status must be removed');
+    assert.equal(html.includes('1 прокрут = 100 монет'), false, 'Status text 1 прокрут = 100 монет must be removed');
+    assert.ok(html.includes('display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle;'), 'Balance pill must have horizontal inline-flex alignment styles');
   });
 });

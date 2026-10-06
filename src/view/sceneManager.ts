@@ -164,6 +164,8 @@ export class SceneManager {
       -30,
       80
     );
+    this.camera.position.set(-7.5, 13.5, -8.0);
+    this.camera.lookAt(0, 0, 3.0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -188,7 +190,7 @@ export class SceneManager {
 
     this.playerMesh = MeshFactory.createCharacter('chicken');
     this.scene.add(this.playerMesh);
-    this.initAmbientParticles(32);
+    this.initAmbientParticles(21);
 
     window.addEventListener('resize', () => this.onResize());
   }
@@ -197,7 +199,7 @@ export class SceneManager {
     this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
   }
 
-  spawnHopPuff(x: number, y: number, z: number, color: number, count: number = 6): void {
+  spawnHopPuff(x: number, y: number, z: number, color: number, count: number = 4): void {
     const mat = new THREE.MeshLambertMaterial({ color });
 
     for (let i = 0; i < count; i++) {
@@ -260,7 +262,7 @@ export class SceneManager {
 
   spawnRecordConfetti(x: number, y: number, z: number): void {
     const colors = [0xfacc15, 0xfbbf24, 0xf59e0b, 0xffffff, 0xef4444, 0xec4899];
-    const count = 48;
+    const count = 32;
     for (let i = 0; i < count; i++) {
       const c = colors[Math.floor(Math.random() * colors.length)];
       const size = 0.08 + Math.random() * 0.08;
@@ -692,7 +694,7 @@ export class SceneManager {
       } else if (landedLane.type === LaneType.RAILWAY) {
         puffColor = 0xd1d5db;
       }
-      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 6);
+      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 4);
     }
     this.lastHoppingState = p.isHopping;
     this.prevRidingLogId = p.ridingLogId;
@@ -773,8 +775,8 @@ export class SceneManager {
       this.shakeIntensity = 0;
     }
 
-    this.camera.position.set(-7.5 + this.currentCamX + shakeX, 12.5, camZ - 7.5 + shakeZ);
-    this.camera.lookAt(this.currentCamX, 0, camZ + 2.5);
+    this.camera.position.set(-7.5 + this.currentCamX + shakeX, 13.5, camZ - 8.0 + shakeZ);
+    this.camera.lookAt(this.currentCamX, 0, camZ + 3.0);
     this.dirLight.position.set(-12 + this.currentCamX, 22, camZ - 6);
     this.dirLight.target.position.set(this.currentCamX, 0, camZ + 3);
     this.renderer.render(this.scene, this.camera);

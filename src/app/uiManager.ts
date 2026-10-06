@@ -66,7 +66,6 @@ export class UIManager {
   private readonly gachaModalRollBtn: HTMLElement | null;
   private readonly gachaModalCloseBtn: HTMLElement | null;
   private readonly gachaModalCoinsEl: HTMLElement | null;
-  private readonly gachaModalStatusEl: HTMLElement | null;
   private readonly gachaModalSkinListEl: HTMLElement | null;
 
   private readonly leaderboardCloseBtn: HTMLElement | null;
@@ -124,7 +123,6 @@ export class UIManager {
     this.gachaModalRollBtn = document.getElementById('gacha-modal-roll-btn');
     this.gachaModalCloseBtn = document.getElementById('gacha-modal-close-btn');
     this.gachaModalCoinsEl = document.getElementById('gacha-modal-coins');
-    this.gachaModalStatusEl = document.getElementById('gacha-modal-status');
     this.gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list');
 
     this.leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
@@ -298,10 +296,8 @@ export class UIManager {
     }, durationMs);
   }
 
-  updateGachaStatus(message: string): void {
-    if (this.gachaModalStatusEl) {
-      this.gachaModalStatusEl.textContent = message;
-    }
+  updateGachaStatus(_message: string): void {
+    // Gacha status element was removed in favor of roll button price and toasts
   }
 
   updateMenuStats(highScore: number, coins: number): void {

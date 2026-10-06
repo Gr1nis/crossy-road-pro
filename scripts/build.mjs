@@ -114,6 +114,9 @@ const htmlContent = `<!DOCTYPE html>
 
     .modal-card-gacha { max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; -webkit-overflow-scrolling: touch; }
     #gacha-modal h2 { font-size: clamp(18px, 4vw, 28px); color: #fbbf24; }
+    .modal-card-gacha .menu-stat-pill.gold { display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; flex-direction: row; align-self: center; margin: 0 auto 16px; font-size: 15px; line-height: 1; }
+    .modal-card-gacha .menu-stat-pill.gold strong { font-size: 22px; line-height: 1; display: inline-flex; align-items: center; margin: 0; color: #facc15; }
+    .modal-card-gacha .menu-stat-pill.gold span { display: inline-flex; align-items: center; line-height: 1; }
     .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
     .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
@@ -283,7 +286,7 @@ const htmlContent = `<!DOCTYPE html>
   <div id="main-menu-modal" class="modal">
     <div class="modal-card">
       <h1>CROSSY ROAD</h1>
-      <p>Классическая воксельная аркада с поездами, реками и скинами</p>
+      <p>Посмотрим, как далеко ты сможешь зайти!</p>
 
       <div class="menu-stats-row">
         <div class="menu-stat-pill">
@@ -299,7 +302,7 @@ const htmlContent = `<!DOCTYPE html>
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
         <button id="menu-achievements-btn" class="menu-btn menu-btn-emerald">🏅 Достижения <span id="menu-achievements-badge" class="btn-badge">0/10</span></button>
-        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 ГАЧА-АВТОМАТ</button>
+        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Автомат скинов</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
         <button id="menu-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
       </div>
@@ -353,17 +356,17 @@ const htmlContent = `<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- Модальное окно Гача-автомата -->
+  <!-- Модальное окно Автомата скинов -->
   <div id="gacha-modal" class="modal hidden">
     <div class="modal-card modal-card-gacha">
-      <h2 style="color: #fbbf24;">🎰 ГАЧА-АВТОМАТ</h2>
+      <h2 style="color: #fbbf24;">🎰 АВТОМАТ СКИНОВ</h2>
       <p>Испытайте удачу и откройте новые воксельные скины!</p>
 
-      <div class="menu-stat-pill gold" style="display: inline-block; margin-bottom: 12px;">
-        Ваш баланс: <strong id="gacha-modal-coins">0</strong> 🪙
+      <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; margin: 0 auto 16px; align-self: center;">
+        <span style="display: inline-flex; align-items: center; line-height: 1;">Ваш баланс:</span>
+        <strong id="gacha-modal-coins" style="display: inline-flex; align-items: center; line-height: 1; margin: 0;">0</strong>
+        <span style="display: inline-flex; align-items: center; line-height: 1;">🪙</span>
       </div>
-
-      <div id="gacha-modal-status" class="gacha-status" style="margin-bottom: 8px;">1 прокрут = 100 монет</div>
 
       <div id="gacha-modal-skin-list" class="gacha-modal-grid"></div>
 

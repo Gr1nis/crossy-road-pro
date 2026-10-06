@@ -52,6 +52,9 @@
 
     .modal-card-gacha { max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; -webkit-overflow-scrolling: touch; }
     #gacha-modal h2 { font-size: clamp(18px, 4vw, 28px); color: #fbbf24; }
+    .modal-card-gacha .menu-stat-pill.gold { display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; flex-direction: row; align-self: center; margin: 0 auto 16px; font-size: 15px; line-height: 1; }
+    .modal-card-gacha .menu-stat-pill.gold strong { font-size: 22px; line-height: 1; display: inline-flex; align-items: center; margin: 0; color: #facc15; }
+    .modal-card-gacha .menu-stat-pill.gold span { display: inline-flex; align-items: center; line-height: 1; }
     .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
     .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
@@ -221,7 +224,7 @@
   <div id="main-menu-modal" class="modal">
     <div class="modal-card">
       <h1>CROSSY ROAD</h1>
-      <p>Классическая воксельная аркада с поездами, реками и скинами</p>
+      <p>Посмотрим, как далеко ты сможешь зайти!</p>
 
       <div class="menu-stats-row">
         <div class="menu-stat-pill">
@@ -237,7 +240,7 @@
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
         <button id="menu-achievements-btn" class="menu-btn menu-btn-emerald">🏅 Достижения <span id="menu-achievements-badge" class="btn-badge">0/10</span></button>
-        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 ГАЧА-АВТОМАТ</button>
+        <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Автомат скинов</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
         <button id="menu-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
       </div>
@@ -291,17 +294,17 @@
     </div>
   </div>
 
-  <!-- Модальное окно Гача-автомата -->
+  <!-- Модальное окно Автомата скинов -->
   <div id="gacha-modal" class="modal hidden">
     <div class="modal-card modal-card-gacha">
-      <h2 style="color: #fbbf24;">🎰 ГАЧА-АВТОМАТ</h2>
+      <h2 style="color: #fbbf24;">🎰 АВТОМАТ СКИНОВ</h2>
       <p>Испытайте удачу и откройте новые воксельные скины!</p>
 
-      <div class="menu-stat-pill gold" style="display: inline-block; margin-bottom: 12px;">
-        Ваш баланс: <strong id="gacha-modal-coins">0</strong> 🪙
+      <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; margin: 0 auto 16px; align-self: center;">
+        <span style="display: inline-flex; align-items: center; line-height: 1;">Ваш баланс:</span>
+        <strong id="gacha-modal-coins" style="display: inline-flex; align-items: center; line-height: 1; margin: 0;">0</strong>
+        <span style="display: inline-flex; align-items: center; line-height: 1;">🪙</span>
       </div>
-
-      <div id="gacha-modal-status" class="gacha-status" style="margin-bottom: 8px;">1 прокрут = 100 монет</div>
 
       <div id="gacha-modal-skin-list" class="gacha-modal-grid"></div>
 
@@ -1603,7 +1606,7 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
 
           ensureLanesAround(centerRow        )       {
     const minR = Math.min(centerRow - 8, Math.floor(this.cameraZ) - 26);
-    const maxR = Math.max(centerRow + 28, Math.floor(this.cameraZ) + 28);
+    const maxR = Math.max(centerRow + 38, Math.floor(this.cameraZ) + 38);
     const currentScore = this.scoreTracker.getScore();
     for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
@@ -1671,7 +1674,7 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
     this.ensureLanesAround(Math.round(this.player.row));
     const list         = [];
     const minRow = Math.min(Math.floor(this.cameraZ) - 24, Math.floor(this.player.row) - 8);
-    const maxRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
+    const maxRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));
     }
@@ -1861,7 +1864,7 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
 
     const currentLane = this.getLane(Math.round(this.player.row));
     const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
-    const maxSimRow = Math.max(Math.floor(this.player.row) + 24, Math.floor(this.cameraZ) + 24);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
 
     for (let r = minSimRow; r <= maxSimRow; r++) {
       const lane = this.getLane(r);
@@ -2266,39 +2269,43 @@ class AudioSynth {
     const gain = ctx.createGain();
 
     if (surface === 'log') {
-      // Warm hollow wooden clack
+      // Warm hollow wooden "tok" (pure sine 380Hz -> 190Hz)
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(220 * pitchScale, now + 0.07);
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.075);
-    } else if (surface === 'road') {
-      // Crisp asphalt tap
-      osc.type = 'triangle';
       osc.frequency.setValueAtTime(380 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(620 * pitchScale, now + 0.065);
-      gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
-    } else if (surface === 'rail') {
-      // Metallic ping
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(520 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(780 * pitchScale, now + 0.08);
-      gain.gain.setValueAtTime(0.14, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.085);
-    } else {
-      // Soft bouncy grass hop
+      osc.frequency.exponentialRampToValueAtTime(190 * pitchScale, now + 0.07);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.075);
+    } else if (surface === 'road') {
+      // Muted neat voxel click without metallic rattle (triangle 320Hz -> 480Hz)
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(310 * pitchScale, now);
-      osc.frequency.exponentialRampToValueAtTime(560 * pitchScale, now + 0.09);
-      gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+      osc.frequency.setValueAtTime(320 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(480 * pitchScale, now + 0.06);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.16, now + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.065);
+    } else if (surface === 'rail') {
+      // Delicate glass-metallic chime instead of screaming saw (pure sine 880Hz -> 1046Hz)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(1046.5 * pitchScale, now + 0.08);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.12, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.085);
+    } else {
+      // Soft bouncy grass rubber pop (sine 220Hz -> 360Hz with fast decay 0.07s)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(360 * pitchScale, now + 0.065);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.18, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.07);
     }
 
     osc.connect(gain);
     gain.connect(this.sfxGainNode ?? ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.1);
+    osc.stop(now + 0.09);
   }
 
   playCoin()       {
@@ -2307,19 +2314,27 @@ class AudioSynth {
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(987.77, now); // B5
-    osc.frequency.setValueAtTime(1318.51, now + 0.06); // E6
+    // Crystalline dual-tone chime (B5 -> E6) with soft anti-click attack and velvety decay
+    const notes = [
+      { freq: 987.77, start: now, dur: 0.18, gain: 0.12 }, // B5
+      { freq: 1318.51, start: now + 0.055, dur: 0.24, gain: 0.14 }, // E6
+    ];
 
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+    notes.forEach(({ freq, start, dur, gain: noteGain }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, start);
 
-    osc.connect(gain);
-    gain.connect(this.sfxGainNode ?? ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.23);
+      gain.gain.setValueAtTime(0.001, start);
+      gain.gain.linearRampToValueAtTime(noteGain, start + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(start);
+      osc.stop(start + dur + 0.01);
+    });
   }
 
   playGacha()       {
@@ -2345,27 +2360,36 @@ class AudioSynth {
     });
   }
 
-  playTrainWhistle()       {
+  playTrainWarning()       {
     if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    [440, 554.37].forEach((freq) => {
+    // Vintage railway crossing bell: soft bell sines (660Hz / 880Hz) with exponential decay
+    const bells = [
+      { freq: 660, gain: 0.14, dur: 0.32 },
+      { freq: 880, gain: 0.09, dur: 0.24 },
+    ];
+    bells.forEach(({ freq, gain: maxGain, dur }) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sawtooth';
+      osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, now);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.45);
 
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(maxGain, now + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
       osc.connect(gain);
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.46);
+      osc.stop(now + dur + 0.01);
     });
+  }
+
+  playTrainWhistle()       {
+    this.playTrainWarning();
   }
 
   playCrash()       {
@@ -2373,19 +2397,48 @@ class AudioSynth {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
+    const now = ctx.currentTime;
+
+    // Soft low-frequency impulse (110Hz -> 35Hz comic 'thud')
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(150, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(42, ctx.currentTime + 0.28);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.exponentialRampToValueAtTime(35, now + 0.22);
 
-    gain.gain.setValueAtTime(0.26, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.002, now + 0.22);
 
     osc.connect(gain);
     gain.connect(this.sfxGainNode ?? ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
+    osc.start(now);
+    osc.stop(now + 0.23);
+
+    // Muted micro-noise puff ('poof-splat')
+    const sampleRate = ctx.sampleRate || 44100;
+    const bufferSize = Math.floor(sampleRate * 0.06);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, sampleRate);
+    const channelData = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      channelData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+    }
+
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(450, now);
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.08, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+    noiseSource.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(this.sfxGainNode ?? ctx.destination);
+    noiseSource.start(now);
+    noiseSource.stop(now + 0.065);
   }
 
   playSplash()       {
@@ -2393,19 +2446,30 @@ class AudioSynth {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
+    const now = ctx.currentTime;
+
+    // Juicy cartoon water bubble "plop" with smoothed highs
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(420, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(95, ctx.currentTime + 0.25);
+    // Subtle initial dip then juicy resonant bubble rise (260Hz -> 580Hz)
+    osc.frequency.setValueAtTime(260, now);
+    osc.frequency.exponentialRampToValueAtTime(580, now + 0.09);
 
-    gain.gain.setValueAtTime(0.24, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(950, now);
 
-    osc.connect(gain);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.002, now + 0.16);
+
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(this.sfxGainNode ?? ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.26);
+    osc.start(now);
+    osc.stop(now + 0.17);
   }
 
   playSkinVoice(skinId         = 'chicken')       {
@@ -3456,6 +3520,8 @@ const BIOME_ATMOSPHERES
       -30,
       80
     );
+    this.camera.position.set(-7.5, 13.5, -8.0);
+    this.camera.lookAt(0, 0, 3.0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -3480,7 +3546,7 @@ const BIOME_ATMOSPHERES
 
     this.playerMesh = MeshFactory.createCharacter('chicken');
     this.scene.add(this.playerMesh);
-    this.initAmbientParticles(32);
+    this.initAmbientParticles(21);
 
     window.addEventListener('resize', () => this.onResize());
   }
@@ -3489,7 +3555,7 @@ const BIOME_ATMOSPHERES
     this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
   }
 
-  spawnHopPuff(x        , y        , z        , color        , count         = 6)       {
+  spawnHopPuff(x        , y        , z        , color        , count         = 4)       {
     const mat = new THREE.MeshLambertMaterial({ color });
 
     for (let i = 0; i < count; i++) {
@@ -3552,7 +3618,7 @@ const BIOME_ATMOSPHERES
 
   spawnRecordConfetti(x        , y        , z        )       {
     const colors = [0xfacc15, 0xfbbf24, 0xf59e0b, 0xffffff, 0xef4444, 0xec4899];
-    const count = 48;
+    const count = 32;
     for (let i = 0; i < count; i++) {
       const c = colors[Math.floor(Math.random() * colors.length)];
       const size = 0.08 + Math.random() * 0.08;
@@ -3984,7 +4050,7 @@ const BIOME_ATMOSPHERES
       } else if (landedLane.type === LaneType.RAILWAY) {
         puffColor = 0xd1d5db;
       }
-      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 6);
+      this.spawnHopPuff(p.x, 0.05, p.row, puffColor, 4);
     }
     this.lastHoppingState = p.isHopping;
     this.prevRidingLogId = p.ridingLogId;
@@ -4065,8 +4131,8 @@ const BIOME_ATMOSPHERES
       this.shakeIntensity = 0;
     }
 
-    this.camera.position.set(-7.5 + this.currentCamX + shakeX, 12.5, camZ - 7.5 + shakeZ);
-    this.camera.lookAt(this.currentCamX, 0, camZ + 2.5);
+    this.camera.position.set(-7.5 + this.currentCamX + shakeX, 13.5, camZ - 8.0 + shakeZ);
+    this.camera.lookAt(this.currentCamX, 0, camZ + 3.0);
     this.dirLight.position.set(-12 + this.currentCamX, 22, camZ - 6);
     this.dirLight.target.position.set(this.currentCamX, 0, camZ + 3);
     this.renderer.render(this.scene, this.camera);
@@ -4137,7 +4203,6 @@ class UIManager {
                    gachaModalRollBtn                    ;
                    gachaModalCloseBtn                    ;
                    gachaModalCoinsEl                    ;
-                   gachaModalStatusEl                    ;
                    gachaModalSkinListEl                    ;
 
                    leaderboardCloseBtn                    ;
@@ -4195,7 +4260,6 @@ class UIManager {
     this.gachaModalRollBtn = document.getElementById('gacha-modal-roll-btn');
     this.gachaModalCloseBtn = document.getElementById('gacha-modal-close-btn');
     this.gachaModalCoinsEl = document.getElementById('gacha-modal-coins');
-    this.gachaModalStatusEl = document.getElementById('gacha-modal-status');
     this.gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list');
 
     this.leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
@@ -4369,10 +4433,8 @@ class UIManager {
     }, durationMs);
   }
 
-  updateGachaStatus(message        )       {
-    if (this.gachaModalStatusEl) {
-      this.gachaModalStatusEl.textContent = message;
-    }
+  updateGachaStatus(_message        )       {
+    // Gacha status element was removed in favor of roll button price and toasts
   }
 
   updateMenuStats(highScore        , coins        )       {

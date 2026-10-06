@@ -283,4 +283,53 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
       'uiManager.ts must render score in .lb-col-score'
     );
   });
+
+  it('Bug 10 (16:9 Viewport & Horizon Draw Distance Optimization): camera positioned at y=13.5, camZ-8.0 looking at camZ+3.0, lanes drawn up to +38 rows forward, and ambient/confetti/hop particles reduced 1.5x', () => {
+    const sceneManagerSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/view/sceneManager.ts'),
+      'utf8'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('this.camera.position.set(-7.5 + this.currentCamX + shakeX, 13.5, camZ - 8.0 + shakeZ);'),
+      'sceneManager.ts must set camera position with height 13.5 and camZ - 8.0'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('this.camera.lookAt(this.currentCamX, 0, camZ + 3.0);'),
+      'sceneManager.ts must look at camZ + 3.0'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('this.initAmbientParticles(21);'),
+      'sceneManager.ts must reduce ambient particles count from 32 to 21 (1.5x reduction)'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('count: number = 4'),
+      'sceneManager.ts spawnHopPuff must default count to 4 (1.5x reduction from 6)'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('const count = 32;'),
+      'sceneManager.ts spawnRecordConfetti must reduce count from 48 to 32 (1.5x reduction)'
+    );
+
+    const gameEngineSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/core/gameEngine.ts'),
+      'utf8'
+    );
+    assert.ok(
+      gameEngineSrc.includes('Math.max(centerRow + 38, Math.floor(this.cameraZ) + 38)'),
+      'gameEngine.ts ensureLanesAround must generate lanes up to +38 rows ahead'
+    );
+    assert.ok(
+      gameEngineSrc.includes('Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38)'),
+      'gameEngine.ts getActiveLanes must include lanes up to +38 rows ahead'
+    );
+
+    // Functional verification with GameEngine instance
+    const engine = new GameEngine(1234);
+    const activeLanes = engine.getActiveLanes();
+    const maxActiveIndex = Math.max(...activeLanes.map((l) => l.index));
+    assert.ok(
+      maxActiveIndex >= 38,
+      `Active lanes must extend to at least row 38 on fresh start, got ${maxActiveIndex}`
+    );
+  });
 });
