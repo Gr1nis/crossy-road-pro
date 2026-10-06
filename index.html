@@ -3808,7 +3808,7 @@ const BIOME_ATMOSPHERES
     }
 
     const ground = new THREE.Mesh(
-      new THREE.BoxGeometry(48, stripHeight, 1),
+      new THREE.BoxGeometry(80, stripHeight, 1),
       new THREE.MeshLambertMaterial({ color: stripColor })
     );
     ground.position.y = -stripHeight / 2;
@@ -3843,9 +3843,9 @@ const BIOME_ATMOSPHERES
       group.add(leftBank, rightBank);
     } else if (lane.type === LaneType.RAILWAY) {
       const railMat = new THREE.MeshLambertMaterial({ color: biome === Biome.NEON ? 0x38bdf8 : 0xcbd5e1 });
-      const r1 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
+      const r1 = new THREE.Mesh(new THREE.BoxGeometry(80, 0.06, 0.08), railMat);
       r1.position.set(0, 0.03, -0.26);
-      const r2 = new THREE.Mesh(new THREE.BoxGeometry(48, 0.06, 0.08), railMat);
+      const r2 = new THREE.Mesh(new THREE.BoxGeometry(80, 0.06, 0.08), railMat);
       r2.position.set(0, 0.03, 0.26);
       group.add(r1, r2);
     }
@@ -3895,6 +3895,76 @@ const BIOME_ATMOSPHERES
       trainMesh.visible = lane.train.isPassing;
       group.add(trainMesh);
     }
+
+    // ── Side Diorama Scenery ──────────────────────────────────────────────────
+    // Fills |x| ∈ [10, 15] with biome-matched decorations so ultrawide / 16:9
+    // monitors see a lush forest or road barrier instead of blank ground.
+    // All meshes are added to `group` and auto-disposed by disposeHierarchy.
+    if (lane.type === LaneType.GRASS) {
+      const STEP_MIN = 1.2;
+      const STEP_MAX = 1.5;
+      for (const side of [-1, 1]         ) {
+        const xStart = side === -1 ? -15 : 10;
+        const xEnd   = side === -1 ? -10 : 15;
+        let xCur = xStart + Math.abs((lane.index * 7) % STEP_MAX);
+        while (xCur < xEnd) {
+          const seed = lane.index * 31 + Math.round(xCur * 10);
+          const kindRoll = Math.abs(seed) % 5;
+          const kind                           =
+            kindRoll < 3 ? 'tree' : kindRoll === 3 ? 'rock' : 'bush';
+          const deco = MeshFactory.createObstacle(kind, seed, biome);
+          // worldToScreenX maps game coords; side deco lives outside game zone
+          deco.position.x = xCur;
+          deco.position.y = 0;
+          group.add(deco);
+          const step = STEP_MIN + ((Math.abs(seed) % 100) / 100) * (STEP_MAX - STEP_MIN);
+          xCur += step;
+        }
+      }
+    } else if (lane.type === LaneType.ROAD) {
+      // Subtle road barriers / streetlamps at the game-zone boundary
+      const barrierMat = new THREE.MeshLambertMaterial({
+        color: biome === Biome.NEON ? 0x06b6d4 : 0xe2e8f0,
+      });
+      const lampMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+      const lightMat = new THREE.MeshBasicMaterial({
+        color: biome === Biome.NEON ? 0x22d3ee : 0xfef9c3,
+      });
+
+      for (const xPos of [-10.2, 10.2]) {
+        // Concrete kerb block
+        const kerb = new THREE.Mesh(
+          new THREE.BoxGeometry(0.22, 0.18, 1.0),
+          barrierMat
+        );
+        kerb.position.set(xPos, 0.09, 0);
+        kerb.castShadow = true;
+        kerb.receiveShadow = true;
+        group.add(kerb);
+
+        // Streetlamp only on even rows to avoid clutter
+        if (lane.index % 2 === 0) {
+          const pole = new THREE.Mesh(
+            new THREE.BoxGeometry(0.1, 1.4, 0.1),
+            lampMat
+          );
+          pole.position.set(xPos, 0.7, 0);
+          pole.castShadow = true;
+          const arm = new THREE.Mesh(
+            new THREE.BoxGeometry(0.32, 0.08, 0.08),
+            lampMat
+          );
+          arm.position.set(xPos + (xPos < 0 ? 0.18 : -0.18), 1.42, 0);
+          const bulb = new THREE.Mesh(
+            new THREE.BoxGeometry(0.18, 0.12, 0.18),
+            lightMat
+          );
+          bulb.position.set(xPos + (xPos < 0 ? 0.18 : -0.18), 1.36, 0);
+          group.add(pole, arm, bulb);
+        }
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     return {
       group,
@@ -4115,11 +4185,10 @@ const BIOME_ATMOSPHERES
     const aspect = window.innerWidth / window.innerHeight;
     engine.setViewportAspect(aspect);
 
-    // Mobile horizontal tracking: smoothly follow player.x if corridor exceeds halfWidth
-    const maxPan = Math.max(0, 10.0 - this.currentHalfWidth);
-    const targetCamX = Math.max(-maxPan, Math.min(maxPan, worldToScreenX(p.x)));
-    const camLerpFactor = Math.min(1, dt * 8.0);
-    this.currentCamX += (targetCamX - this.currentCamX) * camLerpFactor;
+    // Smooth X-tracking: golden-section 0.35 factor keeps player in 16:9 active zone
+    // clamps to ±2.5 units so side borders never expose black void
+    const targetCamX = Math.max(-2.5, Math.min(2.5, worldToScreenX(p.x) * 0.35));
+    this.currentCamX += (targetCamX - this.currentCamX) * Math.min(1, dt * 4.0);
 
     let shakeX = 0;
     let shakeZ = 0;
