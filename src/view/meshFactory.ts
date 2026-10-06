@@ -650,6 +650,53 @@ export class MeshFactory {
     return group;
   }
 
+  static createRoadBarrier(biome: BiomeType = 'forest'): THREE.Group {
+    const group = new THREE.Group();
+
+    const postColor =
+      biome === 'neon'
+        ? 0x1e1b4b
+        : biome === 'desert'
+          ? 0x78716c
+          : biome === 'winter'
+            ? 0x475569
+            : 0x64748b;
+    const railColor =
+      biome === 'neon'
+        ? 0x06b6d4
+        : biome === 'desert'
+          ? 0xd97706
+          : biome === 'winter'
+            ? 0xe2e8f0
+            : 0x94a3b8;
+    const reflectorColor = biome === 'neon' ? 0xec4899 : 0xfacc15;
+
+    const postMat = new THREE.MeshLambertMaterial({ color: postColor });
+    const railMat = new THREE.MeshLambertMaterial({ color: railColor });
+    const reflectorMat = new THREE.MeshBasicMaterial({ color: reflectorColor });
+
+    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.12), postMat);
+    p1.position.set(0, 0.21, -0.32);
+    p1.castShadow = true;
+    p1.receiveShadow = true;
+
+    const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.12), postMat);
+    p2.position.set(0, 0.21, 0.32);
+    p2.castShadow = true;
+    p2.receiveShadow = true;
+
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 0.96), railMat);
+    rail.position.set(0, 0.28, 0);
+    rail.castShadow = true;
+    rail.receiveShadow = true;
+
+    const reflector = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.08, 0.18), reflectorMat);
+    reflector.position.set(0, 0.28, 0);
+
+    group.add(p1, p2, rail, reflector);
+    return group;
+  }
+
   static createRecordFlag(): THREE.Group {
     const group = new THREE.Group();
     group.name = 'recordFlag';

@@ -3265,6 +3265,53 @@ class MeshFactory {
     return group;
   }
 
+  static createRoadBarrier(biome            = 'forest')              {
+    const group = new THREE.Group();
+
+    const postColor =
+      biome === 'neon'
+        ? 0x1e1b4b
+        : biome === 'desert'
+          ? 0x78716c
+          : biome === 'winter'
+            ? 0x475569
+            : 0x64748b;
+    const railColor =
+      biome === 'neon'
+        ? 0x06b6d4
+        : biome === 'desert'
+          ? 0xd97706
+          : biome === 'winter'
+            ? 0xe2e8f0
+            : 0x94a3b8;
+    const reflectorColor = biome === 'neon' ? 0xec4899 : 0xfacc15;
+
+    const postMat = new THREE.MeshLambertMaterial({ color: postColor });
+    const railMat = new THREE.MeshLambertMaterial({ color: railColor });
+    const reflectorMat = new THREE.MeshBasicMaterial({ color: reflectorColor });
+
+    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.12), postMat);
+    p1.position.set(0, 0.21, -0.32);
+    p1.castShadow = true;
+    p1.receiveShadow = true;
+
+    const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.12), postMat);
+    p2.position.set(0, 0.21, 0.32);
+    p2.castShadow = true;
+    p2.receiveShadow = true;
+
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 0.96), railMat);
+    rail.position.set(0, 0.28, 0);
+    rail.castShadow = true;
+    rail.receiveShadow = true;
+
+    const reflector = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.08, 0.18), reflectorMat);
+    reflector.position.set(0, 0.28, 0);
+
+    group.add(p1, p2, rail, reflector);
+    return group;
+  }
+
   static createRecordFlag()              {
     const group = new THREE.Group();
     group.name = 'recordFlag';
@@ -3821,6 +3868,11 @@ const BIOME_ATMOSPHERES
       if (hasNextRoad) {
         group.add(MeshFactory.createLaneDivider());
       }
+      for (const xPos of [-10.2, 10.2]) {
+        const barrier = MeshFactory.createRoadBarrier(biome);
+        barrier.position.set(worldToScreenX(xPos), 0, 0);
+        group.add(barrier);
+      }
     } else if (lane.type === LaneType.RIVER) {
       // Animated current foam ripples across river surface
       const rippleMat = new THREE.MeshBasicMaterial({
@@ -3848,6 +3900,23 @@ const BIOME_ATMOSPHERES
       const r2 = new THREE.Mesh(new THREE.BoxGeometry(80, 0.06, 0.08), railMat);
       r2.position.set(0, 0.03, 0.26);
       group.add(r1, r2);
+    }
+
+    if (lane.type === LaneType.GRASS) {
+      for (const side of [-1, 1]         ) {
+        const xStart = side === -1 ? -15 : 10;
+        const xEnd   = side === -1 ? -10 : 15;
+        let xCur = xStart + Math.abs((lane.index * 7) % 1.5);
+        while (xCur < xEnd) {
+          const seed = lane.index * 31 + Math.round(xCur * 10);
+          const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
+          const mesh = MeshFactory.createObstacle(kind, seed, biome);
+          mesh.position.x = worldToScreenX(xCur);
+          group.add(mesh);
+          const step = 1.2 + ((Math.abs(seed) % 100) / 100) * 0.3;
+          xCur += step;
+        }
+      }
     }
 
     const details = lane.obstacleDetails?.length
@@ -3895,76 +3964,6 @@ const BIOME_ATMOSPHERES
       trainMesh.visible = lane.train.isPassing;
       group.add(trainMesh);
     }
-
-    // ── Side Diorama Scenery ──────────────────────────────────────────────────
-    // Fills |x| ∈ [10, 15] with biome-matched decorations so ultrawide / 16:9
-    // monitors see a lush forest or road barrier instead of blank ground.
-    // All meshes are added to `group` and auto-disposed by disposeHierarchy.
-    if (lane.type === LaneType.GRASS) {
-      const STEP_MIN = 1.2;
-      const STEP_MAX = 1.5;
-      for (const side of [-1, 1]         ) {
-        const xStart = side === -1 ? -15 : 10;
-        const xEnd   = side === -1 ? -10 : 15;
-        let xCur = xStart + Math.abs((lane.index * 7) % STEP_MAX);
-        while (xCur < xEnd) {
-          const seed = lane.index * 31 + Math.round(xCur * 10);
-          const kindRoll = Math.abs(seed) % 5;
-          const kind                           =
-            kindRoll < 3 ? 'tree' : kindRoll === 3 ? 'rock' : 'bush';
-          const deco = MeshFactory.createObstacle(kind, seed, biome);
-          // worldToScreenX maps game coords; side deco lives outside game zone
-          deco.position.x = xCur;
-          deco.position.y = 0;
-          group.add(deco);
-          const step = STEP_MIN + ((Math.abs(seed) % 100) / 100) * (STEP_MAX - STEP_MIN);
-          xCur += step;
-        }
-      }
-    } else if (lane.type === LaneType.ROAD) {
-      // Subtle road barriers / streetlamps at the game-zone boundary
-      const barrierMat = new THREE.MeshLambertMaterial({
-        color: biome === Biome.NEON ? 0x06b6d4 : 0xe2e8f0,
-      });
-      const lampMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
-      const lightMat = new THREE.MeshBasicMaterial({
-        color: biome === Biome.NEON ? 0x22d3ee : 0xfef9c3,
-      });
-
-      for (const xPos of [-10.2, 10.2]) {
-        // Concrete kerb block
-        const kerb = new THREE.Mesh(
-          new THREE.BoxGeometry(0.22, 0.18, 1.0),
-          barrierMat
-        );
-        kerb.position.set(xPos, 0.09, 0);
-        kerb.castShadow = true;
-        kerb.receiveShadow = true;
-        group.add(kerb);
-
-        // Streetlamp only on even rows to avoid clutter
-        if (lane.index % 2 === 0) {
-          const pole = new THREE.Mesh(
-            new THREE.BoxGeometry(0.1, 1.4, 0.1),
-            lampMat
-          );
-          pole.position.set(xPos, 0.7, 0);
-          pole.castShadow = true;
-          const arm = new THREE.Mesh(
-            new THREE.BoxGeometry(0.32, 0.08, 0.08),
-            lampMat
-          );
-          arm.position.set(xPos + (xPos < 0 ? 0.18 : -0.18), 1.42, 0);
-          const bulb = new THREE.Mesh(
-            new THREE.BoxGeometry(0.18, 0.12, 0.18),
-            lightMat
-          );
-          bulb.position.set(xPos + (xPos < 0 ? 0.18 : -0.18), 1.36, 0);
-          group.add(pole, arm, bulb);
-        }
-      }
-    }
-    // ─────────────────────────────────────────────────────────────────────────
 
     return {
       group,
@@ -4185,8 +4184,7 @@ const BIOME_ATMOSPHERES
     const aspect = window.innerWidth / window.innerHeight;
     engine.setViewportAspect(aspect);
 
-    // Smooth X-tracking: golden-section 0.35 factor keeps player in 16:9 active zone
-    // clamps to ±2.5 units so side borders never expose black void
+    // Mobile horizontal tracking: smoothly follow player.x with golden ratio clamp
     const targetCamX = Math.max(-2.5, Math.min(2.5, worldToScreenX(p.x) * 0.35));
     this.currentCamX += (targetCamX - this.currentCamX) * Math.min(1, dt * 4.0);
 

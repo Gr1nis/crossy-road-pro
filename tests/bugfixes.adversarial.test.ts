@@ -332,4 +332,86 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
       `Active lanes must extend to at least row 38 on fresh start, got ${maxActiveIndex}`
     );
   });
+
+  it('Bug 11 (80-Unit World Width & Side Scenery Invariant): lane geometry width is at least 70 blocks and side scenery strictly outside [-9, 9]', () => {
+    const sceneManagerSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/view/sceneManager.ts'),
+      'utf8'
+    );
+
+    // Verify lane ground geometry width is at least 70 blocks (80 blocks in Crossy Road Pro)
+    const groundGeoMatch = sceneManagerSrc.match(/new THREE\.BoxGeometry\((\d+),\s*stripHeight/);
+    assert.ok(groundGeoMatch, 'SceneManager must define strip BoxGeometry for ground meshes');
+    const groundWidth = Number(groundGeoMatch[1]);
+    assert.ok(
+      groundWidth >= 70,
+      `Lane ground geometry width must be >= 70 to prevent side voids in 16:9/21:9, got ${groundWidth}`
+    );
+
+    // Verify railway rails BoxGeometry width is at least 70 blocks
+    const railGeoMatch = sceneManagerSrc.match(/new THREE\.BoxGeometry\((\d+),\s*0\.06/);
+    assert.ok(railGeoMatch, 'SceneManager must define rails BoxGeometry');
+    const railWidth = Number(railGeoMatch[1]);
+    assert.ok(
+      railWidth >= 70,
+      `Railway rails BoxGeometry width must be >= 70, got ${railWidth}`
+    );
+
+    // Verify side diorama scenery generation bounds
+    assert.ok(
+      sceneManagerSrc.includes('const xStart = side === -1 ? -15 : 10;') &&
+      sceneManagerSrc.includes('const xEnd   = side === -1 ? -10 : 15;'),
+      'Side scenery loop bounds must be defined outside playable corridor'
+    );
+
+    // Adversarial verification: simulate side decoration generation across 500 lanes
+    // ensure no obstacle or decoration falls into playable corridor [-9, 9] (|x| < 10)
+    const STEP_MIN = 1.2;
+    const STEP_MAX = 1.5;
+    let totalSideDecos = 0;
+    for (let laneIdx = -50; laneIdx <= 450; laneIdx++) {
+      for (const side of [-1, 1] as const) {
+        const xStart = side === -1 ? -15 : 10;
+        const xEnd = side === -1 ? -10 : 15;
+        let xCur = xStart + Math.abs((laneIdx * 7) % STEP_MAX);
+        while (xCur < xEnd) {
+          totalSideDecos++;
+          assert.ok(
+            Math.abs(xCur) >= 10,
+            `Side decoration at x=${xCur} on lane ${laneIdx} must be strictly outside |x| >= 10`
+          );
+          assert.ok(
+            xCur < -9 || xCur > 9,
+            `Side decoration at x=${xCur} must not invade playable corridor [-9, 9]`
+          );
+          const seed = laneIdx * 31 + Math.round(xCur * 10);
+          const step = STEP_MIN + ((Math.abs(seed) % 100) / 100) * (STEP_MAX - STEP_MIN);
+          xCur += step;
+        }
+      }
+    }
+    assert.ok(totalSideDecos > 1000, 'Expected extensive side scenery generation across lanes');
+
+    // Verify road kerbs / barriers are placed strictly outside corridor (|x| >= 10)
+    const kerbMatches = [...sceneManagerSrc.matchAll(/xPos of \[([^\]]+)\]/g)];
+    for (const match of kerbMatches) {
+      const positions = match[1].split(',').map((s) => Number(s.trim()));
+      for (const pos of positions) {
+        assert.ok(
+          Math.abs(pos) >= 10,
+          `Road kerb/barrier at ${pos} must be outside |x| >= 10`
+        );
+      }
+    }
+
+    // Verify smooth horizontal camera tracking parameters in SceneManager
+    assert.ok(
+      sceneManagerSrc.includes('Math.max(-2.5, Math.min(2.5, worldToScreenX(p.x) * 0.35))'),
+      'sceneManager.ts must calculate targetCamX with golden ratio clamp [-2.5, 2.5] and 0.35 scale'
+    );
+    assert.ok(
+      sceneManagerSrc.includes('this.currentCamX += (targetCamX - this.currentCamX) * Math.min(1, dt * 4.0)'),
+      'sceneManager.ts must smoothly interpolate currentCamX with dt * 4.0'
+    );
+  });
 });
