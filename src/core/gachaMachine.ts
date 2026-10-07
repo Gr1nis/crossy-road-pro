@@ -19,10 +19,6 @@ export const SKIN_RARITY_MAP: Record<SkinId, SkinRarityValue> = {
   box_cat: SkinRarity.RARE,
   raccoon_bandit: SkinRarity.EPIC,
   capybara_zen: SkinRarity.LEGENDARY,
-  chicken: SkinRarity.COMMON,
-  cyber_duck: SkinRarity.RARE,
-  shadow_ninja: SkinRarity.EPIC,
-  frost_penguin: SkinRarity.LEGENDARY,
 };
 
 export const SKIN_RARITY_WEIGHTS: Record<SkinRarityValue, number> = {
@@ -63,10 +59,10 @@ export class GachaMachine {
       : mulberry32(seedOrNonce);
 
     const rollPct = rand * 100;
-    if (rollPct < 50) return 'chicken';
-    if (rollPct < 80) return 'cyber_duck';
-    if (rollPct < 95) return 'shadow_ninja';
-    return 'frost_penguin';
+    if (rollPct < 50) return Math.abs(seedOrNonce) % 2 === 0 ? 'corgi' : 'pigeon_pizza';
+    if (rollPct < 80) return 'box_cat';
+    if (rollPct < 95) return 'raccoon_bandit';
+    return 'capybara_zen';
   }
 
   roll(

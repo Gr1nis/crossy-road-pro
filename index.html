@@ -402,11 +402,6 @@ const LaneType = {
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
   { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
-  // Legacy backward compatibility
-  { id: 'chicken', name: 'Классическая Курица', badge: '🐔' },
-  { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
-  { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
-  { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
 ];const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
@@ -631,7 +626,7 @@ class CoinWallet {
 }
 
 // --- Module: src/core/skinInventory.ts ---
-const DEFAULT_SKIN         = 'chicken';
+const DEFAULT_SKIN         = 'corgi';
 const VALID_SKIN_IDS                      = new Set(ALL_SKINS.map((s) => s.id));
 
 /**
@@ -705,10 +700,6 @@ const SkinRarity = {
   box_cat: SkinRarity.RARE,
   raccoon_bandit: SkinRarity.EPIC,
   capybara_zen: SkinRarity.LEGENDARY,
-  chicken: SkinRarity.COMMON,
-  cyber_duck: SkinRarity.RARE,
-  shadow_ninja: SkinRarity.EPIC,
-  frost_penguin: SkinRarity.LEGENDARY,
 };const SKIN_RARITY_WEIGHTS                                  = {
   [SkinRarity.COMMON]: 50,
   [SkinRarity.RARE]: 30,
@@ -746,10 +737,10 @@ function mulberry32(seed        )         {
       : mulberry32(seedOrNonce);
 
     const rollPct = rand * 100;
-    if (rollPct < 50) return 'chicken';
-    if (rollPct < 80) return 'cyber_duck';
-    if (rollPct < 95) return 'shadow_ninja';
-    return 'frost_penguin';
+    if (rollPct < 50) return Math.abs(seedOrNonce) % 2 === 0 ? 'corgi' : 'pigeon_pizza';
+    if (rollPct < 80) return 'box_cat';
+    if (rollPct < 95) return 'raccoon_bandit';
+    return 'capybara_zen';
   }
 
   roll(
@@ -962,16 +953,16 @@ const ACHIEVEMENT_DEFINITIONS                                       = [
 // Re-exports for backward compatibility
 const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
 const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES = 10;const DEFAULT_BOT_RIVALS                                                = [
-  { playerName: 'CyberKaiser', score: 250, skinId: 'shadow_ninja', date: '2026-09-20', isBot: true },
-  { playerName: 'ArcticFlash', score: 210, skinId: 'frost_penguin', date: '2026-09-21', isBot: true },
-  { playerName: 'NeonQuack', score: 175, skinId: 'cyber_duck', date: '2026-09-22', isBot: true },
-  { playerName: 'ShadowHopper', score: 142, skinId: 'shadow_ninja', date: '2026-09-23', isBot: true },
-  { playerName: 'MasterChicken', score: 115, skinId: 'chicken', date: '2026-09-23', isBot: true },
-  { playerName: 'GlacierWing', score: 95, skinId: 'frost_penguin', date: '2026-09-24', isBot: true },
-  { playerName: 'PixelDrifter', score: 75, skinId: 'cyber_duck', date: '2026-09-24', isBot: true },
-  { playerName: 'TurboCluck', score: 55, skinId: 'chicken', date: '2026-09-25', isBot: true },
-  { playerName: 'TrainDodger', score: 35, skinId: 'shadow_ninja', date: '2026-09-25', isBot: true },
-  { playerName: 'RookieFeather', score: 18, skinId: 'chicken', date: '2026-09-26', isBot: true },
+  { playerName: 'CyberKaiser', score: 250, skinId: 'capybara_zen', date: '2026-09-20', isBot: true },
+  { playerName: 'ArcticFlash', score: 210, skinId: 'raccoon_bandit', date: '2026-09-21', isBot: true },
+  { playerName: 'NeonQuack', score: 175, skinId: 'box_cat', date: '2026-09-22', isBot: true },
+  { playerName: 'ShadowHopper', score: 142, skinId: 'pigeon_pizza', date: '2026-09-23', isBot: true },
+  { playerName: 'MasterChicken', score: 115, skinId: 'corgi', date: '2026-09-23', isBot: true },
+  { playerName: 'GlacierWing', score: 95, skinId: 'capybara_zen', date: '2026-09-24', isBot: true },
+  { playerName: 'PixelDrifter', score: 75, skinId: 'raccoon_bandit', date: '2026-09-24', isBot: true },
+  { playerName: 'TurboCluck', score: 55, skinId: 'corgi', date: '2026-09-25', isBot: true },
+  { playerName: 'TrainDodger', score: 35, skinId: 'box_cat', date: '2026-09-25', isBot: true },
+  { playerName: 'RookieFeather', score: 18, skinId: 'pigeon_pizza', date: '2026-09-26', isBot: true },
 ];class ScoreTracker {
           currentScore = 0;
           highScore = 0;
@@ -988,7 +979,7 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES 
   constructor(storage                 , initialPlayerName         ) {
     this.storage = storage;
     this.wallet = new CoinWallet(0);
-    this.inventory = new SkinInventory(['chicken'], 'chicken');
+    this.inventory = new SkinInventory(['corgi'], 'corgi');
     this.gacha = new GachaMachine();
     this.achievements = new AchievementTracker();
 
@@ -1023,12 +1014,12 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES 
           this.wallet.setCoins(data.coins);
         }
         const validSkinIds = new Set        (ALL_SKINS.map((s) => s.id));
-        let loadedUnlocked           = ['chicken'];
+        let loadedUnlocked           = ['corgi'];
         if (Array.isArray(data.unlockedSkins)) {
           const filtered = data.unlockedSkins.filter((s)              => validSkinIds.has(s));
-          loadedUnlocked = Array.from(new Set        (['chicken', ...filtered]));
+          loadedUnlocked = Array.from(new Set        (['corgi', ...filtered]));
         }
-        let loadedSelected         = 'chicken';
+        let loadedSelected         = 'corgi';
         if (typeof data.selectedSkin === 'string' && loadedUnlocked.includes(data.selectedSkin          )) {
           loadedSelected = data.selectedSkin          ;
         }
@@ -3100,46 +3091,8 @@ function addCharVoxel(
     addCharVoxel(group, 0.03, 0.05, 0.03, 'greenLeaf', 0, 0.725, 0.19, isGhost);
     addCharVoxel(group, 0.06, 0.03, 0.04, 'greenLeaf', 0.035, 0.73, 0.21, isGhost);
   } else {
-    // 14 voxels: Legacy and classical fallback (chicken, cyber_duck, shadow_ninja, frost_penguin)
-    const bodyColor                =
-      skinId === 'cyber_duck'
-        ? 'pizzaCheese'
-        : skinId === 'shadow_ninja'
-          ? 'maskBlack'
-          : skinId === 'frost_penguin'
-            ? 'darkCharcoal'
-            : 'white';
-
-    const combColor                =
-      skinId === 'cyber_duck'
-        ? 'purpleNeck'
-        : skinId === 'frost_penguin'
-          ? 'pigeonGrey'
-          : 'pizzaRed';
-
-    const chestColor                =
-      skinId === 'shadow_ninja' ? 'darkCharcoal' : 'white';
-
-    const beakColor                =
-      skinId === 'shadow_ninja' ? 'darkCharcoal' : 'orangeFruit';
-
-    const eyeColor                =
-      skinId === 'shadow_ninja' || skinId === 'frost_penguin' ? 'white' : 'darkCharcoal';
-
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'orangeFruit', -0.14, 0.07, 0, isGhost);
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'orangeFruit', 0.14, 0.07, 0, isGhost);
-    addCharVoxel(group, 0.14, 0.04, 0.22, 'orangeFruit', -0.14, 0.02, 0.04, isGhost);
-    addCharVoxel(group, 0.14, 0.04, 0.22, 'orangeFruit', 0.14, 0.02, 0.04, isGhost);
-    addCharVoxel(group, 0.52, 0.50, 0.56, bodyColor, 0, 0.36, 0, isGhost);
-    addCharVoxel(group, 0.08, 0.26, 0.32, bodyColor, -0.28, 0.34, -0.02, isGhost);
-    addCharVoxel(group, 0.08, 0.26, 0.32, bodyColor, 0.28, 0.34, -0.02, isGhost);
-    addCharVoxel(group, 0.22, 0.20, 0.12, bodyColor, 0, 0.42, -0.32, isGhost);
-    addCharVoxel(group, 0.14, 0.16, 0.28, combColor, 0, 0.68, 0.04, isGhost);
-    addCharVoxel(group, 0.16, 0.12, 0.18, beakColor, 0, 0.44, 0.34, isGhost);
-    addCharVoxel(group, 0.12, 0.12, 0.10, 'pizzaRed', 0, 0.32, 0.30, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.08, eyeColor, -0.26, 0.48, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.08, eyeColor, 0.26, 0.48, 0.16, isGhost);
-    addCharVoxel(group, 0.34, 0.32, 0.10, chestColor, 0, 0.32, 0.26, isGhost);
+    // Fallback to Corgi mascot
+    return createUrbanCharacter('corgi', isGhost);
   }
 
   return group;
@@ -3677,7 +3630,7 @@ class MeshFactory {
   }
 
   static createChicken()              {
-    return createUrbanCharacter('chicken');
+    return createUrbanCharacter('corgi');
   }
 
   static createObstacle(
@@ -4585,10 +4538,11 @@ const BIOME_ATMOSPHERES
 
 // --- Module: src/app/uiManager.ts ---
 const UI_SKIN_RARITY                                                 = {
-  chicken: { label: 'Обычный', css: 'rarity-common' },
-  cyber_duck: { label: 'Редкий', css: 'rarity-rare' },
-  shadow_ninja: { label: 'Эпический', css: 'rarity-epic' },
-  frost_penguin: { label: 'Легендарный', css: 'rarity-legendary' },
+  corgi: { label: 'Обычный', css: 'rarity-common' },
+  pigeon_pizza: { label: 'Обычный', css: 'rarity-common' },
+  box_cat: { label: 'Редкий', css: 'rarity-rare' },
+  raccoon_bandit: { label: 'Эпический', css: 'rarity-epic' },
+  capybara_zen: { label: 'Легендарный', css: 'rarity-legendary' },
 };class UIManager {
   // HUD
                    scoreEl                    ;

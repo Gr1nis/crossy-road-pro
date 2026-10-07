@@ -249,46 +249,8 @@ export function createUrbanCharacter(skinId: string = 'corgi', isGhost = false):
     addCharVoxel(group, 0.03, 0.05, 0.03, 'greenLeaf', 0, 0.725, 0.19, isGhost);
     addCharVoxel(group, 0.06, 0.03, 0.04, 'greenLeaf', 0.035, 0.73, 0.21, isGhost);
   } else {
-    // 14 voxels: Legacy and classical fallback (chicken, cyber_duck, shadow_ninja, frost_penguin)
-    const bodyColor: VoxelColorKey =
-      skinId === 'cyber_duck'
-        ? 'pizzaCheese'
-        : skinId === 'shadow_ninja'
-          ? 'maskBlack'
-          : skinId === 'frost_penguin'
-            ? 'darkCharcoal'
-            : 'white';
-
-    const combColor: VoxelColorKey =
-      skinId === 'cyber_duck'
-        ? 'purpleNeck'
-        : skinId === 'frost_penguin'
-          ? 'pigeonGrey'
-          : 'pizzaRed';
-
-    const chestColor: VoxelColorKey =
-      skinId === 'shadow_ninja' ? 'darkCharcoal' : 'white';
-
-    const beakColor: VoxelColorKey =
-      skinId === 'shadow_ninja' ? 'darkCharcoal' : 'orangeFruit';
-
-    const eyeColor: VoxelColorKey =
-      skinId === 'shadow_ninja' || skinId === 'frost_penguin' ? 'white' : 'darkCharcoal';
-
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'orangeFruit', -0.14, 0.07, 0, isGhost);
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'orangeFruit', 0.14, 0.07, 0, isGhost);
-    addCharVoxel(group, 0.14, 0.04, 0.22, 'orangeFruit', -0.14, 0.02, 0.04, isGhost);
-    addCharVoxel(group, 0.14, 0.04, 0.22, 'orangeFruit', 0.14, 0.02, 0.04, isGhost);
-    addCharVoxel(group, 0.52, 0.50, 0.56, bodyColor, 0, 0.36, 0, isGhost);
-    addCharVoxel(group, 0.08, 0.26, 0.32, bodyColor, -0.28, 0.34, -0.02, isGhost);
-    addCharVoxel(group, 0.08, 0.26, 0.32, bodyColor, 0.28, 0.34, -0.02, isGhost);
-    addCharVoxel(group, 0.22, 0.20, 0.12, bodyColor, 0, 0.42, -0.32, isGhost);
-    addCharVoxel(group, 0.14, 0.16, 0.28, combColor, 0, 0.68, 0.04, isGhost);
-    addCharVoxel(group, 0.16, 0.12, 0.18, beakColor, 0, 0.44, 0.34, isGhost);
-    addCharVoxel(group, 0.12, 0.12, 0.10, 'pizzaRed', 0, 0.32, 0.30, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.08, eyeColor, -0.26, 0.48, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.08, eyeColor, 0.26, 0.48, 0.16, isGhost);
-    addCharVoxel(group, 0.34, 0.32, 0.10, chestColor, 0, 0.32, 0.26, isGhost);
+    // Fallback to Corgi mascot
+    return createUrbanCharacter('corgi', isGhost);
   }
 
   return group;

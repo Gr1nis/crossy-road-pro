@@ -21,7 +21,7 @@ export class MeshFactory {
   }
 
   static createChicken(): THREE.Group {
-    return createUrbanCharacter('chicken');
+    return createUrbanCharacter('corgi');
   }
 
   static createObstacle(

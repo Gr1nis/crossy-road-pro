@@ -49,16 +49,16 @@ export interface LeaderboardEntry {
 }
 
 export const DEFAULT_BOT_RIVALS: ReadonlyArray<Omit<LeaderboardEntry, 'rank'>> = [
-  { playerName: 'CyberKaiser', score: 250, skinId: 'shadow_ninja', date: '2026-09-20', isBot: true },
-  { playerName: 'ArcticFlash', score: 210, skinId: 'frost_penguin', date: '2026-09-21', isBot: true },
-  { playerName: 'NeonQuack', score: 175, skinId: 'cyber_duck', date: '2026-09-22', isBot: true },
-  { playerName: 'ShadowHopper', score: 142, skinId: 'shadow_ninja', date: '2026-09-23', isBot: true },
-  { playerName: 'MasterChicken', score: 115, skinId: 'chicken', date: '2026-09-23', isBot: true },
-  { playerName: 'GlacierWing', score: 95, skinId: 'frost_penguin', date: '2026-09-24', isBot: true },
-  { playerName: 'PixelDrifter', score: 75, skinId: 'cyber_duck', date: '2026-09-24', isBot: true },
-  { playerName: 'TurboCluck', score: 55, skinId: 'chicken', date: '2026-09-25', isBot: true },
-  { playerName: 'TrainDodger', score: 35, skinId: 'shadow_ninja', date: '2026-09-25', isBot: true },
-  { playerName: 'RookieFeather', score: 18, skinId: 'chicken', date: '2026-09-26', isBot: true },
+  { playerName: 'CyberKaiser', score: 250, skinId: 'capybara_zen', date: '2026-09-20', isBot: true },
+  { playerName: 'ArcticFlash', score: 210, skinId: 'raccoon_bandit', date: '2026-09-21', isBot: true },
+  { playerName: 'NeonQuack', score: 175, skinId: 'box_cat', date: '2026-09-22', isBot: true },
+  { playerName: 'ShadowHopper', score: 142, skinId: 'pigeon_pizza', date: '2026-09-23', isBot: true },
+  { playerName: 'MasterChicken', score: 115, skinId: 'corgi', date: '2026-09-23', isBot: true },
+  { playerName: 'GlacierWing', score: 95, skinId: 'capybara_zen', date: '2026-09-24', isBot: true },
+  { playerName: 'PixelDrifter', score: 75, skinId: 'raccoon_bandit', date: '2026-09-24', isBot: true },
+  { playerName: 'TurboCluck', score: 55, skinId: 'corgi', date: '2026-09-25', isBot: true },
+  { playerName: 'TrainDodger', score: 35, skinId: 'box_cat', date: '2026-09-25', isBot: true },
+  { playerName: 'RookieFeather', score: 18, skinId: 'pigeon_pizza', date: '2026-09-26', isBot: true },
 ];
 
 interface SavedProfile {
@@ -91,7 +91,7 @@ export class ScoreTracker {
   constructor(storage?: StorageAdapter, initialPlayerName?: string) {
     this.storage = storage;
     this.wallet = new CoinWallet(0);
-    this.inventory = new SkinInventory(['chicken'], 'chicken');
+    this.inventory = new SkinInventory(['corgi'], 'corgi');
     this.gacha = new GachaMachine();
     this.achievements = new AchievementTracker();
 
@@ -126,12 +126,12 @@ export class ScoreTracker {
           this.wallet.setCoins(data.coins);
         }
         const validSkinIds = new Set<string>(ALL_SKINS.map((s) => s.id));
-        let loadedUnlocked: SkinId[] = ['chicken'];
+        let loadedUnlocked: SkinId[] = ['corgi'];
         if (Array.isArray(data.unlockedSkins)) {
           const filtered = data.unlockedSkins.filter((s): s is SkinId => validSkinIds.has(s));
-          loadedUnlocked = Array.from(new Set<SkinId>(['chicken', ...filtered]));
+          loadedUnlocked = Array.from(new Set<SkinId>(['corgi', ...filtered]));
         }
-        let loadedSelected: SkinId = 'chicken';
+        let loadedSelected: SkinId = 'corgi';
         if (typeof data.selectedSkin === 'string' && loadedUnlocked.includes(data.selectedSkin as SkinId)) {
           loadedSelected = data.selectedSkin as SkinId;
         }

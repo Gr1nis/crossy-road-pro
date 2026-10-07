@@ -22,10 +22,11 @@ export interface UIActions {
 }
 
 export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
-  chicken: { label: 'Обычный', css: 'rarity-common' },
-  cyber_duck: { label: 'Редкий', css: 'rarity-rare' },
-  shadow_ninja: { label: 'Эпический', css: 'rarity-epic' },
-  frost_penguin: { label: 'Легендарный', css: 'rarity-legendary' },
+  corgi: { label: 'Обычный', css: 'rarity-common' },
+  pigeon_pizza: { label: 'Обычный', css: 'rarity-common' },
+  box_cat: { label: 'Редкий', css: 'rarity-rare' },
+  raccoon_bandit: { label: 'Эпический', css: 'rarity-epic' },
+  capybara_zen: { label: 'Легендарный', css: 'rarity-legendary' },
 };
 
 export class UIManager {

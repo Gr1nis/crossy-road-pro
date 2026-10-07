@@ -32,11 +32,7 @@ export type SkinId =
   | 'pigeon_pizza'
   | 'box_cat'
   | 'raccoon_bandit'
-  | 'capybara_zen'
-  | 'chicken'
-  | 'cyber_duck'
-  | 'shadow_ninja'
-  | 'frost_penguin';
+  | 'capybara_zen';
 
 export const DEFAULT_SKIN_ID: SkinId = 'corgi';
 
@@ -46,11 +42,6 @@ export const ALL_SKINS: ReadonlyArray<{ id: SkinId; name: string; badge: string 
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
   { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
-  // Legacy backward compatibility
-  { id: 'chicken', name: 'Классическая Курица', badge: '🐔' },
-  { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
-  { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
-  { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
 ];
 
 export const Biome = {

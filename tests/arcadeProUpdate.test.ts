@@ -99,8 +99,8 @@ describe('Arcade Pro Update — Railway, Coins, Rocks/Bushes, Gacha Skins, Combo
     const storage = new MemoryStorage();
     const engine = new GameEngine(555, storage) as any;
 
-    assert.deepEqual(engine.getUnlockedSkins(), ['chicken']);
-    assert.equal(engine.getSelectedSkin(), 'chicken');
+    assert.deepEqual(engine.getUnlockedSkins(), ['corgi']);
+    assert.equal(engine.getSelectedSkin(), 'corgi');
 
     // Cannot roll with 0 coins
     const failRoll = engine.rollGacha();
@@ -116,7 +116,7 @@ describe('Arcade Pro Update — Railway, Coins, Rocks/Bushes, Gacha Skins, Combo
     }
 
     assert.equal(unlockedSet.size, 3, '3 rolls must unlock 3 distinct new skins without duplicates');
-    assert.equal(engine.getUnlockedSkins().length, 4, 'Player should now have chicken + 3 gacha skins');
+    assert.equal(engine.getUnlockedSkins().length, 4, 'Player should now have corgi + 3 gacha skins');
 
     // Select one of the new skins and verify persistence on reload
     const chosenSkin = Array.from(unlockedSet)[0];

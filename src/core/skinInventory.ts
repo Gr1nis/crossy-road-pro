@@ -1,6 +1,6 @@
 import { ALL_SKINS, type SkinId } from './types.ts';
 
-const DEFAULT_SKIN: SkinId = 'chicken';
+const DEFAULT_SKIN: SkinId = 'corgi';
 const VALID_SKIN_IDS: ReadonlySet<SkinId> = new Set(ALL_SKINS.map((s) => s.id));
 
 /**

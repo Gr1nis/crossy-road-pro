@@ -119,32 +119,32 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     const storage = new MemoryStorage();
     const tracker = new ScoreTracker(storage);
 
-    assert.equal(tracker.getSkinRarity('chicken'), 'Common');
-    assert.equal(tracker.getSkinRarity('cyber_duck'), 'Rare');
-    assert.equal(tracker.getSkinRarity('shadow_ninja'), 'Epic');
-    assert.equal(tracker.getSkinRarity('frost_penguin'), 'Legendary');
+    assert.equal(tracker.getSkinRarity('corgi'), 'Common');
+    assert.equal(tracker.getSkinRarity('box_cat'), 'Rare');
+    assert.equal(tracker.getSkinRarity('raccoon_bandit'), 'Epic');
+    assert.equal(tracker.getSkinRarity('capybara_zen'), 'Legendary');
 
-    // Give 200 coins. Roll index 0 -> 'chicken' (Common), which is ALREADY unlocked at start!
+    // Give 200 coins. Roll index 0 -> 'corgi' (Common), which is ALREADY unlocked at start!
     tracker.addCoins(200);
     const dupRoll = tracker.rollGacha(0);
     assert.equal(dupRoll.success, true);
-    assert.equal(dupRoll.skinId, 'chicken');
+    assert.equal(dupRoll.skinId, 'corgi');
     assert.equal(dupRoll.rarity, 'Common');
     assert.equal(dupRoll.isDuplicate, true);
     assert.equal(dupRoll.cashback, 40);
     // 200 - 100 (cost) + 40 (cashback) = 140 coins remaining
     assert.equal(tracker.getCoins(), 140);
 
-    // Roll weighted probability 0.97 -> Legendary 'frost_penguin' (new skin!)
+    // Roll weighted probability 0.97 -> Legendary 'capybara_zen' (new skin!)
     const legRoll = tracker.rollGacha(0.97);
     assert.equal(legRoll.success, true);
-    assert.equal(legRoll.skinId, 'frost_penguin');
+    assert.equal(legRoll.skinId, 'capybara_zen');
     assert.equal(legRoll.rarity, 'Legendary');
     assert.equal(legRoll.isDuplicate, false);
     assert.equal(legRoll.cashback, 0);
     assert.equal(tracker.getCoins(), 40);
 
-    // Roll frost_penguin again -> duplicate Legendary gives +40 cashback
+    // Roll capybara_zen again -> duplicate Legendary gives +40 cashback
     tracker.addCoins(60); // now 100 coins
     const dupLegRoll = tracker.rollGacha(0.97);
     assert.equal(dupLegRoll.isDuplicate, true);
