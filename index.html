@@ -1200,6 +1200,14 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES 
     return this.inventory.getUnlockedSkins();
   }
 
+  unlockSkin(skinId        )          {
+    const success = this.inventory.unlockSkin(skinId);
+    if (success) {
+      this.saveToStorage();
+    }
+    return success;
+  }
+
   getSelectedSkin()         {
     return this.inventory.getSelectedSkin();
   }
@@ -1745,6 +1753,10 @@ const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
 
   getUnlockedSkins()           {
     return this.scoreTracker.getUnlockedSkins();
+  }
+
+  unlockSkin(skinId        )          {
+    return this.scoreTracker.unlockSkin(skinId);
   }
 
   getSelectedSkin()         {
@@ -5281,6 +5293,10 @@ const DEATH_LABELS                         = {
     this.ui.setMusicToggle(this.audio.isMusicEnabled());
     const playerName = this.engine.getScoreTracker().getPlayerName() || 'Игрок';
     this.ui.setPlayerName(playerName);
+
+    for (const skin of ALL_SKINS) {
+      this.engine.unlockSkin(skin.id);
+    }
   }
 
          getIsPlaying()          {
@@ -5449,6 +5465,9 @@ const DEATH_LABELS                         = {
   }
 
          renderSkinsUI()       {
+    for (const skin of ALL_SKINS) {
+      this.engine.unlockSkin(skin.id);
+    }
     const unlocked = this.engine.getUnlockedSkins();
     const active = this.engine.getSelectedSkin();
     this.ui.renderSkins(unlocked, active, (skinId        ) => {

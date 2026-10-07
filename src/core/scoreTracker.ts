@@ -303,6 +303,14 @@ export class ScoreTracker {
     return this.inventory.getUnlockedSkins();
   }
 
+  unlockSkin(skinId: SkinId): boolean {
+    const success = this.inventory.unlockSkin(skinId);
+    if (success) {
+      this.saveToStorage();
+    }
+    return success;
+  }
+
   getSelectedSkin(): SkinId {
     return this.inventory.getSelectedSkin();
   }

@@ -207,6 +207,10 @@ export class GameEngine {
     return this.scoreTracker.getUnlockedSkins();
   }
 
+  unlockSkin(skinId: SkinId): boolean {
+    return this.scoreTracker.unlockSkin(skinId);
+  }
+
   getSelectedSkin(): SkinId {
     return this.scoreTracker.getSelectedSkin();
   }

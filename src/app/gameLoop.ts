@@ -54,6 +54,10 @@ export class GameLoop {
     this.ui.setMusicToggle(this.audio.isMusicEnabled());
     const playerName = this.engine.getScoreTracker().getPlayerName() || 'Игрок';
     this.ui.setPlayerName(playerName);
+
+    for (const skin of ALL_SKINS) {
+      this.engine.unlockSkin(skin.id);
+    }
   }
 
   public getIsPlaying(): boolean {
@@ -222,6 +226,9 @@ export class GameLoop {
   }
 
   public renderSkinsUI(): void {
+    for (const skin of ALL_SKINS) {
+      this.engine.unlockSkin(skin.id);
+    }
     const unlocked = this.engine.getUnlockedSkins();
     const active = this.engine.getSelectedSkin();
     this.ui.renderSkins(unlocked, active, (skinId: string) => {
