@@ -18,6 +18,15 @@ export const VOXEL_PALETTE = {
   nosePink: 0xf472b6,
   greenLeaf: 0x16a34a,
   ghostYellow: 0xfbbf24,
+  burlapBag: 0xd4b285,
+  bagRope: 0x854d0e,
+  capybaraCaramel: 0x925227,
+  capybaraMuzzle: 0x542d13,
+  capybaraPaws: 0x2b170a,
+  pigeonFootRed: 0xf43f5e,
+  deliveryRed: 0xdc2626,
+  catStripe: 0x9a3412,
+  boxFlap: 0x92400e,
 
   // Backward compatibility & environment aliases
   corgiTan: 0xd97706,

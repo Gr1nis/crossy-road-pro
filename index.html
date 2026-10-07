@@ -384,23 +384,19 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;
-const MoveDirection = {
+}         ;const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;
-const DeathReason = {
+}         ;const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;
-const DEFAULT_SKIN_ID         = 'corgi';
-const ALL_SKINS                                                             = [
+}         ;const DEFAULT_SKIN_ID         = 'corgi';const ALL_SKINS                                                             = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
@@ -411,26 +407,21 @@ const ALL_SKINS                                                             = [
   { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
   { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
   { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
-];
-const Biome = {
+];const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
   DESERT: 'desert',
   NEON: 'neon',
-}         ;
-const BIOME_ORDER                           = [
+}         ;const BIOME_ORDER                           = [
   Biome.FOREST,
   Biome.WINTER,
   Biome.DESERT,
   Biome.NEON,
-];
-const BIOME_INTERVAL = 25;
-function getBiomeForScore(score        )            {
+];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
   const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
   const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
   return BIOME_ORDER[biomeIndex];
-}
-const WORLD_CONFIG = {
+}const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -484,8 +475,7 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}
-function findSupportingLog(playerX        , logs               )                     {
+}function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -498,19 +488,16 @@ function findSupportingLog(playerX        , logs               )                
 /**
  * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
  * relative to the center of the log, so the character cleanly magnets to a log section.
- */
-function snapToLogSlot(landingX        , log             )         {
+ */function snapToLogSlot(landingX        , log             )         {
   const rel = landingX - log.x;
   // Discrete 1.0-spaced slots centered on log
   const snappedRel = Math.round(rel);
   const maxRel = Math.max(0, (log.length - 1.0) / 2);
   const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
   return log.x + clampedRel;
-}
-function isOutOfBoundsX(playerX        )          {
+}function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}
-function quantizeLandX(x        )         {
+}function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -518,15 +505,11 @@ function quantizeLandX(x        )         {
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */
-function worldToScreenX(x        )         {
+ */function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
-}
-function vehicleScreenRotationY(speed        )         {
+}function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
-}
-const RECORD_FLAG_X = 3.8;
-function getRecordFlagPosition(
+}const RECORD_FLAG_X = 3.8;function getRecordFlagPosition(
   highScore        ,
   shoulderX         = RECORD_FLAG_X
 )                            {
@@ -537,16 +520,14 @@ function getRecordFlagPosition(
     x: shoulderX,
     row: Math.floor(highScore),
   };
-}
-const CAMERA_CONFIG = {
+}const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
   DESKTOP_VIEW_HEIGHT: 22.0,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
   FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
-}         ;
-function getCameraFrustumDimensions(aspect         = 9 / 16)   
+}         ;function getCameraFrustumDimensions(aspect         = 9 / 16)   
                      
                     
                  
@@ -568,8 +549,7 @@ function getCameraFrustumDimensions(aspect         = 9 / 16)
  * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
  * of the player character under the isometric orthographic camera.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
- */
-function getCameraFrustumNdcY(
+ */function getCameraFrustumNdcY(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -592,8 +572,7 @@ function getCameraFrustumNdcY(
 /**
  * Returns true when the player touches or crosses below the visible
  * bottom edge of the screen (NDC Y < -0.98).
- */
-function isPlayerBehindCameraFrustum(
+ */function isPlayerBehindCameraFrustum(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -720,9 +699,7 @@ const SkinRarity = {
   RARE: 'Rare',
   EPIC: 'Epic',
   LEGENDARY: 'Legendary',
-}         ;
-const GACHA_DUPLICATE_CASHBACK = 40;
-const SKIN_RARITY_MAP                                  = {
+}         ;const GACHA_DUPLICATE_CASHBACK = 40;const SKIN_RARITY_MAP                                  = {
   corgi: SkinRarity.COMMON,
   pigeon_pizza: SkinRarity.COMMON,
   box_cat: SkinRarity.RARE,
@@ -732,8 +709,7 @@ const SKIN_RARITY_MAP                                  = {
   cyber_duck: SkinRarity.RARE,
   shadow_ninja: SkinRarity.EPIC,
   frost_penguin: SkinRarity.LEGENDARY,
-};
-const SKIN_RARITY_WEIGHTS                                  = {
+};const SKIN_RARITY_WEIGHTS                                  = {
   [SkinRarity.COMMON]: 50,
   [SkinRarity.RARE]: 30,
   [SkinRarity.EPIC]: 15,
@@ -759,8 +735,7 @@ function mulberry32(seed        )         {
 /**
  * GachaMachine handles skin rolls based on rarity weights, PRNG, and duplicates cashback.
  * Decoupled from storage, view, and game loop.
- */
-class GachaMachine {
+ */class GachaMachine {
   getSkinRarity(skinId        )                  {
     return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
   }
@@ -830,8 +805,7 @@ const ACHIEVEMENT_DEFINITIONS                                       = [
   { id: 'river_navigator', title: 'Речной волк', description: 'Совершите 10 прыжков по брёвнам', badge: '🪵', maxProgress: 10 },
   { id: 'speedy_crosser', title: 'Без оглядки', description: 'Сделайте 30 шагов вперед без движения назад', badge: '🏃', maxProgress: 30 },
   { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑', maxProgress: 1 },
-];
-class AchievementTracker {
+];class AchievementTracker {
           unlocked = new Set               ();
           dates = new Map                       ();
           trainsSurvived = 0;
@@ -986,11 +960,8 @@ class AchievementTracker {
 
 // --- Module: src/core/scoreTracker.ts ---
 // Re-exports for backward compatibility
-
 const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
-const PROFILE_KEY = 'crossy_road_pro_profile_v1';
-const MAX_LEADERBOARD_ENTRIES = 10;
-const DEFAULT_BOT_RIVALS                                                = [
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES = 10;const DEFAULT_BOT_RIVALS                                                = [
   { playerName: 'CyberKaiser', score: 250, skinId: 'shadow_ninja', date: '2026-09-20', isBot: true },
   { playerName: 'ArcticFlash', score: 210, skinId: 'frost_penguin', date: '2026-09-21', isBot: true },
   { playerName: 'NeonQuack', score: 175, skinId: 'cyber_duck', date: '2026-09-22', isBot: true },
@@ -1001,8 +972,7 @@ const DEFAULT_BOT_RIVALS                                                = [
   { playerName: 'TurboCluck', score: 55, skinId: 'chicken', date: '2026-09-25', isBot: true },
   { playerName: 'TrainDodger', score: 35, skinId: 'shadow_ninja', date: '2026-09-25', isBot: true },
   { playerName: 'RookieFeather', score: 18, skinId: 'chicken', date: '2026-09-26', isBot: true },
-];
-class ScoreTracker {
+];class ScoreTracker {
           currentScore = 0;
           highScore = 0;
           bestRow = 0;
@@ -1427,8 +1397,7 @@ class ScoreTracker {
 
 // --- Module: src/core/laneGenerator.ts ---
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
-const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];
-class LaneGenerator {
+const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGenerator {
                    baseSeed        ;
 
   constructor(seed         = 42) {
@@ -1597,8 +1566,7 @@ class LaneGenerator {
 }
 
 // --- Module: src/core/gameEngine.ts ---
-const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;
-class GameEngine {
+const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
           generator               ;
           lanes = new Map              ();
           scoreTracker              ;
@@ -2728,6 +2696,15 @@ const VOXEL_PALETTE = {
   nosePink: 0xf472b6,
   greenLeaf: 0x16a34a,
   ghostYellow: 0xfbbf24,
+  burlapBag: 0xd4b285,
+  bagRope: 0x854d0e,
+  capybaraCaramel: 0x925227,
+  capybaraMuzzle: 0x542d13,
+  capybaraPaws: 0x2b170a,
+  pigeonFootRed: 0xf43f5e,
+  deliveryRed: 0xdc2626,
+  catStripe: 0x9a3412,
+  boxFlap: 0x92400e,
 
   // Backward compatibility & environment aliases
   corgiTan: 0xd97706,
@@ -2757,8 +2734,7 @@ const VOXEL_PALETTE = {
   concreteGrey: 0x64748b,
   goldCoin: 0xfacc15,
   rubyRed: 0xb91c1c,
-}         ;
-class VoxelPalette {
+}         ;class VoxelPalette {
           static          geoCache = new Map                           ();
           static          matCache = new Map                                   ();
           static          basicMatCache = new Map                                 ();
@@ -2836,21 +2812,18 @@ for (const [w, h, d] of voxelStandardSizes) {
 for (const key of Object.keys(VOXEL_PALETTE)                   ) {
   VoxelPalette.getMaterial(key, false);
 }
-VoxelPalette.getGhostMaterial();
-function createVoxelMaterial(
+VoxelPalette.getGhostMaterial();function createVoxelMaterial(
   colorKey                        ,
   isGhost = false
 )                            {
   return VoxelPalette.getMaterial(colorKey, isGhost);
-}
-function createVoxelBasicMaterial(
+}function createVoxelBasicMaterial(
   color        ,
   transparent = false,
   opacity = 1.0
 )                          {
   return VoxelPalette.getBasicMaterial(color, transparent, opacity);
-}
-function createVoxelMesh(
+}function createVoxelMesh(
   w        ,
   h        ,
   d        ,
@@ -2883,103 +2856,237 @@ function addCharVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}
-function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+}function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
   const group = new THREE.Group();
 
   if (skinId === 'corgi') {
-    // 17 voxels: Corgi with stubby paws, pointy ears, tongue, fluffy tail
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'white', -0.16, 0.07, 0.14, isGhost);
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'white', 0.16, 0.07, 0.14, isGhost);
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'corgiOrange', -0.16, 0.07, -0.14, isGhost);
-    addCharVoxel(group, 0.10, 0.14, 0.12, 'corgiOrange', 0.16, 0.07, -0.14, isGhost);
-    addCharVoxel(group, 0.46, 0.30, 0.50, 'corgiOrange', 0, 0.28, 0, isGhost);
-    addCharVoxel(group, 0.32, 0.22, 0.24, 'white', 0, 0.25, 0.14, isGhost);
-    addCharVoxel(group, 0.36, 0.32, 0.34, 'corgiOrange', 0, 0.46, 0.20, isGhost);
-    addCharVoxel(group, 0.22, 0.14, 0.16, 'white', 0, 0.40, 0.36, isGhost);
-    addCharVoxel(group, 0.08, 0.06, 0.08, 'darkCharcoal', 0, 0.44, 0.44, isGhost);
-    addCharVoxel(group, 0.08, 0.03, 0.08, 'nosePink', 0, 0.36, 0.40, isGhost);
-    addCharVoxel(group, 0.06, 0.06, 0.04, 'darkCharcoal', -0.12, 0.50, 0.34, isGhost);
-    addCharVoxel(group, 0.06, 0.06, 0.04, 'darkCharcoal', 0.12, 0.50, 0.34, isGhost);
-    addCharVoxel(group, 0.10, 0.18, 0.06, 'corgiOrange', -0.14, 0.68, 0.18, isGhost);
-    addCharVoxel(group, 0.10, 0.18, 0.06, 'corgiOrange', 0.14, 0.68, 0.18, isGhost);
-    addCharVoxel(group, 0.06, 0.10, 0.04, 'nosePink', -0.14, 0.66, 0.19, isGhost);
-    addCharVoxel(group, 0.06, 0.10, 0.04, 'nosePink', 0.14, 0.66, 0.19, isGhost);
-    addCharVoxel(group, 0.14, 0.14, 0.14, 'corgiOrange', 0, 0.35, -0.28, isGhost);
+    // 32 voxels: Corgi with stubby paws, pink pads, white chest & blaze, tongue, upright ears, peach tail
+    // 4 Stubby paws with pink pads
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, -0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, -0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, -0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, -0.16, isGhost);
+    // Body, underbelly, fluffy chest & rear bum
+    addCharVoxel(group, 0.38, 0.22, 0.46, 'corgiOrange', 0, 0.25, -0.01, isGhost);
+    addCharVoxel(group, 0.26, 0.04, 0.38, 'white', 0, 0.15, -0.01, isGhost);
+    addCharVoxel(group, 0.34, 0.20, 0.12, 'white', 0, 0.26, 0.18, isGhost);
+    addCharVoxel(group, 0.36, 0.20, 0.08, 'corgiOrange', 0, 0.26, -0.24, isGhost);
+    addCharVoxel(group, 0.16, 0.12, 0.03, 'white', 0, 0.25, -0.28, isGhost);
+    addCharVoxel(group, 0.12, 0.12, 0.10, 'corgiOrange', 0, 0.35, -0.27, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.05, 'white', 0, 0.37, -0.31, isGhost);
+    // Collar & golden tag
+    addCharVoxel(group, 0.32, 0.04, 0.22, 'pizzaRed', 0, 0.35, 0.15, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.03, 'pizzaCheese', 0, 0.33, 0.26, isGhost);
+    // Head, blaze, muzzle, nose, tongue, expressive eyes
+    addCharVoxel(group, 0.36, 0.26, 0.30, 'corgiOrange', 0, 0.48, 0.18, isGhost);
+    addCharVoxel(group, 0.08, 0.22, 0.12, 'white', 0, 0.50, 0.28, isGhost);
+    addCharVoxel(group, 0.20, 0.12, 0.14, 'white', 0, 0.42, 0.35, isGhost);
+    addCharVoxel(group, 0.08, 0.06, 0.06, 'darkCharcoal', 0, 0.46, 0.42, isGhost);
+    addCharVoxel(group, 0.06, 0.03, 0.08, 'nosePink', 0.03, 0.38, 0.41, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', -0.11, 0.51, 0.33, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', -0.11, 0.53, 0.35, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', 0.11, 0.51, 0.33, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', 0.11, 0.53, 0.35, isGhost);
+    // Big fox ears with pink inner layer
+    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', -0.14, 0.66, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', -0.15, 0.76, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', -0.14, 0.67, 0.18, isGhost);
+    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', 0.14, 0.66, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', 0.15, 0.76, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', 0.14, 0.67, 0.18, isGhost);
   } else if (skinId === 'pigeon_pizza') {
-    // 16 voxels: Pigeon with purple neck, beak, and triangular pizza slice
-    addCharVoxel(group, 0.10, 0.12, 0.14, 'orangeFruit', -0.12, 0.06, 0.02, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.14, 'orangeFruit', 0.12, 0.06, 0.02, isGhost);
-    addCharVoxel(group, 0.44, 0.38, 0.50, 'pigeonGrey', 0, 0.30, 0, isGhost);
-    addCharVoxel(group, 0.08, 0.22, 0.32, 'darkCharcoal', -0.24, 0.32, -0.02, isGhost);
-    addCharVoxel(group, 0.08, 0.22, 0.32, 'darkCharcoal', 0.24, 0.32, -0.02, isGhost);
-    addCharVoxel(group, 0.22, 0.10, 0.18, 'darkCharcoal', 0, 0.28, -0.28, isGhost);
-    addCharVoxel(group, 0.30, 0.14, 0.30, 'purpleNeck', 0, 0.44, 0.16, isGhost);
-    addCharVoxel(group, 0.26, 0.24, 0.28, 'pigeonGrey', 0, 0.56, 0.20, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.06, 'orangeFruit', -0.14, 0.58, 0.24, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.06, 'orangeFruit', 0.14, 0.58, 0.24, isGhost);
-    addCharVoxel(group, 0.12, 0.09, 0.14, 'pizzaCheese', 0, 0.53, 0.36, isGhost);
-    addCharVoxel(group, 0.26, 0.06, 0.08, 'cardboard', 0, 0.52, 0.60, isGhost);
-    addCharVoxel(group, 0.22, 0.04, 0.12, 'pizzaCheese', 0, 0.50, 0.52, isGhost);
-    addCharVoxel(group, 0.12, 0.04, 0.10, 'pizzaCheese', 0, 0.49, 0.43, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.06, 'pizzaRed', -0.05, 0.51, 0.53, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.06, 'pizzaRed', 0.05, 0.51, 0.47, isGhost);
+    // 33 voxels: Pigeon with iridescent neck, wing stripes, and triangular pepperoni pizza
+    // Coral feet & legs
+    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', -0.10, 0.015, 0.02, isGhost);
+    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', -0.10, 0.07, 0.00, isGhost);
+    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', 0.10, 0.015, 0.02, isGhost);
+    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', 0.10, 0.07, 0.00, isGhost);
+    // Body, light chest, tail feathers
+    addCharVoxel(group, 0.40, 0.28, 0.42, 'pigeonGrey', 0, 0.28, -0.04, isGhost);
+    addCharVoxel(group, 0.30, 0.20, 0.12, 'white', 0, 0.28, 0.12, isGhost);
+    addCharVoxel(group, 0.22, 0.08, 0.18, 'pigeonGrey', 0, 0.26, -0.28, isGhost);
+    addCharVoxel(group, 0.18, 0.05, 0.12, 'darkCharcoal', 0, 0.24, -0.38, isGhost);
+    // Wings with black bars & tips
+    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', -0.22, 0.32, -0.04, isGhost);
+    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', -0.22, 0.28, -0.06, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', -0.20, 0.24, -0.20, isGhost);
+    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', 0.22, 0.32, -0.04, isGhost);
+    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', 0.22, 0.28, -0.06, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', 0.20, 0.24, -0.20, isGhost);
+    // Iridescent shimmering neck & collar
+    addCharVoxel(group, 0.28, 0.12, 0.26, 'purpleNeck', 0, 0.43, 0.10, isGhost);
+    addCharVoxel(group, 0.29, 0.04, 0.27, 'pigeonTeal', 0, 0.41, 0.10, isGhost);
+    // Head, eyes with orange ring, beak & cere
+    addCharVoxel(group, 0.26, 0.22, 0.26, 'pigeonGrey', 0, 0.56, 0.14, isGhost);
+    addCharVoxel(group, 0.18, 0.06, 0.18, 'pigeonGrey', 0, 0.68, 0.14, isGhost);
+    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', -0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', -0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', 0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', 0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.09, 0.06, 0.12, 'orangeFruit', 0, 0.55, 0.26, isGhost);
+    addCharVoxel(group, 0.08, 0.04, 0.08, 'orangeFruit', 0, 0.50, 0.24, isGhost);
+    addCharVoxel(group, 0.08, 0.04, 0.04, 'white', 0, 0.59, 0.23, isGhost);
+    // Realistic triangular pizza slice with cheese, crust & pepperoni
+    addCharVoxel(group, 0.08, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.26, isGhost);
+    addCharVoxel(group, 0.16, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.31, isGhost);
+    addCharVoxel(group, 0.24, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.36, isGhost);
+    addCharVoxel(group, 0.26, 0.06, 0.06, 'pizzaCrust', 0, 0.53, 0.41, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', -0.05, 0.54, 0.36, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', 0.05, 0.54, 0.32, isGhost);
+    addCharVoxel(group, 0.04, 0.02, 0.04, 'pizzaRed', 0, 0.54, 0.28, isGhost);
+    addCharVoxel(group, 0.03, 0.02, 0.03, 'greenLeaf', -0.02, 0.54, 0.33, isGhost);
   } else if (skinId === 'box_cat') {
-    // 17 voxels: Ginger cat peeking from cardboard parcel box
-    addCharVoxel(group, 0.54, 0.38, 0.54, 'cardboard', 0, 0.19, 0, isGhost);
-    addCharVoxel(group, 0.56, 0.04, 0.16, 'orangeFruit', 0, 0.38, 0, isGhost);
-    addCharVoxel(group, 0.16, 0.12, 0.02, 'white', 0.14, 0.20, 0.28, isGhost);
-    addCharVoxel(group, 0.42, 0.26, 0.36, 'catOrange', 0, 0.34, 0.06, isGhost);
-    addCharVoxel(group, 0.38, 0.30, 0.34, 'catOrange', 0, 0.48, 0.12, isGhost);
-    addCharVoxel(group, 0.22, 0.14, 0.12, 'white', 0, 0.42, 0.28, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.06, 'nosePink', 0, 0.44, 0.34, isGhost);
-    addCharVoxel(group, 0.06, 0.06, 0.04, 'pizzaCheese', -0.11, 0.50, 0.29, isGhost);
-    addCharVoxel(group, 0.06, 0.06, 0.04, 'pizzaCheese', 0.11, 0.50, 0.29, isGhost);
-    addCharVoxel(group, 0.10, 0.14, 0.06, 'catOrange', -0.14, 0.66, 0.10, isGhost);
-    addCharVoxel(group, 0.10, 0.14, 0.06, 'catOrange', 0.14, 0.66, 0.10, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.04, 'nosePink', -0.14, 0.65, 0.12, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.04, 'nosePink', 0.14, 0.65, 0.12, isGhost);
-    addCharVoxel(group, 0.10, 0.08, 0.12, 'white', -0.14, 0.38, 0.28, isGhost);
-    addCharVoxel(group, 0.10, 0.08, 0.12, 'white', 0.14, 0.38, 0.28, isGhost);
-    addCharVoxel(group, 0.08, 0.16, 0.08, 'catOrange', 0, 0.32, -0.30, isGhost);
-    addCharVoxel(group, 0.08, 0.10, 0.08, 'white', 0, 0.22, -0.32, isGhost);
+    // 37 voxels: Ginger cat in cardboard parcel box with flaps, FRAGILE stamp & paws on rim
+    // Corrugated box & angled flaps
+    addCharVoxel(group, 0.52, 0.04, 0.52, 'cardboard', 0, 0.02, 0, isGhost);
+    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, 0.24, isGhost);
+    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, -0.24, isGhost);
+    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', -0.24, 0.17, 0, isGhost);
+    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', 0.24, 0.17, 0, isGhost);
+    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, 0.31, isGhost);
+    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, -0.31, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', -0.31, 0.29, 0, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', 0.31, 0.29, 0, isGhost);
+    // Red DELIVERY / FRAGILE stamp label
+    addCharVoxel(group, 0.22, 0.12, 0.02, 'deliveryRed', 0.10, 0.15, 0.262, isGhost);
+    addCharVoxel(group, 0.16, 0.04, 0.02, 'white', 0.10, 0.16, 0.272, isGhost);
+    addCharVoxel(group, 0.04, 0.05, 0.02, 'darkCharcoal', 0.02, 0.15, 0.274, isGhost);
+    // Cat body & white chest
+    addCharVoxel(group, 0.38, 0.22, 0.38, 'catOrange', 0, 0.20, 0, isGhost);
+    addCharVoxel(group, 0.20, 0.14, 0.06, 'white', 0, 0.26, 0.18, isGhost);
+    // Paws resting over the front rim
+    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', -0.13, 0.32, 0.24, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', -0.13, 0.29, 0.26, isGhost);
+    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', 0.13, 0.32, 0.24, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', 0.13, 0.29, 0.26, isGhost);
+    // Cat head, tabby stripes, cheeks & nose
+    addCharVoxel(group, 0.34, 0.26, 0.30, 'catOrange', 0, 0.44, 0.06, isGhost);
+    addCharVoxel(group, 0.05, 0.12, 0.26, 'catStripe', 0, 0.52, 0.06, isGhost);
+    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', -0.09, 0.51, 0.06, isGhost);
+    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', 0.09, 0.51, 0.06, isGhost);
+    addCharVoxel(group, 0.18, 0.09, 0.08, 'white', 0, 0.39, 0.21, isGhost);
+    addCharVoxel(group, 0.05, 0.04, 0.04, 'nosePink', 0, 0.42, 0.25, isGhost);
+    // Expressive cat eyes with dark pupils
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', -0.08, 0.46, 0.212, isGhost);
+    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', -0.08, 0.46, 0.216, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', 0.08, 0.46, 0.212, isGhost);
+    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', 0.08, 0.46, 0.216, isGhost);
+    // Ears with pink inner lining
+    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', -0.12, 0.60, 0.06, isGhost);
+    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', -0.12, 0.59, 0.08, isGhost);
+    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', 0.12, 0.60, 0.06, isGhost);
+    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', 0.12, 0.59, 0.08, isGhost);
+    // Striped tail sticking straight up out of the back
+    addCharVoxel(group, 0.07, 0.14, 0.07, 'catOrange', 0.06, 0.35, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.44, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.07, 'catOrange', 0.06, 0.51, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.58, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.08, 'white', 0.06, 0.65, -0.19, isGhost);
   } else if (skinId === 'raccoon_bandit') {
-    // 17 voxels: Raccoon with bandit eye mask, striped tail & loot sack
-    addCharVoxel(group, 0.12, 0.14, 0.12, 'maskBlack', -0.15, 0.07, -0.06, isGhost);
-    addCharVoxel(group, 0.12, 0.14, 0.12, 'maskBlack', 0.15, 0.07, -0.06, isGhost);
-    addCharVoxel(group, 0.48, 0.40, 0.48, 'raccoonGrey', 0, 0.30, 0, isGhost);
-    addCharVoxel(group, 0.30, 0.26, 0.08, 'white', 0, 0.28, 0.22, isGhost);
-    addCharVoxel(group, 0.36, 0.32, 0.34, 'raccoonGrey', 0, 0.50, 0.16, isGhost);
-    addCharVoxel(group, 0.40, 0.12, 0.10, 'maskBlack', 0, 0.50, 0.29, isGhost);
-    addCharVoxel(group, 0.08, 0.05, 0.04, 'white', -0.10, 0.57, 0.30, isGhost);
-    addCharVoxel(group, 0.08, 0.05, 0.04, 'white', 0.10, 0.57, 0.30, isGhost);
-    addCharVoxel(group, 0.18, 0.12, 0.14, 'white', 0, 0.42, 0.34, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.06, 'maskBlack', 0, 0.44, 0.41, isGhost);
-    addCharVoxel(group, 0.08, 0.12, 0.05, 'maskBlack', -0.15, 0.66, 0.14, isGhost);
-    addCharVoxel(group, 0.08, 0.12, 0.05, 'maskBlack', 0.15, 0.66, 0.14, isGhost);
-    addCharVoxel(group, 0.14, 0.14, 0.14, 'maskBlack', 0, 0.30, -0.30, isGhost);
-    addCharVoxel(group, 0.14, 0.14, 0.14, 'raccoonGrey', 0, 0.34, -0.42, isGhost);
-    addCharVoxel(group, 0.12, 0.12, 0.12, 'maskBlack', 0, 0.38, -0.52, isGhost);
-    addCharVoxel(group, 0.32, 0.30, 0.22, 'cardboard', 0, 0.35, -0.20, isGhost);
-    addCharVoxel(group, 0.14, 0.10, 0.12, 'pizzaCheese', 0, 0.50, -0.16, isGhost);
+    // 41 voxels: Bandit Raccoon with mask, fur cheeks, striped tail & canvas loot bag
+    // 4 Stubby paws & legs
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, 0.14, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, 0.14, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, -0.13, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, -0.13, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, 0.14, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, 0.14, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, -0.13, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, -0.13, isGhost);
+
+    // Ash-grey body & white underbelly / chest
+    addCharVoxel(group, 0.36, 0.22, 0.38, 'raccoonGrey', 0, 0.23, 0, isGhost);
+    addCharVoxel(group, 0.24, 0.16, 0.24, 'white', 0, 0.20, 0.06, isGhost);
+    addCharVoxel(group, 0.24, 0.16, 0.06, 'white', 0, 0.25, 0.19, isGhost);
+    addCharVoxel(group, 0.28, 0.08, 0.20, 'raccoonGrey', 0, 0.34, 0.12, isGhost);
+
+    // Head core & white fur cheeks
+    addCharVoxel(group, 0.32, 0.22, 0.24, 'raccoonGrey', 0, 0.45, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', -0.17, 0.42, 0.18, isGhost);
+    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', 0.17, 0.42, 0.18, isGhost);
+
+    // Bandit mask & eye features
+    addCharVoxel(group, 0.22, 0.08, 0.05, 'maskBlack', 0, 0.46, 0.28, isGhost);
+    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', -0.12, 0.46, 0.28, isGhost);
+    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', 0.12, 0.46, 0.28, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', -0.11, 0.46, 0.31, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', 0.11, 0.46, 0.31, isGhost);
+    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', -0.11, 0.53, 0.27, isGhost);
+    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', 0.11, 0.53, 0.27, isGhost);
+
+    // White snout, black nose & chin
+    addCharVoxel(group, 0.14, 0.09, 0.10, 'white', 0, 0.39, 0.31, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.04, 'maskBlack', 0, 0.42, 0.36, isGhost);
+    addCharVoxel(group, 0.10, 0.04, 0.06, 'white', 0, 0.34, 0.28, isGhost);
+
+    // Pointed ears with white inner rim
+    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', -0.13, 0.58, 0.14, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', -0.13, 0.57, 0.16, isGhost);
+    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', 0.13, 0.58, 0.14, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', 0.13, 0.57, 0.16, isGhost);
+
+    // 5-segment alternating ringed fluffy tail
+    addCharVoxel(group, 0.14, 0.14, 0.06, 'raccoonGrey', 0, 0.24, -0.21, isGhost);
+    addCharVoxel(group, 0.15, 0.15, 0.06, 'maskBlack', 0, 0.26, -0.26, isGhost);
+    addCharVoxel(group, 0.15, 0.15, 0.06, 'raccoonGrey', 0, 0.28, -0.31, isGhost);
+    addCharVoxel(group, 0.14, 0.14, 0.06, 'maskBlack', 0, 0.30, -0.36, isGhost);
+    addCharVoxel(group, 0.10, 0.10, 0.05, 'raccoonGrey', 0, 0.32, -0.41, isGhost);
+
+    // Burlap loot sack on back with tied rope neck & patches
+    addCharVoxel(group, 0.26, 0.18, 0.20, 'burlapBag', 0, 0.37, -0.08, isGhost);
+    addCharVoxel(group, 0.22, 0.10, 0.16, 'burlapBag', 0, 0.47, -0.08, isGhost);
+    addCharVoxel(group, 0.12, 0.04, 0.12, 'bagRope', 0, 0.53, -0.08, isGhost);
+    addCharVoxel(group, 0.14, 0.06, 0.12, 'burlapBag', 0, 0.57, -0.08, isGhost);
+    addCharVoxel(group, 0.27, 0.03, 0.21, 'bagRope', 0, 0.43, -0.08, isGhost);
+    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', -0.135, 0.38, -0.08, isGhost);
+    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', 0.135, 0.38, -0.08, isGhost);
   } else if (skinId === 'capybara_zen') {
-    // 16 voxels: Chill capybara with yuzu/mandarin on head
-    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', -0.16, 0.07, 0.20, isGhost);
-    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', 0.16, 0.07, 0.20, isGhost);
-    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', -0.16, 0.07, -0.20, isGhost);
-    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', 0.16, 0.07, -0.20, isGhost);
-    addCharVoxel(group, 0.54, 0.44, 0.60, 'capybaraBrown', 0, 0.32, 0, isGhost);
-    addCharVoxel(group, 0.40, 0.34, 0.38, 'capybaraBrown', 0, 0.45, 0.26, isGhost);
-    addCharVoxel(group, 0.26, 0.20, 0.18, 'darkCharcoal', 0, 0.38, 0.46, isGhost);
-    addCharVoxel(group, 0.14, 0.04, 0.05, 'maskBlack', 0, 0.40, 0.54, isGhost);
-    addCharVoxel(group, 0.08, 0.03, 0.04, 'darkCharcoal', -0.17, 0.48, 0.38, isGhost);
-    addCharVoxel(group, 0.08, 0.03, 0.04, 'darkCharcoal', 0.17, 0.48, 0.38, isGhost);
-    addCharVoxel(group, 0.06, 0.06, 0.05, 'darkCharcoal', -0.20, 0.58, 0.20, isGhost);
-    addCharVoxel(group, 0.06, 0.06, 0.05, 'darkCharcoal', 0.20, 0.58, 0.20, isGhost);
-    addCharVoxel(group, 0.22, 0.14, 0.10, 'capybaraBrown', 0, 0.34, -0.32, isGhost);
-    addCharVoxel(group, 0.18, 0.16, 0.18, 'orangeFruit', 0, 0.68, 0.24, isGhost);
-    addCharVoxel(group, 0.04, 0.06, 0.04, 'greenLeaf', 0, 0.78, 0.24, isGhost);
-    addCharVoxel(group, 0.07, 0.03, 0.06, 'greenLeaf', 0.04, 0.79, 0.26, isGhost);
+    // 32 voxels: Zen Capybara in grounded meditative pose with mandarin on flat head
+    // 4 Paws touching ground & front leg pillars
+    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', -0.14, 0.04, 0.15, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', 0.14, 0.04, 0.15, isGhost);
+    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', -0.15, 0.04, -0.15, isGhost);
+    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', 0.15, 0.04, -0.15, isGhost);
+    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', -0.14, 0.14, 0.15, isGhost);
+    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', 0.14, 0.14, 0.15, isGhost);
+
+    // Caramel monolithic torso, underbelly tone & wide zen haunches
+    addCharVoxel(group, 0.38, 0.32, 0.42, 'capybaraCaramel', 0, 0.24, -0.02, isGhost);
+    addCharVoxel(group, 0.28, 0.08, 0.34, 'capybaraMuzzle', 0, 0.10, -0.02, isGhost);
+    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', -0.19, 0.20, -0.12, isGhost);
+    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', 0.19, 0.20, -0.12, isGhost);
+    addCharVoxel(group, 0.32, 0.26, 0.08, 'capybaraCaramel', 0, 0.22, -0.26, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.04, 'capybaraDark', 0, 0.24, -0.31, isGhost);
+
+    // Neck slope & heavy square flat-topped capybara head
+    addCharVoxel(group, 0.32, 0.22, 0.14, 'capybaraCaramel', 0, 0.32, 0.16, isGhost);
+    addCharVoxel(group, 0.30, 0.24, 0.26, 'capybaraCaramel', 0, 0.46, 0.19, isGhost);
+    addCharVoxel(group, 0.26, 0.20, 0.14, 'capybaraCaramel', 0, 0.42, 0.33, isGhost);
+    addCharVoxel(group, 0.04, 0.12, 0.02, 'capybaraDark', 0, 0.41, 0.405, isGhost);
+    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', -0.05, 0.42, 0.405, isGhost);
+    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', 0.05, 0.42, 0.405, isGhost);
+    addCharVoxel(group, 0.20, 0.06, 0.10, 'capybaraMuzzle', 0, 0.30, 0.32, isGhost);
+
+    // Serene meditative closed slit eyes & cute rounded ears
+    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', -0.155, 0.48, 0.22, isGhost);
+    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', 0.155, 0.48, 0.22, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', -0.155, 0.50, 0.22, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', 0.155, 0.50, 0.22, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', -0.16, 0.57, 0.12, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', 0.16, 0.57, 0.12, isGhost);
+    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', -0.16, 0.56, 0.13, isGhost);
+    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', 0.16, 0.56, 0.13, isGhost);
+
+    // Round voxel mandarin/yuzu on head with green stem & leaf
+    addCharVoxel(group, 0.14, 0.03, 0.14, 'orangeFruit', 0, 0.595, 0.19, isGhost);
+    addCharVoxel(group, 0.18, 0.08, 0.18, 'orangeFruit', 0, 0.64, 0.19, isGhost);
+    addCharVoxel(group, 0.12, 0.03, 0.12, 'orangeFruit', 0, 0.69, 0.19, isGhost);
+    addCharVoxel(group, 0.03, 0.05, 0.03, 'greenLeaf', 0, 0.725, 0.19, isGhost);
+    addCharVoxel(group, 0.06, 0.03, 0.04, 'greenLeaf', 0.035, 0.73, 0.21, isGhost);
   } else {
     // 14 voxels: Legacy and classical fallback (chicken, cyber_duck, shadow_ninja, frost_penguin)
     const bodyColor                =
@@ -3251,8 +3358,7 @@ function buildTrain()                   {
     [0.8, 0.08, 0.4, 0, 1.02, 0, vent],
     [0.8, 0.08, 0.4, 3.5, 1.02, 0, vent],
   ];
-}
-function createUrbanVehicle(
+}function createUrbanVehicle(
   vOrType                                                           ,
   speed         ,
   colorOverride         
@@ -3284,15 +3390,13 @@ function createUrbanVehicle(
   buildUrbanVoxels(group, specs);
   group.rotation.y = vehicleScreenRotationY(spd);
   return group;
-}
-function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+}function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
   const group = new THREE.Group();
   buildUrbanVoxels(group, buildTrain());
   const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
   group.rotation.y = vehicleScreenRotationY(actualSpeed);
   return group;
-}
-function createUrbanPallet(log             )              {
+}function createUrbanPallet(log             )              {
   const group = new THREE.Group();
   const specs                   = [
     [log.length, 0.22, 0.74, 0, 0.02, 0, 0x854d0e],
@@ -3369,8 +3473,7 @@ function createUrbanTree(
   }
 
   return group;
-}
-function createUrbanRock(seedVariant        , biome            = 'forest')              {
+}function createUrbanRock(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
   const isHydrant = absSeed % 3 === 0 && biome !== 'desert';
@@ -3400,8 +3503,7 @@ function createUrbanRock(seedVariant        , biome            = 'forest')      
   group.add(createVoxelMesh(0.52, 0.28, 0.48, topMat, (absSeed % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0));
 
   return group;
-}
-function createUrbanBush(
+}function createUrbanBush(
   seedVariant        ,
   biomeOrSnow                      = false
 )              {
@@ -3428,8 +3530,7 @@ function createUrbanBush(
   group.add(createVoxelMesh(0.10, 0.10, 0.10, berryMat, 0.05, 0.62, 0.12));
 
   return group;
-}
-function createUrbanObstacle(
+}function createUrbanObstacle(
   kind              ,
   seedVariant        ,
   biomeOrSnow                      = false
@@ -3439,8 +3540,7 @@ function createUrbanObstacle(
   if (kind === 'rock') return createUrbanRock(seedVariant, biome);
   if (kind === 'bush') return createUrbanBush(seedVariant, biome);
   return createUrbanTree(seedVariant, biome);
-}
-function createUrbanCoin()              {
+}function createUrbanCoin()              {
   const group = new THREE.Group();
   const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
   const innerMat = createVoxelMaterial(0xef4444);
@@ -3448,8 +3548,7 @@ function createUrbanCoin()              {
   group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
   group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
   return group;
-}
-function createUrbanRailwaySignal()                                                {
+}function createUrbanRailwaySignal()                                                {
   const group = new THREE.Group();
   const poleMat = createVoxelMaterial(0x1e293b);
   const lightMat = createVoxelBasicMaterial(0x334155);
@@ -3461,15 +3560,13 @@ function createUrbanRailwaySignal()                                             
   group.add(lightMesh);
 
   return { group, lightMesh };
-}
-function createUrbanRoadMarkings()              {
+}function createUrbanRoadMarkings()              {
   const group = new THREE.Group();
   const whiteLineMat = createVoxelBasicMaterial(0xf8fafc);
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(-9.5), 0.015, 0, false, false));
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(9.5), 0.015, 0, false, false));
   return group;
-}
-function createUrbanLaneDivider()              {
+}function createUrbanLaneDivider()              {
   const group = new THREE.Group();
   const dividerMat = createVoxelBasicMaterial(0xf8fafc);
   const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
@@ -3481,8 +3578,7 @@ function createUrbanLaneDivider()              {
   }
 
   return group;
-}
-function createUrbanRoadBarrier(biome            = 'forest')              {
+}function createUrbanRoadBarrier(biome            = 'forest')              {
   const group = new THREE.Group();
   const postColor =
     biome === 'neon' ? 0x1e1b4b : biome === 'desert' ? 0x78716c : biome === 'winter' ? 0x475569 : 0x64748b;
@@ -3499,8 +3595,7 @@ function createUrbanRoadBarrier(biome            = 'forest')              {
   group.add(createVoxelMesh(0.14, 0.18, 0.96, railMat, 0, 0.28, 0));
   group.add(createVoxelMesh(0.15, 0.08, 0.18, reflectorMat, 0, 0.28, 0, false, false));
   return group;
-}
-function createUrbanRiverbankEdge(
+}function createUrbanRiverbankEdge(
   side                  ,
   biome            = 'forest'
 )              {
@@ -3524,8 +3619,7 @@ function createUrbanRiverbankEdge(
   group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
 
   return group;
-}
-function createUrbanRecordFlag()              {
+}function createUrbanRecordFlag()              {
   const group = new THREE.Group();
   group.name = 'recordFlag';
 
@@ -3650,8 +3744,7 @@ class MeshFactory {
 }
 
 // --- Module: src/view/squashStretch.ts ---
-const LANDING_BOUNCE_DURATION = 0.12;
-function calculateHopSquashStretch(hopProgress        )                                      {
+const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProgress        )                                      {
   const progress = Math.max(0, Math.min(1, hopProgress));
 
   if (progress < 0.2) {
@@ -3681,8 +3774,7 @@ function calculateHopSquashStretch(hopProgress        )                         
     scaleY,
     scaleXZ,
   };
-}
-function calculateLandingBounce(elapsedSeconds        )                                      {
+}function calculateLandingBounce(elapsedSeconds        )                                      {
   const t = Math.max(0, Math.min(LANDING_BOUNCE_DURATION, elapsedSeconds));
   // Damped spring: smooth squash from impact with bouncy return to 1.0
   const scaleY = 1.0 - 0.18 * Math.exp(-t * 18) * Math.cos(t * 32);
@@ -3691,8 +3783,7 @@ function calculateLandingBounce(elapsedSeconds        )                         
     scaleY,
     scaleXZ,
   };
-}
-function getDeathSquashScale(reason                           )                            {
+}function getDeathSquashScale(reason                           )                            {
   if (reason === DeathReason.CAR || reason === 'CAR') {
     return { scaleX: 1.65, scaleY: 0.1, scaleZ: 1.65 };
   }
@@ -3756,8 +3847,7 @@ const BIOME_ATMOSPHERES
     dirIntensity: 0.95,
     particleColor: 0xc084fc,
   },
-};
-class SceneManager {
+};class SceneManager {
           static          puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
           scene             ;
           camera                          ;
@@ -4487,8 +4577,7 @@ const UI_SKIN_RARITY                                                 = {
   cyber_duck: { label: 'Редкий', css: 'rarity-rare' },
   shadow_ninja: { label: 'Эпический', css: 'rarity-epic' },
   frost_penguin: { label: 'Легендарный', css: 'rarity-legendary' },
-};
-class UIManager {
+};class UIManager {
   // HUD
                    scoreEl                    ;
                    coinsEl                    ;
@@ -5152,8 +5241,7 @@ const DEATH_LABELS                         = {
   [DeathReason.WATER]: 'Вы упали в бурную реку!',
   [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
   [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
-};
-class GameLoop {
+};class GameLoop {
          isPlaying = false;
          isPaused = false;
          wasDead = false;
