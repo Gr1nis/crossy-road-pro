@@ -384,38 +384,53 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;const MoveDirection = {
+}         ;
+const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;const DeathReason = {
+}         ;
+const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;const ALL_SKINS                                                             = [
+}         ;
+const DEFAULT_SKIN_ID         = 'corgi';
+const ALL_SKINS                                                             = [
+  { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
+  { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
+  { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
+  { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
+  { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
+  // Legacy backward compatibility
   { id: 'chicken', name: 'Классическая Курица', badge: '🐔' },
   { id: 'cyber_duck', name: 'Кибер-Утка', badge: '🦆' },
   { id: 'shadow_ninja', name: 'Тень-Ниндзя', badge: '🥷' },
   { id: 'frost_penguin', name: 'Арктический Пингвин', badge: '🐧' },
-];const Biome = {
+];
+const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
   DESERT: 'desert',
   NEON: 'neon',
-}         ;const BIOME_ORDER                           = [
+}         ;
+const BIOME_ORDER                           = [
   Biome.FOREST,
   Biome.WINTER,
   Biome.DESERT,
   Biome.NEON,
-];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
+];
+const BIOME_INTERVAL = 25;
+function getBiomeForScore(score        )            {
   const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
   const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
   return BIOME_ORDER[biomeIndex];
-}const WORLD_CONFIG = {
+}
+const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -469,7 +484,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}function findSupportingLog(playerX        , logs               )                     {
+}
+function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -482,16 +498,19 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
  * relative to the center of the log, so the character cleanly magnets to a log section.
- */function snapToLogSlot(landingX        , log             )         {
+ */
+function snapToLogSlot(landingX        , log             )         {
   const rel = landingX - log.x;
   // Discrete 1.0-spaced slots centered on log
   const snappedRel = Math.round(rel);
   const maxRel = Math.max(0, (log.length - 1.0) / 2);
   const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
   return log.x + clampedRel;
-}function isOutOfBoundsX(playerX        )          {
+}
+function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}function quantizeLandX(x        )         {
+}
+function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -499,11 +518,15 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */function worldToScreenX(x        )         {
+ */
+function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
-}function vehicleScreenRotationY(speed        )         {
+}
+function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
-}const RECORD_FLAG_X = 3.8;function getRecordFlagPosition(
+}
+const RECORD_FLAG_X = 3.8;
+function getRecordFlagPosition(
   highScore        ,
   shoulderX         = RECORD_FLAG_X
 )                            {
@@ -514,14 +537,16 @@ function checkVehicleCollision(playerX        , vehicles           )            
     x: shoulderX,
     row: Math.floor(highScore),
   };
-}const CAMERA_CONFIG = {
+}
+const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
   DESKTOP_VIEW_HEIGHT: 22.0,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
   FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
-}         ;function getCameraFrustumDimensions(aspect         = 9 / 16)   
+}         ;
+function getCameraFrustumDimensions(aspect         = 9 / 16)   
                      
                     
                  
@@ -543,7 +568,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
  * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
  * of the player character under the isometric orthographic camera.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
- */function getCameraFrustumNdcY(
+ */
+function getCameraFrustumNdcY(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -566,7 +592,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Returns true when the player touches or crosses below the visible
  * bottom edge of the screen (NDC Y < -0.98).
- */function isPlayerBehindCameraFrustum(
+ */
+function isPlayerBehindCameraFrustum(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -696,6 +723,11 @@ const SkinRarity = {
 }         ;
 const GACHA_DUPLICATE_CASHBACK = 40;
 const SKIN_RARITY_MAP                                  = {
+  corgi: SkinRarity.COMMON,
+  pigeon_pizza: SkinRarity.COMMON,
+  box_cat: SkinRarity.RARE,
+  raccoon_bandit: SkinRarity.EPIC,
+  capybara_zen: SkinRarity.LEGENDARY,
   chicken: SkinRarity.COMMON,
   cyber_duck: SkinRarity.RARE,
   shadow_ninja: SkinRarity.EPIC,
@@ -915,7 +947,7 @@ class AchievementTracker {
 
     check('first_50_steps', (ctx.score ?? 0) >= 50);
     check('centurion', (ctx.score ?? 0) >= 100);
-    check('collector', (ctx.unlockedSkinsCount ?? 0) >= (ctx.allSkinsCount ?? 4));
+    check('collector', (ctx.unlockedSkinsCount ?? 0) >= 4);
     check('train_conqueror', this.trainsSurvived >= 5);
     check('rich_hopper', (ctx.coins ?? 0) >= 200);
     check('coin_hoarder', (ctx.runCoins ?? 0) >= 30);
@@ -1395,7 +1427,8 @@ class ScoreTracker {
 
 // --- Module: src/core/laneGenerator.ts ---
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
-const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGenerator {
+const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];
+class LaneGenerator {
                    baseSeed        ;
 
   constructor(seed         = 42) {
@@ -1564,7 +1597,8 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
 }
 
 // --- Module: src/core/gameEngine.ts ---
-const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
+const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;
+class GameEngine {
           generator               ;
           lanes = new Map              ();
           scoreTracker              ;
@@ -2472,7 +2506,7 @@ class AudioSynth {
     osc.stop(now + 0.17);
   }
 
-  playSkinVoice(skinId         = 'chicken')       {
+  playSkinVoice(skinId         = 'corgi')       {
     if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
@@ -2482,7 +2516,66 @@ class AudioSynth {
     const gain = ctx.createGain();
     const id = skinId.toLowerCase();
 
-    if (id.includes('duck')) {
+    if (id.includes('corgi')) {
+      // Corgi: joyful, snappy puppy yap / short bark
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(480, now);
+      osc.frequency.exponentialRampToValueAtTime(940, now + 0.025);
+      osc.frequency.exponentialRampToValueAtTime(580, now + 0.065);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.07);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.075);
+    } else if (id.includes('pigeon')) {
+      // Pigeon: gentle urban cooing
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.linearRampToValueAtTime(440, now + 0.045);
+      osc.frequency.exponentialRampToValueAtTime(330, now + 0.11);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.12);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.125);
+    } else if (id.includes('cat')) {
+      // Box Cat: cute soft purr / kitten meow
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(620, now);
+      osc.frequency.exponentialRampToValueAtTime(840, now + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(520, now + 0.11);
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.115);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } else if (id.includes('raccoon')) {
+      // Raccoon: curious mischievous chitter / chirp
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1150, now);
+      osc.frequency.exponentialRampToValueAtTime(1620, now + 0.025);
+      osc.frequency.exponentialRampToValueAtTime(1280, now + 0.055);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.06);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.065);
+    } else if (id.includes('capybara')) {
+      // Capybara Zen: resonant Tibetan meditation bell chime
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1046.5, now);
+      osc.frequency.exponentialRampToValueAtTime(1050, now + 0.22);
+      gain.gain.setValueAtTime(0.13, now);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.24);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (id.includes('duck')) {
       // Cyber-Duck: nasal synth quack with digital pitch inflection
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(640, now);
@@ -2616,168 +2709,869 @@ class AudioSynth {
   }
 }
 
-// --- Module: src/view/meshFactory.ts ---
-class MeshFactory {
-  static createCharacter(skinId         = 'chicken', isGhost          = false)              {
-    const group = new THREE.Group();
+// --- Module: src/view/voxelPalette.ts ---
+const VOXEL_PALETTE = {
+  // 16 Standard Color Palette
+  corgiOrange: 0xd97706,
+  white: 0xffffff,
+  capybaraBrown: 0x78350f,
+  orangeFruit: 0xf97316,
+  pigeonGrey: 0x64748b,
+  purpleNeck: 0x8b5cf6,
+  pizzaRed: 0xb91c1c,
+  pizzaCheese: 0xfacc15,
+  catOrange: 0xea580c,
+  cardboard: 0xb45309,
+  raccoonGrey: 0x475569,
+  maskBlack: 0x0f172a,
+  darkCharcoal: 0x1e293b,
+  nosePink: 0xf472b6,
+  greenLeaf: 0x16a34a,
+  ghostYellow: 0xfbbf24,
 
-    const makeMat = (color        ) =>
-      new THREE.MeshLambertMaterial({
-        color: isGhost ? 0xfbbf24 : color,
-        transparent: isGhost,
-        opacity: isGhost ? 0.42 : 1.0,
+  // Backward compatibility & environment aliases
+  corgiTan: 0xd97706,
+  corgiWhite: 0xffffff,
+  corgiNose: 0x1e293b,
+  corgiTongue: 0xf472b6,
+  corgiCollar: 0xb91c1c,
+  corgiGold: 0xfacc15,
+  pigeonDark: 0x1e293b,
+  pigeonBeak: 0xf97316,
+  pigeonTeal: 0x8b5cf6,
+  pizzaCrust: 0xb45309,
+  pizzaPepperoni: 0xb91c1c,
+  boxTan: 0xb45309,
+  boxTape: 0xf97316,
+  catWhite: 0xffffff,
+  catNose: 0xf472b6,
+  catEye: 0xfacc15,
+  raccoonDark: 0x0f172a,
+  raccoonWhite: 0xffffff,
+  sodaSilver: 0x64748b,
+  capybaraDark: 0x1e293b,
+  mandarinOrange: 0xf97316,
+  mandarinLeaf: 0x16a34a,
+  hydrantRed: 0xb91c1c,
+  woodLight: 0xd97706,
+  concreteGrey: 0x64748b,
+  goldCoin: 0xfacc15,
+  rubyRed: 0xb91c1c,
+}         ;
+class VoxelPalette {
+          static          geoCache = new Map                           ();
+          static          matCache = new Map                                   ();
+          static          basicMatCache = new Map                                 ();
+          static ghostMaterial                                   = null;
+
+  static getGhostMaterial()                            {
+    if (!VoxelPalette.ghostMaterial) {
+      VoxelPalette.ghostMaterial = new THREE.MeshLambertMaterial({
+        color: VOXEL_PALETTE.ghostYellow,
+        transparent: true,
+        opacity: 0.42,
       });
-
-    const orangeMat = makeMat(0xf97316);
-    const darkMat = makeMat(0x1e293b);
-
-    // Detailed feet and legs touching Y = 0
-    const legGeo = new THREE.BoxGeometry(0.1, 0.14, 0.12);
-    const footGeo = new THREE.BoxGeometry(0.14, 0.04, 0.22);
-    const leftLeg = new THREE.Mesh(legGeo, orangeMat);
-    leftLeg.position.set(-0.14, 0.07, 0);
-    const rightLeg = new THREE.Mesh(legGeo, orangeMat);
-    rightLeg.position.set(0.14, 0.07, 0);
-    const leftFoot = new THREE.Mesh(footGeo, orangeMat);
-    leftFoot.position.set(-0.14, 0.02, 0.04);
-    const rightFoot = new THREE.Mesh(footGeo, orangeMat);
-    rightFoot.position.set(0.14, 0.02, 0.04);
-    group.add(leftLeg, rightLeg, leftFoot, rightFoot);
-
-    if (skinId === 'cyber_duck') {
-      const yellowMat = makeMat(0xfacc15);
-      const visorMat = makeMat(0x06b6d4);
-      const chromeMat = makeMat(0x94a3b8);
-      const neonPinkMat = makeMat(0xec4899);
-
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.54, 0.64), yellowMat);
-      body.position.y = 0.37;
-      body.castShadow = !isGhost;
-      body.receiveShadow = !isGhost;
-      group.add(body);
-
-      // Cyber wings & jetpack thrusters
-      const wingGeo = new THREE.BoxGeometry(0.08, 0.28, 0.38);
-      const leftWing = new THREE.Mesh(wingGeo, yellowMat);
-      leftWing.position.set(-0.33, 0.36, -0.02);
-      const rightWing = new THREE.Mesh(wingGeo, yellowMat);
-      rightWing.position.set(0.33, 0.36, -0.02);
-      const jetpack = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.3, 0.14), chromeMat);
-      jetpack.position.set(0, 0.38, -0.36);
-      const thrusterCore = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.06), neonPinkMat);
-      thrusterCore.position.set(0, 0.38, -0.44);
-      group.add(leftWing, rightWing, jetpack, thrusterCore);
-
-      const bill = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.12, 0.24), orangeMat);
-      bill.position.set(0, 0.44, 0.41);
-      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.14, 0.2), visorMat);
-      visor.position.set(0, 0.55, 0.26);
-      const antenna = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.06), chromeMat);
-      antenna.position.set(0, 0.72, -0.05);
-      const antennaTip = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.1), neonPinkMat);
-      antennaTip.position.set(0, 0.82, -0.05);
-      group.add(bill, visor, antenna, antennaTip);
-    } else if (skinId === 'shadow_ninja') {
-      const suitMat = makeMat(0x0f172a);
-      const armorMat = makeMat(0x1e293b);
-      const bandMat = makeMat(0xef4444);
-      const skinToneMat = makeMat(0xfde68a);
-      const steelMat = makeMat(0xcbd5e1);
-      const goldMat = makeMat(0xf59e0b);
-
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.58), suitMat);
-      body.position.y = 0.39;
-      body.castShadow = !isGhost;
-      body.receiveShadow = !isGhost;
-      group.add(body);
-
-      const chestArmor = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.24, 0.6), armorMat);
-      chestArmor.position.set(0, 0.34, 0);
-      const faceSlit = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.06), skinToneMat);
-      faceSlit.position.set(0, 0.52, 0.28);
-      const leftEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.08), suitMat);
-      leftEye.position.set(-0.12, 0.52, 0.29);
-      const rightEye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.08), suitMat);
-      rightEye.position.set(0.12, 0.52, 0.29);
-      const headband = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 0.62), bandMat);
-      headband.position.set(0, 0.62, 0);
-      const bandTail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 0.12), bandMat);
-      bandTail.position.set(-0.14, 0.56, -0.35);
-
-      const katanaBlade = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.74, 0.08), steelMat);
-      katanaBlade.position.set(0.18, 0.52, -0.33);
-      katanaBlade.rotation.z = -0.35;
-      const katanaHilt = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.06, 0.14), goldMat);
-      katanaHilt.position.set(0.06, 0.78, -0.33);
-      group.add(chestArmor, faceSlit, leftEye, rightEye, headband, bandTail, katanaBlade, katanaHilt);
-    } else if (skinId === 'frost_penguin') {
-      const navyMat = makeMat(0x1e3a8a);
-      const bellyMat = makeMat(0xf8fafc);
-      const scarfMat = makeMat(0x38bdf8);
-      const earmuffMat = makeMat(0xef4444);
-
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.58, 0.56), navyMat);
-      body.position.y = 0.39;
-      body.castShadow = !isGhost;
-      body.receiveShadow = !isGhost;
-      group.add(body);
-
-      const belly = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.44, 0.06), bellyMat);
-      belly.position.set(0, 0.36, 0.27);
-      const flipperGeo = new THREE.BoxGeometry(0.08, 0.32, 0.26);
-      const leftFlipper = new THREE.Mesh(flipperGeo, navyMat);
-      leftFlipper.position.set(-0.32, 0.36, 0);
-      const rightFlipper = new THREE.Mesh(flipperGeo, navyMat);
-      rightFlipper.position.set(0.32, 0.36, 0);
-      const scarf = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.1, 0.62), scarfMat);
-      scarf.position.set(0, 0.48, 0);
-      const scarfTail = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.08), scarfMat);
-      scarfTail.position.set(0.14, 0.36, 0.31);
-      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.2), orangeMat);
-      beak.position.set(0, 0.53, 0.34);
-      const muffLeft = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.16), earmuffMat);
-      muffLeft.position.set(-0.31, 0.58, 0.04);
-      const muffRight = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.16), earmuffMat);
-      muffRight.position.set(0.31, 0.58, 0.04);
-      group.add(belly, leftFlipper, rightFlipper, scarf, scarfTail, beak, muffLeft, muffRight);
-    } else {
-      const whiteMat = makeMat(0xffffff);
-      const redMat = makeMat(0xef4444);
-
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.62), whiteMat);
-      body.position.y = 0.38;
-      body.castShadow = !isGhost;
-      body.receiveShadow = !isGhost;
-      group.add(body);
-
-      const wingGeo = new THREE.BoxGeometry(0.08, 0.28, 0.36);
-      const leftWing = new THREE.Mesh(wingGeo, whiteMat);
-      leftWing.position.set(-0.32, 0.36, -0.02);
-      const rightWing = new THREE.Mesh(wingGeo, whiteMat);
-      rightWing.position.set(0.32, 0.36, -0.02);
-      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.14), whiteMat);
-      tail.position.set(0, 0.44, -0.36);
-
-      const comb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.32), redMat);
-      comb.position.set(0, 0.74, 0.05);
-      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.2), orangeMat);
-      beak.position.set(0, 0.48, 0.38);
-      const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.12), redMat);
-      wattle.position.set(0, 0.34, 0.34);
-
-      const eyeGeo = new THREE.BoxGeometry(0.06, 0.08, 0.08);
-      const leftEye = new THREE.Mesh(eyeGeo, darkMat);
-      leftEye.position.set(-0.29, 0.52, 0.18);
-      const rightEye = new THREE.Mesh(eyeGeo, darkMat);
-      rightEye.position.set(0.29, 0.52, 0.18);
-      group.add(leftWing, rightWing, tail, comb, beak, wattle, leftEye, rightEye);
     }
+    return VoxelPalette.ghostMaterial;
+  }
 
+  static getMaterial(
+    colorKey                        ,
+    isGhost = false
+  )                            {
+    if (isGhost) {
+      return VoxelPalette.getGhostMaterial();
+    }
+    const hex = typeof colorKey === 'number' ? colorKey : VOXEL_PALETTE[colorKey];
+    let mat = VoxelPalette.matCache.get(hex);
+    if (!mat) {
+      mat = new THREE.MeshLambertMaterial({ color: hex });
+      VoxelPalette.matCache.set(hex, mat);
+    }
+    return mat;
+  }
+
+  static getBasicMaterial(
+    color        ,
+    transparent = false,
+    opacity = 1.0
+  )                          {
+    const key = `${color}_${transparent ? 1 : 0}_${opacity}`;
+    let mat = VoxelPalette.basicMatCache.get(key);
+    if (!mat) {
+      mat = new THREE.MeshBasicMaterial({ color, transparent, opacity });
+      VoxelPalette.basicMatCache.set(key, mat);
+    }
+    return mat;
+  }
+
+  static getBox(w        , h        , d        )                    {
+    const key = `${w}_${h}_${d}`;
+    let geo = VoxelPalette.geoCache.get(key);
+    if (!geo) {
+      geo = new THREE.BoxGeometry(w, h, d);
+      VoxelPalette.geoCache.set(key, geo);
+    }
+    return geo;
+  }
+}
+
+// Pre-populate standard geometries and materials to avoid runtime allocations
+const voxelStandardSizes                             = [
+  [0.1, 0.1, 0.1],
+  [0.14, 0.14, 0.14],
+  [0.2, 0.2, 0.2],
+  [0.3, 0.3, 0.3],
+  [0.4, 0.4, 0.4],
+  [0.5, 0.5, 0.5],
+  [0.6, 0.6, 0.6],
+  [0.1, 0.14, 0.12],
+  [0.14, 0.04, 0.22],
+];
+
+for (const [w, h, d] of voxelStandardSizes) {
+  VoxelPalette.getBox(w, h, d);
+}
+
+for (const key of Object.keys(VOXEL_PALETTE)                   ) {
+  VoxelPalette.getMaterial(key, false);
+}
+VoxelPalette.getGhostMaterial();
+function createVoxelMaterial(
+  colorKey                        ,
+  isGhost = false
+)                            {
+  return VoxelPalette.getMaterial(colorKey, isGhost);
+}
+function createVoxelBasicMaterial(
+  color        ,
+  transparent = false,
+  opacity = 1.0
+)                          {
+  return VoxelPalette.getBasicMaterial(color, transparent, opacity);
+}
+function createVoxelMesh(
+  w        ,
+  h        ,
+  d        ,
+  mat                ,
+  x = 0,
+  y = 0,
+  z = 0,
+  castShadow = true,
+  receiveShadow = true
+)             {
+  const mesh = new THREE.Mesh(VoxelPalette.getBox(w, h, d), mat);
+  mesh.position.set(x, y, z);
+  mesh.castShadow = castShadow;
+  mesh.receiveShadow = receiveShadow;
+  return mesh;
+}
+
+// --- Module: src/view/urbanCharacters.ts ---
+function addCharVoxel(
+  group             ,
+  w        ,
+  h        ,
+  d        ,
+  color                        ,
+  x        ,
+  y        ,
+  z        ,
+  isGhost         
+)       {
+  const mat = VoxelPalette.getMaterial(color, isGhost);
+  const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
+  group.add(mesh);
+}
+function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+  const group = new THREE.Group();
+
+  if (skinId === 'corgi') {
+    // 17 voxels: Corgi with stubby paws, pointy ears, tongue, fluffy tail
+    addCharVoxel(group, 0.10, 0.14, 0.12, 'white', -0.16, 0.07, 0.14, isGhost);
+    addCharVoxel(group, 0.10, 0.14, 0.12, 'white', 0.16, 0.07, 0.14, isGhost);
+    addCharVoxel(group, 0.10, 0.14, 0.12, 'corgiOrange', -0.16, 0.07, -0.14, isGhost);
+    addCharVoxel(group, 0.10, 0.14, 0.12, 'corgiOrange', 0.16, 0.07, -0.14, isGhost);
+    addCharVoxel(group, 0.46, 0.30, 0.50, 'corgiOrange', 0, 0.28, 0, isGhost);
+    addCharVoxel(group, 0.32, 0.22, 0.24, 'white', 0, 0.25, 0.14, isGhost);
+    addCharVoxel(group, 0.36, 0.32, 0.34, 'corgiOrange', 0, 0.46, 0.20, isGhost);
+    addCharVoxel(group, 0.22, 0.14, 0.16, 'white', 0, 0.40, 0.36, isGhost);
+    addCharVoxel(group, 0.08, 0.06, 0.08, 'darkCharcoal', 0, 0.44, 0.44, isGhost);
+    addCharVoxel(group, 0.08, 0.03, 0.08, 'nosePink', 0, 0.36, 0.40, isGhost);
+    addCharVoxel(group, 0.06, 0.06, 0.04, 'darkCharcoal', -0.12, 0.50, 0.34, isGhost);
+    addCharVoxel(group, 0.06, 0.06, 0.04, 'darkCharcoal', 0.12, 0.50, 0.34, isGhost);
+    addCharVoxel(group, 0.10, 0.18, 0.06, 'corgiOrange', -0.14, 0.68, 0.18, isGhost);
+    addCharVoxel(group, 0.10, 0.18, 0.06, 'corgiOrange', 0.14, 0.68, 0.18, isGhost);
+    addCharVoxel(group, 0.06, 0.10, 0.04, 'nosePink', -0.14, 0.66, 0.19, isGhost);
+    addCharVoxel(group, 0.06, 0.10, 0.04, 'nosePink', 0.14, 0.66, 0.19, isGhost);
+    addCharVoxel(group, 0.14, 0.14, 0.14, 'corgiOrange', 0, 0.35, -0.28, isGhost);
+  } else if (skinId === 'pigeon_pizza') {
+    // 16 voxels: Pigeon with purple neck, beak, and triangular pizza slice
+    addCharVoxel(group, 0.10, 0.12, 0.14, 'orangeFruit', -0.12, 0.06, 0.02, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.14, 'orangeFruit', 0.12, 0.06, 0.02, isGhost);
+    addCharVoxel(group, 0.44, 0.38, 0.50, 'pigeonGrey', 0, 0.30, 0, isGhost);
+    addCharVoxel(group, 0.08, 0.22, 0.32, 'darkCharcoal', -0.24, 0.32, -0.02, isGhost);
+    addCharVoxel(group, 0.08, 0.22, 0.32, 'darkCharcoal', 0.24, 0.32, -0.02, isGhost);
+    addCharVoxel(group, 0.22, 0.10, 0.18, 'darkCharcoal', 0, 0.28, -0.28, isGhost);
+    addCharVoxel(group, 0.30, 0.14, 0.30, 'purpleNeck', 0, 0.44, 0.16, isGhost);
+    addCharVoxel(group, 0.26, 0.24, 0.28, 'pigeonGrey', 0, 0.56, 0.20, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.06, 'orangeFruit', -0.14, 0.58, 0.24, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.06, 'orangeFruit', 0.14, 0.58, 0.24, isGhost);
+    addCharVoxel(group, 0.12, 0.09, 0.14, 'pizzaCheese', 0, 0.53, 0.36, isGhost);
+    addCharVoxel(group, 0.26, 0.06, 0.08, 'cardboard', 0, 0.52, 0.60, isGhost);
+    addCharVoxel(group, 0.22, 0.04, 0.12, 'pizzaCheese', 0, 0.50, 0.52, isGhost);
+    addCharVoxel(group, 0.12, 0.04, 0.10, 'pizzaCheese', 0, 0.49, 0.43, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.06, 'pizzaRed', -0.05, 0.51, 0.53, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.06, 'pizzaRed', 0.05, 0.51, 0.47, isGhost);
+  } else if (skinId === 'box_cat') {
+    // 17 voxels: Ginger cat peeking from cardboard parcel box
+    addCharVoxel(group, 0.54, 0.38, 0.54, 'cardboard', 0, 0.19, 0, isGhost);
+    addCharVoxel(group, 0.56, 0.04, 0.16, 'orangeFruit', 0, 0.38, 0, isGhost);
+    addCharVoxel(group, 0.16, 0.12, 0.02, 'white', 0.14, 0.20, 0.28, isGhost);
+    addCharVoxel(group, 0.42, 0.26, 0.36, 'catOrange', 0, 0.34, 0.06, isGhost);
+    addCharVoxel(group, 0.38, 0.30, 0.34, 'catOrange', 0, 0.48, 0.12, isGhost);
+    addCharVoxel(group, 0.22, 0.14, 0.12, 'white', 0, 0.42, 0.28, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.06, 'nosePink', 0, 0.44, 0.34, isGhost);
+    addCharVoxel(group, 0.06, 0.06, 0.04, 'pizzaCheese', -0.11, 0.50, 0.29, isGhost);
+    addCharVoxel(group, 0.06, 0.06, 0.04, 'pizzaCheese', 0.11, 0.50, 0.29, isGhost);
+    addCharVoxel(group, 0.10, 0.14, 0.06, 'catOrange', -0.14, 0.66, 0.10, isGhost);
+    addCharVoxel(group, 0.10, 0.14, 0.06, 'catOrange', 0.14, 0.66, 0.10, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.04, 'nosePink', -0.14, 0.65, 0.12, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.04, 'nosePink', 0.14, 0.65, 0.12, isGhost);
+    addCharVoxel(group, 0.10, 0.08, 0.12, 'white', -0.14, 0.38, 0.28, isGhost);
+    addCharVoxel(group, 0.10, 0.08, 0.12, 'white', 0.14, 0.38, 0.28, isGhost);
+    addCharVoxel(group, 0.08, 0.16, 0.08, 'catOrange', 0, 0.32, -0.30, isGhost);
+    addCharVoxel(group, 0.08, 0.10, 0.08, 'white', 0, 0.22, -0.32, isGhost);
+  } else if (skinId === 'raccoon_bandit') {
+    // 17 voxels: Raccoon with bandit eye mask, striped tail & loot sack
+    addCharVoxel(group, 0.12, 0.14, 0.12, 'maskBlack', -0.15, 0.07, -0.06, isGhost);
+    addCharVoxel(group, 0.12, 0.14, 0.12, 'maskBlack', 0.15, 0.07, -0.06, isGhost);
+    addCharVoxel(group, 0.48, 0.40, 0.48, 'raccoonGrey', 0, 0.30, 0, isGhost);
+    addCharVoxel(group, 0.30, 0.26, 0.08, 'white', 0, 0.28, 0.22, isGhost);
+    addCharVoxel(group, 0.36, 0.32, 0.34, 'raccoonGrey', 0, 0.50, 0.16, isGhost);
+    addCharVoxel(group, 0.40, 0.12, 0.10, 'maskBlack', 0, 0.50, 0.29, isGhost);
+    addCharVoxel(group, 0.08, 0.05, 0.04, 'white', -0.10, 0.57, 0.30, isGhost);
+    addCharVoxel(group, 0.08, 0.05, 0.04, 'white', 0.10, 0.57, 0.30, isGhost);
+    addCharVoxel(group, 0.18, 0.12, 0.14, 'white', 0, 0.42, 0.34, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.06, 'maskBlack', 0, 0.44, 0.41, isGhost);
+    addCharVoxel(group, 0.08, 0.12, 0.05, 'maskBlack', -0.15, 0.66, 0.14, isGhost);
+    addCharVoxel(group, 0.08, 0.12, 0.05, 'maskBlack', 0.15, 0.66, 0.14, isGhost);
+    addCharVoxel(group, 0.14, 0.14, 0.14, 'maskBlack', 0, 0.30, -0.30, isGhost);
+    addCharVoxel(group, 0.14, 0.14, 0.14, 'raccoonGrey', 0, 0.34, -0.42, isGhost);
+    addCharVoxel(group, 0.12, 0.12, 0.12, 'maskBlack', 0, 0.38, -0.52, isGhost);
+    addCharVoxel(group, 0.32, 0.30, 0.22, 'cardboard', 0, 0.35, -0.20, isGhost);
+    addCharVoxel(group, 0.14, 0.10, 0.12, 'pizzaCheese', 0, 0.50, -0.16, isGhost);
+  } else if (skinId === 'capybara_zen') {
+    // 16 voxels: Chill capybara with yuzu/mandarin on head
+    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', -0.16, 0.07, 0.20, isGhost);
+    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', 0.16, 0.07, 0.20, isGhost);
+    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', -0.16, 0.07, -0.20, isGhost);
+    addCharVoxel(group, 0.12, 0.14, 0.12, 'darkCharcoal', 0.16, 0.07, -0.20, isGhost);
+    addCharVoxel(group, 0.54, 0.44, 0.60, 'capybaraBrown', 0, 0.32, 0, isGhost);
+    addCharVoxel(group, 0.40, 0.34, 0.38, 'capybaraBrown', 0, 0.45, 0.26, isGhost);
+    addCharVoxel(group, 0.26, 0.20, 0.18, 'darkCharcoal', 0, 0.38, 0.46, isGhost);
+    addCharVoxel(group, 0.14, 0.04, 0.05, 'maskBlack', 0, 0.40, 0.54, isGhost);
+    addCharVoxel(group, 0.08, 0.03, 0.04, 'darkCharcoal', -0.17, 0.48, 0.38, isGhost);
+    addCharVoxel(group, 0.08, 0.03, 0.04, 'darkCharcoal', 0.17, 0.48, 0.38, isGhost);
+    addCharVoxel(group, 0.06, 0.06, 0.05, 'darkCharcoal', -0.20, 0.58, 0.20, isGhost);
+    addCharVoxel(group, 0.06, 0.06, 0.05, 'darkCharcoal', 0.20, 0.58, 0.20, isGhost);
+    addCharVoxel(group, 0.22, 0.14, 0.10, 'capybaraBrown', 0, 0.34, -0.32, isGhost);
+    addCharVoxel(group, 0.18, 0.16, 0.18, 'orangeFruit', 0, 0.68, 0.24, isGhost);
+    addCharVoxel(group, 0.04, 0.06, 0.04, 'greenLeaf', 0, 0.78, 0.24, isGhost);
+    addCharVoxel(group, 0.07, 0.03, 0.06, 'greenLeaf', 0.04, 0.79, 0.26, isGhost);
+  } else {
+    // 14 voxels: Legacy and classical fallback (chicken, cyber_duck, shadow_ninja, frost_penguin)
+    const bodyColor                =
+      skinId === 'cyber_duck'
+        ? 'pizzaCheese'
+        : skinId === 'shadow_ninja'
+          ? 'maskBlack'
+          : skinId === 'frost_penguin'
+            ? 'darkCharcoal'
+            : 'white';
+
+    const combColor                =
+      skinId === 'cyber_duck'
+        ? 'purpleNeck'
+        : skinId === 'frost_penguin'
+          ? 'pigeonGrey'
+          : 'pizzaRed';
+
+    const chestColor                =
+      skinId === 'shadow_ninja' ? 'darkCharcoal' : 'white';
+
+    const beakColor                =
+      skinId === 'shadow_ninja' ? 'darkCharcoal' : 'orangeFruit';
+
+    const eyeColor                =
+      skinId === 'shadow_ninja' || skinId === 'frost_penguin' ? 'white' : 'darkCharcoal';
+
+    addCharVoxel(group, 0.10, 0.14, 0.12, 'orangeFruit', -0.14, 0.07, 0, isGhost);
+    addCharVoxel(group, 0.10, 0.14, 0.12, 'orangeFruit', 0.14, 0.07, 0, isGhost);
+    addCharVoxel(group, 0.14, 0.04, 0.22, 'orangeFruit', -0.14, 0.02, 0.04, isGhost);
+    addCharVoxel(group, 0.14, 0.04, 0.22, 'orangeFruit', 0.14, 0.02, 0.04, isGhost);
+    addCharVoxel(group, 0.52, 0.50, 0.56, bodyColor, 0, 0.36, 0, isGhost);
+    addCharVoxel(group, 0.08, 0.26, 0.32, bodyColor, -0.28, 0.34, -0.02, isGhost);
+    addCharVoxel(group, 0.08, 0.26, 0.32, bodyColor, 0.28, 0.34, -0.02, isGhost);
+    addCharVoxel(group, 0.22, 0.20, 0.12, bodyColor, 0, 0.42, -0.32, isGhost);
+    addCharVoxel(group, 0.14, 0.16, 0.28, combColor, 0, 0.68, 0.04, isGhost);
+    addCharVoxel(group, 0.16, 0.12, 0.18, beakColor, 0, 0.44, 0.34, isGhost);
+    addCharVoxel(group, 0.12, 0.12, 0.10, 'pizzaRed', 0, 0.32, 0.30, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.08, eyeColor, -0.26, 0.48, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.08, eyeColor, 0.26, 0.48, 0.16, isGhost);
+    addCharVoxel(group, 0.34, 0.32, 0.10, chestColor, 0, 0.32, 0.26, isGhost);
+  }
+
+  return group;
+}
+
+// --- Module: src/view/urbanVehicles.ts ---
+const urbanGeoCache = new Map                           ();
+const urbanMatCache = new Map                        ();
+
+function getUrbanGeo(w        , h        , d        )                    {
+  const key = `${w}_${h}_${d}`;
+  let geo = urbanGeoCache.get(key);
+  if (!geo) {
+    geo = new THREE.BoxGeometry(w, h, d);
+    urbanGeoCache.set(key, geo);
+  }
+  return geo;
+}
+
+function getUrbanMat(
+  color        ,
+  basic = false,
+  transparent = false,
+  opacity = 1.0
+)                 {
+  const key = `${color}_${basic ? 1 : 0}_${transparent ? 1 : 0}_${opacity}`;
+  let mat = urbanMatCache.get(key);
+  if (!mat) {
+    mat = basic
+      ? new THREE.MeshBasicMaterial({ color, transparent, opacity })
+      : new THREE.MeshLambertMaterial({ color, transparent, opacity });
+    urbanMatCache.set(key, mat);
+  }
+  return mat;
+}
+
+                       
+              
+              
+              
+              
+              
+              
+                  
+                             
+                     
+  
+
+function buildUrbanVoxels(group             , specs                  )       {
+  for (let i = 0; i < specs.length; i++) {
+    const s = specs[i];
+    const transparent = (s[8] ?? 1.0) < 1.0;
+    const mesh = new THREE.Mesh(
+      getUrbanGeo(s[0], s[1], s[2]),
+      getUrbanMat(s[6], !!s[7], transparent, s[8] ?? 1.0)
+    );
+    mesh.position.set(s[3], s[4], s[5]);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+}
+
+function buildTaxi(color        )                   {
+  const c = color;
+  const glass = 0x1e293b;
+  const wheel = 0x0f172a;
+  const bumper = 0x94a3b8;
+  const white = 0xffffff;
+  const red = 0xef4444;
+  return [
+    // Wheels (4) - center Y = 0.13, touches ground Y = 0
+    [0.26, 0.26, 0.12, 0.5, 0.13, 0.34, wheel],
+    [0.26, 0.26, 0.12, 0.5, 0.13, -0.34, wheel],
+    [0.26, 0.26, 0.12, -0.5, 0.13, 0.34, wheel],
+    [0.26, 0.26, 0.12, -0.5, 0.13, -0.34, wheel],
+    // Body & Cabin (5)
+    [1.7, 0.22, 0.68, 0, 0.23, 0, c],
+    [0.48, 0.18, 0.64, 0.54, 0.41, 0, c],
+    [0.44, 0.18, 0.64, -0.56, 0.41, 0, c],
+    [0.82, 0.24, 0.62, -0.05, 0.47, 0, glass],
+    [0.74, 0.08, 0.6, -0.05, 0.63, 0, c],
+    // Lights & Bumpers (6)
+    [0.06, 0.1, 0.16, 0.85, 0.3, 0.22, white, true],
+    [0.06, 0.1, 0.16, 0.85, 0.3, -0.22, white, true],
+    [0.06, 0.1, 0.16, -0.85, 0.3, 0.22, red, true],
+    [0.06, 0.1, 0.16, -0.85, 0.3, -0.22, red, true],
+    [0.1, 0.12, 0.68, 0.85, 0.17, 0, bumper],
+    [0.1, 0.12, 0.68, -0.85, 0.17, 0, bumper],
+    // Taxi Checker Sign on roof (3)
+    [0.28, 0.08, 0.22, -0.05, 0.71, 0, 0xfacc15, true],
+    [0.12, 0.08, 0.09, -0.11, 0.75, 0.04, wheel],
+    [0.12, 0.08, 0.09, 0.01, 0.75, -0.04, wheel],
+  ];
+}
+
+function buildScooter(color        )                   {
+  const frame = color;
+  const wheel = 0x0f172a;
+  const chrome = 0x94a3b8;
+  const thermo = 0x10b981;
+  const darkGreen = 0x059669;
+  return [
+    // Wheels (2) - center Y = 0.12, touches ground Y = 0
+    [0.24, 0.24, 0.1, 0.44, 0.12, 0, wheel],
+    [0.24, 0.24, 0.1, -0.4, 0.12, 0, wheel],
+    // Frame & Controls (7)
+    [0.54, 0.08, 0.3, 0.02, 0.14, 0, chrome],
+    [0.36, 0.26, 0.26, -0.16, 0.28, 0, frame],
+    [0.28, 0.08, 0.22, -0.16, 0.44, 0, 0x1e293b],
+    [0.08, 0.42, 0.08, 0.34, 0.38, 0, chrome],
+    [0.08, 0.06, 0.44, 0.34, 0.58, 0, chrome],
+    [0.09, 0.08, 0.08, 0.34, 0.58, 0.21, wheel],
+    [0.09, 0.08, 0.08, 0.34, 0.58, -0.21, wheel],
+    // Lights (2)
+    [0.08, 0.1, 0.14, 0.38, 0.46, 0, 0xfef08a, true],
+    [0.06, 0.08, 0.1, -0.36, 0.32, 0, 0xef4444, true],
+    // Courier Thermal Box (3)
+    [0.38, 0.4, 0.38, -0.34, 0.54, 0, thermo],
+    [0.4, 0.06, 0.4, -0.34, 0.77, 0, darkGreen],
+    [0.39, 0.08, 0.39, -0.34, 0.58, 0, 0xffffff, true],
+  ];
+}
+
+function buildBus(color        )                   {
+  const c = color;
+  const wheel = 0x0f172a;
+  const bumper = 0x334155;
+  const glass = 0x1e293b;
+  const roof = 0xf8fafc;
+  const ac = 0x94a3b8;
+  return [
+    // Wheels (6) - center Y = 0.14, touches ground Y = 0
+    [0.3, 0.28, 0.12, 1.05, 0.14, 0.37, wheel],
+    [0.3, 0.28, 0.12, 1.05, 0.14, -0.37, wheel],
+    [0.3, 0.28, 0.12, -0.65, 0.14, 0.37, wheel],
+    [0.3, 0.28, 0.12, -0.65, 0.14, -0.37, wheel],
+    [0.3, 0.28, 0.12, -1.05, 0.14, 0.37, wheel],
+    [0.3, 0.28, 0.12, -1.05, 0.14, -0.37, wheel],
+    // Chassis & Bumpers (3)
+    [3.2, 0.42, 0.74, 0, 0.36, 0, c],
+    [0.08, 0.16, 0.74, 1.6, 0.22, 0, bumper],
+    [0.08, 0.16, 0.74, -1.6, 0.22, 0, bumper],
+    // Windows & Cabin core (5)
+    [0.06, 0.32, 0.68, 1.58, 0.72, 0, glass],
+    [0.06, 0.3, 0.68, -1.58, 0.72, 0, glass],
+    [2.9, 0.28, 0.04, -0.05, 0.72, 0.36, glass],
+    [2.9, 0.28, 0.04, -0.05, 0.72, -0.36, glass],
+    [3.06, 0.32, 0.7, 0, 0.72, 0, c],
+    // White roof & AC units (3)
+    [3.2, 0.14, 0.74, 0, 0.94, 0, roof],
+    [0.55, 0.1, 0.44, 0.4, 1.05, 0, ac],
+    [0.55, 0.1, 0.44, -0.5, 1.05, 0, ac],
+    // Lights & Route display (5)
+    [0.04, 0.1, 0.16, 1.6, 0.36, 0.24, 0xfef08a, true],
+    [0.04, 0.1, 0.16, 1.6, 0.36, -0.24, 0xfef08a, true],
+    [0.04, 0.12, 0.12, -1.6, 0.36, 0.26, 0xef4444, true],
+    [0.04, 0.12, 0.12, -1.6, 0.36, -0.26, 0xef4444, true],
+    [0.04, 0.1, 0.44, 1.6, 0.93, 0, 0xf59e0b, true],
+  ];
+}
+
+function buildSweeper(color        )                   {
+  const orange = color;
+  const white = 0xf8fafc;
+  const wheel = 0x0f172a;
+  const dark = 0x334155;
+  const grey = 0x64748b;
+  const glass = 0x1e293b;
+  return [
+    // Wheels (4) - center Y = 0.13, touches ground Y = 0
+    [0.26, 0.26, 0.12, 0.58, 0.13, 0.35, wheel],
+    [0.26, 0.26, 0.12, 0.58, 0.13, -0.35, wheel],
+    [0.26, 0.26, 0.12, -0.55, 0.13, 0.35, wheel],
+    [0.26, 0.26, 0.12, -0.55, 0.13, -0.35, wheel],
+    // Cleaning brushes & vacuum (3)
+    [0.32, 0.08, 0.32, 0.86, 0.06, 0.3, dark],
+    [0.32, 0.08, 0.32, 0.86, 0.06, -0.3, dark],
+    [0.4, 0.12, 0.5, 0.05, 0.08, 0, grey],
+    // Body & Cabin (6)
+    [1.8, 0.18, 0.7, 0, 0.23, 0, orange],
+    [0.9, 0.54, 0.68, -0.4, 0.56, 0, orange],
+    [0.65, 0.3, 0.68, 0.45, 0.44, 0, white],
+    [0.6, 0.32, 0.64, 0.45, 0.72, 0, glass],
+    [0.62, 0.08, 0.66, 0.45, 0.91, 0, white],
+    [0.14, 0.14, 0.14, 0.45, 1.01, 0, 0xfacc15, true],
+    // Details & Lights (7)
+    [0.06, 0.1, 0.14, 0.8, 0.38, 0.22, 0xfef08a, true],
+    [0.06, 0.1, 0.14, 0.8, 0.38, -0.22, 0xfef08a, true],
+    [0.06, 0.1, 0.14, -0.86, 0.38, 0.24, 0xef4444, true],
+    [0.06, 0.1, 0.14, -0.86, 0.38, -0.24, 0xef4444, true],
+    [0.1, 0.12, 0.68, 0.8, 0.2, 0, grey],
+    [0.86, 0.12, 0.7, -0.4, 0.44, 0, white],
+    [0.26, 0.14, 0.26, -0.65, 0.88, 0, grey],
+  ];
+}
+
+function buildTrain()                   {
+  const silver = 0xd1d5db;
+  const red = 0xef4444;
+  const darkRoof = 0x334155;
+  const glass = 0x1e293b;
+  const undercarriage = 0x0f172a;
+  const vent = 0x64748b;
+  return [
+    // Undercarriage / chassis touching rails Y = 0
+    [13.6, 0.24, 0.8, 0, 0.12, 0, undercarriage],
+    // Main silver body & red stripe & roof
+    [13.2, 0.68, 0.84, 0, 0.56, 0, silver],
+    [13.24, 0.14, 0.86, 0, 0.46, 0, red],
+    [13.2, 0.12, 0.76, 0, 0.94, 0, darkRoof],
+    // Streamlined aerodynamic front nose
+    [0.6, 0.56, 0.82, 6.85, 0.48, 0, silver],
+    [0.46, 0.28, 0.76, 6.78, 0.76, 0, glass],
+    [0.3, 0.4, 0.72, 7.15, 0.39, 0, silver],
+    // Streamlined aerodynamic rear nose
+    [0.6, 0.56, 0.82, -6.85, 0.48, 0, silver],
+    [0.46, 0.28, 0.76, -6.78, 0.76, 0, glass],
+    [0.3, 0.4, 0.72, -7.15, 0.39, 0, silver],
+    // Bright glowing spotlight in front + light beam
+    [0.14, 0.2, 0.28, 7.32, 0.54, 0, 0xfef08a, true],
+    [3.4, 0.12, 0.88, 8.8, 0.24, 0, 0xfef08a, true, 0.5],
+    // Side window stripes
+    [12.0, 0.22, 0.04, 0, 0.68, 0.43, glass],
+    [12.0, 0.22, 0.04, 0, 0.68, -0.43, glass],
+    // Roof vents
+    [0.8, 0.08, 0.4, -3.5, 1.02, 0, vent],
+    [0.8, 0.08, 0.4, 0, 1.02, 0, vent],
+    [0.8, 0.08, 0.4, 3.5, 1.02, 0, vent],
+  ];
+}
+function createUrbanVehicle(
+  vOrType                                                           ,
+  speed         ,
+  colorOverride         
+)              {
+  const group = new THREE.Group();
+  let specs                  ;
+  let spd        ;
+
+  if (typeof vOrType === 'object') {
+    spd = vOrType.speed;
+    const col = vOrType.color;
+    if (vOrType.type === 'truck') {
+      specs = Math.abs(vOrType.id) % 2 === 0 ? buildBus(col) : buildSweeper(col);
+    } else {
+      specs = Math.abs(vOrType.id) % 2 === 0 ? buildTaxi(col) : buildScooter(col);
+    }
+  } else {
+    spd = speed ?? 1;
+    switch (vOrType) {
+      case 'taxi': specs = buildTaxi(colorOverride ?? 0xeab308); break;
+      case 'scooter': specs = buildScooter(colorOverride ?? 0x3b82f6); break;
+      case 'bus': specs = buildBus(colorOverride ?? 0x38bdf8); break;
+      case 'sweeper': specs = buildSweeper(colorOverride ?? 0xf97316); break;
+      case 'train': return createUrbanTrain(spd);
+      default: specs = buildTaxi(colorOverride ?? 0xeab308); break;
+    }
+  }
+
+  buildUrbanVoxels(group, specs);
+  group.rotation.y = vehicleScreenRotationY(spd);
+  return group;
+}
+function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+  const group = new THREE.Group();
+  buildUrbanVoxels(group, buildTrain());
+  const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
+  group.rotation.y = vehicleScreenRotationY(actualSpeed);
+  return group;
+}
+function createUrbanPallet(log             )              {
+  const group = new THREE.Group();
+  const specs                   = [
+    [log.length, 0.22, 0.74, 0, 0.02, 0, 0x854d0e],
+    [log.length + 0.04, 0.14, 0.54, 0, 0.02, 0, 0xfde047],
+    [0.36, 0.22, 0.68, -log.length * 0.38, -0.08, 0, 0x0284c7],
+    [0.36, 0.22, 0.68, log.length * 0.38, -0.08, 0, 0x0284c7],
+  ];
+
+  const slotCount = Math.floor(log.length);
+  for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+    if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
+      specs.push([0.06, 0.24, 0.75, s, 0.02, 0, 0x582a08]);
+    }
+  }
+
+  buildUrbanVoxels(group, specs);
+  return group;
+}
+
+// --- Module: src/view/urbanEnvironment.ts ---
+function createUrbanTree(
+  seedVariant        ,
+  biomeOrSnow                      = false
+)              {
+  const group = new THREE.Group();
+  const biome            =
+    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
+  const absSeed = Math.abs(seedVariant);
+
+  if (biome === 'desert') {
+    const cactusMat = createVoxelMaterial(0x15803d);
+    const flowerMat = createVoxelMaterial(0xf43f5e);
+    group.add(createVoxelMesh(0.36, 1.35, 0.36, cactusMat, 0, 0.675, 0));
+    group.add(createVoxelMesh(0.24, 0.18, 0.22, cactusMat, -0.26, 0.65, 0));
+    group.add(createVoxelMesh(0.20, 0.42, 0.22, cactusMat, -0.34, 0.86, 0));
+    group.add(createVoxelMesh(0.24, 0.18, 0.22, cactusMat, 0.26, 0.82, 0));
+    group.add(createVoxelMesh(0.20, 0.38, 0.22, cactusMat, 0.34, 1.0, 0));
+    group.add(createVoxelMesh(0.16, 0.12, 0.16, flowerMat, 0, 1.4, 0));
     return group;
   }
 
+  const trunkColor = biome === 'neon' ? 0x1e1b4b : 0x78350f;
+  const trunkMat = createVoxelMaterial(trunkColor);
+  group.add(createVoxelMesh(0.36, 0.56, 0.36, trunkMat, 0, 0.28, 0));
+
+  const isPine = absSeed % 2 === 1 || biome === 'winter';
+  const leafColor =
+    biome === 'winter'
+      ? 0x0f766e
+      : biome === 'neon'
+        ? absSeed % 2 === 0
+          ? 0x06b6d4
+          : 0xd946ef
+        : absSeed % 3 === 0
+          ? 0x16a34a
+          : absSeed % 3 === 1
+            ? 0x15803d
+            : 0x22c55e;
+  const leavesMat = createVoxelMaterial(leafColor);
+
+  if (isPine) {
+    group.add(createVoxelMesh(0.86, 0.46, 0.86, leavesMat, 0, 0.72, 0));
+    group.add(createVoxelMesh(0.66, 0.44, 0.66, leavesMat, 0, 1.10, 0));
+    group.add(createVoxelMesh(0.42, 0.38, 0.42, leavesMat, 0, 1.44, 0));
+    if (biome === 'winter') {
+      const snowMat = createVoxelMaterial(0xf8fafc);
+      group.add(createVoxelMesh(0.88, 0.08, 0.88, snowMat, 0, 0.96, 0));
+      group.add(createVoxelMesh(0.44, 0.12, 0.44, snowMat, 0, 1.65, 0));
+    }
+  } else {
+    const height = 0.85 + (absSeed % 3) * 0.22;
+    group.add(createVoxelMesh(0.82, height, 0.82, leavesMat, 0, 0.54 + height / 2, 0));
+    group.add(createVoxelMesh(0.56, 0.24, 0.56, leavesMat, 0, 0.54 + height + 0.1, 0));
+  }
+
+  return group;
+}
+function createUrbanRock(seedVariant        , biome            = 'forest')              {
+  const group = new THREE.Group();
+  const absSeed = Math.abs(seedVariant);
+  const isHydrant = absSeed % 3 === 0 && biome !== 'desert';
+
+  if (isHydrant) {
+    // City Cast-Iron Fire Hydrant
+    const hydrantMat = createVoxelMaterial(VOXEL_PALETTE.hydrantRed);
+    const nutMat = createVoxelMaterial(VOXEL_PALETTE.woodLight);
+    group.add(createVoxelMesh(0.36, 0.46, 0.36, hydrantMat, 0, 0.23, 0));
+    group.add(createVoxelMesh(0.48, 0.14, 0.24, hydrantMat, 0, 0.28, 0));
+    group.add(createVoxelMesh(0.26, 0.18, 0.26, hydrantMat, 0, 0.52, 0));
+    group.add(createVoxelMesh(0.12, 0.10, 0.12, nutMat, 0, 0.64, 0));
+    return group;
+  }
+
+  // Street concrete bollard or park boulder
+  const baseColor =
+    biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : VOXEL_PALETTE.concreteGrey;
+  const topColor =
+    biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x22d3ee : 0x94a3b8;
+  const baseMat = createVoxelMaterial(baseColor);
+  const topMat = createVoxelMaterial(topColor);
+
+  group.add(createVoxelMesh(0.76, 0.44, 0.72, baseMat, 0, 0.22, 0));
+  const shardX = absSeed % 2 === 0 ? -0.26 : 0.26;
+  group.add(createVoxelMesh(0.32, 0.30, 0.34, baseMat, shardX, 0.15, 0.18));
+  group.add(createVoxelMesh(0.52, 0.28, 0.48, topMat, (absSeed % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0));
+
+  return group;
+}
+function createUrbanBush(
+  seedVariant        ,
+  biomeOrSnow                      = false
+)              {
+  const group = new THREE.Group();
+  const biome            =
+    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
+  const bushColor =
+    biome === 'winter'
+      ? 0xdbeafe
+      : biome === 'desert'
+        ? 0xa16207
+        : biome === 'neon'
+          ? 0x7e22ce
+          : 0x22c55e;
+  const bushMat = createVoxelMaterial(bushColor);
+  const berryColor =
+    biome === 'neon' ? 0x06b6d4 : Math.abs(seedVariant) % 2 === 0 ? 0xef4444 : 0xf59e0b;
+  const berryMat = createVoxelMaterial(berryColor);
+
+  group.add(createVoxelMesh(0.78, 0.46, 0.78, bushMat, 0, 0.23, 0));
+  group.add(createVoxelMesh(0.54, 0.22, 0.54, bushMat, 0, 0.52, 0));
+  group.add(createVoxelMesh(0.12, 0.12, 0.12, berryMat, -0.22, 0.46, 0.22));
+  group.add(createVoxelMesh(0.12, 0.12, 0.12, berryMat, 0.22, 0.42, -0.18));
+  group.add(createVoxelMesh(0.10, 0.10, 0.10, berryMat, 0.05, 0.62, 0.12));
+
+  return group;
+}
+function createUrbanObstacle(
+  kind              ,
+  seedVariant        ,
+  biomeOrSnow                      = false
+)              {
+  const biome            =
+    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
+  if (kind === 'rock') return createUrbanRock(seedVariant, biome);
+  if (kind === 'bush') return createUrbanBush(seedVariant, biome);
+  return createUrbanTree(seedVariant, biome);
+}
+function createUrbanCoin()              {
+  const group = new THREE.Group();
+  const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
+  const innerMat = createVoxelMaterial(0xef4444);
+
+  group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
+  group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
+  return group;
+}
+function createUrbanRailwaySignal()                                                {
+  const group = new THREE.Group();
+  const poleMat = createVoxelMaterial(0x1e293b);
+  const lightMat = createVoxelBasicMaterial(0x334155);
+
+  group.add(createVoxelMesh(0.14, 1.20, 0.14, poleMat, 0, 0.60, 0));
+  group.add(createVoxelMesh(0.36, 0.28, 0.24, poleMat, 0, 1.22, 0));
+
+  const lightMesh = createVoxelMesh(0.22, 0.16, 0.28, lightMat, 0, 1.22, 0, false, false);
+  group.add(lightMesh);
+
+  return { group, lightMesh };
+}
+function createUrbanRoadMarkings()              {
+  const group = new THREE.Group();
+  const whiteLineMat = createVoxelBasicMaterial(0xf8fafc);
+  group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(-9.5), 0.015, 0, false, false));
+  group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(9.5), 0.015, 0, false, false));
+  return group;
+}
+function createUrbanLaneDivider()              {
+  const group = new THREE.Group();
+  const dividerMat = createVoxelBasicMaterial(0xf8fafc);
+  const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
+
+  for (let x = -8.5; x <= 8.5; x += 1.6) {
+    const dash = new THREE.Mesh(dashGeo, dividerMat);
+    dash.position.set(x, 0.015, 0.5);
+    group.add(dash);
+  }
+
+  return group;
+}
+function createUrbanRoadBarrier(biome            = 'forest')              {
+  const group = new THREE.Group();
+  const postColor =
+    biome === 'neon' ? 0x1e1b4b : biome === 'desert' ? 0x78716c : biome === 'winter' ? 0x475569 : 0x64748b;
+  const railColor =
+    biome === 'neon' ? 0x06b6d4 : biome === 'desert' ? 0xd97706 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
+  const reflectorColor = biome === 'neon' ? 0xec4899 : 0xfacc15;
+
+  const postMat = createVoxelMaterial(postColor);
+  const railMat = createVoxelMaterial(railColor);
+  const reflectorMat = createVoxelBasicMaterial(reflectorColor);
+
+  group.add(createVoxelMesh(0.12, 0.42, 0.12, postMat, 0, 0.21, -0.32));
+  group.add(createVoxelMesh(0.12, 0.42, 0.12, postMat, 0, 0.21, 0.32));
+  group.add(createVoxelMesh(0.14, 0.18, 0.96, railMat, 0, 0.28, 0));
+  group.add(createVoxelMesh(0.15, 0.08, 0.18, reflectorMat, 0, 0.28, 0, false, false));
+  return group;
+}
+function createUrbanRiverbankEdge(
+  side                  ,
+  biome            = 'forest'
+)              {
+  const group = new THREE.Group();
+  const woodColor =
+    biome === 'winter' ? 0x475569 : biome === 'desert' ? 0x92400e : biome === 'neon' ? 0x1e1b4b : 0x78350f;
+  const capColor =
+    biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x06b6d4 : 0x451a03;
+  const rockColor =
+    biome === 'winter' ? 0x94a3b8 : biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : 0x64748b;
+
+  const woodMat = createVoxelMaterial(woodColor);
+  const capMat = createVoxelMaterial(capColor);
+  const rockMat = createVoxelMaterial(rockColor);
+
+  group.add(createVoxelMesh(0.28, 0.44, 0.28, woodMat, 0, 0.16, -0.22));
+  group.add(createVoxelMesh(0.32, 0.08, 0.32, capMat, 0, 0.40, -0.22));
+
+  const bx = side === 'left' ? 0.2 : -0.2;
+  group.add(createVoxelMesh(0.36, 0.22, 0.32, rockMat, bx, 0.07, 0.2));
+  group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
+
+  return group;
+}
+function createUrbanRecordFlag()              {
+  const group = new THREE.Group();
+  group.name = 'recordFlag';
+
+  const baseMat = createVoxelMaterial(0x334155);
+  const trimMat = createVoxelMaterial(0xf59e0b);
+  const poleMat = createVoxelMaterial(0x94a3b8);
+  const clothMat = createVoxelMaterial(0xfbbf24);
+  const crownMat = createVoxelMaterial(0xf59e0b);
+  const rubyMat = createVoxelMaterial(VOXEL_PALETTE.rubyRed);
+
+  group.add(createVoxelMesh(0.70, 0.12, 0.70, baseMat, 0, 0.06, 0));
+  group.add(createVoxelMesh(0.76, 0.04, 0.76, trimMat, 0, 0.02, 0));
+  group.add(createVoxelMesh(0.10, 1.80, 0.10, poleMat, 0, 1.02, 0));
+  group.add(createVoxelMesh(0.18, 0.14, 0.18, crownMat, 0, 1.99, 0));
+
+  const clothGroup = new THREE.Group();
+  clothGroup.name = 'flagCloth';
+  clothGroup.position.set(0.05, 1.45, 0);
+
+  clothGroup.add(createVoxelMesh(0.75, 0.44, 0.04, clothMat, 0.375, 0, 0));
+  clothGroup.add(createVoxelMesh(0.20, 0.14, 0.042, clothMat, 0.85, 0.14, 0));
+  clothGroup.add(createVoxelMesh(0.20, 0.14, 0.042, clothMat, 0.85, -0.14, 0));
+
+  // Crown emblem 👑 on flag
+  clothGroup.add(createVoxelMesh(0.36, 0.06, 0.07, crownMat, 0.375, -0.08, 0));
+  clothGroup.add(createVoxelMesh(0.08, 0.16, 0.07, crownMat, 0.24, -0.01, 0));
+  clothGroup.add(createVoxelMesh(0.09, 0.22, 0.07, crownMat, 0.375, 0.02, 0));
+  clothGroup.add(createVoxelMesh(0.08, 0.16, 0.07, crownMat, 0.51, -0.01, 0));
+
+  // Ruby gems
+  clothGroup.add(createVoxelMesh(0.06, 0.06, 0.08, rubyMat, 0.24, 0.09, 0));
+  clothGroup.add(createVoxelMesh(0.07, 0.07, 0.08, rubyMat, 0.375, 0.15, 0));
+  clothGroup.add(createVoxelMesh(0.06, 0.06, 0.08, rubyMat, 0.51, 0.09, 0));
+
+  group.add(clothGroup);
+  return group;
+}
+
+// --- Module: src/view/meshFactory.ts ---
+class MeshFactory {
+  static createCharacter(skinId         = 'corgi', isGhost = false)              {
+    return createUrbanCharacter(skinId, isGhost);
+  }
+
   static createChicken()              {
-    return MeshFactory.createCharacter('chicken');
+    return createUrbanCharacter('chicken');
   }
 
   static createObstacle(
@@ -2785,470 +3579,51 @@ class MeshFactory {
     seedVariant        ,
     biomeOrSnow                      = false
   )              {
-    const biome            =
-      typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-    if (kind === 'rock') {
-      return MeshFactory.createRock(seedVariant, biome);
-    }
-    if (kind === 'bush') {
-      return MeshFactory.createBush(seedVariant, biome);
-    }
-    return MeshFactory.createTree(seedVariant, biome);
+    return createUrbanObstacle(kind, seedVariant, biomeOrSnow);
   }
 
   static createTree(seedVariant        , biomeOrSnow                      = false)              {
-    const group = new THREE.Group();
-    const biome            =
-      typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-    const absSeed = Math.abs(seedVariant);
-
-    if (biome === 'desert') {
-      // Voxel Saguaro Cactus with arms & desert blossom
-      const cactusMat = new THREE.MeshLambertMaterial({ color: 0x15803d });
-      const flowerMat = new THREE.MeshLambertMaterial({ color: 0xf43f5e });
-      const stem = new THREE.Mesh(new THREE.BoxGeometry(0.36, 1.35, 0.36), cactusMat);
-      stem.position.y = 0.675;
-      stem.castShadow = true;
-      stem.receiveShadow = true;
-      const armLeftH = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.22), cactusMat);
-      armLeftH.position.set(-0.26, 0.65, 0);
-      const armLeftV = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.42, 0.22), cactusMat);
-      armLeftV.position.set(-0.34, 0.86, 0);
-      const armRightH = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.22), cactusMat);
-      armRightH.position.set(0.26, 0.82, 0);
-      const armRightV = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.22), cactusMat);
-      armRightV.position.set(0.34, 1.0, 0);
-      const flower = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.16), flowerMat);
-      flower.position.set(0, 1.4, 0);
-      group.add(stem, armLeftH, armLeftV, armRightH, armRightV, flower);
-      return group;
-    }
-
-    const trunkMat = new THREE.MeshLambertMaterial({
-      color: biome === 'neon' ? 0x1e1b4b : 0x78350f,
-    });
-    const trunk = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.56, 0.36), trunkMat);
-    trunk.position.y = 0.28;
-    trunk.castShadow = true;
-    trunk.receiveShadow = true;
-    group.add(trunk);
-
-    const isPine = absSeed % 2 === 1 || biome === 'winter';
-    const leafColor =
-      biome === 'winter'
-        ? 0x0f766e
-        : biome === 'neon'
-          ? absSeed % 2 === 0
-            ? 0x06b6d4
-            : 0xd946ef
-          : absSeed % 3 === 0
-            ? 0x16a34a
-            : absSeed % 3 === 1
-              ? 0x15803d
-              : 0x22c55e;
-    const leavesMat = new THREE.MeshLambertMaterial({ color: leafColor });
-
-    if (isPine) {
-      // Multi-tiered conifer pine tree
-      const t1 = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.46, 0.86), leavesMat);
-      t1.position.y = 0.72;
-      const t2 = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.44, 0.66), leavesMat);
-      t2.position.y = 1.1;
-      const t3 = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.38, 0.42), leavesMat);
-      t3.position.y = 1.44;
-      t1.castShadow = t2.castShadow = t3.castShadow = true;
-      group.add(t1, t2, t3);
-      if (biome === 'winter') {
-        const snowMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
-        const s1 = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.08, 0.88), snowMat);
-        s1.position.y = 0.96;
-        const s2 = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.12, 0.44), snowMat);
-        s2.position.y = 1.65;
-        group.add(s1, s2);
-      }
-    } else {
-      // Detailed blocky oak / cyber tree with crown & side foliage clusters
-      const height = 0.85 + (absSeed % 3) * 0.22;
-      const crown = new THREE.Mesh(new THREE.BoxGeometry(0.82, height, 0.82), leavesMat);
-      crown.position.y = 0.54 + height / 2;
-      crown.castShadow = true;
-      crown.receiveShadow = true;
-      const topCap = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.24, 0.56), leavesMat);
-      topCap.position.y = 0.54 + height + 0.1;
-      topCap.castShadow = true;
-      group.add(crown, topCap);
-    }
-
-    return group;
+    return createUrbanTree(seedVariant, biomeOrSnow);
   }
 
   static createRock(seedVariant        , biome            = 'forest')              {
-    const group = new THREE.Group();
-    const baseMat = new THREE.MeshLambertMaterial({
-      color: biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : 0x64748b,
-    });
-    const topMat = new THREE.MeshLambertMaterial({
-      color: biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x22d3ee : 0x94a3b8,
-    });
-
-    const base = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.44, 0.72), baseMat);
-    base.position.y = 0.22;
-    base.castShadow = true;
-    base.receiveShadow = true;
-    const sideShard = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.3, 0.34), baseMat);
-    sideShard.position.set(seedVariant % 2 === 0 ? -0.26 : 0.26, 0.15, 0.18);
-    const top = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.28, 0.48), topMat);
-    top.position.set((seedVariant % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0);
-    top.castShadow = true;
-    group.add(base, sideShard, top);
-
-    return group;
+    return createUrbanRock(seedVariant, biome);
   }
 
   static createBush(seedVariant        , biomeOrSnow                      = false)              {
-    const group = new THREE.Group();
-    const biome            =
-      typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-    const bushMat = new THREE.MeshLambertMaterial({
-      color:
-        biome === 'winter'
-          ? 0xdbeafe
-          : biome === 'desert'
-            ? 0xa16207
-            : biome === 'neon'
-              ? 0x7e22ce
-              : 0x22c55e,
-    });
-    const berryMat = new THREE.MeshLambertMaterial({
-      color: biome === 'neon' ? 0x06b6d4 : seedVariant % 2 === 0 ? 0xef4444 : 0xf59e0b,
-    });
-
-    const main = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.46, 0.78), bushMat);
-    main.position.y = 0.23;
-    main.castShadow = true;
-    const crown = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.22, 0.54), bushMat);
-    crown.position.y = 0.52;
-    crown.castShadow = true;
-    group.add(main, crown);
-
-    const b1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
-    b1.position.set(-0.22, 0.46, 0.22);
-    const b2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), berryMat);
-    b2.position.set(0.22, 0.42, -0.18);
-    const b3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), berryMat);
-    b3.position.set(0.05, 0.62, 0.12);
-    group.add(b1, b2, b3);
-
-    return group;
+    return createUrbanBush(seedVariant, biomeOrSnow);
   }
 
   static createCoin()              {
-    const group = new THREE.Group();
-    const goldMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
-    const innerMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
-
-    const rim = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.44, 0.12), goldMat);
-    rim.position.y = 0.36;
-    rim.castShadow = true;
-    group.add(rim);
-
-    const center = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.15), innerMat);
-    center.position.y = 0.36;
-    group.add(center);
-
-    return group;
+    return createUrbanCoin();
   }
 
   static createRailwaySignal()                                                {
-    const group = new THREE.Group();
-    const poleMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
-    const lightMat = new THREE.MeshBasicMaterial({ color: 0x334155 });
-
-    const pole = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.2, 0.14), poleMat);
-    pole.position.y = 0.6;
-    pole.castShadow = true;
-    group.add(pole);
-
-    const box = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.28, 0.24), poleMat);
-    box.position.y = 1.22;
-    group.add(box);
-
-    const lightMesh = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.28), lightMat);
-    lightMesh.position.y = 1.22;
-    group.add(lightMesh);
-
-    return { group, lightMesh };
+    return createUrbanRailwaySignal();
   }
 
   static createTrain(length        , speed        )              {
-    const group = new THREE.Group();
-    const bodyMat = new THREE.MeshLambertMaterial({ color: 0xdc2626 });
-    const stripeMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
-    const roofMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
-    const beamMat = new THREE.MeshBasicMaterial({
-      color: 0xfef08a,
-      transparent: true,
-      opacity: 0.55,
-    });
-
-    const carBody = new THREE.Mesh(new THREE.BoxGeometry(length, 0.96, 0.84), bodyMat);
-    carBody.position.y = 0.54;
-    carBody.castShadow = true;
-    group.add(carBody);
-
-    const stripe = new THREE.Mesh(new THREE.BoxGeometry(length + 0.04, 0.18, 0.86), stripeMat);
-    stripe.position.y = 0.44;
-    group.add(stripe);
-
-    const roof = new THREE.Mesh(new THREE.BoxGeometry(length * 0.96, 0.14, 0.72), roofMat);
-    roof.position.y = 1.08;
-    group.add(roof);
-
-    const headlightBeam = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.92), beamMat);
-    headlightBeam.position.set(length / 2 + 1.6, 0.22, 0);
-    group.add(headlightBeam);
-
-    group.rotation.y = vehicleScreenRotationY(speed);
-    return group;
+    return createUrbanTrain(length, speed);
   }
 
   static createVehicle(v         )              {
-    const group = new THREE.Group();
-    const bodyMat = new THREE.MeshLambertMaterial({ color: v.color });
-    const cabinMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
-    const glassMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
-    const chromeMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
-    const wheelMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
-    const tailLightMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
-    const headLightMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
-    const beamMat = new THREE.MeshBasicMaterial({
-      color: 0xfef08a,
-      transparent: true,
-      opacity: 0.28,
-    });
-
-    const variant = Math.abs(v.id) % 3;
-
-    if (v.type === 'truck') {
-      const cab = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.28, 0.7, 0.74), bodyMat);
-      cab.position.set(v.length * 0.34, 0.45, 0);
-      cab.castShadow = true;
-      const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.26, 0.66), glassMat);
-      windshield.position.set(v.length * 0.45, 0.58, 0);
-      const grille = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 0.52), chromeMat);
-      grille.position.set(v.length * 0.48, 0.3, 0);
-      const exhaust = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.88, 0.08), chromeMat);
-      exhaust.position.set(v.length * 0.2, 0.58, -0.36);
-      group.add(cab, windshield, grille, exhaust);
-
-      if (variant === 1) {
-        // Tanker Truck with cylindrical voxel fuel tank & hazard bands
-        const baseBed = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.14, 0.76), chromeMat);
-        baseBed.position.set(-v.length * 0.14, 0.22, 0);
-        const tankMain = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.64, 0.56, 0.68), cabinMat);
-        tankMain.position.set(-v.length * 0.14, 0.56, 0);
-        tankMain.castShadow = true;
-        const tankTop = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.58, 0.14, 0.44), bodyMat);
-        tankTop.position.set(-v.length * 0.14, 0.88, 0);
-        group.add(baseBed, tankMain, tankTop);
-      } else if (variant === 2) {
-        // Timber / Flatbed Hauler carrying stacked voxel logs
-        const flatbed = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.16, 0.78), chromeMat);
-        flatbed.position.set(-v.length * 0.14, 0.24, 0);
-        const logMat = new THREE.MeshLambertMaterial({ color: 0x854d0e });
-        const l1 = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.62, 0.24, 0.28), logMat);
-        l1.position.set(-v.length * 0.14, 0.44, -0.18);
-        const l2 = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.62, 0.24, 0.28), logMat);
-        l2.position.set(-v.length * 0.14, 0.44, 0.18);
-        const l3 = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.58, 0.24, 0.3), logMat);
-        l3.position.set(-v.length * 0.14, 0.68, 0);
-        l1.castShadow = l2.castShadow = l3.castShadow = true;
-        group.add(flatbed, l1, l2, l3);
-      } else {
-        // Classic Box Delivery Trailer with side trim stripe
-        const trailer = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.84, 0.78), cabinMat);
-        trailer.position.set(-v.length * 0.14, 0.53, 0);
-        trailer.castShadow = true;
-        trailer.receiveShadow = true;
-        const stripe = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.69, 0.14, 0.8), bodyMat);
-        stripe.position.set(-v.length * 0.14, 0.48, 0);
-        group.add(trailer, stripe);
-      }
-    } else {
-      const chassis = new THREE.Mesh(new THREE.BoxGeometry(v.length, 0.38, 0.74), bodyMat);
-      chassis.position.y = 0.3;
-      chassis.castShadow = true;
-      chassis.receiveShadow = true;
-      group.add(chassis);
-
-      if (variant === 0) {
-        // Sports Coupe with low aerodynamic cabin, racing stripe & rear spoiler
-        const top = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.48, 0.26, 0.64), glassMat);
-        top.position.set(-0.04, 0.6, 0);
-        const roofCap = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.38, 0.06, 0.6), bodyMat);
-        roofCap.position.set(-0.04, 0.75, 0);
-        const spoiler = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.72), chromeMat);
-        spoiler.position.set(-v.length * 0.44, 0.55, 0);
-        group.add(top, roofCap, spoiler);
-      } else if (variant === 1) {
-        // Off-Road SUV with tall boxy cabin, roof rack & rear spare wheel
-        const suvTop = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.68, 0.34, 0.68), bodyMat);
-        suvTop.position.set(-0.08, 0.64, 0);
-        suvTop.castShadow = true;
-        const suvGlass = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.7, 0.2, 0.7), glassMat);
-        suvGlass.position.set(-0.06, 0.63, 0);
-        const roofRack = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.46, 0.08, 0.52), chromeMat);
-        roofRack.position.set(-0.1, 0.84, 0);
-        const spareTire = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.28), wheelMat);
-        spareTire.position.set(-v.length * 0.52, 0.44, 0);
-        group.add(suvTop, suvGlass, roofRack, spareTire);
-      } else {
-        // Sedan / Cruiser with distinct cabin & roof beacon
-        const top = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.56, 0.32, 0.64), cabinMat);
-        top.position.set(-0.05, 0.64, 0);
-        top.castShadow = true;
-        const windows = new THREE.Mesh(new THREE.BoxGeometry(v.length * 0.58, 0.18, 0.66), glassMat);
-        windows.position.set(-0.05, 0.62, 0);
-        const lightBar = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.08, 0.38), tailLightMat);
-        lightBar.position.set(-0.05, 0.84, 0);
-        group.add(top, windows, lightBar);
-      }
-    }
-
-    // Headlights, taillights, and light beam
-    const hl = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, 0.58), headLightMat);
-    hl.position.set(v.length / 2 + 0.01, 0.32, 0);
-    const tl = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, 0.58), tailLightMat);
-    tl.position.set(-v.length / 2 - 0.01, 0.32, 0);
-    const beam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.04, 0.62), beamMat);
-    beam.position.set(v.length / 2 + 0.7, 0.08, 0);
-    group.add(hl, tl, beam);
-
-    const wheelGeo = new THREE.BoxGeometry(0.28, 0.24, 0.82);
-    const hubGeo = new THREE.BoxGeometry(0.14, 0.12, 0.86);
-    const wheelOffsets = v.type === 'truck' ? [-0.36, -0.1, 0.32] : [-0.3, 0.3];
-    for (const factor of wheelOffsets) {
-      const w = new THREE.Mesh(wheelGeo, wheelMat);
-      w.position.set(v.length * factor, 0.14, 0);
-      const hub = new THREE.Mesh(hubGeo, chromeMat);
-      hub.position.set(v.length * factor, 0.14, 0);
-      group.add(w, hub);
-    }
-
-    group.rotation.y = vehicleScreenRotationY(v.speed);
-    return group;
+    return createUrbanVehicle(v);
   }
 
   static createLog(log             )              {
-    const group = new THREE.Group();
-    const barkMat = new THREE.MeshLambertMaterial({ color: 0x854d0e });
-    const ringMat = new THREE.MeshLambertMaterial({ color: 0xfde047 });
-
-    const mainMesh = new THREE.Mesh(new THREE.BoxGeometry(log.length, 0.32, 0.72), barkMat);
-    mainMesh.position.y = -0.04;
-    mainMesh.receiveShadow = true;
-    mainMesh.castShadow = true;
-    group.add(mainMesh);
-
-    const ends = new THREE.Mesh(new THREE.BoxGeometry(log.length + 0.04, 0.22, 0.52), ringMat);
-    ends.position.y = -0.04;
-    group.add(ends);
-
-    // Visual segment notches representing magnet slots on the log
-    const notchMat = new THREE.MeshLambertMaterial({ color: 0x582a08 });
-    const slotCount = Math.floor(log.length);
-    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
-      if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
-        const notch = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.33, 0.73), notchMat);
-        notch.position.set(s, -0.04, 0);
-        group.add(notch);
-      }
-    }
-
-    return group;
+    return createUrbanPallet(log);
   }
 
   static createRiverbankEdge(side                  , biome            = 'forest')              {
-    const group = new THREE.Group();
-
-    // Wood mooring pylon / bollard material based on biome
-    const woodColor =
-      biome === 'winter'
-        ? 0x475569
-        : biome === 'desert'
-          ? 0x92400e
-          : biome === 'neon'
-            ? 0x1e1b4b
-            : 0x78350f;
-
-    const capColor =
-      biome === 'winter'
-        ? 0xf1f5f9
-        : biome === 'desert'
-          ? 0xd97706
-          : biome === 'neon'
-            ? 0x06b6d4
-            : 0x451a03;
-
-    const rockColor =
-      biome === 'winter'
-        ? 0x94a3b8
-        : biome === 'desert'
-          ? 0xb45309
-          : biome === 'neon'
-            ? 0x312e81
-            : 0x64748b;
-
-    const woodMat = new THREE.MeshLambertMaterial({ color: woodColor });
-    const capMat = new THREE.MeshLambertMaterial({ color: capColor });
-    const rockMat = new THREE.MeshLambertMaterial({ color: rockColor });
-
-    // Mooring pylon (аккуратная деревянная причальная свая)
-    const pylon = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.44, 0.28), woodMat);
-    pylon.position.set(0, 0.16, -0.22);
-    pylon.castShadow = true;
-    pylon.receiveShadow = true;
-    group.add(pylon);
-
-    // Decorative top cap / iron ring
-    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.32), capMat);
-    cap.position.set(0, 0.4, -0.22);
-    cap.castShadow = true;
-    group.add(cap);
-
-    // Low riverbank boulder (аккуратный гладкий валун) beside the post
-    const boulder = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.22, 0.32), rockMat);
-    const boulderOffsetX = side === 'left' ? 0.2 : -0.2;
-    boulder.position.set(boulderOffsetX, 0.07, 0.2);
-    boulder.castShadow = true;
-    boulder.receiveShadow = true;
-    group.add(boulder);
-
-    // Subtle accent shard on the boulder
-    const shard = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.1, 0.16), capMat);
-    shard.position.set(boulderOffsetX + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22);
-    group.add(shard);
-
-    return group;
+    return createUrbanRiverbankEdge(side, biome);
   }
 
   static createWaterfallEdge(side                  , biome            = 'forest')              {
-    return MeshFactory.createRiverbankEdge(side, biome);
+    return createUrbanRiverbankEdge(side, biome);
   }
 
   static createRoadMarkings()              {
-    const group = new THREE.Group();
-    const whiteLineMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
-
-    // Clean solid shoulder lines at boundary edges
-    const solidEdgeGeo = new THREE.BoxGeometry(0.12, 0.02, 1.0);
-    const leftSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
-    leftSolid.position.set(worldToScreenX(-9.5), 0.015, 0);
-    const rightSolid = new THREE.Mesh(solidEdgeGeo, whiteLineMat);
-    rightSolid.position.set(worldToScreenX(9.5), 0.015, 0);
-    group.add(leftSolid, rightSolid);
-
-    return group;
+    return createUrbanRoadMarkings();
   }
 
   static createLaneDivider()              {
@@ -3266,131 +3641,11 @@ class MeshFactory {
   }
 
   static createRoadBarrier(biome            = 'forest')              {
-    const group = new THREE.Group();
-
-    const postColor =
-      biome === 'neon'
-        ? 0x1e1b4b
-        : biome === 'desert'
-          ? 0x78716c
-          : biome === 'winter'
-            ? 0x475569
-            : 0x64748b;
-    const railColor =
-      biome === 'neon'
-        ? 0x06b6d4
-        : biome === 'desert'
-          ? 0xd97706
-          : biome === 'winter'
-            ? 0xe2e8f0
-            : 0x94a3b8;
-    const reflectorColor = biome === 'neon' ? 0xec4899 : 0xfacc15;
-
-    const postMat = new THREE.MeshLambertMaterial({ color: postColor });
-    const railMat = new THREE.MeshLambertMaterial({ color: railColor });
-    const reflectorMat = new THREE.MeshBasicMaterial({ color: reflectorColor });
-
-    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.12), postMat);
-    p1.position.set(0, 0.21, -0.32);
-    p1.castShadow = true;
-    p1.receiveShadow = true;
-
-    const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.12), postMat);
-    p2.position.set(0, 0.21, 0.32);
-    p2.castShadow = true;
-    p2.receiveShadow = true;
-
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 0.96), railMat);
-    rail.position.set(0, 0.28, 0);
-    rail.castShadow = true;
-    rail.receiveShadow = true;
-
-    const reflector = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.08, 0.18), reflectorMat);
-    reflector.position.set(0, 0.28, 0);
-
-    group.add(p1, p2, rail, reflector);
-    return group;
+    return createUrbanRoadBarrier(biome);
   }
 
   static createRecordFlag()              {
-    const group = new THREE.Group();
-    group.name = 'recordFlag';
-
-    // Materials
-    const baseMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
-    const baseTrimMat = new THREE.MeshLambertMaterial({ color: 0xf59e0b });
-    const poleMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
-    const goldClothMat = new THREE.MeshLambertMaterial({ color: 0xfbbf24 });
-    const crownMat = new THREE.MeshLambertMaterial({ color: 0xf59e0b });
-    const rubyMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
-
-    // Platform pedestal base on the shoulder
-    const base = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.7), baseMat);
-    base.position.y = 0.06;
-    base.castShadow = true;
-    base.receiveShadow = true;
-    group.add(base);
-
-    const baseTrim = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.04, 0.76), baseTrimMat);
-    baseTrim.position.y = 0.02;
-    baseTrim.castShadow = true;
-    baseTrim.receiveShadow = true;
-    group.add(baseTrim);
-
-    // Voxel flagpole of height 1.8 blocks
-    const pole = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.8, 0.1), poleMat);
-    pole.position.y = 1.02;
-    pole.castShadow = true;
-    pole.receiveShadow = true;
-    group.add(pole);
-
-    // Pole top finial (golden cap)
-    const finial = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.18), crownMat);
-    finial.position.y = 1.99;
-    finial.castShadow = true;
-    group.add(finial);
-
-    // Golden voxel pennant/cloth with pivot along flagpole edge
-    const clothGroup = new THREE.Group();
-    clothGroup.name = 'flagCloth';
-    clothGroup.position.set(0.05, 1.45, 0);
-
-    const mainCloth = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.44, 0.04), goldClothMat);
-    mainCloth.position.set(0.375, 0, 0);
-    mainCloth.castShadow = true;
-    clothGroup.add(mainCloth);
-
-    // Pennant swallowtail tips
-    const tipUpper = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.042), goldClothMat);
-    tipUpper.position.set(0.85, 0.14, 0);
-    const tipLower = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.042), goldClothMat);
-    tipLower.position.set(0.85, -0.14, 0);
-    clothGroup.add(tipUpper, tipLower);
-
-    // Crown emblem 👑 on flag
-    const crownBase = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.06, 0.07), crownMat);
-    crownBase.position.set(0.375, -0.08, 0);
-    clothGroup.add(crownBase);
-
-    const crownLeft = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.07), crownMat);
-    crownLeft.position.set(0.24, -0.01, 0);
-    const crownMid = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.22, 0.07), crownMat);
-    crownMid.position.set(0.375, 0.02, 0);
-    const crownRight = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.07), crownMat);
-    crownRight.position.set(0.51, -0.01, 0);
-    clothGroup.add(crownLeft, crownMid, crownRight);
-
-    // Ruby gems on crown peaks
-    const rubyLeft = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.08), rubyMat);
-    rubyLeft.position.set(0.24, 0.09, 0);
-    const rubyMid = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.08), rubyMat);
-    rubyMid.position.set(0.375, 0.15, 0);
-    const rubyRight = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.08), rubyMat);
-    rubyRight.position.set(0.51, 0.09, 0);
-    clothGroup.add(rubyLeft, rubyMid, rubyRight);
-
-    group.add(clothGroup);
-    return group;
+    return createUrbanRecordFlag();
   }
 }
 
@@ -3462,46 +3717,47 @@ const BIOME_ATMOSPHERES
    
   = {
   [Biome.FOREST]: {
-    sky: 0x87ceeb,
-    fogColor: 0x87ceeb,
+    sky: 0x60a5fa,
+    fogColor: 0xbae6fd,
     fogDensity: 0.012,
     ambientColor: 0xffffff,
-    ambientIntensity: 0.68,
+    ambientIntensity: 0.72,
     dirColor: 0xfffbeb,
-    dirIntensity: 1.1,
-    particleColor: 0xbef264,
+    dirIntensity: 1.15,
+    particleColor: 0x4ade80,
   },
   [Biome.WINTER]: {
-    sky: 0xcbd5e1,
+    sky: 0x93c5fd,
     fogColor: 0xdbeafe,
     fogDensity: 0.018,
     ambientColor: 0xe0f2fe,
     ambientIntensity: 0.78,
     dirColor: 0xf8fafc,
-    dirIntensity: 0.95,
-    particleColor: 0xffffff,
+    dirIntensity: 0.98,
+    particleColor: 0xf8fafc,
   },
   [Biome.DESERT]: {
-    sky: 0xfde68a,
-    fogColor: 0xfcd34d,
+    sky: 0xf97316,
+    fogColor: 0xfdba74,
     fogDensity: 0.015,
     ambientColor: 0xffedd5,
-    ambientIntensity: 0.75,
+    ambientIntensity: 0.76,
     dirColor: 0xfef08a,
-    dirIntensity: 1.22,
+    dirIntensity: 1.25,
     particleColor: 0xfbbf24,
   },
   [Biome.NEON]: {
-    sky: 0x0f172a,
+    sky: 0x090d16,
     fogColor: 0x1e1b4b,
     fogDensity: 0.016,
     ambientColor: 0x818cf8,
-    ambientIntensity: 0.58,
+    ambientIntensity: 0.6,
     dirColor: 0x38bdf8,
-    dirIntensity: 0.92,
-    particleColor: 0x22d3ee,
+    dirIntensity: 0.95,
+    particleColor: 0xc084fc,
   },
-};class SceneManager {
+};
+class SceneManager {
           static          puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
           scene             ;
           camera                          ;
@@ -3510,7 +3766,7 @@ const BIOME_ATMOSPHERES
           dirLight                        ;
           fog               ;
           playerMesh             ;
-          currentSkin         = 'chicken';
+          currentSkin         = 'corgi';
           renderedLanes = new Map                      ();
           activeIndices = new Set        ();
           shakeIntensity = 0;
@@ -3591,7 +3847,7 @@ const BIOME_ATMOSPHERES
     this.dirLight.shadow.camera.bottom = -d;
     this.scene.add(this.dirLight, this.dirLight.target);
 
-    this.playerMesh = MeshFactory.createCharacter('chicken');
+    this.playerMesh = MeshFactory.createCharacter('corgi');
     this.scene.add(this.playerMesh);
     this.initAmbientParticles(21);
 
@@ -4896,7 +5152,8 @@ const DEATH_LABELS                         = {
   [DeathReason.WATER]: 'Вы упали в бурную реку!',
   [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
   [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
-};class GameLoop {
+};
+class GameLoop {
          isPlaying = false;
          isPaused = false;
          wasDead = false;

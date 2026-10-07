@@ -6,8 +6,8 @@
 - **Точки входа**:
   - **GitHub Pages (Live Игра):** [https://gr1nis.github.io/crossy-road-pro/](https://gr1nis.github.io/crossy-road-pro/)
   - **GitHub Pages (Архитектурный план):** [https://gr1nis.github.io/crossy-road-pro/crossy_road_plan.html](https://gr1nis.github.io/crossy-road-pro/crossy_road_plan.html)
-  - [index.html](file:///C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/index.html) — Автономная 3D-игра (готова к запуску двойным кликом в браузере).
-  - [crossy_road_plan.html](file:///C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/crossy_road_plan.html) — Инженерный анализ и архитектурный план в HTML-формате.
+  - [index.html](./index.html) — Автономная 3D-игра (готова к запуску в браузере).
+  - [crossy_road_plan.html](./crossy_road_plan.html) — Инженерный анализ и архитектурный план в HTML-формате.
 
 ## 2. Реализованные модули и их контракты
 - `src/core/types.ts`: Контракты `Lane`, `Vehicle`, `LogPlatform`, `TrainState`, `PlayerState`, `WORLD_CONFIG` (`CAMERA_BACK_LIMIT = 18.0`, `CAMERA_GRACE_PERIOD = 1.25s`, `GACHA_COST = 100`, `WRAP_LIMIT = 22`).
@@ -29,11 +29,12 @@
 7. **Pause Invariant**: Игра надёжно приостанавливает физический шаг симуляции `engine.step(dt)` при вызове паузы (кнопка ⏸ или `Esc`/`P`).
 
 ## 4. Текущий этап и Next Up
-- **Текущий этап**: **Система и модальное окно достижений (Achievements UI & 10 Challenges) — 100% GREEN**:
-  - `ACHIEVEMENT_DEFINITIONS` расширен до 10 сбалансированных достижений с живым трекингом прогресса и инвариантами.
-  - В Главном меню добавлена кнопка «🏅 Достижения (X/10)» с бейджем актуального счета.
-  - Разработано стильное модальное окно `#achievements-modal` с общим прогресс-баром и карточками статуса (`✅ Открыто` / `🔒 В процессе`).
-  - Все **48 из 48 тестов GREEN**, `tsc --noEmit` — 0 ошибок.
-  - Автономный билд `index.html` и `dist/bundle.js` пересобраны через `node scripts/build.mjs`.
-- **Next Up**: Дальнейшее развитие мобильного управления и оптимизации рендеринга Three.js.
+- **Текущий этап**: **Сеттинг «Городские животные» & Оптимизированные 3D-модели — 100% GREEN**:
+  - Реализованы модули `VoxelPalette` (кэш материалов и геометрий по `OPTIMIZATION_PLAN.md`), `UrbanCharacters`, `UrbanVehicles`, `UrbanEnvironment`.
+  - Маскот и дефолтный персонаж: **Корги** (🐶), новые скины: Голубь с пиццей (🐦), Кот в коробке (📦), Енот-воришка (🦝), Капибара Дзен (🍊).
+  - Городской транспорт: Жёлтое такси, Курьерский скутер, Городской автобус, Уборочная машина и скоростной поезд метро.
+  - Объекты окружения: Пожарные гидранты, уличные урны, парковые скамейки, кадочные деревья, деревянные европаллеты на реках и дорожные отбойники.
+  - 4 биома обновлены под городские кварталы (Парк, Снежный Даунтаун, Закатный Порт, Кибер-Сити).
+  - Все **63 из 63 тестов GREEN**, `tsc --noEmit` — 0 ошибок, билд `index.html` и `dist/bundle.js` собран.
+- **Next Up**: Фаза 3 — Интеграция с Yandex Games SDK (Яндекс Игры), облачные сохранения и монетизация (Interstitial + Rewarded Ads).
 

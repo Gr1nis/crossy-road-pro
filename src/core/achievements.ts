@@ -171,7 +171,7 @@ export class AchievementTracker {
 
     check('first_50_steps', (ctx.score ?? 0) >= 50);
     check('centurion', (ctx.score ?? 0) >= 100);
-    check('collector', (ctx.unlockedSkinsCount ?? 0) >= (ctx.allSkinsCount ?? 4));
+    check('collector', (ctx.unlockedSkinsCount ?? 0) >= 4);
     check('train_conqueror', this.trainsSurvived >= 5);
     check('rich_hopper', (ctx.coins ?? 0) >= 200);
     check('coin_hoarder', (ctx.runCoins ?? 0) >= 30);

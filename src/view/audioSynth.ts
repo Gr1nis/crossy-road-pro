@@ -413,7 +413,7 @@ export class AudioSynth {
     osc.stop(now + 0.17);
   }
 
-  playSkinVoice(skinId: string = 'chicken'): void {
+  playSkinVoice(skinId: string = 'corgi'): void {
     if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
@@ -423,7 +423,66 @@ export class AudioSynth {
     const gain = ctx.createGain();
     const id = skinId.toLowerCase();
 
-    if (id.includes('duck')) {
+    if (id.includes('corgi')) {
+      // Corgi: joyful, snappy puppy yap / short bark
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(480, now);
+      osc.frequency.exponentialRampToValueAtTime(940, now + 0.025);
+      osc.frequency.exponentialRampToValueAtTime(580, now + 0.065);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.07);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.075);
+    } else if (id.includes('pigeon')) {
+      // Pigeon: gentle urban cooing
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.linearRampToValueAtTime(440, now + 0.045);
+      osc.frequency.exponentialRampToValueAtTime(330, now + 0.11);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.12);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.125);
+    } else if (id.includes('cat')) {
+      // Box Cat: cute soft purr / kitten meow
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(620, now);
+      osc.frequency.exponentialRampToValueAtTime(840, now + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(520, now + 0.11);
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.115);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } else if (id.includes('raccoon')) {
+      // Raccoon: curious mischievous chitter / chirp
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1150, now);
+      osc.frequency.exponentialRampToValueAtTime(1620, now + 0.025);
+      osc.frequency.exponentialRampToValueAtTime(1280, now + 0.055);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.06);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.065);
+    } else if (id.includes('capybara')) {
+      // Capybara Zen: resonant Tibetan meditation bell chime
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1046.5, now);
+      osc.frequency.exponentialRampToValueAtTime(1050, now + 0.22);
+      gain.gain.setValueAtTime(0.13, now);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.24);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (id.includes('duck')) {
       // Cyber-Duck: nasal synth quack with digital pitch inflection
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(640, now);

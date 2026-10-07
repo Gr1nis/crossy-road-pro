@@ -1,3 +1,3 @@
-# Project Rules: Crossy Road Pro (Anti-Stream-Timeout Guard)
+# Project Rules: Crossy Road Pro
 
-@[Global Config Rules](C:/Users/MIXPC/.gemini/config/GEMINI.md)
+@[Rules](.agents/rules/crossy-road.md)

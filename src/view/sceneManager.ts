@@ -57,44 +57,44 @@ const BIOME_ATMOSPHERES: Record<
   }
 > = {
   [Biome.FOREST]: {
-    sky: 0x87ceeb,
-    fogColor: 0x87ceeb,
+    sky: 0x60a5fa,
+    fogColor: 0xbae6fd,
     fogDensity: 0.012,
     ambientColor: 0xffffff,
-    ambientIntensity: 0.68,
+    ambientIntensity: 0.72,
     dirColor: 0xfffbeb,
-    dirIntensity: 1.1,
-    particleColor: 0xbef264,
+    dirIntensity: 1.15,
+    particleColor: 0x4ade80,
   },
   [Biome.WINTER]: {
-    sky: 0xcbd5e1,
+    sky: 0x93c5fd,
     fogColor: 0xdbeafe,
     fogDensity: 0.018,
     ambientColor: 0xe0f2fe,
     ambientIntensity: 0.78,
     dirColor: 0xf8fafc,
-    dirIntensity: 0.95,
-    particleColor: 0xffffff,
+    dirIntensity: 0.98,
+    particleColor: 0xf8fafc,
   },
   [Biome.DESERT]: {
-    sky: 0xfde68a,
-    fogColor: 0xfcd34d,
+    sky: 0xf97316,
+    fogColor: 0xfdba74,
     fogDensity: 0.015,
     ambientColor: 0xffedd5,
-    ambientIntensity: 0.75,
+    ambientIntensity: 0.76,
     dirColor: 0xfef08a,
-    dirIntensity: 1.22,
+    dirIntensity: 1.25,
     particleColor: 0xfbbf24,
   },
   [Biome.NEON]: {
-    sky: 0x0f172a,
+    sky: 0x090d16,
     fogColor: 0x1e1b4b,
     fogDensity: 0.016,
     ambientColor: 0x818cf8,
-    ambientIntensity: 0.58,
+    ambientIntensity: 0.6,
     dirColor: 0x38bdf8,
-    dirIntensity: 0.92,
-    particleColor: 0x22d3ee,
+    dirIntensity: 0.95,
+    particleColor: 0xc084fc,
   },
 };
 
@@ -107,7 +107,7 @@ export class SceneManager {
   private dirLight: THREE.DirectionalLight;
   private fog: THREE.FogExp2;
   private playerMesh: THREE.Group;
-  private currentSkin: SkinId = 'chicken';
+  private currentSkin: SkinId = 'corgi';
   private renderedLanes = new Map<number, RenderedLane>();
   private activeIndices = new Set<number>();
   private shakeIntensity = 0;
@@ -188,7 +188,7 @@ export class SceneManager {
     this.dirLight.shadow.camera.bottom = -d;
     this.scene.add(this.dirLight, this.dirLight.target);
 
-    this.playerMesh = MeshFactory.createCharacter('chicken');
+    this.playerMesh = MeshFactory.createCharacter('corgi');
     this.scene.add(this.playerMesh);
     this.initAmbientParticles(21);
 

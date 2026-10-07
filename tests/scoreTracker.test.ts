@@ -81,8 +81,8 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     const storage = new MemoryStorage();
     const tracker = new ScoreTracker(storage, 'VibeRunner');
     tracker.addCoins(100);
-    tracker.rollGacha(1); // unlocks cyber_duck
-    tracker.selectSkin('cyber_duck');
+    const rollRes = tracker.rollGacha(1);
+    tracker.selectSkin(rollRes.skinId!);
 
     const initialBoard = tracker.getLeaderboard();
     assert.equal(initialBoard.length, 10, 'Leaderboard must always contain Top-10 entries');
@@ -104,7 +104,7 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     assert.equal(updatedBoard.length, 10);
     assert.equal(updatedBoard[4].playerName, 'VibeRunner');
     assert.equal(updatedBoard[4].score, 120);
-    assert.equal(updatedBoard[4].skinId, 'cyber_duck');
+    assert.equal(updatedBoard[4].skinId, rollRes.skinId);
     assert.equal(updatedBoard[4].date, '2026-09-26');
     assert.equal(updatedBoard[4].isBot, false);
 

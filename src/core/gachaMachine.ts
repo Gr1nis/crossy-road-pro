@@ -14,6 +14,11 @@ export type SkinRarityValue = (typeof SkinRarity)[keyof typeof SkinRarity];
 export const GACHA_DUPLICATE_CASHBACK = 40;
 
 export const SKIN_RARITY_MAP: Record<SkinId, SkinRarityValue> = {
+  corgi: SkinRarity.COMMON,
+  pigeon_pizza: SkinRarity.COMMON,
+  box_cat: SkinRarity.RARE,
+  raccoon_bandit: SkinRarity.EPIC,
+  capybara_zen: SkinRarity.LEGENDARY,
   chicken: SkinRarity.COMMON,
   cyber_duck: SkinRarity.RARE,
   shadow_ninja: SkinRarity.EPIC,
