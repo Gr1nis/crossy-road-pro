@@ -74,100 +74,106 @@ function buildTaxi(color: number = 0xfacc15): UrbanVoxelSpec[] {
   const glass = 0x1e293b;
 
   const specs: UrbanVoxelSpec[] = [
-    // 4 Wheels with grey hubcaps (center Y = 0.12, touching ground strictly at Y = 0)
+    // 4 Wheels & Rims (center Y = 0.12, touches ground strictly at Y = 0)
     [0.24, 0.24, 0.12, 0.46, 0.12, 0.33, wheel],
     [0.24, 0.24, 0.12, 0.46, 0.12, -0.33, wheel],
     [0.24, 0.24, 0.12, -0.46, 0.12, 0.33, wheel],
     [0.24, 0.24, 0.12, -0.46, 0.12, -0.33, wheel],
-    [0.12, 0.12, 0.04, 0.46, 0.12, 0.39, rim],
-    [0.12, 0.12, 0.04, 0.46, 0.12, -0.39, rim],
-    [0.12, 0.12, 0.04, -0.46, 0.12, 0.39, rim],
-    [0.12, 0.12, 0.04, -0.46, 0.12, -0.39, rim],
+    [0.12, 0.12, 0.03, 0.46, 0.12, 0.395, rim],
+    [0.12, 0.12, 0.03, 0.46, 0.12, -0.395, rim],
+    [0.12, 0.12, 0.03, -0.46, 0.12, 0.395, rim],
+    [0.12, 0.12, 0.03, -0.46, 0.12, -0.395, rim],
 
-    // Chassis & Solid Voxel Body (100% opaque, no interior voids)
-    [1.32, 0.06, 0.58, 0, 0.07, 0, bumper],
-    [1.40, 0.16, 0.64, 0, 0.18, 0, c],
-    [0.50, 0.12, 0.64, 0.45, 0.32, 0, c],
-    [0.28, 0.10, 0.64, -0.56, 0.31, 0, c],
-    [0.62, 0.28, 0.56, -0.11, 0.40, 0, c],
-    [0.52, 0.06, 0.62, -0.10, 0.57, 0, c],
+    // Undercarriage base & Bumpers
+    [1.36, 0.08, 0.58, 0, 0.08, 0, bumper],
+    [0.12, 0.12, 0.68, 0.74, 0.16, 0, bumper],
+    [0.12, 0.12, 0.68, -0.74, 0.16, 0, bumper],
 
-    // Solid Opaque Windows (0% transparency) & Body Pillars
-    [0.08, 0.22, 0.56, 0.16, 0.45, 0, glass],
-    [0.06, 0.12, 0.56, 0.20, 0.38, 0, glass],
-    [0.08, 0.20, 0.54, -0.38, 0.44, 0, glass],
-    [0.07, 0.22, 0.62, -0.045, 0.45, 0, c],
-    [0.16, 0.18, 0.05, 0.08, 0.45, 0.295, glass],
-    [0.16, 0.18, 0.05, 0.08, 0.45, -0.295, glass],
-    [0.18, 0.18, 0.05, -0.18, 0.45, 0.295, glass],
-    [0.18, 0.18, 0.05, -0.18, 0.45, -0.295, glass],
-    [0.07, 0.22, 0.05, 0.17, 0.45, 0.295, c],
-    [0.07, 0.22, 0.05, 0.17, 0.45, -0.295, c],
-    [0.09, 0.22, 0.05, -0.335, 0.45, 0.295, c],
-    [0.09, 0.22, 0.05, -0.335, 0.45, -0.295, c],
+    // Solid Monolithic Body (100% opaque, seamless solid tier)
+    [1.38, 0.14, 0.64, 0, 0.19, 0, c],
+    [0.50, 0.12, 0.64, 0.44, 0.32, 0, c],
+    [0.30, 0.10, 0.64, -0.54, 0.31, 0, c],
+    [0.58, 0.12, 0.64, -0.10, 0.32, 0, c],
 
-    // Relief Door Handles (Protruding Delta >= 0.04) & Door Seam
-    [0.02, 0.16, 0.645, -0.045, 0.18, 0, black],
-    [0.07, 0.035, 0.05, 0.07, 0.30, 0.345, black],
-    [0.07, 0.035, 0.05, 0.07, 0.30, -0.345, black],
-    [0.07, 0.035, 0.05, -0.19, 0.30, 0.345, black],
-    [0.07, 0.035, 0.05, -0.19, 0.30, -0.345, black],
+    // Upper Cabin Glass Core & Roof
+    [0.56, 0.18, 0.56, -0.10, 0.47, 0, glass],
+    [0.08, 0.16, 0.56, 0.18, 0.46, 0, glass],
+    [0.08, 0.16, 0.56, -0.38, 0.46, 0, glass],
+    [0.56, 0.05, 0.62, -0.10, 0.585, 0, c],
 
-    // Front View: Bumper, Blue "CITY" Plate, Grille Slats, Headlights, Turn Signals & Mirrors
-    [0.10, 0.12, 0.68, 0.74, 0.16, 0, bumper],
-    [0.05, 0.08, 0.22, 0.795, 0.16, 0, plateBlue, true],
-    [0.03, 0.05, 0.16, 0.82, 0.16, 0, white, true],
-    [0.05, 0.12, 0.30, 0.715, 0.31, 0, glass],
-    [0.04, 0.025, 0.26, 0.74, 0.345, 0, rim],
-    [0.04, 0.025, 0.26, 0.74, 0.31, 0, rim],
-    [0.04, 0.025, 0.26, 0.74, 0.275, 0, rim],
-    [0.05, 0.10, 0.11, 0.725, 0.31, 0.21, headlight, true],
-    [0.05, 0.10, 0.11, 0.725, 0.31, -0.21, headlight, true],
-    [0.05, 0.10, 0.06, 0.725, 0.31, 0.295, turnSignal, true],
-    [0.05, 0.10, 0.06, 0.725, 0.31, -0.295, turnSignal, true],
-    [0.06, 0.07, 0.08, 0.16, 0.42, 0.37, black],
-    [0.06, 0.07, 0.08, 0.16, 0.42, -0.37, black],
+    // Cabin Pillars (A, B, C pillars framing side windows)
+    [0.06, 0.18, 0.05, 0.16, 0.47, 0.305, c],
+    [0.06, 0.18, 0.05, 0.16, 0.47, -0.305, c],
+    [0.08, 0.18, 0.05, -0.10, 0.47, 0.305, c],
+    [0.08, 0.18, 0.05, -0.10, 0.47, -0.305, c],
+    [0.08, 0.18, 0.05, -0.36, 0.47, 0.305, c],
+    [0.08, 0.18, 0.05, -0.36, 0.47, -0.305, c],
 
-    // Rear View: Bumper, Taillights & Blue Plate
-    [0.10, 0.12, 0.68, -0.74, 0.16, 0, bumper],
-    [0.05, 0.09, 0.14, -0.715, 0.30, 0.23, red, true],
-    [0.05, 0.09, 0.14, -0.715, 0.30, -0.23, red, true],
-    [0.04, 0.07, 0.18, -0.75, 0.16, 0, plateBlue, true],
-    [0.02, 0.04, 0.12, -0.77, 0.16, 0, white, true],
+    // Door Handles & Side Mirrors
+    [0.07, 0.03, 0.04, 0.06, 0.30, 0.34, black],
+    [0.07, 0.03, 0.04, 0.06, 0.30, -0.34, black],
+    [0.07, 0.03, 0.04, -0.22, 0.30, 0.34, black],
+    [0.07, 0.03, 0.04, -0.22, 0.30, -0.34, black],
+    [0.04, 0.03, 0.06, 0.16, 0.43, 0.35, black],
+    [0.04, 0.03, 0.06, 0.16, 0.43, -0.35, black],
+    [0.05, 0.07, 0.04, 0.16, 0.43, 0.39, black],
+    [0.05, 0.07, 0.04, 0.16, 0.43, -0.39, black],
 
-    // Roof TAXI Sign: Black Mount, White Box, Checkers & Rear Orange Beacon
-    [0.32, 0.03, 0.20, -0.07, 0.61, 0, black],
-    [0.28, 0.12, 0.16, -0.06, 0.68, 0, white, true],
-    [0.05, 0.10, 0.10, -0.21, 0.68, 0, turnSignal, true],
-    [0.06, 0.045, 0.03, -0.14, 0.71, 0.095, black],
-    [0.06, 0.045, 0.03, 0.02, 0.71, 0.095, black],
-    [0.06, 0.045, 0.03, -0.06, 0.65, 0.095, black],
-    [0.06, 0.045, 0.03, -0.14, 0.71, -0.095, black],
-    [0.06, 0.045, 0.03, 0.02, 0.71, -0.095, black],
-    [0.06, 0.045, 0.03, -0.06, 0.65, -0.095, black],
+    // Front Fascia: Grille Slats, Headlights, Turn Signals & Blue "CITY" Plate
+    [0.04, 0.10, 0.30, 0.70, 0.31, 0, glass],
+    [0.03, 0.02, 0.26, 0.73, 0.34, 0, rim],
+    [0.03, 0.02, 0.26, 0.73, 0.31, 0, rim],
+    [0.03, 0.02, 0.26, 0.73, 0.28, 0, rim],
+    [0.04, 0.09, 0.11, 0.71, 0.31, 0.22, headlight, true],
+    [0.04, 0.09, 0.11, 0.71, 0.31, -0.22, headlight, true],
+    [0.04, 0.09, 0.06, 0.71, 0.31, 0.29, turnSignal, true],
+    [0.04, 0.09, 0.06, 0.71, 0.31, -0.29, turnSignal, true],
+    [0.05, 0.08, 0.22, 0.80, 0.16, 0, plateBlue, true],
+    [0.02, 0.04, 0.16, 0.83, 0.16, 0, white, true],
+
+    // Rear Fascia: Taillights & Blue Plate
+    [0.04, 0.09, 0.13, -0.71, 0.30, 0.23, red, true],
+    [0.04, 0.09, 0.13, -0.71, 0.30, -0.23, red, true],
+    [0.04, 0.07, 0.18, -0.76, 0.16, 0, plateBlue, true],
+    [0.02, 0.04, 0.12, -0.785, 0.16, 0, white, true],
+
+    // Roof TAXI Sign: Black Base, White Sign Box, Orange Beacon & Checkers
+    [0.32, 0.04, 0.20, -0.10, 0.63, 0, black],
+    [0.26, 0.12, 0.16, -0.09, 0.71, 0, white, true],
+    [0.06, 0.10, 0.12, -0.23, 0.71, 0, turnSignal, true],
+    [0.05, 0.04, 0.02, -0.16, 0.73, 0.09, black],
+    [0.05, 0.04, 0.02, -0.08, 0.73, 0.09, black],
+    [0.05, 0.04, 0.02, 0.00, 0.73, 0.09, black],
+    [0.05, 0.04, 0.02, -0.12, 0.68, 0.09, black],
+    [0.05, 0.04, 0.02, -0.04, 0.68, 0.09, black],
+    [0.05, 0.04, 0.02, -0.16, 0.73, -0.09, black],
+    [0.05, 0.04, 0.02, -0.08, 0.73, -0.09, black],
+    [0.05, 0.04, 0.02, 0.00, 0.73, -0.09, black],
+    [0.05, 0.04, 0.02, -0.12, 0.68, -0.09, black],
+    [0.05, 0.04, 0.02, -0.04, 0.68, -0.09, black],
   ];
 
-  // 2-row Checkerboard pattern on front and rear fenders (relief Delta >= 0.04)
-  const frontFenderXs = [0.32, 0.39, 0.46, 0.53];
-  for (let i = 0; i < frontFenderXs.length; i++) {
-    const fx = frontFenderXs[i];
+  // Side Checkerboard Pattern on Front & Rear Fenders (Solid non-overlapping blocks)
+  const frontXs = [0.33, 0.40, 0.47, 0.54];
+  for (let i = 0; i < frontXs.length; i++) {
+    const fx = frontXs[i];
     const topCol = i % 2 === 0 ? black : white;
     const btmCol = i % 2 === 0 ? white : black;
-    specs.push([0.065, 0.04, 0.045, fx, 0.32, 0.3425, topCol, true]);
-    specs.push([0.065, 0.04, 0.045, fx, 0.28, 0.3425, btmCol, true]);
-    specs.push([0.065, 0.04, 0.045, fx, 0.32, -0.3425, topCol, true]);
-    specs.push([0.065, 0.04, 0.045, fx, 0.28, -0.3425, btmCol, true]);
+    specs.push([0.065, 0.035, 0.03, fx, 0.335, 0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, fx, 0.30, 0.335, btmCol, true]);
+    specs.push([0.065, 0.035, 0.03, fx, 0.335, -0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, fx, 0.30, -0.335, btmCol, true]);
   }
 
-  const rearFenderXs = [-0.39, -0.46, -0.53, -0.60];
-  for (let i = 0; i < rearFenderXs.length; i++) {
-    const rx = rearFenderXs[i];
+  const rearXs = [-0.43, -0.50, -0.57, -0.64];
+  for (let i = 0; i < rearXs.length; i++) {
+    const rx = rearXs[i];
     const topCol = i % 2 === 0 ? black : white;
     const btmCol = i % 2 === 0 ? white : black;
-    specs.push([0.065, 0.04, 0.045, rx, 0.32, 0.3425, topCol, true]);
-    specs.push([0.065, 0.04, 0.045, rx, 0.28, 0.3425, btmCol, true]);
-    specs.push([0.065, 0.04, 0.045, rx, 0.32, -0.3425, topCol, true]);
-    specs.push([0.065, 0.04, 0.045, rx, 0.28, -0.3425, btmCol, true]);
+    specs.push([0.065, 0.035, 0.03, rx, 0.335, 0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, rx, 0.30, 0.335, btmCol, true]);
+    specs.push([0.065, 0.035, 0.03, rx, 0.335, -0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, rx, 0.30, -0.335, btmCol, true]);
   }
 
   return specs;
@@ -453,132 +459,130 @@ function buildSweeper(color: number): UrbanVoxelSpec[] {
   const labelWhite = 0xf1f5f9;
 
   const specs: UrbanVoxelSpec[] = [
-    // 4 Heavy Road Wheels with Slate Rims (center Y = 0.13, touches ground Y = 0)
+    // 4 Heavy Road Wheels & Rims (center Y = 0.13, touches ground strictly at Y = 0)
     [0.26, 0.26, 0.12, 0.48, 0.13, 0.35, wheel],
     [0.26, 0.26, 0.12, 0.48, 0.13, -0.35, wheel],
-    [0.12, 0.12, 0.02, 0.48, 0.13, 0.415, rim],
-    [0.12, 0.12, 0.02, 0.48, 0.13, -0.415, rim],
+    [0.12, 0.12, 0.03, 0.48, 0.13, 0.42, rim],
+    [0.12, 0.12, 0.03, 0.48, 0.13, -0.42, rim],
     [0.26, 0.26, 0.12, -0.62, 0.13, 0.35, wheel],
     [0.26, 0.26, 0.12, -0.62, 0.13, -0.35, wheel],
-    [0.12, 0.12, 0.02, -0.62, 0.13, 0.415, rim],
-    [0.12, 0.12, 0.02, -0.62, 0.13, -0.415, rim],
+    [0.12, 0.12, 0.03, -0.62, 0.13, 0.42, rim],
+    [0.12, 0.12, 0.03, -0.62, 0.13, -0.42, rim],
 
-    // Chassis Frame, Undercarriage Vacuum Suction & Bumpers
+    // Chassis Frame, Undercarriage Vacuum Unit & Bumpers
     [2.04, 0.12, 0.66, -0.08, 0.14, 0, frameDark],
     [0.40, 0.10, 0.48, -0.06, 0.06, 0, frameDark],
     [0.14, 0.14, 0.74, 0.78, 0.16, 0, frameDark],
     [0.10, 0.16, 0.72, -1.04, 0.18, 0, frameDark],
 
-    // Front Dual Conical Sweeper Brushes (Y = 0 ground contact, flared bristle skirts)
+    // Front Dual Conical Sweeper Brushes (Clean 3-tier stepped solid volumes, zero coplanar faces)
     // Left Brush (Z = +0.38)
-    [0.18, 0.06, 0.08, 0.86, 0.18, 0.38, frameDark],
-    [0.14, 0.04, 0.14, 0.94, 0.16, 0.38, rim],
-    [0.28, 0.05, 0.28, 0.94, 0.12, 0.38, brushCore],
-    [0.42, 0.05, 0.34, 0.94, 0.07, 0.38, brushBristle],
-    [0.34, 0.05, 0.42, 0.94, 0.07, 0.38, brushBristle],
-    [0.54, 0.044, 0.42, 0.94, 0.022, 0.38, brushCore],
-    [0.42, 0.044, 0.54, 0.94, 0.022, 0.38, brushCore],
-    [0.48, 0.044, 0.48, 0.94, 0.022, 0.38, brushBristle],
+    [0.18, 0.05, 0.10, 0.86, 0.165, 0.38, frameDark],
+    [0.24, 0.04, 0.24, 0.94, 0.12, 0.38, rim],
+    [0.38, 0.05, 0.38, 0.94, 0.075, 0.38, brushCore],
+    [0.48, 0.05, 0.48, 0.94, 0.025, 0.38, brushBristle],
     // Right Brush (Z = -0.38)
-    [0.18, 0.06, 0.08, 0.86, 0.18, -0.38, frameDark],
-    [0.14, 0.04, 0.14, 0.94, 0.16, -0.38, rim],
-    [0.28, 0.05, 0.28, 0.94, 0.12, -0.38, brushCore],
-    [0.42, 0.05, 0.34, 0.94, 0.07, -0.38, brushBristle],
-    [0.34, 0.05, 0.42, 0.94, 0.07, -0.38, brushBristle],
-    [0.54, 0.044, 0.42, 0.94, 0.022, -0.38, brushCore],
-    [0.42, 0.044, 0.54, 0.94, 0.022, -0.38, brushCore],
-    [0.48, 0.044, 0.48, 0.94, 0.022, -0.38, brushBristle],
+    [0.18, 0.05, 0.10, 0.86, 0.165, -0.38, frameDark],
+    [0.24, 0.04, 0.24, 0.94, 0.12, -0.38, rim],
+    [0.38, 0.05, 0.38, 0.94, 0.075, -0.38, brushCore],
+    [0.48, 0.05, 0.48, 0.94, 0.025, -0.38, brushBristle],
 
-    // High Municipal Orange Cab Body, Front Grille, Headlights & Door Handles
+    // Municipal Orange Cab Body, Front Grille, Headlights & Handles
     [0.72, 0.28, 0.70, 0.44, 0.34, 0, cabOrange],
     [0.03, 0.10, 0.12, 0.81, 0.34, 0.24, headlight, true],
     [0.03, 0.10, 0.12, 0.81, 0.34, -0.24, headlight, true],
-    [0.03, 0.03, 0.26, 0.81, 0.37, 0, 0xc2410c],
-    [0.03, 0.03, 0.26, 0.81, 0.31, 0, 0xc2410c],
-    [0.08, 0.03, 0.02, 0.36, 0.36, 0.36, 0x0f172a],
-    [0.08, 0.03, 0.02, 0.36, 0.36, -0.36, 0x0f172a],
+    [0.03, 0.08, 0.26, 0.81, 0.34, 0, 0xc2410c],
+    [0.06, 0.03, 0.03, 0.36, 0.36, 0.365, 0x0f172a],
+    [0.06, 0.03, 0.03, 0.36, 0.36, -0.365, 0x0f172a],
 
-    // Panoramic Windshield, Low-Cut Door Glass (0% transparency) & Cab Roof
-    [0.04, 0.34, 0.62, 0.79, 0.66, 0, glass],
-    [0.06, 0.34, 0.05, 0.79, 0.66, 0.33, cabOrange],
-    [0.06, 0.34, 0.05, 0.79, 0.66, -0.33, cabOrange],
-    [0.54, 0.34, 0.03, 0.44, 0.66, 0.355, glass],
-    [0.54, 0.34, 0.03, 0.44, 0.66, -0.355, glass],
-    [0.22, 0.14, 0.03, 0.65, 0.42, 0.355, glass],
-    [0.22, 0.14, 0.03, 0.65, 0.42, -0.355, glass],
-    [0.08, 0.34, 0.70, 0.10, 0.66, 0, cabOrange],
+    // Panoramic Windshield, Low Observation Glass & Cab Roof
+    [0.04, 0.35, 0.61, 0.79, 0.655, 0, glass],
+    [0.06, 0.35, 0.05, 0.79, 0.655, 0.33, cabOrange],
+    [0.06, 0.35, 0.05, 0.79, 0.655, -0.33, cabOrange],
+    [0.55, 0.35, 0.03, 0.45, 0.655, 0.34, glass],
+    [0.55, 0.35, 0.03, 0.45, 0.655, -0.34, glass],
+    [0.20, 0.12, 0.02, 0.65, 0.41, 0.36, glass],
+    [0.20, 0.12, 0.02, 0.65, 0.41, -0.36, glass],
+    [0.08, 0.35, 0.70, 0.12, 0.655, 0, cabOrange],
     [0.72, 0.06, 0.72, 0.44, 0.86, 0, cabOrange],
 
-    // Roof Flashing Safety Beacon (0xfacc15) & Dual Black Side Mirrors
+    // Flashing Safety Beacon & Side Mirrors
     [0.16, 0.04, 0.16, 0.44, 0.91, 0, frameDark],
     [0.14, 0.12, 0.14, 0.44, 0.99, 0, beacon, true],
-    [0.06, 0.03, 0.08, 0.72, 0.65, 0.40, 0x0f172a],
-    [0.06, 0.14, 0.05, 0.73, 0.65, 0.45, 0x0f172a],
-    [0.06, 0.03, 0.08, 0.72, 0.65, -0.40, 0x0f172a],
-    [0.06, 0.14, 0.05, 0.73, 0.65, -0.45, 0x0f172a],
+    [0.04, 0.03, 0.08, 0.72, 0.65, 0.39, 0x0f172a],
+    [0.05, 0.14, 0.04, 0.72, 0.65, 0.44, 0x0f172a],
+    [0.04, 0.03, 0.08, 0.72, 0.65, -0.39, 0x0f172a],
+    [0.05, 0.14, 0.04, 0.72, 0.65, -0.44, 0x0f172a],
 
-    // Rear Waste Hopper with Sloped / Chamfered Top-Rear Profile & Taillights
+    // Rear Waste Hopper with Sloped / Stepped Chamfered Top & Taillights
     [1.08, 0.50, 0.72, -0.48, 0.47, 0, hopperGrey],
-    [0.74, 0.08, 0.70, -0.33, 0.76, 0, hopperDark],
-    [0.16, 0.07, 0.70, -0.76, 0.74, 0, hopperDark],
-    [0.14, 0.08, 0.70, -0.89, 0.68, 0, hopperDark],
-    [0.10, 0.08, 0.70, -0.99, 0.61, 0, hopperDark],
+    [0.72, 0.06, 0.70, -0.34, 0.75, 0, hopperDark],
+    [0.16, 0.06, 0.70, -0.78, 0.72, 0, hopperDark],
+    [0.12, 0.06, 0.70, -0.90, 0.66, 0, hopperDark],
+    [0.08, 0.08, 0.70, -0.98, 0.59, 0, hopperDark],
     [0.03, 0.10, 0.12, -1.03, 0.36, 0.26, taillight, true],
     [0.03, 0.10, 0.12, -1.03, 0.36, -0.26, taillight, true],
 
-    // Contrast Black Hazard Band Plate (+0.04 Protrusion, Z = +/-0.38)
-    [0.96, 0.13, 0.04, -0.48, 0.34, 0.38, hazardDark],
-    [0.96, 0.13, 0.04, -0.48, 0.34, -0.38, hazardDark],
+    // Solid Contrast Black Hazard Band Plate (Z = +/-0.375)
+    [0.96, 0.12, 0.03, -0.48, 0.34, 0.375, hazardDark],
+    [0.96, 0.12, 0.03, -0.48, 0.34, -0.375, hazardDark],
   ];
 
-  // Alternating Hazard Chevrons (Yellow Slanted Slashes, +0.04 Protrusion)
-  for (let x = -0.06; x >= -0.86; x -= 0.12) {
-    specs.push([0.055, 0.065, 0.042, x, 0.31, 0.382, hazardYellow, true]);
-    specs.push([0.055, 0.065, 0.042, x - 0.04, 0.37, 0.382, hazardYellow, true]);
-    specs.push([0.055, 0.065, 0.042, x, 0.31, -0.382, hazardYellow, true]);
-    specs.push([0.055, 0.065, 0.042, x - 0.04, 0.37, -0.382, hazardYellow, true]);
+  // Alternating Hazard Chevrons (Yellow Slanted Slashes sitting cleanly at Z = +/-0.395)
+  for (let x = -0.08; x >= -0.88; x -= 0.13) {
+    specs.push([0.05, 0.055, 0.02, x, 0.31, 0.395, hazardYellow, true]);
+    specs.push([0.05, 0.055, 0.02, x - 0.035, 0.365, 0.395, hazardYellow, true]);
+    specs.push([0.05, 0.055, 0.02, x, 0.31, -0.395, hazardYellow, true]);
+    specs.push([0.05, 0.055, 0.02, x - 0.035, 0.365, -0.395, hazardYellow, true]);
   }
 
-  // Relief "STREET SWEEP" Typography (Protrusion delta = 0.04, Z = +/-0.385)
-  // Two-line layout: "STREET" at Y = 0.63, "SWEEP" at Y = 0.50
-  const renderSweeperText = (text: string, startX: number, baseY: number) => {
-    const glyphs: Record<string, number[]> = {
-      S: [0x7, 0x1, 0x7, 0x4, 0x7],
-      T: [0x7, 0x2, 0x2, 0x2, 0x2],
-      R: [0x7, 0x5, 0x7, 0x5, 0x5],
-      E: [0x7, 0x1, 0x7, 0x1, 0x7],
-      W: [0x5, 0x5, 0x7, 0x5, 0x5],
-      P: [0x7, 0x5, 0x7, 0x1, 0x1],
+  // Relief "STREET SWEEP" Typography (Clean non-overlapping macro glyph blocks at Z = +/-0.375)
+  const addGlyph = (type: string, cx: number, cy: number) => {
+    const addBox = (w: number, h: number, x: number, y: number) => {
+      specs.push([w, h, 0.03, x, y, 0.375, labelWhite, true]);
+      specs.push([w, h, 0.03, x, y, -0.375, labelWhite, true]);
     };
-    for (let c = 0; c < text.length; c++) {
-      const g = glyphs[text[c]];
-      if (!g) continue;
-      const ox = startX - c * 0.11;
-      for (let r = 0; r < 5; r++) {
-        const mask = g[r];
-        const py = baseY + (4 - r) * 0.022;
-        if ((mask & 0x7) === 0x7) {
-          specs.push([0.08, 0.02, 0.04, ox, py, 0.385, labelWhite, true]);
-          specs.push([0.08, 0.02, 0.04, ox, py, -0.385, labelWhite, true]);
-        } else {
-          if (mask & 0x1) {
-            specs.push([0.025, 0.02, 0.04, ox + 0.028, py, 0.385, labelWhite, true]);
-            specs.push([0.025, 0.02, 0.04, ox + 0.028, py, -0.385, labelWhite, true]);
-          }
-          if (mask & 0x2) {
-            specs.push([0.025, 0.02, 0.04, ox, py, 0.385, labelWhite, true]);
-            specs.push([0.025, 0.02, 0.04, ox, py, -0.385, labelWhite, true]);
-          }
-          if (mask & 0x4) {
-            specs.push([0.025, 0.02, 0.04, ox - 0.028, py, 0.385, labelWhite, true]);
-            specs.push([0.025, 0.02, 0.04, ox - 0.028, py, -0.385, labelWhite, true]);
-          }
-        }
-      }
+    if (type === 'S') {
+      addBox(0.08, 0.02, cx, cy + 0.04);
+      addBox(0.08, 0.02, cx, cy);
+      addBox(0.08, 0.02, cx, cy - 0.04);
+      addBox(0.025, 0.02, cx - 0.0275, cy + 0.02);
+      addBox(0.025, 0.02, cx + 0.0275, cy - 0.02);
+    } else if (type === 'T') {
+      addBox(0.08, 0.02, cx, cy + 0.04);
+      addBox(0.025, 0.08, cx, cy - 0.01);
+    } else if (type === 'R') {
+      addBox(0.025, 0.10, cx - 0.0275, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy + 0.04);
+      addBox(0.055, 0.02, cx + 0.0125, cy);
+      addBox(0.025, 0.02, cx + 0.0275, cy + 0.02);
+      addBox(0.025, 0.04, cx + 0.0275, cy - 0.03);
+    } else if (type === 'E') {
+      addBox(0.025, 0.10, cx - 0.0275, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy + 0.04);
+      addBox(0.045, 0.02, cx + 0.0075, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy - 0.04);
+    } else if (type === 'W') {
+      addBox(0.025, 0.10, cx - 0.035, cy);
+      addBox(0.025, 0.10, cx + 0.035, cy);
+      addBox(0.02, 0.06, cx, cy - 0.02);
+      addBox(0.09, 0.02, cx, cy - 0.04);
+    } else if (type === 'P') {
+      addBox(0.025, 0.10, cx - 0.0275, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy + 0.04);
+      addBox(0.055, 0.02, cx + 0.0125, cy);
+      addBox(0.025, 0.02, cx + 0.0275, cy + 0.02);
     }
   };
-  renderSweeperText('STREET', -0.21, 0.63);
-  renderSweeperText('SWEEP', -0.26, 0.50);
+
+  const streetWord = 'STREET';
+  for (let i = 0; i < streetWord.length; i++) {
+    addGlyph(streetWord[i], -0.16 - i * 0.11, 0.63);
+  }
+  const sweepWord = 'SWEEP';
+  for (let i = 0; i < sweepWord.length; i++) {
+    addGlyph(sweepWord[i], -0.21 - i * 0.11, 0.50);
+  }
 
   return specs;
 }

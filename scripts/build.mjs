@@ -322,7 +322,7 @@ const htmlContent = `<!DOCTYPE html>
       <div class="menu-btn-stack">
         <button id="pause-resume-btn" class="menu-btn menu-btn-primary">▶ Продолжить</button>
         <button id="pause-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
-        <button id="pause-menu-btn" class="menu-btn menu-btn-secondary">🏠 Обратно в главное меню</button>
+        <button id="pause-menu-btn" class="menu-btn menu-btn-secondary">🏠 Главное меню</button>
       </div>
     </div>
   </div>
