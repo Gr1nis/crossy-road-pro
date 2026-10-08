@@ -178,6 +178,23 @@ const htmlContent = `<!DOCTYPE html>
     .ach-desc { font-size: 11px; color: #cbd5e1; margin: 2px 0 6px; line-height: 1.3; }
     .ach-progress-row { display: flex; align-items: center; gap: 8px; }
     .ach-progress-num { font-size: 11px; font-weight: 800; color: #94a3b8; min-width: 44px; text-align: right; }
+    .ach-diff-tag { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .ach-diff-tag.easy { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .ach-diff-tag.medium { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .ach-diff-tag.hard { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }
+    .ach-diff-tag.master { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .ach-reward-tag { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; color: #facc15; }
+    .ach-card.claimable { border-color: #facc15; background: rgba(245, 158, 11, 0.16); box-shadow: 0 0 14px rgba(245, 158, 11, 0.25); cursor: pointer; }
+    .ach-card.claimed { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); }
+    .ach-claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: transform 0.1s ease, filter 0.1s ease; white-space: nowrap; }
+    .ach-claim-btn:active { transform: scale(0.96); filter: brightness(1.1); }
+
+    /* Game Over Score Card */
+    .game-over-score-card { display: flex; justify-content: center; gap: 16px; margin: 0 auto 20px; max-width: 280px; }
+    .game-over-score-item { flex: 1; background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 10px 8px; text-align: center; }
+    .game-over-score-label { display: block; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
+    .game-over-score-num { display: block; font-size: 26px; font-weight: 900; color: #38bdf8; font-variant-numeric: tabular-nums; line-height: 1.1; }
+    .game-over-score-item:last-child .game-over-score-num { color: #facc15; }
 
     /* Toast Notifications */
     #toast-container { position: fixed; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
@@ -434,6 +451,18 @@ const htmlContent = `<!DOCTYPE html>
     <div class="modal-card">
       <h2>Игра окончена!</h2>
       <p id="death-reason">Вас сбил автомобиль!</p>
+
+      <div class="game-over-score-card">
+        <div class="game-over-score-item">
+          <span class="game-over-score-label">СЧЁТ</span>
+          <span id="game-over-score-val" class="game-over-score-num">0</span>
+        </div>
+        <div class="game-over-score-item">
+          <span class="game-over-score-label">РЕКОРД</span>
+          <span id="game-over-best-val" class="game-over-score-num">0</span>
+        </div>
+      </div>
+
       <div class="menu-btn-stack">
         <button id="restart-btn" class="menu-btn menu-btn-primary">Играть снова</button>
         <button id="to-menu-btn" class="menu-btn menu-btn-secondary">Главное меню</button>

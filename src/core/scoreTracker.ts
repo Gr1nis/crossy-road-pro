@@ -70,6 +70,7 @@ interface SavedProfile {
   playerName?: string;
   playerRuns?: Array<Omit<LeaderboardEntry, 'rank'>>;
   unlockedAchievements?: AchievementId[];
+  claimedAchievements?: AchievementId[];
   trainsSurvived?: number;
   logsHopped?: number;
   gachaRolls?: number;
@@ -206,11 +207,19 @@ export class ScoreTracker {
         const loadedGacha = typeof data.gachaRolls === 'number' && Number.isFinite(data.gachaRolls) && data.gachaRolls >= 0
           ? Math.floor(data.gachaRolls)
           : 0;
-        this.achievements = new AchievementTracker(loadedAch, {
-          trains: loadedTrains,
-          logs: loadedLogs,
-          gacha: loadedGacha,
-        });
+        const loadedClaimed = Array.isArray(data.claimedAchievements)
+          ? (data.claimedAchievements.filter((id) => typeof id === 'string') as AchievementId[])
+          : [];
+        this.achievements = new AchievementTracker(
+          loadedAch,
+          {
+            trains: loadedTrains,
+            logs: loadedLogs,
+            gacha: loadedGacha,
+          },
+          undefined,
+          loadedClaimed
+        );
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -230,6 +239,7 @@ export class ScoreTracker {
         playerName: this.playerName,
         playerRuns: this.playerRuns,
         unlockedAchievements: this.achievements.getUnlockedIds(),
+        claimedAchievements: this.achievements.getClaimedIds(),
         trainsSurvived: this.achievements.getTrainsSurvived(),
         logsHopped: this.achievements.getLogsHopped(),
         gachaRolls: this.achievements.getGachaRolls(),
@@ -479,6 +489,19 @@ export class ScoreTracker {
 
   isAchievementUnlocked(id: AchievementId): boolean {
     return this.achievements.isUnlocked(id);
+  }
+
+  isAchievementClaimed(id: AchievementId): boolean {
+    return this.achievements.isClaimed(id);
+  }
+
+  claimAchievement(id: AchievementId): { success: boolean; rewardCoins: number } {
+    const res = this.achievements.claim(id);
+    if (res.success && res.rewardCoins > 0) {
+      this.wallet.addCoins(res.rewardCoins);
+      this.saveToStorage();
+    }
+    return res;
   }
 
   recordLogHopped(count: number = 1): number {

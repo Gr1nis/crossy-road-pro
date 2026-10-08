@@ -1,5 +1,5 @@
 import { ALL_SKINS } from '../core/types.ts';
-import type { Achievement } from '../core/achievements.ts';
+import type { Achievement, AchievementId } from '../core/achievements.ts';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -81,6 +81,8 @@ export class UIManager {
   private readonly achievementsListEl: HTMLElement | null;
 
   private readonly deathReasonEl: HTMLElement | null;
+  private readonly gameOverScoreValEl: HTMLElement | null;
+  private readonly gameOverBestValEl: HTMLElement | null;
   private readonly restartBtn: HTMLElement | null;
   private readonly toMenuBtn: HTMLElement | null;
 
@@ -138,6 +140,8 @@ export class UIManager {
     this.achievementsListEl = document.getElementById('achievements-list');
 
     this.deathReasonEl = document.getElementById('death-reason');
+    this.gameOverScoreValEl = document.getElementById('game-over-score-val');
+    this.gameOverBestValEl = document.getElementById('game-over-best-val');
     this.restartBtn = document.getElementById('restart-btn');
     this.toMenuBtn = document.getElementById('to-menu-btn');
 
@@ -225,9 +229,15 @@ export class UIManager {
     this.achievementsModal?.classList.add('hidden');
   }
 
-  showGameOver(reasonText: string): void {
+  showGameOver(reasonText: string, score = 0, highScore = 0): void {
     if (this.deathReasonEl) {
       this.deathReasonEl.textContent = reasonText;
+    }
+    if (this.gameOverScoreValEl) {
+      this.gameOverScoreValEl.textContent = String(score);
+    }
+    if (this.gameOverBestValEl) {
+      this.gameOverBestValEl.textContent = String(highScore);
     }
     this.gameOverModal?.classList.remove('hidden');
   }
@@ -435,7 +445,8 @@ export class UIManager {
 
   renderAchievements(
     achievements: Achievement[],
-    summary: { total: number; unlockedCount: number; percent: number }
+    summary: { total: number; unlockedCount: number; percent: number },
+    onClaim?: (id: AchievementId) => void
   ): void {
     this.updateAchievementsBadge(summary.unlockedCount, summary.total);
 
@@ -448,12 +459,34 @@ export class UIManager {
     if (!this.achievementsListEl) return;
     this.achievementsListEl.innerHTML = '';
 
+    const diffLabels: Record<string, string> = {
+      easy: 'Легко',
+      medium: 'Средне',
+      hard: 'Сложно',
+      master: 'Мастер',
+    };
+
     for (const ach of achievements) {
       const card = document.createElement('div');
-      card.className = `ach-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
-      const statusText = ach.unlocked
-        ? `✅ Открыто ${ach.unlockedAt ? '(' + ach.unlockedAt + ')' : ''}`
-        : '🔒 В процессе';
+      let cardClass = 'ach-card';
+      if (ach.canClaim) cardClass += ' unlocked claimable';
+      else if (ach.claimed) cardClass += ' unlocked claimed';
+      else if (ach.unlocked) cardClass += ' unlocked';
+      else cardClass += ' locked';
+      card.className = cardClass;
+
+      const diffText = diffLabels[ach.difficulty] ?? 'Легко';
+      let actionHtml = '';
+      if (ach.canClaim) {
+        actionHtml = `<button class="ach-claim-btn" type="button">Забрать +${ach.rewardCoins} 🪙</button>`;
+      } else if (ach.claimed) {
+        actionHtml = `<span class="ach-status-badge done">✅ Забрано</span>`;
+      } else if (ach.unlocked) {
+        actionHtml = `<span class="ach-status-badge done">✅ Открыто</span>`;
+      } else {
+        actionHtml = `<span class="ach-status-badge pending">🔒 В процессе</span>`;
+      }
+
       card.innerHTML = `
         <div class="ach-badge-col">
           <div class="ach-badge-icon">${ach.badge}</div>
@@ -461,7 +494,8 @@ export class UIManager {
         <div class="ach-info-col">
           <div class="ach-title-row">
             <span class="ach-title">${ach.title}</span>
-            <span class="ach-status-badge ${ach.unlocked ? 'done' : 'pending'}">${statusText}</span>
+            <span class="ach-diff-tag ${ach.difficulty}">${diffText}</span>
+            ${actionHtml}
           </div>
           <div class="ach-desc">${ach.description}</div>
           <div class="ach-progress-row">
@@ -469,9 +503,18 @@ export class UIManager {
               <div class="ach-progress-bar-fill ${ach.unlocked ? 'gold' : 'blue'}" style="width: ${ach.progressPercent}%;"></div>
             </div>
             <span class="ach-progress-num">${ach.currentProgress} / ${ach.maxProgress}</span>
+            <span class="ach-reward-tag">+${ach.rewardCoins} 🪙</span>
           </div>
         </div>
       `;
+
+      if (ach.canClaim && onClaim) {
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onClaim(ach.id);
+        });
+      }
+
       this.achievementsListEl.appendChild(card);
     }
   }

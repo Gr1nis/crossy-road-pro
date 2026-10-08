@@ -1,6 +1,7 @@
 import { GameEngine } from '../core/gameEngine.ts';
 import { RECORD_FLAG_X } from '../core/collision.ts';
 import { ALL_SKINS, DeathReason, MoveDirection, WORLD_CONFIG, type MoveDirectionValue, type SkinId } from '../core/types.ts';
+import type { AchievementId } from '../core/achievements.ts';
 import { AudioSynth } from '../view/audioSynth.ts';
 import { SceneManager } from '../view/sceneManager.ts';
 import { UIManager, UI_SKIN_RARITY, type UIActions } from './uiManager.ts';
@@ -216,7 +217,14 @@ export class GameLoop {
       }
     }
     const summary = tracker.getAchievementsSummary();
-    this.ui.renderAchievements(list, summary);
+    this.ui.renderAchievements(list, summary, (id: AchievementId) => {
+      const res = this.engine.claimAchievement(id);
+      if (res.success) {
+        this.audio.playCoin();
+        this.ui.showToast('🎁', 'Награда получена!', `+${res.rewardCoins} 🪙 зачислено на баланс!`);
+        this.updateMenuStats();
+      }
+    });
   }
 
   public updateMenuStats(): void {
@@ -308,7 +316,11 @@ export class GameLoop {
         this.audio.playCrash();
         this.sceneManager.triggerShake(p.deathReason === DeathReason.TRAIN ? 0.9 : 0.45);
       }
-      this.ui.showGameOver(DEATH_LABELS[p.deathReason] ?? 'Игра окончена');
+      this.ui.showGameOver(
+        DEATH_LABELS[p.deathReason] ?? 'Игра окончена',
+        currentScore,
+        this.engine.getHighScore()
+      );
       this.updateMenuStats();
       this.syncBackgroundMusic();
     }

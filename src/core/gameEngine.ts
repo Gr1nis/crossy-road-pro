@@ -9,6 +9,7 @@ import {
 } from './collision.ts';
 import { LaneGenerator } from './laneGenerator.ts';
 import { ScoreTracker } from './scoreTracker.ts';
+import type { AchievementId } from './achievements.ts';
 import {
   DeathReason,
   getBiomeForScore,
@@ -221,6 +222,10 @@ export class GameEngine {
 
   getScoreTracker(): ScoreTracker {
     return this.scoreTracker;
+  }
+
+  claimAchievement(id: AchievementId): { success: boolean; rewardCoins: number } {
+    return this.scoreTracker.claimAchievement(id);
   }
 
   rollGacha() {

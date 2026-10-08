@@ -94,4 +94,78 @@ describe('Adversarial TDD — Achievements System & Expansion', () => {
     const corrupted = AchievementTracker.deserialize('{ invalid json: true ]');
     assert.equal(corrupted.getSummary().unlockedCount, 0);
   });
+
+  it('Property 5: Difficulty ranking tiers and reward coins are assigned correctly for all 10 achievements', () => {
+    const tracker = new AchievementTracker();
+    const list = tracker.getAchievements();
+
+    const expectedTiers: Record<string, { difficulty: string; rewardCoins: number }> = {
+      first_50_steps: { difficulty: 'easy', rewardCoins: 25 },
+      gacha_roller: { difficulty: 'easy', rewardCoins: 25 },
+      river_navigator: { difficulty: 'easy', rewardCoins: 25 },
+      centurion: { difficulty: 'medium', rewardCoins: 50 },
+      rich_hopper: { difficulty: 'medium', rewardCoins: 50 },
+      speedy_crosser: { difficulty: 'medium', rewardCoins: 50 },
+      train_conqueror: { difficulty: 'hard', rewardCoins: 100 },
+      coin_hoarder: { difficulty: 'hard', rewardCoins: 100 },
+      collector: { difficulty: 'master', rewardCoins: 200 },
+      leaderboard_champion: { difficulty: 'master', rewardCoins: 200 },
+    };
+
+    for (const ach of list) {
+      const exp = expectedTiers[ach.id];
+      assert.ok(exp, `Achievement ${ach.id} must have expected tier`);
+      assert.equal(ach.difficulty, exp.difficulty, `${ach.id} difficulty must match`);
+      assert.equal(ach.rewardCoins, exp.rewardCoins, `${ach.id} rewardCoins must match`);
+      assert.equal(ach.claimed, false);
+      assert.equal(ach.canClaim, false);
+    }
+  });
+
+  it('Property 6: Claiming mechanic awards coins, prevents duplicate claims, and persists claimed state', () => {
+    const memory = new Map<string, string>();
+    const storage = {
+      getItem: (k: string) => memory.get(k) ?? null,
+      setItem: (k: string, v: string) => { memory.set(k, v); },
+      removeItem: (k: string) => { memory.delete(k); },
+    };
+
+    const tracker = new AchievementTracker();
+
+    // Locked achievement cannot be claimed
+    assert.equal(tracker.claim('first_50_steps').success, false);
+    assert.equal(tracker.isClaimed('first_50_steps'), false);
+
+    // Unlock achievement
+    assert.equal(tracker.unlock('first_50_steps'), true);
+    assert.equal(tracker.isUnlocked('first_50_steps'), true);
+    const unlList = tracker.getAchievements();
+    const first50 = unlList.find((a) => a.id === 'first_50_steps')!;
+    assert.equal(first50.unlocked, true);
+    assert.equal(first50.claimed, false);
+    assert.equal(first50.canClaim, true);
+
+    // First claim succeeds and awards 25 coins
+    const claimRes = tracker.claim('first_50_steps');
+    assert.equal(claimRes.success, true);
+    assert.equal(claimRes.rewardCoins, 25);
+    assert.equal(tracker.isClaimed('first_50_steps'), true);
+
+    const claimedList = tracker.getAchievements();
+    const claimedAch = claimedList.find((a) => a.id === 'first_50_steps')!;
+    assert.equal(claimedAch.claimed, true);
+    assert.equal(claimedAch.canClaim, false);
+
+    // Second claim fails (idempotent / no duplicate reward)
+    const secondClaim = tracker.claim('first_50_steps');
+    assert.equal(secondClaim.success, false);
+    assert.equal(secondClaim.rewardCoins, 0);
+
+    // Serialization preserves claimed IDs
+    const serialized = tracker.serialize();
+    const restored = AchievementTracker.deserialize(serialized);
+    assert.equal(restored.isUnlocked('first_50_steps'), true);
+    assert.equal(restored.isClaimed('first_50_steps'), true);
+    assert.equal(restored.claim('first_50_steps').success, false);
+  });
 });

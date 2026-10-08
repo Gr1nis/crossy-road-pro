@@ -10,13 +10,19 @@ export type AchievementId =
   | 'speedy_crosser'
   | 'leaderboard_champion';
 
+export type AchievementDifficulty = 'easy' | 'medium' | 'hard' | 'master';
+
 export interface Achievement {
   id: AchievementId;
   title: string;
   description: string;
   badge: string;
+  difficulty: AchievementDifficulty;
+  rewardCoins: number;
   unlocked: boolean;
   unlockedAt?: string;
+  claimed: boolean;
+  canClaim: boolean;
   currentProgress: number;
   maxProgress: number;
   progressPercent: number;
@@ -28,19 +34,21 @@ export interface AchievementDefinition {
   description: string;
   badge: string;
   maxProgress: number;
+  difficulty: AchievementDifficulty;
+  rewardCoins: number;
 }
 
 export const ACHIEVEMENT_DEFINITIONS: ReadonlyArray<AchievementDefinition> = [
-  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣', maxProgress: 50 },
-  { id: 'centurion', title: 'Центурион', description: 'Достигните 100 очков за один забег', badge: '🏛️', maxProgress: 100 },
-  { id: 'collector', title: 'Коллекционер', description: 'Откройте все 4 скина в Гача-автомате', badge: '🎭', maxProgress: 4 },
-  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆', maxProgress: 5 },
-  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰', maxProgress: 200 },
-  { id: 'coin_hoarder', title: 'Монетный магнат', description: 'Соберите 30 монет за один забег', badge: '🪙', maxProgress: 30 },
-  { id: 'gacha_roller', title: 'Азартный игрок', description: 'Совершите 3 прокрутки в Гача-автомате', badge: '🎰', maxProgress: 3 },
-  { id: 'river_navigator', title: 'Речной волк', description: 'Совершите 10 прыжков по брёвнам', badge: '🪵', maxProgress: 10 },
-  { id: 'speedy_crosser', title: 'Без оглядки', description: 'Сделайте 30 шагов вперед без движения назад', badge: '🏃', maxProgress: 30 },
-  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑', maxProgress: 1 },
+  { id: 'first_50_steps', title: 'Первые 50 шагов', description: 'Достигните 50 очков за один забег', badge: '👣', maxProgress: 50, difficulty: 'easy', rewardCoins: 25 },
+  { id: 'centurion', title: 'Центурион', description: 'Достигните 100 очков за один забег', badge: '🏛️', maxProgress: 100, difficulty: 'medium', rewardCoins: 50 },
+  { id: 'collector', title: 'Коллекционер', description: 'Откройте все 4 скина в Гача-автомате', badge: '🎭', maxProgress: 4, difficulty: 'master', rewardCoins: 200 },
+  { id: 'train_conqueror', title: 'Покоритель поездов', description: 'Переживите встречу с 5 скоростными поездами', badge: '🚆', maxProgress: 5, difficulty: 'hard', rewardCoins: 100 },
+  { id: 'rich_hopper', title: 'Золотой запас', description: 'Накопите 200 монет на балансе', badge: '💰', maxProgress: 200, difficulty: 'medium', rewardCoins: 50 },
+  { id: 'coin_hoarder', title: 'Монетный магнат', description: 'Соберите 30 монет за один забег', badge: '🪙', maxProgress: 30, difficulty: 'hard', rewardCoins: 100 },
+  { id: 'gacha_roller', title: 'Азартный игрок', description: 'Совершите 3 прокрутки в Гача-автомате', badge: '🎰', maxProgress: 3, difficulty: 'easy', rewardCoins: 25 },
+  { id: 'river_navigator', title: 'Речной волк', description: 'Совершите 10 прыжков по брёвнам', badge: '🪵', maxProgress: 10, difficulty: 'easy', rewardCoins: 25 },
+  { id: 'speedy_crosser', title: 'Без оглядки', description: 'Сделайте 30 шагов вперед без движения назад', badge: '🏃', maxProgress: 30, difficulty: 'medium', rewardCoins: 50 },
+  { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑', maxProgress: 1, difficulty: 'master', rewardCoins: 200 },
 ];
 
 export interface AchievementEvaluationContext {
@@ -57,6 +65,7 @@ export interface AchievementEvaluationContext {
 
 export class AchievementTracker {
   private unlocked = new Set<AchievementId>();
+  private claimed = new Set<AchievementId>();
   private dates = new Map<AchievementId, string>();
   private trainsSurvived = 0;
   private logsHopped = 0;
@@ -66,10 +75,14 @@ export class AchievementTracker {
   constructor(
     initialUnlocked: AchievementId[] = [],
     initialCounters: number | { trains?: number; logs?: number; gacha?: number } = {},
-    initialDates?: Record<AchievementId, string> | Map<AchievementId, string>
+    initialDates?: Record<AchievementId, string> | Map<AchievementId, string>,
+    initialClaimed: AchievementId[] = []
   ) {
     if (Array.isArray(initialUnlocked)) {
       for (const id of initialUnlocked) this.unlocked.add(id);
+    }
+    if (Array.isArray(initialClaimed)) {
+      for (const id of initialClaimed) this.claimed.add(id);
     }
     const counters = typeof initialCounters === 'number' ? { trains: initialCounters } : initialCounters;
     this.trainsSurvived = Math.max(0, Math.floor(counters.trains ?? 0));
@@ -88,6 +101,20 @@ export class AchievementTracker {
     return this.unlocked.has(id);
   }
 
+  isClaimed(id: AchievementId): boolean {
+    return this.claimed.has(id);
+  }
+
+  claim(id: AchievementId): { success: boolean; rewardCoins: number } {
+    if (!this.unlocked.has(id) || this.claimed.has(id)) {
+      return { success: false, rewardCoins: 0 };
+    }
+    const def = ACHIEVEMENT_DEFINITIONS.find((d) => d.id === id);
+    const rewardCoins = def ? def.rewardCoins : 0;
+    this.claimed.add(id);
+    return { success: true, rewardCoins };
+  }
+
   unlock(id: AchievementId, date?: string): boolean {
     if (this.unlocked.has(id)) return false;
     this.unlocked.add(id);
@@ -97,6 +124,10 @@ export class AchievementTracker {
 
   getUnlockedIds(): AchievementId[] {
     return Array.from(this.unlocked);
+  }
+
+  getClaimedIds(): AchievementId[] {
+    return Array.from(this.claimed);
   }
 
   getTrainsSurvived(): number { return this.trainsSurvived; }
@@ -127,6 +158,7 @@ export class AchievementTracker {
 
     return ACHIEVEMENT_DEFINITIONS.map((def) => {
       const isUnl = this.unlocked.has(def.id);
+      const isClm = this.claimed.has(def.id);
       let rawVal = 0;
       switch (def.id) {
         case 'first_50_steps': rawVal = Math.max(0, c.score ?? 0); break;
@@ -146,6 +178,8 @@ export class AchievementTracker {
         ...def,
         unlocked: isUnl,
         unlockedAt: this.dates.get(def.id),
+        claimed: isClm,
+        canClaim: isUnl && !isClm,
         currentProgress: cur,
         progressPercent: pct,
       };
@@ -186,6 +220,7 @@ export class AchievementTracker {
   serialize(): string {
     return JSON.stringify({
       unlocked: Array.from(this.unlocked),
+      claimed: Array.from(this.claimed),
       dates: Object.fromEntries(this.dates),
       trains: this.trainsSurvived,
       logs: this.logsHopped,
@@ -200,7 +235,8 @@ export class AchievementTracker {
       return new AchievementTracker(
         Array.isArray(data.unlocked) ? data.unlocked : [],
         { trains: data.trains, logs: data.logs, gacha: data.gacha },
-        data.dates
+        data.dates,
+        Array.isArray(data.claimed) ? data.claimed : []
       );
     } catch {
       return new AchievementTracker();
