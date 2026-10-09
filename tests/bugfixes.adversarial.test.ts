@@ -174,9 +174,9 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
         assert.ok(viewHeight >= 14 && viewHeight <= 16, `viewHeight must be 14-16 on mobile, got ${viewHeight}`);
       }
 
-      // On desktop (16/9): wide view (viewHeight ~ 22, halfWidth >= 10.5 to fit [-9..9])
+      // On desktop (16/9): zoomed desktop view (~1.3x zoom: viewHeight ~ 16.92, halfWidth >= 10.5 to fit [-9..9])
       if (aspect >= 16 / 9) {
-        assert.ok(viewHeight >= 20 && viewHeight <= 22, `viewHeight must be ~22 on desktop, got ${viewHeight}`);
+        assert.ok(viewHeight >= 16.5 && viewHeight <= 17.5, `viewHeight must be ~16.92 on desktop (1.3x zoom), got ${viewHeight}`);
         assert.ok(halfWidth >= 10.5, `halfWidth must be >= 10.5 on desktop to fit [-9..9], got ${halfWidth}`);
       }
 
@@ -189,7 +189,7 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
 
       // Aspect ratio must be isotropic (no stretching distortion)
       assert.ok(Math.abs((halfWidth * 2) / viewHeight - aspect) < 1e-9);
-      assert.equal(top - bottom, viewHeight);
+      assert.ok(Math.abs((top - bottom) - viewHeight) < 1e-9);
     }
 
     const meshFactorySrc = fs.readFileSync(
