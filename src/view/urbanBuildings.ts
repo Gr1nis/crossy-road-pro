@@ -183,6 +183,8 @@ export function createTownhouseC(): THREE.Group {
 }
 
 export function createUrbanTownhouse(seed: number, biome: BiomeType = 'forest'): THREE.Group {
+  const root = new THREE.Group();
+  root.name = 'urbanTownhouse';
   const variant = Math.abs(seed) % 3;
   let bldg: THREE.Group;
   if (variant === 0) bldg = createTownhouseA();
@@ -197,5 +199,10 @@ export function createUrbanTownhouse(seed: number, biome: BiomeType = 'forest'):
     snowCap.position.set(0, 3.82, 0);
     bldg.add(snowCap);
   }
-  return bldg;
+
+  // Center depth around Z=0 and scale so building fits strictly within 1 lane (depth 0.85 < 1.0)
+  bldg.position.z = -0.1325;
+  root.add(bldg);
+  root.scale.set(0.50, 0.50, 0.50);
+  return root;
 }
