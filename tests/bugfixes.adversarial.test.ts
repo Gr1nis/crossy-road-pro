@@ -174,9 +174,9 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
         assert.ok(viewHeight >= 14 && viewHeight <= 16, `viewHeight must be 14-16 on mobile, got ${viewHeight}`);
       }
 
-      // On desktop (16/9): zoomed desktop view (~1.3x zoom: viewHeight ~ 16.92, halfWidth >= 10.5 to fit [-9..9])
+      // On desktop (16/9): zoomed desktop view (viewHeight ~ 12.5, halfWidth >= 10.5 to fit [-9..9])
       if (aspect >= 16 / 9) {
-        assert.ok(viewHeight >= 16.5 && viewHeight <= 17.5, `viewHeight must be ~16.92 on desktop (1.3x zoom), got ${viewHeight}`);
+        assert.ok(viewHeight >= 12.0 && viewHeight <= 13.5, `viewHeight must be ~12.5 on desktop, got ${viewHeight}`);
         assert.ok(halfWidth >= 10.5, `halfWidth must be >= 10.5 on desktop to fit [-9..9], got ${halfWidth}`);
       }
 

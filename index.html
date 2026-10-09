@@ -564,7 +564,7 @@ function getRecordFlagPosition(
 }
 const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
-  DESKTOP_VIEW_HEIGHT: 16.92,
+  DESKTOP_VIEW_HEIGHT: 12.5,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
@@ -5123,7 +5123,7 @@ class SceneManager {
           let mesh             ;
           if (isBuilding) {
             mesh = MeshFactory.createTownhouse(seed, biome);
-            mesh.rotation.y = side === -1 ? -Math.PI * 0.75 : Math.PI * 0.75;
+            mesh.rotation.y = Math.PI;
           } else {
             const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
             mesh = MeshFactory.createObstacle(kind, seed, biome);

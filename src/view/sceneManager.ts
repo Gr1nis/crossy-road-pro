@@ -510,7 +510,7 @@ export class SceneManager {
           let mesh: THREE.Group;
           if (isBuilding) {
             mesh = MeshFactory.createTownhouse(seed, biome);
-            mesh.rotation.y = side === -1 ? -Math.PI * 0.75 : Math.PI * 0.75;
+            mesh.rotation.y = Math.PI;
           } else {
             const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
             mesh = MeshFactory.createObstacle(kind, seed, biome);
