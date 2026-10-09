@@ -200,9 +200,9 @@ export function createUrbanTownhouse(seed: number, biome: BiomeType = 'forest'):
     bldg.add(snowCap);
   }
 
-  // Center depth around Z=0 and scale so building fits strictly within 1 lane (depth 0.85 < 1.0)
+  // Center depth around Z=0 and scale so building spans across 2 lanes (depth ~1.62 < 2.0)
   bldg.position.z = -0.1325;
   root.add(bldg);
-  root.scale.set(0.50, 0.50, 0.50);
+  root.scale.set(0.95, 0.95, 0.95);
   return root;
 }

@@ -127,6 +127,7 @@ export class SceneManager {
   private currentViewHeight = 15.0;
   private recordFlagMesh: THREE.Group | null = null;
   private recordFlagRow: number | null = null;
+  private currentEngine: GameEngine | null = null;
 
   private disposeHierarchy(obj: THREE.Object3D): void {
     obj.traverse((child) => {
@@ -500,17 +501,33 @@ export class SceneManager {
     }
 
     if (lane.type === LaneType.GRASS) {
+      const nextLane = this.currentEngine?.getLane(lane.index + 1);
+      const prevLane = this.currentEngine?.getLane(lane.index - 1);
+      const hasRoomFor2Lane = nextLane?.type === LaneType.GRASS;
+      const prevHasBuilding =
+        prevLane?.type === LaneType.GRASS && Math.abs(lane.index - 1) % 4 === 0;
+
       for (const side of [-1, 1] as const) {
         const xStart = side === -1 ? -15 : 10;
         const xEnd   = side === -1 ? -10 : 15;
         let xCur = xStart + Math.abs((lane.index * 7) % 1.5);
         while (xCur < xEnd) {
+          const inBuildingZone = Math.abs(xCur) >= 11 && Math.abs(xCur) <= 13.5;
+
+          // If previous grass lane spawned a 2-lane townhouse here, skip so props do not clip inside it
+          if (prevHasBuilding && inBuildingZone) {
+            xCur += 2.0;
+            continue;
+          }
+
           const seed = lane.index * 31 + Math.round(xCur * 10);
-          const isBuilding = Math.abs(lane.index) % 4 === 0 && Math.abs(xCur) >= 11 && Math.abs(xCur) <= 13.5;
+          const isBuilding =
+            Math.abs(lane.index) % 4 === 0 && inBuildingZone && hasRoomFor2Lane;
           let mesh: THREE.Group;
           if (isBuilding) {
             mesh = MeshFactory.createTownhouse(seed, biome);
             mesh.rotation.y = Math.PI;
+            mesh.position.z = 0.5;
           } else {
             const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
             mesh = MeshFactory.createObstacle(kind, seed, biome);
@@ -606,6 +623,7 @@ export class SceneManager {
     this.dirLight.color.lerp(this.cachedDirColor, lerpFactor);
     this.dirLight.intensity += (targetAtmos.dirIntensity - this.dirLight.intensity) * lerpFactor;
 
+    this.currentEngine = engine;
     const activeLanes = engine.getActiveLanes();
     this.activeIndices.clear();
     const nowSec = performance.now() * 0.004;
@@ -811,6 +829,7 @@ export class SceneManager {
 
   clearAll(): void {
     this.currentCamX = 0;
+    this.currentEngine = null;
     this.removeRecordFlag();
     for (const rendered of this.renderedLanes.values()) {
       this.scene.remove(rendered.group);

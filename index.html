@@ -4514,10 +4514,10 @@ function createUrbanTownhouse(seed        , biome            = 'forest')        
     bldg.add(snowCap);
   }
 
-  // Center depth around Z=0 and scale so building fits strictly within 1 lane (depth 0.85 < 1.0)
+  // Center depth around Z=0 and scale so building spans across 2 lanes (depth ~1.62 < 2.0)
   bldg.position.z = -0.1325;
   root.add(bldg);
-  root.scale.set(0.50, 0.50, 0.50);
+  root.scale.set(0.95, 0.95, 0.95);
   return root;
 }
 
@@ -4747,6 +4747,7 @@ class SceneManager {
           currentViewHeight = 15.0;
           recordFlagMesh                     = null;
           recordFlagRow                = null;
+          currentEngine                    = null;
 
           disposeHierarchy(obj                )       {
     obj.traverse((child) => {
@@ -5120,17 +5121,33 @@ class SceneManager {
     }
 
     if (lane.type === LaneType.GRASS) {
+      const nextLane = this.currentEngine?.getLane(lane.index + 1);
+      const prevLane = this.currentEngine?.getLane(lane.index - 1);
+      const hasRoomFor2Lane = nextLane?.type === LaneType.GRASS;
+      const prevHasBuilding =
+        prevLane?.type === LaneType.GRASS && Math.abs(lane.index - 1) % 4 === 0;
+
       for (const side of [-1, 1]         ) {
         const xStart = side === -1 ? -15 : 10;
         const xEnd   = side === -1 ? -10 : 15;
         let xCur = xStart + Math.abs((lane.index * 7) % 1.5);
         while (xCur < xEnd) {
+          const inBuildingZone = Math.abs(xCur) >= 11 && Math.abs(xCur) <= 13.5;
+
+          // If previous grass lane spawned a 2-lane townhouse here, skip so props do not clip inside it
+          if (prevHasBuilding && inBuildingZone) {
+            xCur += 2.0;
+            continue;
+          }
+
           const seed = lane.index * 31 + Math.round(xCur * 10);
-          const isBuilding = Math.abs(lane.index) % 4 === 0 && Math.abs(xCur) >= 11 && Math.abs(xCur) <= 13.5;
+          const isBuilding =
+            Math.abs(lane.index) % 4 === 0 && inBuildingZone && hasRoomFor2Lane;
           let mesh             ;
           if (isBuilding) {
             mesh = MeshFactory.createTownhouse(seed, biome);
             mesh.rotation.y = Math.PI;
+            mesh.position.z = 0.5;
           } else {
             const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
             mesh = MeshFactory.createObstacle(kind, seed, biome);
@@ -5226,6 +5243,7 @@ class SceneManager {
     this.dirLight.color.lerp(this.cachedDirColor, lerpFactor);
     this.dirLight.intensity += (targetAtmos.dirIntensity - this.dirLight.intensity) * lerpFactor;
 
+    this.currentEngine = engine;
     const activeLanes = engine.getActiveLanes();
     this.activeIndices.clear();
     const nowSec = performance.now() * 0.004;
@@ -5431,6 +5449,7 @@ class SceneManager {
 
   clearAll()       {
     this.currentCamX = 0;
+    this.currentEngine = null;
     this.removeRecordFlag();
     for (const rendered of this.renderedLanes.values()) {
       this.scene.remove(rendered.group);
