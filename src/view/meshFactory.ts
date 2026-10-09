@@ -14,8 +14,13 @@ import {
   createUrbanTree,
 } from './urbanEnvironment.ts';
 import { createUrbanPallet, createUrbanTrain, createUrbanVehicle } from './urbanVehicles.ts';
+import { createUrbanTownhouse } from './urbanBuildings.ts';
 
 export class MeshFactory {
+  static createTownhouse(seedVariant: number, biome: BiomeType = 'forest'): THREE.Group {
+    return createUrbanTownhouse(seedVariant, biome);
+  }
+
   static createCharacter(skinId: SkinId = 'corgi', isGhost = false): THREE.Group {
     return createUrbanCharacter(skinId, isGhost);
   }

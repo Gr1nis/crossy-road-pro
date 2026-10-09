@@ -413,39 +413,48 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;const MoveDirection = {
+}         ;
+const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;const DeathReason = {
+}         ;
+const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;const DEFAULT_SKIN_ID         = 'corgi';const ALL_SKINS                                                             = [
+}         ;
+const DEFAULT_SKIN_ID         = 'corgi';
+const ALL_SKINS                                                             = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
   { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
-];const Biome = {
+];
+const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
   DESERT: 'desert',
   NEON: 'neon',
-}         ;const BIOME_ORDER                           = [
+}         ;
+const BIOME_ORDER                           = [
   Biome.FOREST,
   Biome.WINTER,
   Biome.DESERT,
   Biome.NEON,
-];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
+];
+const BIOME_INTERVAL = 25;
+function getBiomeForScore(score        )            {
   const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
   const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
   return BIOME_ORDER[biomeIndex];
-}const WORLD_CONFIG = {
+}
+const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -499,7 +508,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}function findSupportingLog(playerX        , logs               )                     {
+}
+function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -512,16 +522,19 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
  * relative to the center of the log, so the character cleanly magnets to a log section.
- */function snapToLogSlot(landingX        , log             )         {
+ */
+function snapToLogSlot(landingX        , log             )         {
   const rel = landingX - log.x;
   // Discrete 1.0-spaced slots centered on log
   const snappedRel = Math.round(rel);
   const maxRel = Math.max(0, (log.length - 1.0) / 2);
   const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
   return log.x + clampedRel;
-}function isOutOfBoundsX(playerX        )          {
+}
+function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}function quantizeLandX(x        )         {
+}
+function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -529,11 +542,15 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */function worldToScreenX(x        )         {
+ */
+function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
-}function vehicleScreenRotationY(speed        )         {
+}
+function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
-}const RECORD_FLAG_X = 3.8;function getRecordFlagPosition(
+}
+const RECORD_FLAG_X = 3.8;
+function getRecordFlagPosition(
   highScore        ,
   shoulderX         = RECORD_FLAG_X
 )                            {
@@ -544,14 +561,16 @@ function checkVehicleCollision(playerX        , vehicles           )            
     x: shoulderX,
     row: Math.floor(highScore),
   };
-}const CAMERA_CONFIG = {
+}
+const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
   DESKTOP_VIEW_HEIGHT: 22.0,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
   FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
-}         ;function getCameraFrustumDimensions(aspect         = 9 / 16)   
+}         ;
+function getCameraFrustumDimensions(aspect         = 9 / 16)   
                      
                     
                  
@@ -573,7 +592,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
  * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
  * of the player character under the isometric orthographic camera.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
- */function getCameraFrustumNdcY(
+ */
+function getCameraFrustumNdcY(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -596,7 +616,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Returns true when the player touches or crosses below the visible
  * bottom edge of the screen (NDC Y < -0.98).
- */function isPlayerBehindCameraFrustum(
+ */
+function isPlayerBehindCameraFrustum(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -723,13 +744,16 @@ const SkinRarity = {
   RARE: 'Rare',
   EPIC: 'Epic',
   LEGENDARY: 'Legendary',
-}         ;const GACHA_DUPLICATE_CASHBACK = 40;const SKIN_RARITY_MAP                                  = {
+}         ;
+const GACHA_DUPLICATE_CASHBACK = 40;
+const SKIN_RARITY_MAP                                  = {
   corgi: SkinRarity.COMMON,
   pigeon_pizza: SkinRarity.COMMON,
   box_cat: SkinRarity.RARE,
   raccoon_bandit: SkinRarity.EPIC,
   capybara_zen: SkinRarity.LEGENDARY,
-};const SKIN_RARITY_WEIGHTS                                  = {
+};
+const SKIN_RARITY_WEIGHTS                                  = {
   [SkinRarity.COMMON]: 50,
   [SkinRarity.RARE]: 30,
   [SkinRarity.EPIC]: 15,
@@ -755,7 +779,8 @@ function mulberry32(seed        )         {
 /**
  * GachaMachine handles skin rolls based on rarity weights, PRNG, and duplicates cashback.
  * Decoupled from storage, view, and game loop.
- */class GachaMachine {
+ */
+class GachaMachine {
   getSkinRarity(skinId        )                  {
     return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
   }
@@ -825,7 +850,8 @@ const ACHIEVEMENT_DEFINITIONS                                       = [
   { id: 'river_navigator', title: 'Речной волк', description: 'Совершите 10 прыжков по брёвнам', badge: '🪵', maxProgress: 10, difficulty: 'easy', rewardCoins: 25 },
   { id: 'speedy_crosser', title: 'Без оглядки', description: 'Сделайте 30 шагов вперед без движения назад', badge: '🏃', maxProgress: 30, difficulty: 'medium', rewardCoins: 50 },
   { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑', maxProgress: 1, difficulty: 'master', rewardCoins: 200 },
-];class AchievementTracker {
+];
+class AchievementTracker {
           unlocked = new Set               ();
           claimed = new Set               ();
           dates = new Map                       ();
@@ -1008,8 +1034,11 @@ const ACHIEVEMENT_DEFINITIONS                                       = [
 
 // --- Module: src/core/scoreTracker.ts ---
 // Re-exports for backward compatibility
+
 const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
-const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES = 10;const DEFAULT_BOT_RIVALS                                                = [
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';
+const MAX_LEADERBOARD_ENTRIES = 10;
+const DEFAULT_BOT_RIVALS                                                = [
   { playerName: 'CyberKaiser', score: 250, skinId: 'capybara_zen', date: '2026-09-20', isBot: true },
   { playerName: 'ArcticFlash', score: 210, skinId: 'raccoon_bandit', date: '2026-09-21', isBot: true },
   { playerName: 'NeonQuack', score: 175, skinId: 'box_cat', date: '2026-09-22', isBot: true },
@@ -1020,7 +1049,8 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES 
   { playerName: 'TurboCluck', score: 55, skinId: 'corgi', date: '2026-09-25', isBot: true },
   { playerName: 'TrainDodger', score: 35, skinId: 'box_cat', date: '2026-09-25', isBot: true },
   { playerName: 'RookieFeather', score: 18, skinId: 'pigeon_pizza', date: '2026-09-26', isBot: true },
-];class ScoreTracker {
+];
+class ScoreTracker {
           currentScore = 0;
           highScore = 0;
           bestRow = 0;
@@ -1475,7 +1505,8 @@ const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES 
 
 // --- Module: src/core/laneGenerator.ts ---
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
-const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGenerator {
+const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];
+class LaneGenerator {
                    baseSeed        ;
 
   constructor(seed         = 42) {
@@ -1644,7 +1675,8 @@ const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGener
 }
 
 // --- Module: src/core/gameEngine.ts ---
-const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
+const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;
+class GameEngine {
           generator               ;
           lanes = new Map              ();
           scoreTracker              ;
@@ -2820,7 +2852,8 @@ const VOXEL_PALETTE = {
   concreteGrey: 0x64748b,
   goldCoin: 0xfacc15,
   rubyRed: 0xb91c1c,
-}         ;class VoxelPalette {
+}         ;
+class VoxelPalette {
           static          geoCache = new Map                           ();
           static          matCache = new Map                                   ();
           static          basicMatCache = new Map                                 ();
@@ -2898,18 +2931,21 @@ for (const [w, h, d] of voxelStandardSizes) {
 for (const key of Object.keys(VOXEL_PALETTE)                   ) {
   VoxelPalette.getMaterial(key, false);
 }
-VoxelPalette.getGhostMaterial();function createVoxelMaterial(
+VoxelPalette.getGhostMaterial();
+function createVoxelMaterial(
   colorKey                        ,
   isGhost = false
 )                            {
   return VoxelPalette.getMaterial(colorKey, isGhost);
-}function createVoxelBasicMaterial(
+}
+function createVoxelBasicMaterial(
   color        ,
   transparent = false,
   opacity = 1.0
 )                          {
   return VoxelPalette.getBasicMaterial(color, transparent, opacity);
-}function createVoxelMesh(
+}
+function createVoxelMesh(
   w        ,
   h        ,
   d        ,
@@ -2942,7 +2978,8 @@ function addCharVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+}
+function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
   const group = new THREE.Group();
 
   if (skinId === 'corgi') {
@@ -3905,7 +3942,8 @@ function buildTrain()                   {
     [0.06, 0.08, 0.08, -6.90, 0.28, 0.32, taillight, true],
     [0.06, 0.08, 0.08, -6.90, 0.28, -0.32, taillight, true],
   ];
-}function createUrbanVehicle(
+}
+function createUrbanVehicle(
   vOrType                                                           ,
   speed         ,
   colorOverride         
@@ -3937,25 +3975,59 @@ function buildTrain()                   {
   buildUrbanVoxels(group, specs);
   group.rotation.y = vehicleScreenRotationY(spd);
   return group;
-}function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+}
+function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
   const group = new THREE.Group();
   buildUrbanVoxels(group, buildTrain());
   const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
   group.rotation.y = vehicleScreenRotationY(actualSpeed);
   return group;
-}function createUrbanPallet(log             )              {
+}
+function createUrbanPallet(log             )              {
   const group = new THREE.Group();
+  const timberColor = 0xd97706; // Light timber planks
+  const darkWood = 0x78350f;    // Stringers, blocks, stamp
+  const foamColor = 0xf8fafc;   // Water foam ripples
+  const waterColor = 0x0284c7;  // Submerged keel
+
   const specs                   = [
-    [log.length, 0.22, 0.74, 0, 0.02, 0, 0x854d0e],
-    [log.length + 0.04, 0.14, 0.54, 0, 0.02, 0, 0xfde047],
-    [0.36, 0.22, 0.68, -log.length * 0.38, -0.08, 0, 0x0284c7],
-    [0.36, 0.22, 0.68, log.length * 0.38, -0.08, 0, 0x0284c7],
+    // Submerged buoyancy keel
+    [log.length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
+    // White foam wake around floating pallet
+    [log.length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor, true, 0.85],
+    // 3 Longitudinal bottom skids
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, -0.28, darkWood],
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0, darkWood],
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0.28, darkWood],
   ];
 
+  // 9 Support spacer blocks along pallet length
+  const blockXPositions = [-log.length * 0.42, 0, log.length * 0.42];
+  for (const bx of blockXPositions) {
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, -0.28, darkWood]);
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, 0, darkWood]);
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, 0.28, darkWood]);
+  }
+
+  // 3 Cross stringer beams on top of blocks
+  for (const bx of blockXPositions) {
+    specs.push([0.10, 0.04, 0.72, bx, 0.10, 0, darkWood]);
+  }
+
+  // 5 Top longitudinal timber boards with realistic gaps (Ref: 20_euro_pallet_turnaround.jpg)
+  const boardZ = [-0.29, -0.15, 0, 0.15, 0.29];
+  for (const bz of boardZ) {
+    specs.push([log.length, 0.04, 0.11, 0, 0.14, bz, timberColor]);
+  }
+
+  // Burned wood 'PALLET' stamp brand on front board
+  specs.push([0.48, 0.042, 0.02, 0, 0.14, 0.35, darkWood]);
+
+  // Discrete 1.0-spaced slot notches for hop magnetism
   const slotCount = Math.floor(log.length);
   for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
     if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
-      specs.push([0.06, 0.24, 0.75, s, 0.02, 0, 0x582a08]);
+      specs.push([0.04, 0.045, 0.74, s, 0.14, 0, 0x92400e]);
     }
   }
 
@@ -3964,173 +4036,206 @@ function buildTrain()                   {
 }
 
 // --- Module: src/view/urbanEnvironment.ts ---
-function createUrbanTree(
-  seedVariant        ,
-  biomeOrSnow                      = false
-)              {
+/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */
+function createUrbanHydrant()              {
   const group = new THREE.Group();
-  const biome            =
-    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-  const absSeed = Math.abs(seedVariant);
+  const redMat = createVoxelMaterial(0xef4444);
+  const silverMat = createVoxelMaterial(0xcbd5e1);
 
-  if (biome === 'desert') {
-    const cactusMat = createVoxelMaterial(0x15803d);
-    const flowerMat = createVoxelMaterial(0xf43f5e);
-    group.add(createVoxelMesh(0.36, 1.35, 0.36, cactusMat, 0, 0.675, 0));
-    group.add(createVoxelMesh(0.24, 0.18, 0.22, cactusMat, -0.26, 0.65, 0));
-    group.add(createVoxelMesh(0.20, 0.42, 0.22, cactusMat, -0.34, 0.86, 0));
-    group.add(createVoxelMesh(0.24, 0.18, 0.22, cactusMat, 0.26, 0.82, 0));
-    group.add(createVoxelMesh(0.20, 0.38, 0.22, cactusMat, 0.34, 1.0, 0));
-    group.add(createVoxelMesh(0.16, 0.12, 0.16, flowerMat, 0, 1.4, 0));
-    return group;
+  // Flanged base, barrel, collar, domed cap & top square nut
+  group.add(
+    createVoxelMesh(0.44, 0.08, 0.44, redMat, 0, 0.04, 0),
+    createVoxelMesh(0.34, 0.44, 0.34, redMat, 0, 0.30, 0),
+    createVoxelMesh(0.40, 0.08, 0.40, redMat, 0, 0.48, 0),
+    createVoxelMesh(0.28, 0.14, 0.28, redMat, 0, 0.59, 0),
+    createVoxelMesh(0.10, 0.10, 0.10, silverMat, 0, 0.71, 0),
+    // Side & front nozzles
+    createVoxelMesh(0.14, 0.14, 0.16, redMat, -0.22, 0.34, 0),
+    createVoxelMesh(0.08, 0.10, 0.12, silverMat, -0.29, 0.34, 0),
+    createVoxelMesh(0.14, 0.14, 0.16, redMat, 0.22, 0.34, 0),
+    createVoxelMesh(0.08, 0.10, 0.12, silverMat, 0.29, 0.34, 0),
+    createVoxelMesh(0.16, 0.16, 0.14, redMat, 0, 0.34, 0.22),
+    createVoxelMesh(0.10, 0.10, 0.08, silverMat, 0, 0.34, 0.29)
+  );
+  return group;
+}
+
+/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */
+function createUrbanTrashCan()              {
+  const group = new THREE.Group();
+  const greenMat = createVoxelMaterial(0x15803d);
+  const darkMat = createVoxelMaterial(0x1e293b);
+  const whiteMat = createVoxelBasicMaterial(0xf8fafc);
+  const greyMat = createVoxelMaterial(0x64748b);
+
+  group.add(
+    createVoxelMesh(0.46, 0.52, 0.46, greenMat, 0, 0.33, 0),
+    createVoxelMesh(0.32, 0.08, 0.02, whiteMat, 0, 0.46, 0.24, false, false),
+    createVoxelMesh(0.52, 0.10, 0.52, greenMat, 0, 0.64, 0),
+    createVoxelMesh(0.26, 0.06, 0.16, greenMat, 0, 0.72, 0),
+    createVoxelMesh(0.08, 0.14, 0.14, darkMat, -0.22, 0.07, -0.16),
+    createVoxelMesh(0.08, 0.14, 0.14, darkMat, 0.22, 0.07, -0.16),
+    createVoxelMesh(0.08, 0.07, 0.08, darkMat, -0.18, 0.035, 0.16),
+    createVoxelMesh(0.08, 0.07, 0.08, darkMat, 0.18, 0.035, 0.16),
+    createVoxelMesh(0.06, 0.06, 0.18, greyMat, -0.25, 0.45, 0),
+    createVoxelMesh(0.06, 0.06, 0.18, greyMat, 0.25, 0.45, 0)
+  );
+  return group;
+}
+
+/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */
+function createUrbanBench()              {
+  const group = new THREE.Group();
+  const woodMat = createVoxelMaterial(0x854d0e);
+  const ironMat = createVoxelMaterial(0x1e293b);
+
+  // Cast iron legs & frame
+  for (const lx of [-0.34, 0.34]) {
+    group.add(createVoxelMesh(0.08, 0.22, 0.08, ironMat, lx, 0.11, 0.14)); // Front leg
+    group.add(createVoxelMesh(0.08, 0.54, 0.08, ironMat, lx, 0.27, -0.14)); // Rear upright
+    group.add(createVoxelMesh(0.06, 0.06, 0.36, ironMat, lx, 0.28, 0)); // Armrest
   }
+  // Seat slats (4 horizontal wooden slats)
+  for (let i = 0; i < 4; i++) {
+    const zPos = -0.10 + i * 0.09;
+    group.add(createVoxelMesh(0.84, 0.04, 0.07, woodMat, 0, 0.22, zPos));
+  }
+  // Backrest slats (3 horizontal wooden slats)
+  for (let i = 0; i < 3; i++) {
+    const yPos = 0.32 + i * 0.10;
+    group.add(createVoxelMesh(0.84, 0.08, 0.04, woodMat, 0, yPos, -0.14));
+  }
+  return group;
+}
 
-  const trunkColor = biome === 'neon' ? 0x1e1b4b : 0x78350f;
-  const trunkMat = createVoxelMaterial(trunkColor);
-  group.add(createVoxelMesh(0.36, 0.56, 0.36, trunkMat, 0, 0.28, 0));
+/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */
+function createUrbanLampPost()              {
+  const group = new THREE.Group();
+  const ironMat = createVoxelMaterial(0x0f172a);
+  const glowMat = createVoxelBasicMaterial(0xfef08a);
 
-  const isPine = absSeed % 2 === 1 || biome === 'winter';
+  // Stepped square base pedestal & slender pole
+  group.add(createVoxelMesh(0.34, 0.08, 0.34, ironMat, 0, 0.04, 0));
+  group.add(createVoxelMesh(0.26, 0.24, 0.26, ironMat, 0, 0.20, 0));
+  group.add(createVoxelMesh(0.10, 1.10, 0.10, ironMat, 0, 0.87, 0));
+  // Crossbar collar
+  group.add(createVoxelMesh(0.36, 0.06, 0.08, ironMat, 0, 1.34, 0));
+  group.add(createVoxelMesh(0.20, 0.06, 0.20, ironMat, 0, 1.45, 0));
+  // Glowing yellow lantern chamber & cap
+  group.add(createVoxelMesh(0.24, 0.30, 0.24, glowMat, 0, 1.63, 0, false, false));
+  group.add(createVoxelMesh(0.28, 0.06, 0.28, ironMat, 0, 1.81, 0));
+  group.add(createVoxelMesh(0.10, 0.08, 0.10, ironMat, 0, 1.88, 0));
+  return group;
+}
+
+/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */
+function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
+  const group = new THREE.Group();
+  const absSeed = Math.abs(seedVariant);
+  const boxMat = createVoxelMaterial(0x78350f);
+  const darkWood = createVoxelMaterial(0x451a03);
+  const trunkMat = createVoxelMaterial(0x854d0e);
+
   const leafColor =
     biome === 'winter'
       ? 0x0f766e
       : biome === 'neon'
-        ? absSeed % 2 === 0
-          ? 0x06b6d4
-          : 0xd946ef
-        : absSeed % 3 === 0
-          ? 0x16a34a
-          : absSeed % 3 === 1
-            ? 0x15803d
-            : 0x22c55e;
-  const leavesMat = createVoxelMaterial(leafColor);
+        ? absSeed % 2 === 0 ? 0x06b6d4 : 0xd946ef
+        : biome === 'desert' ? 0xa16207 : 0x16a34a;
+  const leafMat = createVoxelMaterial(leafColor);
+  const accentMat = createVoxelMaterial(biome === 'winter' ? 0xf8fafc : 0x4ade80);
 
-  if (isPine) {
-    group.add(createVoxelMesh(0.86, 0.46, 0.86, leavesMat, 0, 0.72, 0));
-    group.add(createVoxelMesh(0.66, 0.44, 0.66, leavesMat, 0, 1.10, 0));
-    group.add(createVoxelMesh(0.42, 0.38, 0.42, leavesMat, 0, 1.44, 0));
-    if (biome === 'winter') {
-      const snowMat = createVoxelMaterial(0xf8fafc);
-      group.add(createVoxelMesh(0.88, 0.08, 0.88, snowMat, 0, 0.96, 0));
-      group.add(createVoxelMesh(0.44, 0.12, 0.44, snowMat, 0, 1.65, 0));
-    }
-  } else {
-    const height = 0.85 + (absSeed % 3) * 0.22;
-    group.add(createVoxelMesh(0.82, height, 0.82, leavesMat, 0, 0.54 + height / 2, 0));
-    group.add(createVoxelMesh(0.56, 0.24, 0.56, leavesMat, 0, 0.54 + height + 0.1, 0));
-  }
-
+  group.add(
+    createVoxelMesh(0.64, 0.44, 0.64, boxMat, 0, 0.22, 0),
+    createVoxelMesh(0.68, 0.06, 0.68, darkWood, 0, 0.42, 0),
+    createVoxelMesh(0.54, 0.04, 0.54, leafMat, 0, 0.44, 0),
+    createVoxelMesh(0.16, 0.56, 0.16, trunkMat, 0, 0.70, 0),
+    createVoxelMesh(0.72, 0.80, 0.72, leafMat, 0, 1.34, 0),
+    createVoxelMesh(0.78, 0.64, 0.78, leafMat, 0, 1.34, 0),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, 0.20, 1.48, 0.40),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, -0.20, 1.25, 0.40),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, 0.40, 1.38, -0.15)
+  );
   return group;
-}function createUrbanRock(seedVariant        , biome            = 'forest')              {
+}
+
+/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */
+function createUrbanHedge(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
-  const isHydrant = absSeed % 3 === 0 && biome !== 'desert';
-
-  if (isHydrant) {
-    // City Cast-Iron Fire Hydrant
-    const hydrantMat = createVoxelMaterial(VOXEL_PALETTE.hydrantRed);
-    const nutMat = createVoxelMaterial(VOXEL_PALETTE.woodLight);
-    group.add(createVoxelMesh(0.36, 0.46, 0.36, hydrantMat, 0, 0.23, 0));
-    group.add(createVoxelMesh(0.48, 0.14, 0.24, hydrantMat, 0, 0.28, 0));
-    group.add(createVoxelMesh(0.26, 0.18, 0.26, hydrantMat, 0, 0.52, 0));
-    group.add(createVoxelMesh(0.12, 0.10, 0.12, nutMat, 0, 0.64, 0));
-    return group;
-  }
-
-  // Street concrete bollard or park boulder
-  const baseColor =
-    biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : VOXEL_PALETTE.concreteGrey;
-  const topColor =
-    biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x22d3ee : 0x94a3b8;
-  const baseMat = createVoxelMaterial(baseColor);
-  const topMat = createVoxelMaterial(topColor);
-
-  group.add(createVoxelMesh(0.76, 0.44, 0.72, baseMat, 0, 0.22, 0));
-  const shardX = absSeed % 2 === 0 ? -0.26 : 0.26;
-  group.add(createVoxelMesh(0.32, 0.30, 0.34, baseMat, shardX, 0.15, 0.18));
-  group.add(createVoxelMesh(0.52, 0.28, 0.48, topMat, (absSeed % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0));
-
-  return group;
-}function createUrbanBush(
-  seedVariant        ,
-  biomeOrSnow                      = false
-)              {
-  const group = new THREE.Group();
-  const biome            =
-    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-  const bushColor =
+  const hedgeColor =
     biome === 'winter'
       ? 0xdbeafe
-      : biome === 'desert'
-        ? 0xa16207
-        : biome === 'neon'
-          ? 0x7e22ce
-          : 0x22c55e;
-  const bushMat = createVoxelMaterial(bushColor);
-  const berryColor =
-    biome === 'neon' ? 0x06b6d4 : Math.abs(seedVariant) % 2 === 0 ? 0xef4444 : 0xf59e0b;
-  const berryMat = createVoxelMaterial(berryColor);
+      : biome === 'neon'
+        ? 0x7e22ce
+        : biome === 'desert' ? 0xb45309 : 0x84cc16;
+  const hedgeMat = createVoxelMaterial(hedgeColor);
+  const accentMat = createVoxelMaterial(biome === 'winter' ? 0xf8fafc : 0x4ade80);
 
-  group.add(createVoxelMesh(0.78, 0.46, 0.78, bushMat, 0, 0.23, 0));
-  group.add(createVoxelMesh(0.54, 0.22, 0.54, bushMat, 0, 0.52, 0));
-  group.add(createVoxelMesh(0.12, 0.12, 0.12, berryMat, -0.22, 0.46, 0.22));
-  group.add(createVoxelMesh(0.12, 0.12, 0.12, berryMat, 0.22, 0.42, -0.18));
-  group.add(createVoxelMesh(0.10, 0.10, 0.10, berryMat, 0.05, 0.62, 0.12));
-
+  // Stepped monolithic rectangular hedge block
+  group.add(createVoxelMesh(0.76, 0.06, 0.56, hedgeMat, 0, 0.03, 0));
+  group.add(createVoxelMesh(0.82, 0.52, 0.62, hedgeMat, 0, 0.29, 0));
+  group.add(createVoxelMesh(0.76, 0.08, 0.56, hedgeMat, 0, 0.58, 0));
+  // Leaf accent cubes
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, 0.18, 0.35, 0.32));
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, -0.22, 0.22, 0.32));
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, 0.10, 0.62, -0.12));
   return group;
-}function createUrbanObstacle(
+}
+
+/** Obstacle Dispatcher */
+function createUrbanObstacle(
   kind              ,
   seedVariant        ,
   biomeOrSnow                      = false
 )              {
   const biome            =
     typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-  if (kind === 'rock') return createUrbanRock(seedVariant, biome);
-  if (kind === 'bush') return createUrbanBush(seedVariant, biome);
-  return createUrbanTree(seedVariant, biome);
-}function createUrbanCoin()              {
+  const absSeed = Math.abs(seedVariant);
+
+  if (kind === 'rock') {
+    // 50% Fire Hydrant (Asset 16), 50% Green Street Trash Can (Asset 17)
+    return absSeed % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+  }
+  if (kind === 'bush') {
+    // 50% Park Wooden Bench (Asset 14), 50% Trimmed Cubic Bush Hedge (Asset 19)
+    return absSeed % 2 === 0 ? createUrbanBench() : createUrbanHedge(absSeed, biome);
+  }
+  // kind === 'tree':
+  // 60% Square Tree in Planter Box (Asset 18), 40% City Street Lamp Post (Asset 15)
+  return absSeed % 5 < 3
+    ? createUrbanTreePlanter(absSeed, biome)
+    : createUrbanLampPost();
+}
+function createUrbanCoin()              {
   const group = new THREE.Group();
   const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
   const innerMat = createVoxelMaterial(0xef4444);
-
   group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
   group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
   return group;
-}function createUrbanRailwaySignal()                                                {
+}
+function createUrbanRailwaySignal()                                                {
   const group = new THREE.Group();
   const poleMat = createVoxelMaterial(0x1e293b);
   const lightMat = createVoxelBasicMaterial(0x334155);
-
   group.add(createVoxelMesh(0.14, 1.20, 0.14, poleMat, 0, 0.60, 0));
   group.add(createVoxelMesh(0.36, 0.28, 0.24, poleMat, 0, 1.22, 0));
-
   const lightMesh = createVoxelMesh(0.22, 0.16, 0.28, lightMat, 0, 1.22, 0, false, false);
   group.add(lightMesh);
-
   return { group, lightMesh };
-}function createUrbanRoadMarkings()              {
+}
+function createUrbanRoadMarkings()              {
   const group = new THREE.Group();
   const whiteLineMat = createVoxelBasicMaterial(0xf8fafc);
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(-9.5), 0.015, 0, false, false));
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(9.5), 0.015, 0, false, false));
   return group;
-}function createUrbanLaneDivider()              {
+}
+function createUrbanRoadBarrier(biome            = 'forest')              {
   const group = new THREE.Group();
-  const dividerMat = createVoxelBasicMaterial(0xf8fafc);
-  const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
-
-  for (let x = -8.5; x <= 8.5; x += 1.6) {
-    const dash = new THREE.Mesh(dashGeo, dividerMat);
-    dash.position.set(x, 0.015, 0.5);
-    group.add(dash);
-  }
-
-  return group;
-}function createUrbanRoadBarrier(biome            = 'forest')              {
-  const group = new THREE.Group();
-  const postColor =
-    biome === 'neon' ? 0x1e1b4b : biome === 'desert' ? 0x78716c : biome === 'winter' ? 0x475569 : 0x64748b;
-  const railColor =
-    biome === 'neon' ? 0x06b6d4 : biome === 'desert' ? 0xd97706 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
+  const postColor = biome === 'neon' ? 0x1e1b4b : biome === 'winter' ? 0x475569 : 0x64748b;
+  const railColor = biome === 'neon' ? 0x06b6d4 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
   const reflectorColor = biome === 'neon' ? 0xec4899 : 0xfacc15;
 
   const postMat = createVoxelMaterial(postColor);
@@ -4142,17 +4247,15 @@ function createUrbanTree(
   group.add(createVoxelMesh(0.14, 0.18, 0.96, railMat, 0, 0.28, 0));
   group.add(createVoxelMesh(0.15, 0.08, 0.18, reflectorMat, 0, 0.28, 0, false, false));
   return group;
-}function createUrbanRiverbankEdge(
+}
+function createUrbanRiverbankEdge(
   side                  ,
   biome            = 'forest'
 )              {
   const group = new THREE.Group();
-  const woodColor =
-    biome === 'winter' ? 0x475569 : biome === 'desert' ? 0x92400e : biome === 'neon' ? 0x1e1b4b : 0x78350f;
-  const capColor =
-    biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x06b6d4 : 0x451a03;
-  const rockColor =
-    biome === 'winter' ? 0x94a3b8 : biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : 0x64748b;
+  const woodColor = biome === 'winter' ? 0x475569 : biome === 'neon' ? 0x1e1b4b : 0x78350f;
+  const capColor = biome === 'winter' ? 0xf1f5f9 : biome === 'neon' ? 0x06b6d4 : 0x451a03;
+  const rockColor = biome === 'winter' ? 0x94a3b8 : biome === 'neon' ? 0x312e81 : 0x64748b;
 
   const woodMat = createVoxelMaterial(woodColor);
   const capMat = createVoxelMaterial(capColor);
@@ -4160,13 +4263,12 @@ function createUrbanTree(
 
   group.add(createVoxelMesh(0.28, 0.44, 0.28, woodMat, 0, 0.16, -0.22));
   group.add(createVoxelMesh(0.32, 0.08, 0.32, capMat, 0, 0.40, -0.22));
-
   const bx = side === 'left' ? 0.2 : -0.2;
   group.add(createVoxelMesh(0.36, 0.22, 0.32, rockMat, bx, 0.07, 0.2));
   group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
-
   return group;
-}function createUrbanRecordFlag()              {
+}
+function createUrbanRecordFlag()              {
   const group = new THREE.Group();
   group.name = 'recordFlag';
 
@@ -4204,9 +4306,220 @@ function createUrbanTree(
   group.add(clothGroup);
   return group;
 }
+const createUrbanTree = (seedVariant        , biome                      )              =>
+  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
+const createUrbanRock = (seedVariant        , _biome            )              =>
+  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+const createUrbanBush = (seedVariant        , biome                      )              =>
+  Math.abs(seedVariant) % 2 === 0
+    ? createUrbanBench()
+    : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
+
+// --- Module: src/view/urbanBuildings.ts ---
+const buildingGeoCache = new Map                           ();
+const buildingMatCache = new Map                        ();
+
+function getBldgGeo(w        , h        , d        )                    {
+  const key = `${w.toFixed(2)}_${h.toFixed(2)}_${d.toFixed(2)}`;
+  let geo = buildingGeoCache.get(key);
+  if (!geo) {
+    geo = new THREE.BoxGeometry(w, h, d);
+    buildingGeoCache.set(key, geo);
+  }
+  return geo;
+}
+
+function getBldgMat(color        , basic = false)                 {
+  const key = `${color}_${basic ? 1 : 0}`;
+  let mat = buildingMatCache.get(key);
+  if (!mat) {
+    mat = basic
+      ? new THREE.MeshBasicMaterial({ color })
+      : new THREE.MeshLambertMaterial({ color });
+    buildingMatCache.set(key, mat);
+  }
+  return mat;
+}
+
+                                                                                    
+
+function buildVoxels(group             , specs             )       {
+  for (const [w, h, d, x, y, z, color, basic] of specs) {
+    const geo = getBldgGeo(w, h, d);
+    const mat = getBldgMat(color, basic ?? false);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+}
+
+/** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */
+function createTownhouseA()              {
+  const group = new THREE.Group();
+  const voxels              = [
+    // Foundation & 1st Floor
+    [1.60, 0.12, 1.40, 0, 0.06, 0, 0x94a3b8],
+    [1.50, 1.30, 1.30, 0, 0.77, 0, 0x2563eb],
+    [0.34, 0.90, 0.04, -0.42, 0.60, 0.66, 0x78350f],     // Door
+    [0.26, 0.40, 0.05, -0.42, 0.72, 0.665, 0xfef08a, true], // Door glass
+    [0.72, 0.70, 0.04, 0.26, 0.70, 0.66, 0xfef08a, true],  // Cafe window
+    [0.76, 0.08, 0.06, 0.26, 0.32, 0.67, 0x1e3a8a],
+    // Striped Awning (Red & White)
+    [0.86, 0.14, 0.36, 0.26, 1.15, 0.80, 0xdc2626],
+    [0.28, 0.15, 0.37, 0.26, 1.15, 0.80, 0xf8fafc],
+    // Sign 'CAFE'
+    [0.72, 0.24, 0.08, 0.26, 1.38, 0.68, 0x78350f],
+    [0.54, 0.14, 0.09, 0.26, 1.38, 0.68, 0xfef08a, true],
+    // Cornice Belt between 1st & 2nd floors
+    [1.62, 0.12, 1.42, 0, 1.50, 0, 0xf8fafc],
+    // 2nd Floor
+    [1.50, 1.20, 1.30, 0, 2.16, 0, 0x3b82f6],
+    [0.32, 0.60, 0.05, -0.38, 2.16, 0.66, 0xfef08a, true], // Window L
+    [0.36, 0.66, 0.03, -0.38, 2.16, 0.65, 0xf8fafc],
+    [0.32, 0.60, 0.05, 0.38, 2.16, 0.66, 0xfef08a, true],  // Window R
+    [0.36, 0.66, 0.03, 0.38, 2.16, 0.65, 0xf8fafc],
+    // Planter boxes under 2nd floor windows
+    [0.38, 0.12, 0.14, -0.38, 1.80, 0.70, 0x854d0e],
+    [0.32, 0.08, 0.10, -0.38, 1.88, 0.70, 0x16a34a],
+    [0.38, 0.12, 0.14, 0.38, 1.80, 0.70, 0x854d0e],
+    [0.32, 0.08, 0.10, 0.38, 1.88, 0.70, 0x16a34a],
+    // Roof cornice
+    [1.64, 0.14, 1.44, 0, 2.82, 0, 0xf8fafc],
+    // Mansard Roof (Terracotta Tiles)
+    [1.46, 0.85, 1.26, 0, 3.28, 0, 0xb45309],
+    [1.30, 0.20, 1.10, 0, 3.75, 0, 0x92400e],
+    // Dormer window on roof
+    [0.40, 0.38, 0.36, 0, 3.32, 0.58, 0x3b82f6],
+    [0.26, 0.24, 0.05, 0, 3.32, 0.76, 0xfef08a, true],
+    [0.44, 0.12, 0.38, 0, 3.55, 0.58, 0x92400e],
+    // Chimney
+    [0.22, 0.60, 0.22, -0.45, 3.85, -0.25, 0x64748b],
+    [0.26, 0.10, 0.26, -0.45, 4.18, -0.25, 0x475569],
+  ];
+  buildVoxels(group, voxels);
+  return group;
+}
+
+/** Townhouse B: Red Brick Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */
+function createTownhouseB()              {
+  const group = new THREE.Group();
+  const voxels              = [
+    // Base & 1st Floor
+    [1.60, 0.12, 1.40, 0, 0.06, 0, 0xfacc15],
+    [1.50, 1.30, 1.30, 0, 0.77, 0, 0xdc2626],
+    // Yellow quoin stones on corners
+    [0.14, 1.30, 0.14, -0.70, 0.77, 0.60, 0xfacc15],
+    [0.14, 1.30, 0.14, 0.70, 0.77, 0.60, 0xfacc15],
+    // Door
+    [0.34, 0.90, 0.04, -0.42, 0.60, 0.66, 0x78350f],
+    [0.26, 0.34, 0.05, -0.42, 0.75, 0.665, 0xfef08a, true],
+    // Bakery window & display
+    [0.74, 0.68, 0.04, 0.26, 0.71, 0.66, 0xfef08a, true],
+    // Awning (Red & White)
+    [0.86, 0.14, 0.36, 0.26, 1.15, 0.80, 0xef4444],
+    [0.30, 0.15, 0.37, 0.26, 1.15, 0.80, 0xf8fafc],
+    // Sign 'BAKERY'
+    [0.88, 0.26, 0.08, 0.22, 1.38, 0.68, 0x78350f],
+    [0.72, 0.16, 0.09, 0.22, 1.38, 0.68, 0xfef08a, true],
+    // Mid Cornice
+    [1.62, 0.14, 1.42, 0, 1.50, 0, 0xfacc15],
+    // 2nd Floor (Brick Red)
+    [1.50, 1.25, 1.30, 0, 2.18, 0, 0xb91c1c],
+    [0.14, 1.25, 0.14, -0.70, 2.18, 0.60, 0xfacc15],
+    [0.14, 1.25, 0.14, 0.70, 2.18, 0.60, 0xfacc15],
+    // 3 Arched Windows
+    [0.26, 0.60, 0.05, -0.42, 2.20, 0.66, 0xfef08a, true],
+    [0.30, 0.66, 0.03, -0.42, 2.20, 0.65, 0xfacc15],
+    [0.26, 0.60, 0.05, 0, 2.20, 0.66, 0xfef08a, true],
+    [0.30, 0.66, 0.03, 0, 2.20, 0.65, 0xfacc15],
+    [0.26, 0.60, 0.05, 0.42, 2.20, 0.66, 0xfef08a, true],
+    [0.30, 0.66, 0.03, 0.42, 2.20, 0.65, 0xfacc15],
+    // Roof Cornice & Stepped Parapet Balustrade
+    [1.64, 0.16, 1.44, 0, 2.86, 0, 0xfacc15],
+    [1.50, 0.40, 1.30, 0, 3.12, 0, 0xb91c1c],
+    [0.70, 0.36, 0.12, 0, 3.42, 0.60, 0xdc2626],
+    [0.40, 0.16, 0.06, 0, 3.42, 0.66, 0x38bdf8, true], // Top decorative attic arch
+    [0.76, 0.08, 0.14, 0, 3.62, 0.60, 0xfacc15],
+    // Double Chimneys
+    [0.24, 0.54, 0.24, 0.44, 3.50, -0.20, 0x991b1b],
+    [0.28, 0.10, 0.28, 0.44, 3.80, -0.20, 0x475569],
+  ];
+  buildVoxels(group, voxels);
+  return group;
+}
+
+/** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */
+function createTownhouseC()              {
+  const group = new THREE.Group();
+  const voxels              = [
+    // Base & 1st Floor
+    [1.56, 0.12, 1.40, 0, 0.06, 0, 0x854d0e],
+    [1.48, 1.30, 1.30, 0, 0.77, 0, 0x15803d],
+    // Door
+    [0.34, 0.90, 0.04, -0.40, 0.60, 0.66, 0x78350f],
+    [0.26, 0.36, 0.05, -0.40, 0.74, 0.665, 0xfef08a, true],
+    // Books Window with interior shelves
+    [0.74, 0.70, 0.04, 0.24, 0.70, 0.66, 0xfef08a, true],
+    [0.68, 0.20, 0.08, 0.24, 0.48, 0.67, 0x9333ea], // Books display
+    // Emerald Awning
+    [0.84, 0.14, 0.36, 0.24, 1.15, 0.80, 0x166534],
+    [0.26, 0.15, 0.37, 0.24, 1.15, 0.80, 0x4ade80],
+    // Sign 'BOOKS'
+    [0.82, 0.26, 0.08, 0.18, 1.38, 0.68, 0x14532d],
+    [0.68, 0.16, 0.09, 0.18, 1.38, 0.68, 0xa3e635, true],
+    // Vertical blade sign 'BOOKS' on corner
+    [0.10, 0.55, 0.24, -0.74, 1.80, 0.45, 0x78350f],
+    [0.08, 0.45, 0.20, -0.74, 1.80, 0.45, 0xa3e635, true],
+    // Mid Cornice
+    [1.58, 0.12, 1.42, 0, 1.48, 0, 0xdcfce7],
+    // 2nd Floor (Olive Green)
+    [1.48, 1.20, 1.30, 0, 2.14, 0, 0x16a34a],
+    // 3 Upper Windows
+    [0.24, 0.58, 0.05, -0.40, 2.15, 0.66, 0xfef08a, true],
+    [0.28, 0.64, 0.03, -0.40, 2.15, 0.65, 0xdcfce7],
+    [0.24, 0.58, 0.05, 0, 2.15, 0.66, 0xfef08a, true],
+    [0.28, 0.64, 0.03, 0, 2.15, 0.65, 0xdcfce7],
+    [0.24, 0.58, 0.05, 0.40, 2.15, 0.66, 0xfef08a, true],
+    [0.28, 0.64, 0.03, 0.40, 2.15, 0.65, 0xdcfce7],
+    // Gable Roof (Terracotta Tile Pitch)
+    [1.54, 0.14, 1.44, 0, 2.78, 0, 0xdcfce7],
+    [1.44, 0.60, 1.32, 0, 3.12, 0, 0xc2410c],
+    [1.24, 0.40, 1.20, 0, 3.52, 0, 0x9a3412],
+    [0.96, 0.24, 1.08, 0, 3.78, 0, 0x7c2d12],
+    // Chimney with terracotta pots
+    [0.26, 0.68, 0.26, 0.40, 3.72, -0.22, 0x854d0e],
+    [0.10, 0.16, 0.10, 0.36, 4.12, -0.22, 0xc2410c],
+    [0.10, 0.16, 0.10, 0.44, 4.12, -0.22, 0xc2410c],
+  ];
+  buildVoxels(group, voxels);
+  return group;
+}
+function createUrbanTownhouse(seed        , biome            = 'forest')              {
+  const variant = Math.abs(seed) % 3;
+  let bldg             ;
+  if (variant === 0) bldg = createTownhouseA();
+  else if (variant === 1) bldg = createTownhouseB();
+  else bldg = createTownhouseC();
+
+  // Special lighting or tinting for night / winter biomes if needed
+  if (biome === 'winter') {
+    const snowGeo = getBldgGeo(1.48, 0.08, 1.28);
+    const snowMat = getBldgMat(0xf8fafc);
+    const snowCap = new THREE.Mesh(snowGeo, snowMat);
+    snowCap.position.set(0, 3.82, 0);
+    bldg.add(snowCap);
+  }
+  return bldg;
+}
 
 // --- Module: src/view/meshFactory.ts ---
 class MeshFactory {
+  static createTownhouse(seedVariant        , biome            = 'forest')              {
+    return createUrbanTownhouse(seedVariant, biome);
+  }
+
   static createCharacter(skinId         = 'corgi', isGhost = false)              {
     return createUrbanCharacter(skinId, isGhost);
   }
@@ -4291,7 +4604,8 @@ class MeshFactory {
 }
 
 // --- Module: src/view/squashStretch.ts ---
-const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProgress        )                                      {
+const LANDING_BOUNCE_DURATION = 0.12;
+function calculateHopSquashStretch(hopProgress        )                                      {
   const progress = Math.max(0, Math.min(1, hopProgress));
 
   if (progress < 0.2) {
@@ -4321,7 +4635,8 @@ const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProg
     scaleY,
     scaleXZ,
   };
-}function calculateLandingBounce(elapsedSeconds        )                                      {
+}
+function calculateLandingBounce(elapsedSeconds        )                                      {
   const t = Math.max(0, Math.min(LANDING_BOUNCE_DURATION, elapsedSeconds));
   // Damped spring: smooth squash from impact with bouncy return to 1.0
   const scaleY = 1.0 - 0.18 * Math.exp(-t * 18) * Math.cos(t * 32);
@@ -4330,7 +4645,8 @@ const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProg
     scaleY,
     scaleXZ,
   };
-}function getDeathSquashScale(reason                           )                            {
+}
+function getDeathSquashScale(reason                           )                            {
   if (reason === DeathReason.CAR || reason === 'CAR') {
     return { scaleX: 1.65, scaleY: 0.1, scaleZ: 1.65 };
   }
@@ -4394,7 +4710,8 @@ const BIOME_ATMOSPHERES
     dirIntensity: 0.95,
     particleColor: 0xc084fc,
   },
-};class SceneManager {
+};
+class SceneManager {
           static          puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
           scene             ;
           camera                          ;
@@ -4802,11 +5119,18 @@ const BIOME_ATMOSPHERES
         let xCur = xStart + Math.abs((lane.index * 7) % 1.5);
         while (xCur < xEnd) {
           const seed = lane.index * 31 + Math.round(xCur * 10);
-          const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
-          const mesh = MeshFactory.createObstacle(kind, seed, biome);
+          const isBuilding = Math.abs(lane.index) % 4 === 0 && Math.abs(xCur) >= 11 && Math.abs(xCur) <= 13.5;
+          let mesh             ;
+          if (isBuilding) {
+            mesh = MeshFactory.createTownhouse(seed, biome);
+            mesh.rotation.y = side === -1 ? Math.PI / 2 : -Math.PI / 2;
+          } else {
+            const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
+            mesh = MeshFactory.createObstacle(kind, seed, biome);
+          }
           mesh.position.x = worldToScreenX(xCur);
           group.add(mesh);
-          const step = 1.2 + ((Math.abs(seed) % 100) / 100) * 0.3;
+          const step = isBuilding ? 2.0 : 1.2 + ((Math.abs(seed) % 100) / 100) * 0.3;
           xCur += step;
         }
       }
@@ -5125,7 +5449,8 @@ const UI_SKIN_RARITY                                                 = {
   box_cat: { label: 'Редкий', css: 'rarity-rare' },
   raccoon_bandit: { label: 'Эпический', css: 'rarity-epic' },
   capybara_zen: { label: 'Легендарный', css: 'rarity-legendary' },
-};class UIManager {
+};
+class UIManager {
   // HUD
                    scoreEl                    ;
                    coinsEl                    ;
@@ -5832,7 +6157,8 @@ const DEATH_LABELS                         = {
   [DeathReason.WATER]: 'Вы упали в бурную реку!',
   [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
   [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
-};class GameLoop {
+};
+class GameLoop {
          isPlaying = false;
          isPaused = false;
          wasDead = false;

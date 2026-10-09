@@ -16,6 +16,20 @@
    - Файл: `docs/references/urban_characters_vehicles.jpg`
    - Содержит: Корги, Пицца-Голубя, Кота в коробке, Енота-воришку, Дзен-Капибару, Желтое такси, Курьерский скутер с термосумкой, Автобус, Уборочную машину со щетками, Скоростной поезд метро.
 
+3. **Turnaround 3-View референс-листы уличной мебели и инфраструктуры**:
+   - `docs/references/14_park_bench_turnaround.jpg` — Парковая деревянная скамейка (Park Wooden Bench: 45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/15_street_lamp_turnaround.jpg` — Фонарный столб со светящимся плафоном (City Street Lamp Post: 45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/16_fire_hydrant_turnaround.jpg` — Чугунный пожарный гидрант (Cast-Iron Fire Hydrant: 45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/17_trash_can_turnaround.jpg` — Уличная зеленая урна (Green Street Trash Can: 45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/18_tree_planter_turnaround.jpg` — Дерево в деревянной кадке (Square Tree in Planter Box: 45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/19_cubic_hedge_turnaround.jpg` — Стриженая изгородь (Neat Trimmed Cubic Bush Hedge: 45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/20_euro_pallet_turnaround.jpg` — Деревянный европаллет на воде (Wooden Euro-Pallet on Water: 45° изометрия, вид сбоку, вид сверху).
+
+4. **Turnaround 3-View референс-листы модульных зданий-кулис**:
+   - `docs/references/11_townhouse_cafe_turnaround.jpg` — Modular Townhouse A: Синее кафе с мансардой (45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/12_townhouse_bakery_turnaround.jpg` — Modular Townhouse B: Красная кирпичная пекарня (45° изометрия, вид сбоку, вид спереди).
+   - `docs/references/13_townhouse_books_turnaround.jpg` — Modular Townhouse C: Зеленый книжный магазин (45° изометрия, вид сбоку, вид спереди).
+
 ---
 
 ## 📊 Матрица готовности ассетов
@@ -32,17 +46,19 @@
 | 8 | **Городской автобус** | Транспорт | (8) CITY BUS | ✅ Готово | `src/view/urbanVehicles.ts` |
 | 9 | **Уборочная машина** | Транспорт | (9) STREET SWEEPER | ✅ Готово | `src/view/urbanVehicles.ts` |
 | 10 | **Поезд-экспресс** | Транспорт | (10) BULLET TRAIN | ✅ Готово | `src/view/urbanVehicles.ts` |
-| 11 | **Пожарный гидрант** | Препятствие | CAST-IRON FIRE HYDRANT | ✅ Готово | `src/view/urbanEnvironment.ts` |
-| 12 | **Дерево в кадке** | Препятствие (`tree`) | SQUARE TREE IN PLANTER | ⏳ В плане | `src/view/urbanEnvironment.ts` |
-| 13 | **Парковый фонарь** | Препятствие (`tree`) | CITY STREET LAMP POST | ⏳ В плане | `src/view/urbanEnvironment.ts` |
-| 14 | **Стриженая изгородь** | Препятствие (`bush`) | TRIMMED CUBIC HEDGE | ⏳ В плане | `src/view/urbanEnvironment.ts` |
-| 15 | **Парковая скамейка** | Препятствие (`bush`) | PARK WOODEN BENCH | ⏳ В плане | `src/view/urbanEnvironment.ts` |
-| 16 | **Уличная урна** | Препятствие (`rock`) | GREEN STREET TRASH CAN | ⏳ В плане | `src/view/urbanEnvironment.ts` |
+| 11 | **Пожарный гидрант** | Препятствие | CAST-IRON FIRE HYDRANT (`16_fire_hydrant_turnaround.jpg`) | ✅ Готово | `src/view/urbanEnvironment.ts` |
+| 12 | **Дерево в кадке** | Препятствие (`tree`) | SQUARE TREE IN PLANTER (`18_tree_planter_turnaround.jpg`) | ✅ Готово | `src/view/urbanEnvironment.ts` |
+| 13 | **Парковый фонарь** | Препятствие (`tree`) | CITY STREET LAMP POST (`15_street_lamp_turnaround.jpg`) | ✅ Готово | `src/view/urbanEnvironment.ts` |
+| 14 | **Стриженая изгородь** | Препятствие (`bush`) | TRIMMED CUBIC HEDGE (`19_cubic_hedge_turnaround.jpg`) | ✅ Готово | `src/view/urbanEnvironment.ts` |
+| 15 | **Парковая скамейка** | Препятствие (`bush`) | PARK WOODEN BENCH (`14_park_bench_turnaround.jpg`) | ✅ Готово | `src/view/urbanEnvironment.ts` |
+| 16 | **Уличная урна** | Препятствие (`rock`) | GREEN STREET TRASH CAN (`17_trash_can_turnaround.jpg`) | ✅ Готово | `src/view/urbanEnvironment.ts` |
 | 17 | **Бетонный боллард** | Препятствие (`rock`) | CONCRETE BOLLARD | ⏳ В плане | `src/view/urbanEnvironment.ts` |
-| 18 | **Европаллет** | Водная платформа | WOODEN EURO-PALLET | ⏳ В плане | `src/view/urbanVehicles.ts` |
-| 19 | **Таунхаусы A, B, C** | Боковые кулисы | MODULAR TOWNHOUSES | ⏳ В плане | `src/view/urbanBuildings.ts` |
-| 20 | **Тротуар и бордюр** | Полоса дороги/пешеход | SIDEWALK & CURB | ⏳ В плане | `src/view/sceneManager.ts` |
-| 21 | **Набережная канала** | Полоса воды | CANAL EMBANKMENT | ⏳ В плане | `src/view/sceneManager.ts` |
+| 18 | **Европаллет** | Водная платформа | WOODEN EURO-PALLET (`20_euro_pallet_turnaround.jpg`) | ✅ Готово | `src/view/urbanVehicles.ts` |
+| 19 | **Таунхаус A (Синее кафе)** | Боковые кулисы | `11_townhouse_cafe_turnaround.jpg` | ✅ Готово | `src/view/urbanBuildings.ts` |
+| 20 | **Таунхаус B (Красная пекарня)** | Боковые кулисы | `12_townhouse_bakery_turnaround.jpg` | ✅ Готово | `src/view/urbanBuildings.ts` |
+| 21 | **Таунхаус C (Зеленый книжный)** | Боковые кулисы | `13_townhouse_books_turnaround.jpg` | ✅ Готово | `src/view/urbanBuildings.ts` |
+| 22 | **Тротуар и бордюр** | Полоса дороги/пешеход | SIDEWALK & CURB | ⏳ В плане | `src/view/sceneManager.ts` |
+| 23 | **Набережная канала** | Полоса воды | CANAL EMBANKMENT | ⏳ В плане | `src/view/sceneManager.ts` |
 
 
 ---
@@ -53,15 +69,15 @@
 
 ### 1. Модульные здания-таунхаусы для боковых кулис (`urbanBuildings.ts`)
 *Назначение*: Заменяют процедурный хвойный лес на обочинах ($|x| \in [10, 15]$ и $[-15, -10]$).
-- **Townhouse A (Синее кафе)**:
+- **Townhouse A (Синее кафе)** (`docs/references/11_townhouse_cafe_turnaround.jpg`):
   - 2 этажа, ширина 1.6, глубина 1.4, высота 3.8.
   - Первый этаж: синий фасад, полосатый красно-белый козырек (awning), светящаяся вывеска `CAFE`, входная дверь с витриной.
   - Второй этаж: 2 окна с белыми рамами и карнизами, цветочные ящики.
   - Крыша: мансардная черепичная крыша с люкарнами (dormers) и дымоходом.
-- **Townhouse B (Красная пекарня)**:
+- **Townhouse B (Красная пекарня)** (`docs/references/12_townhouse_bakery_turnaround.jpg`):
   - 2.5 этажа, ширина 1.6, глубина 1.4, высота 4.1.
   - Красно-желтая кирпичная кладка, вывеска `BAKERY`, полосатый тент, арочные окна с сандриками, плоская крыша с балюстрадой.
-- **Townhouse C (Зеленый книжный магазин)**:
+- **Townhouse C (Зеленый книжный магазин)** (`docs/references/13_townhouse_books_turnaround.jpg`):
   - 2 этажа, ширина 1.5, глубина 1.4, высота 3.6.
   - Оливково-зеленый фасад, зеленая маркиза, книжная витрина, вертикальная вывеска `BOOKS`, двускатная черепичная крыша.
 

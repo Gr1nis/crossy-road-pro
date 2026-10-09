@@ -506,11 +506,18 @@ export class SceneManager {
         let xCur = xStart + Math.abs((lane.index * 7) % 1.5);
         while (xCur < xEnd) {
           const seed = lane.index * 31 + Math.round(xCur * 10);
-          const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
-          const mesh = MeshFactory.createObstacle(kind, seed, biome);
+          const isBuilding = Math.abs(lane.index) % 4 === 0 && Math.abs(xCur) >= 11 && Math.abs(xCur) <= 13.5;
+          let mesh: THREE.Group;
+          if (isBuilding) {
+            mesh = MeshFactory.createTownhouse(seed, biome);
+            mesh.rotation.y = side === -1 ? Math.PI / 2 : -Math.PI / 2;
+          } else {
+            const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
+            mesh = MeshFactory.createObstacle(kind, seed, biome);
+          }
           mesh.position.x = worldToScreenX(xCur);
           group.add(mesh);
-          const step = 1.2 + ((Math.abs(seed) % 100) / 100) * 0.3;
+          const step = isBuilding ? 2.0 : 1.2 + ((Math.abs(seed) % 100) / 100) * 0.3;
           xCur += step;
         }
       }

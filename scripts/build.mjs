@@ -33,6 +33,7 @@ const moduleOrder = [
   'src/view/urbanCharacters.ts',
   'src/view/urbanVehicles.ts',
   'src/view/urbanEnvironment.ts',
+  'src/view/urbanBuildings.ts',
   'src/view/meshFactory.ts',
   'src/view/squashStretch.ts',
   'src/view/sceneManager.ts',

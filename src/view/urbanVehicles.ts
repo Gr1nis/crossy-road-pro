@@ -771,20 +771,53 @@ export function createUrbanTrain(lengthOrSpeed: number = -1, speed?: number): TH
 
 export function createUrbanPallet(log: LogPlatform): THREE.Group {
   const group = new THREE.Group();
+  const timberColor = 0xd97706; // Light timber planks
+  const darkWood = 0x78350f;    // Stringers, blocks, stamp
+  const foamColor = 0xf8fafc;   // Water foam ripples
+  const waterColor = 0x0284c7;  // Submerged keel
+
   const specs: UrbanVoxelSpec[] = [
-    [log.length, 0.22, 0.74, 0, 0.02, 0, 0x854d0e],
-    [log.length + 0.04, 0.14, 0.54, 0, 0.02, 0, 0xfde047],
-    [0.36, 0.22, 0.68, -log.length * 0.38, -0.08, 0, 0x0284c7],
-    [0.36, 0.22, 0.68, log.length * 0.38, -0.08, 0, 0x0284c7],
+    // Submerged buoyancy keel
+    [log.length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
+    // White foam wake around floating pallet
+    [log.length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor, true, 0.85],
+    // 3 Longitudinal bottom skids
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, -0.28, darkWood],
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0, darkWood],
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0.28, darkWood],
   ];
 
+  // 9 Support spacer blocks along pallet length
+  const blockXPositions = [-log.length * 0.42, 0, log.length * 0.42];
+  for (const bx of blockXPositions) {
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, -0.28, darkWood]);
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, 0, darkWood]);
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, 0.28, darkWood]);
+  }
+
+  // 3 Cross stringer beams on top of blocks
+  for (const bx of blockXPositions) {
+    specs.push([0.10, 0.04, 0.72, bx, 0.10, 0, darkWood]);
+  }
+
+  // 5 Top longitudinal timber boards with realistic gaps (Ref: 20_euro_pallet_turnaround.jpg)
+  const boardZ = [-0.29, -0.15, 0, 0.15, 0.29];
+  for (const bz of boardZ) {
+    specs.push([log.length, 0.04, 0.11, 0, 0.14, bz, timberColor]);
+  }
+
+  // Burned wood 'PALLET' stamp brand on front board
+  specs.push([0.48, 0.042, 0.02, 0, 0.14, 0.35, darkWood]);
+
+  // Discrete 1.0-spaced slot notches for hop magnetism
   const slotCount = Math.floor(log.length);
   for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
     if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
-      specs.push([0.06, 0.24, 0.75, s, 0.02, 0, 0x582a08]);
+      specs.push([0.04, 0.045, 0.74, s, 0.14, 0, 0x92400e]);
     }
   }
 
   buildUrbanVoxels(group, specs);
   return group;
 }
+

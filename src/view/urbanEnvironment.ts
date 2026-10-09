@@ -8,125 +8,154 @@ import {
   VOXEL_PALETTE,
 } from './voxelPalette.ts';
 
-export function createUrbanTree(
-  seedVariant: number,
-  biomeOrSnow: BiomeType | boolean = false
-): THREE.Group {
+/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */
+export function createUrbanHydrant(): THREE.Group {
   const group = new THREE.Group();
-  const biome: BiomeType =
-    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-  const absSeed = Math.abs(seedVariant);
+  const redMat = createVoxelMaterial(0xef4444);
+  const silverMat = createVoxelMaterial(0xcbd5e1);
 
-  if (biome === 'desert') {
-    const cactusMat = createVoxelMaterial(0x15803d);
-    const flowerMat = createVoxelMaterial(0xf43f5e);
-    group.add(createVoxelMesh(0.36, 1.35, 0.36, cactusMat, 0, 0.675, 0));
-    group.add(createVoxelMesh(0.24, 0.18, 0.22, cactusMat, -0.26, 0.65, 0));
-    group.add(createVoxelMesh(0.20, 0.42, 0.22, cactusMat, -0.34, 0.86, 0));
-    group.add(createVoxelMesh(0.24, 0.18, 0.22, cactusMat, 0.26, 0.82, 0));
-    group.add(createVoxelMesh(0.20, 0.38, 0.22, cactusMat, 0.34, 1.0, 0));
-    group.add(createVoxelMesh(0.16, 0.12, 0.16, flowerMat, 0, 1.4, 0));
-    return group;
+  // Flanged base, barrel, collar, domed cap & top square nut
+  group.add(
+    createVoxelMesh(0.44, 0.08, 0.44, redMat, 0, 0.04, 0),
+    createVoxelMesh(0.34, 0.44, 0.34, redMat, 0, 0.30, 0),
+    createVoxelMesh(0.40, 0.08, 0.40, redMat, 0, 0.48, 0),
+    createVoxelMesh(0.28, 0.14, 0.28, redMat, 0, 0.59, 0),
+    createVoxelMesh(0.10, 0.10, 0.10, silverMat, 0, 0.71, 0),
+    // Side & front nozzles
+    createVoxelMesh(0.14, 0.14, 0.16, redMat, -0.22, 0.34, 0),
+    createVoxelMesh(0.08, 0.10, 0.12, silverMat, -0.29, 0.34, 0),
+    createVoxelMesh(0.14, 0.14, 0.16, redMat, 0.22, 0.34, 0),
+    createVoxelMesh(0.08, 0.10, 0.12, silverMat, 0.29, 0.34, 0),
+    createVoxelMesh(0.16, 0.16, 0.14, redMat, 0, 0.34, 0.22),
+    createVoxelMesh(0.10, 0.10, 0.08, silverMat, 0, 0.34, 0.29)
+  );
+  return group;
+}
+
+/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */
+export function createUrbanTrashCan(): THREE.Group {
+  const group = new THREE.Group();
+  const greenMat = createVoxelMaterial(0x15803d);
+  const darkMat = createVoxelMaterial(0x1e293b);
+  const whiteMat = createVoxelBasicMaterial(0xf8fafc);
+  const greyMat = createVoxelMaterial(0x64748b);
+
+  group.add(
+    createVoxelMesh(0.46, 0.52, 0.46, greenMat, 0, 0.33, 0),
+    createVoxelMesh(0.32, 0.08, 0.02, whiteMat, 0, 0.46, 0.24, false, false),
+    createVoxelMesh(0.52, 0.10, 0.52, greenMat, 0, 0.64, 0),
+    createVoxelMesh(0.26, 0.06, 0.16, greenMat, 0, 0.72, 0),
+    createVoxelMesh(0.08, 0.14, 0.14, darkMat, -0.22, 0.07, -0.16),
+    createVoxelMesh(0.08, 0.14, 0.14, darkMat, 0.22, 0.07, -0.16),
+    createVoxelMesh(0.08, 0.07, 0.08, darkMat, -0.18, 0.035, 0.16),
+    createVoxelMesh(0.08, 0.07, 0.08, darkMat, 0.18, 0.035, 0.16),
+    createVoxelMesh(0.06, 0.06, 0.18, greyMat, -0.25, 0.45, 0),
+    createVoxelMesh(0.06, 0.06, 0.18, greyMat, 0.25, 0.45, 0)
+  );
+  return group;
+}
+
+/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */
+export function createUrbanBench(): THREE.Group {
+  const group = new THREE.Group();
+  const woodMat = createVoxelMaterial(0x854d0e);
+  const ironMat = createVoxelMaterial(0x1e293b);
+
+  // Cast iron legs & frame
+  for (const lx of [-0.34, 0.34]) {
+    group.add(createVoxelMesh(0.08, 0.22, 0.08, ironMat, lx, 0.11, 0.14)); // Front leg
+    group.add(createVoxelMesh(0.08, 0.54, 0.08, ironMat, lx, 0.27, -0.14)); // Rear upright
+    group.add(createVoxelMesh(0.06, 0.06, 0.36, ironMat, lx, 0.28, 0)); // Armrest
   }
+  // Seat slats (4 horizontal wooden slats)
+  for (let i = 0; i < 4; i++) {
+    const zPos = -0.10 + i * 0.09;
+    group.add(createVoxelMesh(0.84, 0.04, 0.07, woodMat, 0, 0.22, zPos));
+  }
+  // Backrest slats (3 horizontal wooden slats)
+  for (let i = 0; i < 3; i++) {
+    const yPos = 0.32 + i * 0.10;
+    group.add(createVoxelMesh(0.84, 0.08, 0.04, woodMat, 0, yPos, -0.14));
+  }
+  return group;
+}
 
-  const trunkColor = biome === 'neon' ? 0x1e1b4b : 0x78350f;
-  const trunkMat = createVoxelMaterial(trunkColor);
-  group.add(createVoxelMesh(0.36, 0.56, 0.36, trunkMat, 0, 0.28, 0));
+/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */
+export function createUrbanLampPost(): THREE.Group {
+  const group = new THREE.Group();
+  const ironMat = createVoxelMaterial(0x0f172a);
+  const glowMat = createVoxelBasicMaterial(0xfef08a);
 
-  const isPine = absSeed % 2 === 1 || biome === 'winter';
+  // Stepped square base pedestal & slender pole
+  group.add(createVoxelMesh(0.34, 0.08, 0.34, ironMat, 0, 0.04, 0));
+  group.add(createVoxelMesh(0.26, 0.24, 0.26, ironMat, 0, 0.20, 0));
+  group.add(createVoxelMesh(0.10, 1.10, 0.10, ironMat, 0, 0.87, 0));
+  // Crossbar collar
+  group.add(createVoxelMesh(0.36, 0.06, 0.08, ironMat, 0, 1.34, 0));
+  group.add(createVoxelMesh(0.20, 0.06, 0.20, ironMat, 0, 1.45, 0));
+  // Glowing yellow lantern chamber & cap
+  group.add(createVoxelMesh(0.24, 0.30, 0.24, glowMat, 0, 1.63, 0, false, false));
+  group.add(createVoxelMesh(0.28, 0.06, 0.28, ironMat, 0, 1.81, 0));
+  group.add(createVoxelMesh(0.10, 0.08, 0.10, ironMat, 0, 1.88, 0));
+  return group;
+}
+
+/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */
+export function createUrbanTreePlanter(seedVariant: number, biome: BiomeType = 'forest'): THREE.Group {
+  const group = new THREE.Group();
+  const absSeed = Math.abs(seedVariant);
+  const boxMat = createVoxelMaterial(0x78350f);
+  const darkWood = createVoxelMaterial(0x451a03);
+  const trunkMat = createVoxelMaterial(0x854d0e);
+
   const leafColor =
     biome === 'winter'
       ? 0x0f766e
       : biome === 'neon'
-        ? absSeed % 2 === 0
-          ? 0x06b6d4
-          : 0xd946ef
-        : absSeed % 3 === 0
-          ? 0x16a34a
-          : absSeed % 3 === 1
-            ? 0x15803d
-            : 0x22c55e;
-  const leavesMat = createVoxelMaterial(leafColor);
+        ? absSeed % 2 === 0 ? 0x06b6d4 : 0xd946ef
+        : biome === 'desert' ? 0xa16207 : 0x16a34a;
+  const leafMat = createVoxelMaterial(leafColor);
+  const accentMat = createVoxelMaterial(biome === 'winter' ? 0xf8fafc : 0x4ade80);
 
-  if (isPine) {
-    group.add(createVoxelMesh(0.86, 0.46, 0.86, leavesMat, 0, 0.72, 0));
-    group.add(createVoxelMesh(0.66, 0.44, 0.66, leavesMat, 0, 1.10, 0));
-    group.add(createVoxelMesh(0.42, 0.38, 0.42, leavesMat, 0, 1.44, 0));
-    if (biome === 'winter') {
-      const snowMat = createVoxelMaterial(0xf8fafc);
-      group.add(createVoxelMesh(0.88, 0.08, 0.88, snowMat, 0, 0.96, 0));
-      group.add(createVoxelMesh(0.44, 0.12, 0.44, snowMat, 0, 1.65, 0));
-    }
-  } else {
-    const height = 0.85 + (absSeed % 3) * 0.22;
-    group.add(createVoxelMesh(0.82, height, 0.82, leavesMat, 0, 0.54 + height / 2, 0));
-    group.add(createVoxelMesh(0.56, 0.24, 0.56, leavesMat, 0, 0.54 + height + 0.1, 0));
-  }
-
+  group.add(
+    createVoxelMesh(0.64, 0.44, 0.64, boxMat, 0, 0.22, 0),
+    createVoxelMesh(0.68, 0.06, 0.68, darkWood, 0, 0.42, 0),
+    createVoxelMesh(0.54, 0.04, 0.54, leafMat, 0, 0.44, 0),
+    createVoxelMesh(0.16, 0.56, 0.16, trunkMat, 0, 0.70, 0),
+    createVoxelMesh(0.72, 0.80, 0.72, leafMat, 0, 1.34, 0),
+    createVoxelMesh(0.78, 0.64, 0.78, leafMat, 0, 1.34, 0),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, 0.20, 1.48, 0.40),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, -0.20, 1.25, 0.40),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, 0.40, 1.38, -0.15)
+  );
   return group;
 }
 
-export function createUrbanRock(seedVariant: number, biome: BiomeType = 'forest'): THREE.Group {
+/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */
+export function createUrbanHedge(seedVariant: number, biome: BiomeType = 'forest'): THREE.Group {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
-  const isHydrant = absSeed % 3 === 0 && biome !== 'desert';
-
-  if (isHydrant) {
-    // City Cast-Iron Fire Hydrant
-    const hydrantMat = createVoxelMaterial(VOXEL_PALETTE.hydrantRed);
-    const nutMat = createVoxelMaterial(VOXEL_PALETTE.woodLight);
-    group.add(createVoxelMesh(0.36, 0.46, 0.36, hydrantMat, 0, 0.23, 0));
-    group.add(createVoxelMesh(0.48, 0.14, 0.24, hydrantMat, 0, 0.28, 0));
-    group.add(createVoxelMesh(0.26, 0.18, 0.26, hydrantMat, 0, 0.52, 0));
-    group.add(createVoxelMesh(0.12, 0.10, 0.12, nutMat, 0, 0.64, 0));
-    return group;
-  }
-
-  // Street concrete bollard or park boulder
-  const baseColor =
-    biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : VOXEL_PALETTE.concreteGrey;
-  const topColor =
-    biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x22d3ee : 0x94a3b8;
-  const baseMat = createVoxelMaterial(baseColor);
-  const topMat = createVoxelMaterial(topColor);
-
-  group.add(createVoxelMesh(0.76, 0.44, 0.72, baseMat, 0, 0.22, 0));
-  const shardX = absSeed % 2 === 0 ? -0.26 : 0.26;
-  group.add(createVoxelMesh(0.32, 0.30, 0.34, baseMat, shardX, 0.15, 0.18));
-  group.add(createVoxelMesh(0.52, 0.28, 0.48, topMat, (absSeed % 2 === 0 ? 1 : -1) * 0.06, 0.54, 0));
-
-  return group;
-}
-
-export function createUrbanBush(
-  seedVariant: number,
-  biomeOrSnow: BiomeType | boolean = false
-): THREE.Group {
-  const group = new THREE.Group();
-  const biome: BiomeType =
-    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-  const bushColor =
+  const hedgeColor =
     biome === 'winter'
       ? 0xdbeafe
-      : biome === 'desert'
-        ? 0xa16207
-        : biome === 'neon'
-          ? 0x7e22ce
-          : 0x22c55e;
-  const bushMat = createVoxelMaterial(bushColor);
-  const berryColor =
-    biome === 'neon' ? 0x06b6d4 : Math.abs(seedVariant) % 2 === 0 ? 0xef4444 : 0xf59e0b;
-  const berryMat = createVoxelMaterial(berryColor);
+      : biome === 'neon'
+        ? 0x7e22ce
+        : biome === 'desert' ? 0xb45309 : 0x84cc16;
+  const hedgeMat = createVoxelMaterial(hedgeColor);
+  const accentMat = createVoxelMaterial(biome === 'winter' ? 0xf8fafc : 0x4ade80);
 
-  group.add(createVoxelMesh(0.78, 0.46, 0.78, bushMat, 0, 0.23, 0));
-  group.add(createVoxelMesh(0.54, 0.22, 0.54, bushMat, 0, 0.52, 0));
-  group.add(createVoxelMesh(0.12, 0.12, 0.12, berryMat, -0.22, 0.46, 0.22));
-  group.add(createVoxelMesh(0.12, 0.12, 0.12, berryMat, 0.22, 0.42, -0.18));
-  group.add(createVoxelMesh(0.10, 0.10, 0.10, berryMat, 0.05, 0.62, 0.12));
-
+  // Stepped monolithic rectangular hedge block
+  group.add(createVoxelMesh(0.76, 0.06, 0.56, hedgeMat, 0, 0.03, 0));
+  group.add(createVoxelMesh(0.82, 0.52, 0.62, hedgeMat, 0, 0.29, 0));
+  group.add(createVoxelMesh(0.76, 0.08, 0.56, hedgeMat, 0, 0.58, 0));
+  // Leaf accent cubes
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, 0.18, 0.35, 0.32));
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, -0.22, 0.22, 0.32));
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, 0.10, 0.62, -0.12));
   return group;
 }
 
+/** Obstacle Dispatcher */
 export function createUrbanObstacle(
   kind: ObstacleKind,
   seedVariant: number,
@@ -134,16 +163,27 @@ export function createUrbanObstacle(
 ): THREE.Group {
   const biome: BiomeType =
     typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
-  if (kind === 'rock') return createUrbanRock(seedVariant, biome);
-  if (kind === 'bush') return createUrbanBush(seedVariant, biome);
-  return createUrbanTree(seedVariant, biome);
+  const absSeed = Math.abs(seedVariant);
+
+  if (kind === 'rock') {
+    // 50% Fire Hydrant (Asset 16), 50% Green Street Trash Can (Asset 17)
+    return absSeed % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+  }
+  if (kind === 'bush') {
+    // 50% Park Wooden Bench (Asset 14), 50% Trimmed Cubic Bush Hedge (Asset 19)
+    return absSeed % 2 === 0 ? createUrbanBench() : createUrbanHedge(absSeed, biome);
+  }
+  // kind === 'tree':
+  // 60% Square Tree in Planter Box (Asset 18), 40% City Street Lamp Post (Asset 15)
+  return absSeed % 5 < 3
+    ? createUrbanTreePlanter(absSeed, biome)
+    : createUrbanLampPost();
 }
 
 export function createUrbanCoin(): THREE.Group {
   const group = new THREE.Group();
   const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
   const innerMat = createVoxelMaterial(0xef4444);
-
   group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
   group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
   return group;
@@ -153,13 +193,10 @@ export function createUrbanRailwaySignal(): { group: THREE.Group; lightMesh: THR
   const group = new THREE.Group();
   const poleMat = createVoxelMaterial(0x1e293b);
   const lightMat = createVoxelBasicMaterial(0x334155);
-
   group.add(createVoxelMesh(0.14, 1.20, 0.14, poleMat, 0, 0.60, 0));
   group.add(createVoxelMesh(0.36, 0.28, 0.24, poleMat, 0, 1.22, 0));
-
   const lightMesh = createVoxelMesh(0.22, 0.16, 0.28, lightMat, 0, 1.22, 0, false, false);
   group.add(lightMesh);
-
   return { group, lightMesh };
 }
 
@@ -171,26 +208,10 @@ export function createUrbanRoadMarkings(): THREE.Group {
   return group;
 }
 
-export function createUrbanLaneDivider(): THREE.Group {
-  const group = new THREE.Group();
-  const dividerMat = createVoxelBasicMaterial(0xf8fafc);
-  const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
-
-  for (let x = -8.5; x <= 8.5; x += 1.6) {
-    const dash = new THREE.Mesh(dashGeo, dividerMat);
-    dash.position.set(x, 0.015, 0.5);
-    group.add(dash);
-  }
-
-  return group;
-}
-
 export function createUrbanRoadBarrier(biome: BiomeType = 'forest'): THREE.Group {
   const group = new THREE.Group();
-  const postColor =
-    biome === 'neon' ? 0x1e1b4b : biome === 'desert' ? 0x78716c : biome === 'winter' ? 0x475569 : 0x64748b;
-  const railColor =
-    biome === 'neon' ? 0x06b6d4 : biome === 'desert' ? 0xd97706 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
+  const postColor = biome === 'neon' ? 0x1e1b4b : biome === 'winter' ? 0x475569 : 0x64748b;
+  const railColor = biome === 'neon' ? 0x06b6d4 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
   const reflectorColor = biome === 'neon' ? 0xec4899 : 0xfacc15;
 
   const postMat = createVoxelMaterial(postColor);
@@ -209,12 +230,9 @@ export function createUrbanRiverbankEdge(
   biome: BiomeType = 'forest'
 ): THREE.Group {
   const group = new THREE.Group();
-  const woodColor =
-    biome === 'winter' ? 0x475569 : biome === 'desert' ? 0x92400e : biome === 'neon' ? 0x1e1b4b : 0x78350f;
-  const capColor =
-    biome === 'winter' ? 0xf1f5f9 : biome === 'desert' ? 0xd97706 : biome === 'neon' ? 0x06b6d4 : 0x451a03;
-  const rockColor =
-    biome === 'winter' ? 0x94a3b8 : biome === 'desert' ? 0xb45309 : biome === 'neon' ? 0x312e81 : 0x64748b;
+  const woodColor = biome === 'winter' ? 0x475569 : biome === 'neon' ? 0x1e1b4b : 0x78350f;
+  const capColor = biome === 'winter' ? 0xf1f5f9 : biome === 'neon' ? 0x06b6d4 : 0x451a03;
+  const rockColor = biome === 'winter' ? 0x94a3b8 : biome === 'neon' ? 0x312e81 : 0x64748b;
 
   const woodMat = createVoxelMaterial(woodColor);
   const capMat = createVoxelMaterial(capColor);
@@ -222,11 +240,9 @@ export function createUrbanRiverbankEdge(
 
   group.add(createVoxelMesh(0.28, 0.44, 0.28, woodMat, 0, 0.16, -0.22));
   group.add(createVoxelMesh(0.32, 0.08, 0.32, capMat, 0, 0.40, -0.22));
-
   const bx = side === 'left' ? 0.2 : -0.2;
   group.add(createVoxelMesh(0.36, 0.22, 0.32, rockMat, bx, 0.07, 0.2));
   group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
-
   return group;
 }
 
@@ -268,3 +284,15 @@ export function createUrbanRecordFlag(): THREE.Group {
   group.add(clothGroup);
   return group;
 }
+
+export const createUrbanTree = (seedVariant: number, biome?: BiomeType | boolean): THREE.Group =>
+  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
+
+export const createUrbanRock = (seedVariant: number, _biome?: BiomeType): THREE.Group =>
+  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+
+export const createUrbanBush = (seedVariant: number, biome?: BiomeType | boolean): THREE.Group =>
+  Math.abs(seedVariant) % 2 === 0
+    ? createUrbanBench()
+    : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
+
