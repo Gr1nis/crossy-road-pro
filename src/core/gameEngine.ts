@@ -598,6 +598,7 @@ export class GameEngine {
   }
 
   private killPlayer(reason: typeof DeathReason[keyof typeof DeathReason]): void {
+    if (this.godMode) return;
     this.player.isDead = true;
     this.player.deathReason = reason;
     this.inputQueue = [];

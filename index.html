@@ -3680,7 +3680,8 @@ class GameEngine {
             this.scoreTracker.recordLogHopped();
           } else {
             this.killPlayer(DeathReason.WATER);
-            return;
+            if (!this.godMode) return;
+            this.player.ridingLogId = null;
           }
         } else {
           this.player.x = quantizeLandX(this.player.x);
@@ -3700,14 +3701,14 @@ class GameEngine {
       const support = findSupportingLog(this.player.x, currentLane.logs);
       if (!support) {
         this.killPlayer(DeathReason.WATER);
-        return;
+        if (!this.godMode) return;
       }
-      this.player.ridingLogId = support.id;
+      this.player.ridingLogId = support ? support.id : null;
     }
 
     if (isOutOfBoundsX(this.player.x)) {
       this.killPlayer(DeathReason.OUT_OF_BOUNDS);
-      return;
+      if (!this.godMode) return;
     }
 
     const activeRow = Math.round(this.player.row);
@@ -3718,14 +3719,14 @@ class GameEngine {
       const hitCar = checkVehicleCollision(this.player.x, activeLane.vehicles);
       if (hitCar) {
         this.killPlayer(DeathReason.CAR);
-        return;
+        if (!this.godMode) return;
       }
     } else if (activeLane.type === LaneType.RAILWAY && activeLane.train?.isPassing) {
       const tr = activeLane.train;
       const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + tr.length) / 2;
       if (Math.abs(this.player.x - tr.x) < halfSpan) {
         this.killPlayer(DeathReason.TRAIN);
-        return;
+        if (!this.godMode) return;
       }
     }
 
@@ -3743,7 +3744,7 @@ class GameEngine {
       this.cameraGraceTimer += dt;
       if (this.cameraGraceTimer >= WORLD_CONFIG.CAMERA_GRACE_PERIOD) {
         this.killPlayer(DeathReason.CAMERA_BEHIND);
-        return;
+        if (!this.godMode) return;
       }
     } else {
       this.cameraGraceTimer = 0;
@@ -3804,6 +3805,7 @@ class GameEngine {
   }
 
           killPlayer(reason                                              )       {
+    if (this.godMode) return;
     this.player.isDead = true;
     this.player.deathReason = reason;
     this.inputQueue = [];
