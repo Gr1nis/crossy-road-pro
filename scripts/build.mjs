@@ -139,6 +139,34 @@ const htmlContent = `<!DOCTYPE html>
     .rarity-epic { background: rgba(192, 132, 252, 0.22); color: #c084fc; border: 1px solid #9333ea; box-shadow: 0 0 8px rgba(168, 85, 247, 0.3); }
     .rarity-legendary { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.3)); color: #fbbf24; border: 1px solid #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
+    /* Daily Bonus Modal & 7-Day Grid */
+    .menu-btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+    .btn-badge.pulse-badge { background: #10b981; color: #fff; border-color: #34d399; animation: badgePulse 1.4s infinite; }
+    .btn-badge.hidden { display: none !important; }
+    @keyframes badgePulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+    .modal-card-daily { max-height: 90vh; overflow-y: auto; padding: 28px 24px; -webkit-overflow-scrolling: touch; }
+    .daily-streak-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: rgba(245, 158, 11, 0.15); border: 1.5px solid rgba(245, 158, 11, 0.4); color: #fbbf24; padding: 6px 16px; border-radius: 999px; font-weight: 800; font-size: 13px; margin: 0 auto 16px; }
+    .daily-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .daily-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 8px; text-align: center; position: relative; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .daily-card-mega { grid-column: span 3; background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(234, 88, 12, 0.12)); border-color: #f59e0b; flex-direction: row; justify-content: space-between; padding: 14px 20px; }
+    .daily-card.claimed { opacity: 0.65; border-color: #10b981; background: rgba(16, 185, 129, 0.08); }
+    .daily-card.available { border-color: #fbbf24; background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); animation: availableFloat 2s ease-in-out infinite; }
+    @keyframes availableFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    .daily-card.locked { opacity: 0.45; }
+    .daily-card-day { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .daily-card.available .daily-card-day { color: #fbbf24; }
+    .daily-card-icon { font-size: 26px; margin: 4px 0; }
+    .daily-card-mega .daily-card-icon { font-size: 32px; }
+    .daily-card-reward { font-size: 14px; font-weight: 900; color: #facc15; }
+    .daily-card-status { font-size: 10px; font-weight: 800; margin-top: 6px; padding: 2px 6px; border-radius: 999px; text-transform: uppercase; }
+    .daily-card.claimed .daily-card-status { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .daily-card.available .daily-card-status { background: #f59e0b; color: #000; }
+    .daily-card.locked .daily-card-status { color: #64748b; }
+    .daily-timer-box { background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; padding: 10px 14px; color: #94a3b8; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+    .daily-timer-box strong { color: #38bdf8; font-variant-numeric: tabular-nums; }
+    .daily-timer-box.hidden { display: none !important; }
+
     .modal-card-leaderboard { max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
     #leaderboard-modal h2 { font-size: clamp(18px, 4vw, 28px); }
     .lb-name-form { display: flex; gap: 8px; margin-bottom: 12px; flex-shrink: 0; }
@@ -274,6 +302,13 @@ const htmlContent = `<!DOCTYPE html>
       .settings-label { font-size: 14px; }
       .settings-subtext { font-size: 11px; }
 
+      .modal-card-daily { padding: 18px 14px !important; }
+      .daily-grid { gap: 6px; }
+      .daily-card { padding: 8px 4px; }
+      .daily-card-icon { font-size: 20px; }
+      .daily-card-reward { font-size: 12px; }
+      .daily-card-mega { padding: 10px 14px; }
+
       .info-links { display: none; }
     }
   </style>
@@ -325,6 +360,7 @@ const htmlContent = `<!DOCTYPE html>
 
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
+        <button id="menu-daily-btn" class="menu-btn menu-btn-gold">🎁 Бонус дня <span id="menu-daily-badge" class="btn-badge pulse-badge hidden">ГОТОВО</span></button>
         <button id="menu-achievements-btn" class="menu-btn menu-btn-emerald">🏅 Достижения <span id="menu-achievements-badge" class="btn-badge">0/10</span></button>
         <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Автомат скинов</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
@@ -446,6 +482,30 @@ const htmlContent = `<!DOCTYPE html>
       <div id="achievements-list" class="achievements-list-box"></div>
 
       <button id="achievements-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно Ежедневного бонуса (Daily Bonus Modal) -->
+  <div id="daily-bonus-modal" class="modal hidden">
+    <div class="modal-card modal-card-daily">
+      <h2 style="color: #fbbf24;">🎁 ЕЖЕДНЕВНЫЙ БОНУС</h2>
+      <p style="margin-bottom: 12px;">Заходите каждый день и собирайте ценные награды!</p>
+
+      <div class="daily-streak-pill">
+        🔥 <span id="daily-streak-text">Серия: 1 день</span>
+      </div>
+
+      <div id="daily-bonus-grid" class="daily-grid"></div>
+
+      <div id="daily-timer-box" class="daily-timer-box hidden">
+        Следующий бонус через: <strong id="daily-timer-val">00:00:00</strong>
+      </div>
+
+      <div class="menu-btn-stack">
+        <button id="daily-claim-btn" class="menu-btn menu-btn-primary">Забрать награду</button>
+        <button id="daily-double-btn" class="menu-btn menu-btn-purple">🎬 Забрать x2 за рекламу</button>
+        <button id="daily-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+      </div>
     </div>
   </div>
 

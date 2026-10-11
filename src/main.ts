@@ -22,4 +22,7 @@ inputManager.attach();
 ui.openMainMenu();
 gameLoop.updateMenuStats();
 gameLoop.renderSkinsUI();
+if (engine.canClaimDailyReward()) {
+  gameLoop.handleOpenDailyBonus();
+}
 gameLoop.start();

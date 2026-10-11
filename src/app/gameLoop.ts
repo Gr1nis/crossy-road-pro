@@ -62,9 +62,6 @@ export class GameLoop {
     }
 
     this.updateDailyBonusUI();
-    if (this.engine.canClaimDailyReward()) {
-      this.handleOpenDailyBonus();
-    }
   }
 
   public getIsPlaying(): boolean {
@@ -240,6 +237,7 @@ export class GameLoop {
     this.ui.updateMenuStats(this.engine.getHighScore(), this.engine.getCoins());
     this.ui.renderLeaderboard(this.engine.getScoreTracker().getLeaderboard());
     this.syncAchievements();
+    this.updateDailyBonusUI();
   }
 
   public renderSkinsUI(): void {
