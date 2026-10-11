@@ -70,6 +70,7 @@
 
     .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
     .modal.hidden { display: none !important; }
+    #perf-report-modal { z-index: 2000; }
 
     /* Modern Subway Surfers-style Main Menu HUD */
     .main-menu-overlay {
@@ -1355,7 +1356,8 @@
         <button id="dev-cycle-biome-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🌲 Сменить биом</button>
         <button id="dev-godmode-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🛡️ God Mode: ВЫКЛ</button>
         <button id="dev-perf-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">⚡ Perf HUD: ВЫКЛ</button>
-        <button id="dev-benchmark-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🚀 Бенчмарк (300)</button>
+        <button id="dev-benchmark-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🚀 Бенчмарк (60)</button>
+        <button id="dev-report-btn" class="menu-btn menu-btn-primary" style="font-size: 13px; padding: 10px; grid-column: span 2; background: #0284c7; border-color: #38bdf8; color: #fff;">📋 Открыть отчёт бенчмарка</button>
       </div>
 
       <div style="margin-bottom: 14px;">
@@ -7856,6 +7858,7 @@ class PerfReportModal {
       el.className = 'modal hidden';
       document.body.appendChild(el);
     }
+    el.style.zIndex = '2000';
     this.rootEl = el;
 
     el.innerHTML = `
@@ -7948,6 +7951,8 @@ class PerfReportModal {
       this.copyBtn.style.background = '#0284c7';
     }
 
+    this.rootEl.style.zIndex = '2000';
+    this.rootEl.style.display = 'flex';
     this.rootEl.classList.remove('hidden');
   }
 
@@ -7976,6 +7981,7 @@ class PerfReportModal {
 
          close()       {
     if (this.rootEl) {
+      this.rootEl.style.display = 'none';
       this.rootEl.classList.add('hidden');
     }
   }
@@ -8001,6 +8007,8 @@ class PerfMonitor {
           memValEl                     = null;
           breakdownValEl                     = null;
           worldValEl                     = null;
+          benchBtnEl                     = null;
+          isBenchActive = false;
 
           lastDomUpdate = 0;
           onBenchmarkComplete                                        ;
@@ -8025,7 +8033,8 @@ class PerfMonitor {
       <div class="perf-header">
         <span class="perf-title">⚡ PERF TELEMETRY</span>
         <div class="perf-actions">
-          <button id="perf-bench-btn" class="perf-btn" title="Стресс-тест на 300 полос">🚀 Тест</button>
+          <button id="perf-bench-btn" class="perf-btn" title="Стресс-тест на 60 полос">🚀 Тест</button>
+          <button id="perf-report-btn" class="perf-btn" title="Показать отчёт (копирование)">📋 Отчёт</button>
           <button id="perf-close-btn" class="perf-btn" title="Скрыть (F3)">✖</button>
         </div>
       </div>
@@ -8052,6 +8061,7 @@ class PerfMonitor {
     this.memValEl = document.getElementById('perf-mem-val');
     this.breakdownValEl = document.getElementById('perf-breakdown-val');
     this.worldValEl = document.getElementById('perf-world-val');
+    this.benchBtnEl = document.getElementById('perf-bench-btn');
 
     this.canvasEl = document.getElementById('perf-sparkline')                            ;
     if (this.canvasEl) {
@@ -8062,9 +8072,18 @@ class PerfMonitor {
       this.setEnabled(false);
     });
 
-    document.getElementById('perf-bench-btn')?.addEventListener('click', () => {
-      const globalDev = (window                                                                 ).__CROSSY_DEV__;
-      globalDev?.startBenchmark?.();
+    document.getElementById('perf-report-btn')?.addEventListener('click', () => {
+      const globalDev = (window                                                             ).__CROSSY_DEV__;
+      globalDev?.openReport?.();
+    });
+
+    this.benchBtnEl?.addEventListener('click', () => {
+      const globalDev = (window                                                                                                       ).__CROSSY_DEV__;
+      if (this.isBenchActive) {
+        globalDev?.stopBenchmark?.();
+      } else {
+        globalDev?.startBenchmark?.(60);
+      }
     });
   }
 
@@ -8181,8 +8200,27 @@ class PerfMonitor {
     return this.tracker;
   }
 
+         setBenchmarkState(active         , currentDone         = 0, totalRows         = 60)       {
+    this.isBenchActive = active;
+    if (!this.benchBtnEl) return;
+    if (active) {
+      this.benchBtnEl.textContent = `⏹️ ${currentDone}/${totalRows}`;
+      this.benchBtnEl.style.background = '#f59e0b';
+      this.benchBtnEl.style.color = '#0f172a';
+      this.benchBtnEl.style.fontWeight = '900';
+      this.benchBtnEl.title = 'Остановить бенчмарк и открыть отчёт';
+    } else {
+      this.benchBtnEl.textContent = '🚀 Тест';
+      this.benchBtnEl.style.background = '';
+      this.benchBtnEl.style.color = '';
+      this.benchBtnEl.style.fontWeight = '';
+      this.benchBtnEl.title = `Стресс-тест на ${totalRows} полос`;
+    }
+  }
+
          startBenchmarkSession(initialGeometries        , startRow        )       {
     this.tracker.startBenchmark(initialGeometries, startRow);
+    this.setBenchmarkState(true, 0, 60);
     this.setEnabled(true);
   }
 
@@ -8191,6 +8229,7 @@ class PerfMonitor {
     endRow        ,
     onComplete                                        
   )                      {
+    this.setBenchmarkState(false);
     const report = this.tracker.finishBenchmark(endGeometries, endRow);
     this.onBenchmarkComplete = onComplete;
     this.onBenchmarkComplete?.(report);
@@ -8303,6 +8342,7 @@ class UIManager {
                    devGodModeBtn                    ;
                    devPerfBtn                    ;
                    devBenchmarkBtn                    ;
+                   devReportBtn                    ;
 
   // State
           lastScore = -1;
@@ -8402,6 +8442,7 @@ class UIManager {
     this.devGodModeBtn = document.getElementById('dev-godmode-btn');
     this.devPerfBtn = document.getElementById('dev-perf-btn');
     this.devBenchmarkBtn = document.getElementById('dev-benchmark-btn');
+    this.devReportBtn = document.getElementById('dev-report-btn');
 
     this.setupInternalNavigation();
     this.hideHud();
@@ -9021,6 +9062,7 @@ class UIManager {
     this.devGodModeBtn?.addEventListener('click', () => handlers.onDevToggleGodMode?.());
     this.devPerfBtn?.addEventListener('click', () => handlers.onDevTogglePerfHUD?.());
     this.devBenchmarkBtn?.addEventListener('click', () => handlers.onDevStartBenchmark?.());
+    this.devReportBtn?.addEventListener('click', () => handlers.onDevOpenReport?.());
 
     this.leaderboardSaveNameBtn?.addEventListener('click', () => {
       const raw = this.leaderboardNameInput?.value ?? '';
@@ -9573,8 +9615,11 @@ class GameLoop {
                    perfMonitor             ;
                    perfReportModal = new PerfReportModal();
           benchmarkActive = false;
+          benchmarkStartRow = 0;
           benchmarkTargetRow = 0;
+          benchmarkRowsCount = 60;
           lastAutoHopTime = 0;
+          lastBenchmarkReport                             = null;
 
   constructor(
     engine            ,
@@ -9630,6 +9675,8 @@ class GameLoop {
                                      
                                      
                                                 
+                                  
+                               
                                
         
      
@@ -9659,7 +9706,9 @@ class GameLoop {
         return this.godMode;
       },
       togglePerfHUD: () => this.togglePerfHUD(),
-      startBenchmark: (rows = 300) => this.startBenchmark(rows),
+      startBenchmark: (rows = 60) => this.startBenchmark(rows),
+      stopBenchmark: () => this.finishBenchmark(),
+      openReport: () => this.openPerfReport(),
       openViewer: () => window.open('model-viewer.html?v=' + Date.now(), '_blank'),
     };
   }
@@ -9908,6 +9957,8 @@ class GameLoop {
         } else {
           this.engine.queueMove(MoveDirection.FORWARD);
         }
+        const done = Math.max(0, Math.round(this.engine.getPlayer().row - this.benchmarkStartRow));
+        this.perfMonitor.setBenchmarkState(true, done, this.benchmarkRowsCount);
       }
       if (this.engine.getPlayer().row >= this.benchmarkTargetRow) {
         this.finishBenchmark();
@@ -10234,7 +10285,8 @@ class GameLoop {
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛЮЧЕНО' : 'Бессмертие ВЫКЛЮЧЕНО');
       },
       onDevTogglePerfHUD: () => this.togglePerfHUD(),
-      onDevStartBenchmark: () => this.startBenchmark(),
+      onDevStartBenchmark: () => this.startBenchmark(60),
+      onDevOpenReport: () => this.openPerfReport(),
     };
   }
 
@@ -10245,7 +10297,7 @@ class GameLoop {
     return active;
   }
 
-         startBenchmark(rows         = 300)       {
+         startBenchmark(rows         = 60)       {
     this.ui.closeDevModal();
     if (!this.isPlaying) {
       this.startGame();
@@ -10257,24 +10309,51 @@ class GameLoop {
     this.engine.setIgnoreObstacles(true);
     this.ui.updateGodModeButton(true);
     this.benchmarkActive = true;
-    const startRow = this.engine.getPlayer().row;
-    this.benchmarkTargetRow = startRow + rows;
+    this.benchmarkRowsCount = rows;
+    this.benchmarkStartRow = this.engine.getPlayer().row;
+    this.benchmarkTargetRow = this.benchmarkStartRow + rows;
     const stats = this.sceneManager.getRenderStats();
-    this.perfMonitor.startBenchmarkSession(stats.geometries, startRow);
-    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-раннер сквозь деревья и воду (${rows} полос). Следите за телеметрией!`);
+    this.perfMonitor.startBenchmarkSession(stats.geometries, this.benchmarkStartRow);
+    this.perfMonitor.setBenchmarkState(true, 0, rows);
+    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-раннер (${rows} полос). Нажмите «⏹️ Стоп» в HUD для мгновенного отчёта!`);
   }
 
-          finishBenchmark()       {
+         finishBenchmark()       {
+    if (!this.benchmarkActive && this.lastBenchmarkReport) {
+      this.perfReportModal.show(this.lastBenchmarkReport);
+      return;
+    }
     this.benchmarkActive = false;
     this.engine.setIgnoreObstacles(false);
     this.engine.setGodMode(this.godMode);
+    this.perfMonitor.setBenchmarkState(false);
     const stats = this.sceneManager.getRenderStats();
     const finalRow = this.engine.getPlayer().row;
     const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
+    this.lastBenchmarkReport = report;
+    (window                                                 ).__CROSSY_PERF_REPORT__ = report;
     this.perfReportModal.show(report);
-    const summaryMsg = `Avg: ${report.avgFps} FPS | 1% Low: ${report.low1PercentFps} | Calls: ${report.avgDrawCalls} (Пик: ${report.peakDrawCalls})`;
+    const summaryMsg = `Avg: ${report.avgFps} FPS | 1% Low: ${report.low1PercentFps} | Calls: ${report.avgDrawCalls}`;
     this.ui.showToast('📊', 'Бенчмарк завершён!', summaryMsg);
     console.log('[PERF BENCHMARK REPORT]', report);
+  }
+
+         openPerfReport()       {
+    this.ui.closeDevModal();
+    if (this.benchmarkActive) {
+      this.finishBenchmark();
+      return;
+    }
+    if (this.lastBenchmarkReport) {
+      this.perfReportModal.show(this.lastBenchmarkReport);
+      return;
+    }
+    const stats = this.sceneManager.getRenderStats();
+    const finalRow = this.engine.getPlayer().row;
+    const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
+    this.lastBenchmarkReport = report;
+    (window                                                 ).__CROSSY_PERF_REPORT__ = report;
+    this.perfReportModal.show(report);
   }
 
          getInputCallbacks()                 {

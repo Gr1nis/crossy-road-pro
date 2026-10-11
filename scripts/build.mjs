@@ -144,6 +144,7 @@ const htmlContent = `<!DOCTYPE html>
 
     .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
     .modal.hidden { display: none !important; }
+    #perf-report-modal { z-index: 2000; }
 
     /* Modern Subway Surfers-style Main Menu HUD */
     .main-menu-overlay {
@@ -1429,7 +1430,8 @@ const htmlContent = `<!DOCTYPE html>
         <button id="dev-cycle-biome-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🌲 Сменить биом</button>
         <button id="dev-godmode-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🛡️ God Mode: ВЫКЛ</button>
         <button id="dev-perf-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">⚡ Perf HUD: ВЫКЛ</button>
-        <button id="dev-benchmark-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🚀 Бенчмарк (300)</button>
+        <button id="dev-benchmark-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🚀 Бенчмарк (60)</button>
+        <button id="dev-report-btn" class="menu-btn menu-btn-primary" style="font-size: 13px; padding: 10px; grid-column: span 2; background: #0284c7; border-color: #38bdf8; color: #fff;">📋 Открыть отчёт бенчмарка</button>
       </div>
 
       <div style="margin-bottom: 14px;">

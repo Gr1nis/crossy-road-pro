@@ -9,6 +9,7 @@ import { UIManager, UI_SKIN_RARITY, type UIActions } from './uiManager.ts';
 import { type InputCallbacks, type ModalStateProvider } from './inputManager.ts';
 import { PerfMonitor } from './perfMonitor.ts';
 import { PerfReportModal } from './perfReportModal.ts';
+import type { PerfBenchmarkReport } from './perfMetrics.ts';
 
 const DEATH_LABELS: Record<string, string> = {
   [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
@@ -41,8 +42,11 @@ export class GameLoop {
   private readonly perfMonitor: PerfMonitor;
   private readonly perfReportModal = new PerfReportModal();
   private benchmarkActive = false;
+  private benchmarkStartRow = 0;
   private benchmarkTargetRow = 0;
+  private benchmarkRowsCount = 60;
   private lastAutoHopTime = 0;
+  private lastBenchmarkReport: PerfBenchmarkReport | null = null;
 
   constructor(
     engine: GameEngine,
@@ -98,6 +102,8 @@ export class GameLoop {
         toggleGodMode: () => boolean;
         togglePerfHUD: () => boolean;
         startBenchmark: (rows?: number) => void;
+        stopBenchmark: () => void;
+        openReport: () => void;
         openViewer: () => void;
       };
     }
@@ -127,7 +133,9 @@ export class GameLoop {
         return this.godMode;
       },
       togglePerfHUD: () => this.togglePerfHUD(),
-      startBenchmark: (rows = 300) => this.startBenchmark(rows),
+      startBenchmark: (rows = 60) => this.startBenchmark(rows),
+      stopBenchmark: () => this.finishBenchmark(),
+      openReport: () => this.openPerfReport(),
       openViewer: () => window.open('model-viewer.html?v=' + Date.now(), '_blank'),
     };
   }
@@ -376,6 +384,8 @@ export class GameLoop {
         } else {
           this.engine.queueMove(MoveDirection.FORWARD);
         }
+        const done = Math.max(0, Math.round(this.engine.getPlayer().row - this.benchmarkStartRow));
+        this.perfMonitor.setBenchmarkState(true, done, this.benchmarkRowsCount);
       }
       if (this.engine.getPlayer().row >= this.benchmarkTargetRow) {
         this.finishBenchmark();
@@ -702,7 +712,8 @@ export class GameLoop {
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛЮЧЕНО' : 'Бессмертие ВЫКЛЮЧЕНО');
       },
       onDevTogglePerfHUD: () => this.togglePerfHUD(),
-      onDevStartBenchmark: () => this.startBenchmark(),
+      onDevStartBenchmark: () => this.startBenchmark(60),
+      onDevOpenReport: () => this.openPerfReport(),
     };
   }
 
@@ -713,7 +724,7 @@ export class GameLoop {
     return active;
   }
 
-  public startBenchmark(rows: number = 300): void {
+  public startBenchmark(rows: number = 60): void {
     this.ui.closeDevModal();
     if (!this.isPlaying) {
       this.startGame();
@@ -725,24 +736,51 @@ export class GameLoop {
     this.engine.setIgnoreObstacles(true);
     this.ui.updateGodModeButton(true);
     this.benchmarkActive = true;
-    const startRow = this.engine.getPlayer().row;
-    this.benchmarkTargetRow = startRow + rows;
+    this.benchmarkRowsCount = rows;
+    this.benchmarkStartRow = this.engine.getPlayer().row;
+    this.benchmarkTargetRow = this.benchmarkStartRow + rows;
     const stats = this.sceneManager.getRenderStats();
-    this.perfMonitor.startBenchmarkSession(stats.geometries, startRow);
-    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-раннер сквозь деревья и воду (${rows} полос). Следите за телеметрией!`);
+    this.perfMonitor.startBenchmarkSession(stats.geometries, this.benchmarkStartRow);
+    this.perfMonitor.setBenchmarkState(true, 0, rows);
+    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-раннер (${rows} полос). Нажмите «⏹️ Стоп» в HUD для мгновенного отчёта!`);
   }
 
-  private finishBenchmark(): void {
+  public finishBenchmark(): void {
+    if (!this.benchmarkActive && this.lastBenchmarkReport) {
+      this.perfReportModal.show(this.lastBenchmarkReport);
+      return;
+    }
     this.benchmarkActive = false;
     this.engine.setIgnoreObstacles(false);
     this.engine.setGodMode(this.godMode);
+    this.perfMonitor.setBenchmarkState(false);
     const stats = this.sceneManager.getRenderStats();
     const finalRow = this.engine.getPlayer().row;
     const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
+    this.lastBenchmarkReport = report;
+    (window as Window & { __CROSSY_PERF_REPORT__?: unknown }).__CROSSY_PERF_REPORT__ = report;
     this.perfReportModal.show(report);
-    const summaryMsg = `Avg: ${report.avgFps} FPS | 1% Low: ${report.low1PercentFps} | Calls: ${report.avgDrawCalls} (Пик: ${report.peakDrawCalls})`;
+    const summaryMsg = `Avg: ${report.avgFps} FPS | 1% Low: ${report.low1PercentFps} | Calls: ${report.avgDrawCalls}`;
     this.ui.showToast('📊', 'Бенчмарк завершён!', summaryMsg);
     console.log('[PERF BENCHMARK REPORT]', report);
+  }
+
+  public openPerfReport(): void {
+    this.ui.closeDevModal();
+    if (this.benchmarkActive) {
+      this.finishBenchmark();
+      return;
+    }
+    if (this.lastBenchmarkReport) {
+      this.perfReportModal.show(this.lastBenchmarkReport);
+      return;
+    }
+    const stats = this.sceneManager.getRenderStats();
+    const finalRow = this.engine.getPlayer().row;
+    const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
+    this.lastBenchmarkReport = report;
+    (window as Window & { __CROSSY_PERF_REPORT__?: unknown }).__CROSSY_PERF_REPORT__ = report;
+    this.perfReportModal.show(report);
   }
 
   public getInputCallbacks(): InputCallbacks {

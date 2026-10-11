@@ -15,6 +15,8 @@ export class PerfMonitor {
   private memValEl: HTMLElement | null = null;
   private breakdownValEl: HTMLElement | null = null;
   private worldValEl: HTMLElement | null = null;
+  private benchBtnEl: HTMLElement | null = null;
+  private isBenchActive = false;
 
   private lastDomUpdate = 0;
   private onBenchmarkComplete?: (report: PerfBenchmarkReport) => void;
@@ -39,7 +41,8 @@ export class PerfMonitor {
       <div class="perf-header">
         <span class="perf-title">⚡ PERF TELEMETRY</span>
         <div class="perf-actions">
-          <button id="perf-bench-btn" class="perf-btn" title="Стресс-тест на 300 полос">🚀 Тест</button>
+          <button id="perf-bench-btn" class="perf-btn" title="Стресс-тест на 60 полос">🚀 Тест</button>
+          <button id="perf-report-btn" class="perf-btn" title="Показать отчёт (копирование)">📋 Отчёт</button>
           <button id="perf-close-btn" class="perf-btn" title="Скрыть (F3)">✖</button>
         </div>
       </div>
@@ -66,6 +69,7 @@ export class PerfMonitor {
     this.memValEl = document.getElementById('perf-mem-val');
     this.breakdownValEl = document.getElementById('perf-breakdown-val');
     this.worldValEl = document.getElementById('perf-world-val');
+    this.benchBtnEl = document.getElementById('perf-bench-btn');
 
     this.canvasEl = document.getElementById('perf-sparkline') as HTMLCanvasElement | null;
     if (this.canvasEl) {
@@ -76,9 +80,18 @@ export class PerfMonitor {
       this.setEnabled(false);
     });
 
-    document.getElementById('perf-bench-btn')?.addEventListener('click', () => {
-      const globalDev = (window as Window & { __CROSSY_DEV__?: { startBenchmark?: () => void } }).__CROSSY_DEV__;
-      globalDev?.startBenchmark?.();
+    document.getElementById('perf-report-btn')?.addEventListener('click', () => {
+      const globalDev = (window as Window & { __CROSSY_DEV__?: { openReport?: () => void } }).__CROSSY_DEV__;
+      globalDev?.openReport?.();
+    });
+
+    this.benchBtnEl?.addEventListener('click', () => {
+      const globalDev = (window as Window & { __CROSSY_DEV__?: { startBenchmark?: (r?: number) => void; stopBenchmark?: () => void } }).__CROSSY_DEV__;
+      if (this.isBenchActive) {
+        globalDev?.stopBenchmark?.();
+      } else {
+        globalDev?.startBenchmark?.(60);
+      }
     });
   }
 
@@ -195,8 +208,27 @@ export class PerfMonitor {
     return this.tracker;
   }
 
+  public setBenchmarkState(active: boolean, currentDone: number = 0, totalRows: number = 60): void {
+    this.isBenchActive = active;
+    if (!this.benchBtnEl) return;
+    if (active) {
+      this.benchBtnEl.textContent = `⏹️ ${currentDone}/${totalRows}`;
+      this.benchBtnEl.style.background = '#f59e0b';
+      this.benchBtnEl.style.color = '#0f172a';
+      this.benchBtnEl.style.fontWeight = '900';
+      this.benchBtnEl.title = 'Остановить бенчмарк и открыть отчёт';
+    } else {
+      this.benchBtnEl.textContent = '🚀 Тест';
+      this.benchBtnEl.style.background = '';
+      this.benchBtnEl.style.color = '';
+      this.benchBtnEl.style.fontWeight = '';
+      this.benchBtnEl.title = `Стресс-тест на ${totalRows} полос`;
+    }
+  }
+
   public startBenchmarkSession(initialGeometries: number, startRow: number): void {
     this.tracker.startBenchmark(initialGeometries, startRow);
+    this.setBenchmarkState(true, 0, 60);
     this.setEnabled(true);
   }
 
@@ -205,6 +237,7 @@ export class PerfMonitor {
     endRow: number,
     onComplete?: (report: PerfBenchmarkReport) => void
   ): PerfBenchmarkReport {
+    this.setBenchmarkState(false);
     const report = this.tracker.finishBenchmark(endGeometries, endRow);
     this.onBenchmarkComplete = onComplete;
     this.onBenchmarkComplete?.(report);

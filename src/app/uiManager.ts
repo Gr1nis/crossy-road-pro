@@ -34,6 +34,7 @@ export interface UIActions {
   onDevToggleGodMode?: () => void;
   onDevTogglePerfHUD?: () => void;
   onDevStartBenchmark?: () => void;
+  onDevOpenReport?: () => void;
 }
 
 export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
@@ -141,6 +142,7 @@ export class UIManager {
   private readonly devGodModeBtn: HTMLElement | null;
   private readonly devPerfBtn: HTMLElement | null;
   private readonly devBenchmarkBtn: HTMLElement | null;
+  private readonly devReportBtn: HTMLElement | null;
 
   // State
   private lastScore = -1;
@@ -240,6 +242,7 @@ export class UIManager {
     this.devGodModeBtn = document.getElementById('dev-godmode-btn');
     this.devPerfBtn = document.getElementById('dev-perf-btn');
     this.devBenchmarkBtn = document.getElementById('dev-benchmark-btn');
+    this.devReportBtn = document.getElementById('dev-report-btn');
 
     this.setupInternalNavigation();
     this.hideHud();
@@ -859,6 +862,7 @@ export class UIManager {
     this.devGodModeBtn?.addEventListener('click', () => handlers.onDevToggleGodMode?.());
     this.devPerfBtn?.addEventListener('click', () => handlers.onDevTogglePerfHUD?.());
     this.devBenchmarkBtn?.addEventListener('click', () => handlers.onDevStartBenchmark?.());
+    this.devReportBtn?.addEventListener('click', () => handlers.onDevOpenReport?.());
 
     this.leaderboardSaveNameBtn?.addEventListener('click', () => {
       const raw = this.leaderboardNameInput?.value ?? '';

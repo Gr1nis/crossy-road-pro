@@ -22,6 +22,7 @@ export class PerfReportModal {
       el.className = 'modal hidden';
       document.body.appendChild(el);
     }
+    el.style.zIndex = '2000';
     this.rootEl = el;
 
     el.innerHTML = `
@@ -114,6 +115,8 @@ export class PerfReportModal {
       this.copyBtn.style.background = '#0284c7';
     }
 
+    this.rootEl.style.zIndex = '2000';
+    this.rootEl.style.display = 'flex';
     this.rootEl.classList.remove('hidden');
   }
 
@@ -142,6 +145,7 @@ export class PerfReportModal {
 
   public close(): void {
     if (this.rootEl) {
+      this.rootEl.style.display = 'none';
       this.rootEl.classList.add('hidden');
     }
   }
