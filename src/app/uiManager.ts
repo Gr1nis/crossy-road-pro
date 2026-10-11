@@ -38,6 +38,7 @@ export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
 
 export class UIManager {
   // HUD
+  private readonly hudEl: HTMLElement | null;
   private readonly scoreEl: HTMLElement | null;
   private readonly coinsEl: HTMLElement | null;
   private readonly pauseBtn: HTMLElement | null;
@@ -130,6 +131,7 @@ export class UIManager {
       isAdReady: () => false,
       showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
     };
+    this.hudEl = document.getElementById('in-game-hud') ?? (typeof document.querySelector === 'function' ? document.querySelector('.hud') : null);
     this.scoreEl = document.getElementById('score-value');
     this.coinsEl = document.getElementById('coins-value');
     this.pauseBtn = document.getElementById('pause-btn');
@@ -221,6 +223,9 @@ export class UIManager {
     this.menuLeaderboardBtn?.addEventListener('click', () => this.openLeaderboard());
     this.leaderboardCloseBtn?.addEventListener('click', () => this.closeLeaderboard());
     this.menuSettingsBtn?.addEventListener('click', () => this.openSettings('menu'));
+    document.getElementById('menu-skins-btn')?.addEventListener('click', () => this.openGacha());
+    document.getElementById('menu-coins-plus-btn')?.addEventListener('click', () => this.openGacha());
+    document.getElementById('menu-coins-pill')?.addEventListener('click', () => this.openGacha());
     this.pauseSettingsBtn?.addEventListener('click', () => {
       this.closePause();
       this.openSettings('pause');
@@ -243,10 +248,12 @@ export class UIManager {
 
   openMainMenu(): void {
     this.hideAllModals();
+    this.hudEl?.classList.add('hidden');
     this.mainMenuModal?.classList.remove('hidden');
   }
 
   closeMainMenu(): void {
+    this.hudEl?.classList.remove('hidden');
     this.mainMenuModal?.classList.add('hidden');
   }
 
@@ -353,6 +360,7 @@ export class UIManager {
   updateDailyBadge(hasReward: boolean): void {
     if (!this.menuDailyBadgeEl) return;
     if (hasReward) {
+      this.menuDailyBadgeEl.textContent = '!';
       this.menuDailyBadgeEl.classList.remove('hidden');
     } else {
       this.menuDailyBadgeEl.classList.add('hidden');
@@ -826,6 +834,11 @@ export class UIManager {
   updateAchievementsBadge(unlocked: number, total: number): void {
     if (this.menuAchievementsBadgeEl) {
       this.menuAchievementsBadgeEl.textContent = `${unlocked}/${total}`;
+      if (unlocked > 0) {
+        this.menuAchievementsBadgeEl.classList.remove('hidden');
+      } else {
+        this.menuAchievementsBadgeEl.classList.add('hidden');
+      }
     }
   }
 
