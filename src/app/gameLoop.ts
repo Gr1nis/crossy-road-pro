@@ -119,6 +119,7 @@ export class GameLoop {
       },
       toggleGodMode: () => {
         this.godMode = !this.godMode;
+        this.engine.setGodMode(this.godMode);
         this.ui.updateGodModeButton(this.godMode);
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛ' : 'Бессмертие ВЫКЛ');
         return this.godMode;
@@ -363,7 +364,14 @@ export class GameLoop {
     if (this.benchmarkActive && this.isPlaying && !this.isPaused) {
       if (now - this.lastAutoHopTime >= 65) {
         this.lastAutoHopTime = now;
-        this.engine.queueMove(MoveDirection.FORWARD);
+        const px = this.engine.getPlayer().x;
+        if (px > 1.8) {
+          this.engine.queueMove(MoveDirection.LEFT);
+        } else if (px < -1.8) {
+          this.engine.queueMove(MoveDirection.RIGHT);
+        } else {
+          this.engine.queueMove(MoveDirection.FORWARD);
+        }
       }
       if (this.engine.getPlayer().row >= this.benchmarkTargetRow) {
         this.finishBenchmark();
@@ -685,6 +693,7 @@ export class GameLoop {
       },
       onDevToggleGodMode: () => {
         this.godMode = !this.godMode;
+        this.engine.setGodMode(this.godMode);
         this.ui.updateGodModeButton(this.godMode);
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛЮЧЕНО' : 'Бессмертие ВЫКЛЮЧЕНО');
       },
@@ -708,17 +717,21 @@ export class GameLoop {
       this.resumeGame();
     }
     this.godMode = true;
+    this.engine.setGodMode(true);
+    this.engine.setIgnoreObstacles(true);
     this.ui.updateGodModeButton(true);
     this.benchmarkActive = true;
     const startRow = this.engine.getPlayer().row;
     this.benchmarkTargetRow = startRow + rows;
     const stats = this.sceneManager.getRenderStats();
     this.perfMonitor.startBenchmarkSession(stats.geometries, startRow);
-    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-прогон на ${rows} полос. Следите за телеметрией!`);
+    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-раннер сквозь деревья и воду (${rows} полос). Следите за телеметрией!`);
   }
 
   private finishBenchmark(): void {
     this.benchmarkActive = false;
+    this.engine.setIgnoreObstacles(false);
+    this.engine.setGodMode(this.godMode);
     const stats = this.sceneManager.getRenderStats();
     const finalRow = this.engine.getPlayer().row;
     const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
