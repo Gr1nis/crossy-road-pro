@@ -8,6 +8,7 @@ import { SceneManager } from '../view/sceneManager.ts';
 import { UIManager, UI_SKIN_RARITY, type UIActions } from './uiManager.ts';
 import { type InputCallbacks, type ModalStateProvider } from './inputManager.ts';
 import { PerfMonitor } from './perfMonitor.ts';
+import { PerfReportModal } from './perfReportModal.ts';
 
 const DEATH_LABELS: Record<string, string> = {
   [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
@@ -38,6 +39,7 @@ export class GameLoop {
   private readonly unlockedAchievements = new Set<string>();
   private godMode = false;
   private readonly perfMonitor: PerfMonitor;
+  private readonly perfReportModal = new PerfReportModal();
   private benchmarkActive = false;
   private benchmarkTargetRow = 0;
   private lastAutoHopTime = 0;
@@ -266,6 +268,8 @@ export class GameLoop {
       this.ui.closeLeaderboard();
     } else if (this.ui.isDevModalOpen()) {
       this.ui.closeDevModal();
+    } else if (this.perfReportModal.isOpen()) {
+      this.perfReportModal.close();
     }
   }
 
@@ -735,9 +739,9 @@ export class GameLoop {
     const stats = this.sceneManager.getRenderStats();
     const finalRow = this.engine.getPlayer().row;
     const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
+    this.perfReportModal.show(report);
     const summaryMsg = `Avg: ${report.avgFps} FPS | 1% Low: ${report.low1PercentFps} | Calls: ${report.avgDrawCalls} (Пик: ${report.peakDrawCalls})`;
     this.ui.showToast('📊', 'Бенчмарк завершён!', summaryMsg);
-    this.ui.showToast('💡', 'Диагностика', report.verdict);
     console.log('[PERF BENCHMARK REPORT]', report);
   }
 
@@ -767,6 +771,7 @@ export class GameLoop {
       isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),
       isDailyQuestsOpen: () => this.ui.isDailyQuestsOpen(),
       isDevModalOpen: () => this.ui.isDevModalOpen(),
+      isPerfReportModalOpen: () => this.perfReportModal.isOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,

@@ -45,6 +45,10 @@ export interface PerfBenchmarkReport {
   endGeometries: number;
   geometriesDelta: number;
   rowsTraversed: number;
+  avgCoreMs: number;
+  avgSyncMs: number;
+  avgRenderMs: number;
+  peakTriangles: number;
   verdict: string;
 }
 
@@ -68,6 +72,10 @@ export class PerfMetricsTracker {
   private benchPeakCalls = 0;
   private benchPeakGeos = 0;
   private benchTotalCalls = 0;
+  private benchTotalCoreMs = 0;
+  private benchTotalSyncMs = 0;
+  private benchTotalRenderMs = 0;
+  private benchPeakTriangles = 0;
   private readonly benchAllFrameTimes: number[] = [];
 
   public record(snapshot: PerfSnapshot): void {
@@ -91,7 +99,11 @@ export class PerfMetricsTracker {
       if (ft > this.benchMaxFrameTime) this.benchMaxFrameTime = ft;
       if (snapshot.calls > this.benchPeakCalls) this.benchPeakCalls = snapshot.calls;
       if (snapshot.geometries > this.benchPeakGeos) this.benchPeakGeos = snapshot.geometries;
+      if (snapshot.triangles > this.benchPeakTriangles) this.benchPeakTriangles = snapshot.triangles;
       this.benchTotalCalls += snapshot.calls;
+      this.benchTotalCoreMs += snapshot.coreMs;
+      this.benchTotalSyncMs += snapshot.syncMs;
+      this.benchTotalRenderMs += snapshot.renderMs;
     }
   }
 
@@ -177,6 +189,10 @@ export class PerfMetricsTracker {
     this.benchPeakCalls = 0;
     this.benchPeakGeos = initialGeometries;
     this.benchTotalCalls = 0;
+    this.benchTotalCoreMs = 0;
+    this.benchTotalSyncMs = 0;
+    this.benchTotalRenderMs = 0;
+    this.benchPeakTriangles = 0;
     this.benchAllFrameTimes.length = 0;
   }
 
@@ -197,6 +213,9 @@ export class PerfMetricsTracker {
     const minFps = sorted.length > 0 ? Math.max(1, Math.round(1000 / sorted[0])) : avgFps;
 
     const avgCalls = Math.round(this.benchTotalCalls / totalFrames);
+    const avgCoreMs = Number((this.benchTotalCoreMs / totalFrames).toFixed(1));
+    const avgSyncMs = Number((this.benchTotalSyncMs / totalFrames).toFixed(1));
+    const avgRenderMs = Number((this.benchTotalRenderMs / totalFrames).toFixed(1));
     const geosDelta = endGeometries - this.benchInitialGeos;
     const rowsTraversed = Math.max(0, endRow - this.benchStartRow);
 
@@ -225,6 +244,10 @@ export class PerfMetricsTracker {
       endGeometries,
       geometriesDelta: geosDelta,
       rowsTraversed,
+      avgCoreMs,
+      avgSyncMs,
+      avgRenderMs,
+      peakTriangles: this.benchPeakTriangles,
       verdict,
     };
   }
@@ -238,4 +261,28 @@ export class PerfMetricsTracker {
     const walked = Math.max(0, currentRow - this.benchStartRow);
     return Math.min(1, walked / targetRows);
   }
+}
+
+export function formatPerfReportMarkdown(report: PerfBenchmarkReport): string {
+  const kTris = (report.peakTriangles / 1000).toFixed(1);
+  return [
+    '### 📊 Crossy Road Pro — Результаты стресс-теста производительности',
+    `- **Пройдено полос**: ${report.rowsTraversed} (${report.totalFrames} кадров за ${report.totalDurationSec} сек)`,
+    `- **Кадровая частота (FPS)**:`,
+    `  - Средний FPS: **${report.avgFps}**`,
+    `  - 1% Low FPS (микрофризы): **${report.low1PercentFps}**`,
+    `  - Минимальный FPS: **${report.minFps}**`,
+    `  - Макс. спайк кадра: **${report.maxFrameTimeMs} ms**`,
+    `- **Нагрузка WebGL (Three.js)**:`,
+    `  - Среднее число Draw Calls: **${report.avgDrawCalls}**`,
+    `  - Пик Draw Calls: **${report.peakDrawCalls}** ${report.peakDrawCalls > 250 ? '⚠️ (Критично много! Требуется <100)' : '✅'}`,
+    `  - Пик полигонов: **~${kTris}k** треугольников`,
+    `- **Память WebGL (Geometries)**:`,
+    `  - Геометрии: ${report.startGeometries} ➔ ${report.endGeometries} (Дельта: ${report.geometriesDelta >= 0 ? '+' : ''}${report.geometriesDelta} ${report.geometriesDelta > 30 ? '⚠️ Возможна утечка!' : '✅ Утечек нет'})`,
+    `- **Бюджет времени кадра**:`,
+    `  - Движок (GameEngine Core): **${report.avgCoreMs} ms**`,
+    `  - Синхронизация сцены (CPU Sync): **${report.avgSyncMs} ms**`,
+    `  - Отрисовка Three.js (GPU Render): **${report.avgRenderMs} ms**`,
+    `- **Вердикт**: ${report.verdict}`,
+  ].join('\n');
 }

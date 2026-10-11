@@ -42,6 +42,7 @@ const moduleOrder = [
   'src/view/squashStretch.ts',
   'src/view/sceneManager.ts',
   'src/app/perfMetrics.ts',
+  'src/app/perfReportModal.ts',
   'src/app/perfMonitor.ts',
   'src/app/uiManager.ts',
   'src/app/inputManager.ts',

@@ -24,6 +24,7 @@ export interface ModalStateProvider {
   isDailyBonusOpen?: () => boolean;
   isDailyQuestsOpen?: () => boolean;
   isDevModalOpen?: () => boolean;
+  isPerfReportModalOpen?: () => boolean;
   isGameOverOpen: () => boolean;
   isNameInputFocused?: () => boolean;
   isPlaying: () => boolean;
@@ -191,6 +192,14 @@ export class InputManager {
 
     if (this.modalState.isDevModalOpen?.()) {
       if (e.code === 'Escape') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      }
+      return;
+    }
+
+    if (this.modalState.isPerfReportModalOpen?.()) {
+      if (e.code === 'Escape' || e.code === 'Enter') {
         e.preventDefault();
         this.callbacks.onCloseModal();
       }

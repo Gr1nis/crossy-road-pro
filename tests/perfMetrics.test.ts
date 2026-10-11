@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { PerfMetricsTracker, type PerfSnapshot } from '../src/app/perfMetrics.ts';
+import { PerfMetricsTracker, type PerfSnapshot, formatPerfReportMarkdown } from '../src/app/perfMetrics.ts';
 
 describe('PerfMetricsTracker — Real-Time Framerate, 1% Low & Benchmark Suite', () => {
   function makeSnapshot(frameTimeMs: number, calls = 100, geos = 40): PerfSnapshot {
@@ -80,5 +80,25 @@ describe('PerfMetricsTracker — Real-Time Framerate, 1% Low & Benchmark Suite',
     assert.equal(report.peakDrawCalls, 219);
     assert.ok(report.avgFps >= 58 && report.avgFps <= 62);
     assert.ok(report.low1PercentFps >= 50);
+    assert.equal(report.avgCoreMs, 0.5);
+    assert.equal(report.avgSyncMs, 1.2);
+    assert.ok(report.avgRenderMs >= 14 && report.avgRenderMs <= 16);
+    assert.equal(report.peakTriangles, 5000);
+  });
+
+  it('Formats benchmark report into human-readable markdown with key metrics', () => {
+    const tracker = new PerfMetricsTracker();
+    tracker.startBenchmark(30, 0);
+    for (let i = 0; i < 50; i++) {
+      tracker.record(makeSnapshot(16.67, 150, 32));
+    }
+    const report = tracker.finishBenchmark(32, 50);
+    const md = formatPerfReportMarkdown(report);
+
+    assert.ok(md.includes('Crossy Road Pro — Результаты стресс-теста'));
+    assert.ok(md.includes('Средний FPS'));
+    assert.ok(md.includes('Draw Calls'));
+    assert.ok(md.includes('GameEngine Core'));
+    assert.ok(md.includes('GPU Render'));
   });
 });
