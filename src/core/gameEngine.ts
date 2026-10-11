@@ -250,12 +250,12 @@ export class GameEngine {
     return this.scoreTracker.recordDailyQuestProgress(events);
   }
 
-  claimDailyQuest(questId: string): { success: boolean; coins: number } {
-    return this.scoreTracker.claimDailyQuest(questId);
+  claimDailyQuest(questId: string, doubleMultiplier: boolean = false): { success: boolean; coins: number; isDouble: boolean } {
+    return this.scoreTracker.claimDailyQuest(questId, doubleMultiplier);
   }
 
-  claimDailyQuestBonus(): { success: boolean; coins: number } {
-    return this.scoreTracker.claimDailyQuestBonus();
+  claimDailyQuestBonus(doubleMultiplier: boolean = false): { success: boolean; coins: number; isDouble: boolean } {
+    return this.scoreTracker.claimDailyQuestBonus(doubleMultiplier);
   }
 
   getDailyQuestTracker(): DailyQuestTracker {

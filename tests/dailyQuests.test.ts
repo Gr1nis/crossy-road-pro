@@ -313,6 +313,7 @@ describe('DailyQuests — Comprehensive TDD Suite', () => {
     assert.ok(html.includes('id="quests-summary-bar"'), 'Must contain progress bar #quests-summary-bar');
     assert.ok(html.includes('id="daily-quests-list"'), 'Must contain #daily-quests-list');
     assert.ok(html.includes('id="quests-claim-bonus-btn"'), 'Must contain super bonus button #quests-claim-bonus-btn');
+    assert.ok(html.includes('id="quests-claim-bonus-x2-btn"'), 'Must contain super bonus x2 button #quests-claim-bonus-x2-btn');
     assert.ok(html.includes('id="quests-close-btn"'), 'Must contain close button #quests-close-btn');
 
     // CSS Styling
@@ -321,6 +322,8 @@ describe('DailyQuests — Comprehensive TDD Suite', () => {
     assert.ok(html.includes('.quest-card.claimed'), 'Must contain .quest-card.claimed CSS');
     assert.ok(html.includes('.quest-card.in-progress'), 'Must contain .quest-card.in-progress CSS');
     assert.ok(html.includes('.quest-super-card'), 'Must contain .quest-super-card CSS');
+    assert.ok(html.includes('.quest-btn-purple'), 'Must contain .quest-btn-purple CSS');
+    assert.ok(html.includes('.quest-super-actions'), 'Must contain .quest-super-actions CSS');
   });
 });
 

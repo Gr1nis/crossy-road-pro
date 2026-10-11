@@ -1,4 +1,4 @@
-import { ALL_SKINS } from '../core/types.ts';
+import { ALL_SKINS, type AdProvider } from '../core/types.ts';
 import type { Achievement, AchievementId } from '../core/achievements.ts';
 import type { DailyRewardDayView } from '../core/dailyReward.ts';
 import type { DailyQuestDayState } from '../core/dailyQuests.ts';
@@ -24,8 +24,8 @@ export interface UIActions {
   onOpenDaily?: () => void;
   onClaimDaily?: (doubleMultiplier: boolean) => void;
   onOpenDailyQuests?: () => void;
-  onClaimDailyQuest?: (id: string) => void;
-  onClaimDailyBonus?: () => void;
+  onClaimDailyQuest?: (id: string, doubleMultiplier?: boolean) => void;
+  onClaimDailyBonus?: (doubleMultiplier?: boolean) => void;
 }
 
 export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
@@ -110,11 +110,14 @@ export class UIManager {
   private readonly menuDailyQuestsBtn: HTMLElement | null;
   private readonly menuDailyQuestsBadgeEl: HTMLElement | null;
   private readonly questsTimerValEl: HTMLElement | null;
+  private readonly questsCoinsValEl: HTMLElement | null;
   private readonly questsSummaryTextEl: HTMLElement | null;
   private readonly questsSummaryBarEl: HTMLElement | null;
   private readonly dailyQuestsListEl: HTMLElement | null;
   private readonly questsClaimBonusBtn: HTMLButtonElement | null;
+  private readonly questsClaimBonusX2Btn: HTMLButtonElement | null;
   private readonly questsCloseBtn: HTMLElement | null;
+  private readonly platform: AdProvider;
   private questsTimerInterval: number | null = null;
 
   // State
@@ -122,7 +125,11 @@ export class UIManager {
   private lastCoins = -1;
   private settingsReturnTo: 'menu' | 'pause' = 'menu';
 
-  constructor() {
+  constructor(platform?: AdProvider) {
+    this.platform = platform ?? {
+      isAdReady: () => false,
+      showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
+    };
     this.scoreEl = document.getElementById('score-value');
     this.coinsEl = document.getElementById('coins-value');
     this.pauseBtn = document.getElementById('pause-btn');
@@ -191,10 +198,12 @@ export class UIManager {
     this.menuDailyQuestsBtn = document.getElementById('menu-daily-quests-btn');
     this.menuDailyQuestsBadgeEl = document.getElementById('menu-daily-quests-badge');
     this.questsTimerValEl = document.getElementById('quests-timer-val');
+    this.questsCoinsValEl = document.getElementById('quests-coins-val');
     this.questsSummaryTextEl = document.getElementById('quests-summary-text');
     this.questsSummaryBarEl = document.getElementById('quests-summary-bar');
     this.dailyQuestsListEl = document.getElementById('daily-quests-list');
     this.questsClaimBonusBtn = document.getElementById('quests-claim-bonus-btn') as HTMLButtonElement | null;
+    this.questsClaimBonusX2Btn = document.getElementById('quests-claim-bonus-x2-btn') as HTMLButtonElement | null;
     this.questsCloseBtn = document.getElementById('quests-close-btn');
 
     this.setupInternalNavigation();
@@ -382,7 +391,8 @@ export class UIManager {
     }
 
     if (this.dailyDoubleBtn) {
-      this.dailyDoubleBtn.style.display = canClaim ? 'flex' : 'none';
+      const showX2 = canClaim && this.platform.isAdReady();
+      this.dailyDoubleBtn.style.display = showX2 ? 'flex' : 'none';
       const availableDay = days.find((d) => d.status === 'available');
       if (availableDay) {
         this.dailyDoubleBtn.textContent = `🎬 Забрать x2 (${availableDay.coins * 2} 🪙)`;
@@ -434,8 +444,8 @@ export class UIManager {
 
   renderDailyQuests(
     state: DailyQuestDayState,
-    onClaimQuest: (id: string) => void,
-    onClaimBonus: () => void
+    onClaimQuest: (id: string, doubleMultiplier?: boolean) => void,
+    onClaimBonus: (doubleMultiplier?: boolean) => void
   ): void {
     const quests = state.quests || [];
     const completedCount = quests.filter((q) => q.isCompleted).length;
@@ -493,7 +503,11 @@ export class UIManager {
         if (q.isClaimed) {
           actionHtml = `<span class="quest-status-badge claimed">✔ Получено</span>`;
         } else if (q.isCompleted) {
-          actionHtml = `<button class="quest-btn quest-btn-claim" type="button">Забрать ${q.rewardCoins} 🪙</button>`;
+          const showX2 = this.platform.isAdReady();
+          actionHtml = `
+            <button class="quest-btn quest-btn-claim" type="button">Забрать ${q.rewardCoins} 🪙</button>
+            ${showX2 ? `<button class="quest-btn quest-btn-purple quest-btn-x2" type="button">🎬 x2 (${q.rewardCoins * 2} 🪙)</button>` : ''}
+          `;
         } else {
           actionHtml = `<span class="quest-status-badge pending">${q.current}/${q.target}</span>`;
         }
@@ -524,7 +538,15 @@ export class UIManager {
           const claimBtn = card.querySelector('.quest-btn-claim');
           claimBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
-            onClaimQuest(q.id);
+            this.spawnFlyingCoins(claimBtn as HTMLElement);
+            onClaimQuest(q.id, false);
+          });
+
+          const x2Btn = card.querySelector('.quest-btn-x2');
+          x2Btn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.spawnFlyingCoins(x2Btn as HTMLElement, 6);
+            onClaimQuest(q.id, true);
           });
         }
 
@@ -539,18 +561,38 @@ export class UIManager {
         this.questsClaimBonusBtn.textContent = '✔ Получено';
         this.questsClaimBonusBtn.className = 'quest-btn quest-status-badge claimed';
         this.questsClaimBonusBtn.onclick = null;
+        if (this.questsClaimBonusX2Btn) {
+          this.questsClaimBonusX2Btn.style.display = 'none';
+          this.questsClaimBonusX2Btn.onclick = null;
+        }
       } else if (canClaimSuperBonus) {
         this.questsClaimBonusBtn.disabled = false;
         this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
         this.questsClaimBonusBtn.className = 'quest-btn quest-btn-claim quest-super-btn';
         this.questsClaimBonusBtn.onclick = () => {
-          onClaimBonus();
+          this.spawnFlyingCoins(this.questsClaimBonusBtn as HTMLElement, 8);
+          onClaimBonus(false);
         };
+        if (this.questsClaimBonusX2Btn) {
+          const showX2 = this.platform.isAdReady();
+          this.questsClaimBonusX2Btn.style.display = showX2 ? 'block' : 'none';
+          this.questsClaimBonusX2Btn.disabled = false;
+          this.questsClaimBonusX2Btn.textContent = '🎬 Забрать x2 (200 🪙)';
+          this.questsClaimBonusX2Btn.className = 'quest-btn quest-super-btn quest-btn-purple';
+          this.questsClaimBonusX2Btn.onclick = () => {
+            this.spawnFlyingCoins(this.questsClaimBonusX2Btn as HTMLElement, 12);
+            onClaimBonus(true);
+          };
+        }
       } else {
         this.questsClaimBonusBtn.disabled = true;
         this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
         this.questsClaimBonusBtn.className = 'quest-btn quest-super-btn';
         this.questsClaimBonusBtn.onclick = null;
+        if (this.questsClaimBonusX2Btn) {
+          this.questsClaimBonusX2Btn.style.display = 'none';
+          this.questsClaimBonusX2Btn.onclick = null;
+        }
       }
     }
   }
@@ -610,6 +652,15 @@ export class UIManager {
     if (this.coinsEl) {
       this.coinsEl.textContent = String(coins);
     }
+    if (this.menuCoinsEl) {
+      this.menuCoinsEl.textContent = String(coins);
+    }
+    if (this.gachaModalCoinsEl) {
+      this.gachaModalCoinsEl.textContent = String(coins);
+    }
+    if (this.questsCoinsValEl) {
+      this.questsCoinsValEl.textContent = String(coins);
+    }
   }
 
   setWarningVignette(graceRatio: number): void {
@@ -642,6 +693,7 @@ export class UIManager {
     if (this.menuCoinsEl) this.menuCoinsEl.textContent = String(coins);
     if (this.leaderboardBestScoreEl) this.leaderboardBestScoreEl.textContent = String(highScore);
     if (this.gachaModalCoinsEl) this.gachaModalCoinsEl.textContent = String(coins);
+    if (this.questsCoinsValEl) this.questsCoinsValEl.textContent = String(coins);
   }
 
   renderLeaderboard(entries: LeaderboardEntry[]): void {
@@ -855,5 +907,118 @@ export class UIManager {
 
       this.achievementsListEl.appendChild(card);
     }
+  }
+
+  spawnFlyingCoins(origin: HTMLElement | { x: number; y: number }, coinCount = 7): void {
+    if (typeof document === 'undefined') return;
+
+    let startX = (typeof window !== 'undefined' ? window.innerWidth : 800) / 2;
+    let startY = (typeof window !== 'undefined' ? window.innerHeight : 600) / 2;
+    if ('getBoundingClientRect' in origin && typeof origin.getBoundingClientRect === 'function') {
+      const rect = origin.getBoundingClientRect();
+      if (rect.width > 0 || rect.height > 0) {
+        startX = rect.left + rect.width / 2;
+        startY = rect.top + rect.height / 2;
+      }
+    } else if (origin && 'x' in origin && typeof origin.x === 'number') {
+      startX = origin.x;
+      startY = origin.y;
+    }
+
+    const candidates = [
+      this.questsCoinsValEl,
+      this.menuCoinsEl,
+      this.coinsEl,
+      document.getElementById('quests-coins-val'),
+      document.getElementById('menu-coins'),
+      document.getElementById('coins-value'),
+    ];
+
+    let targetEl: HTMLElement | null = null;
+    let targetX = (typeof window !== 'undefined' ? window.innerWidth : 800) - 48;
+    let targetY = 36;
+
+    for (const el of candidates) {
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.left >= 0) {
+          targetEl = el;
+          targetX = rect.left + rect.width / 2;
+          targetY = rect.top + rect.height / 2;
+          break;
+        }
+      }
+    }
+
+    const count = Math.max(5, Math.min(8, coinCount));
+    let landedCount = 0;
+
+    const rAF = (typeof requestAnimationFrame === 'function')
+      ? requestAnimationFrame
+      : (cb: (now: number) => void) => setTimeout(() => cb(performance.now()), 16);
+
+    for (let i = 0; i < count; i++) {
+      const coin = document.createElement('div');
+      coin.className = 'flying-coin-particle';
+      coin.textContent = '🪙';
+      document.body.appendChild(coin);
+
+      const delay = i * 45;
+      const duration = 520 + Math.random() * 140;
+      const cpX = (startX + targetX) / 2 + (Math.random() - 0.5) * 60;
+      const cpY = Math.min(startY, targetY) - (60 + Math.random() * 80);
+
+      const startTime = performance.now() + delay;
+
+      const animateStep = (now: number) => {
+        if (now < startTime) {
+          rAF(animateStep);
+          return;
+        }
+
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        const easeT = t * t * (3 - 2 * t);
+
+        const inv = 1 - easeT;
+        const curX = inv * inv * startX + 2 * inv * easeT * cpX + easeT * easeT * targetX;
+        const curY = inv * inv * startY + 2 * inv * easeT * cpY + easeT * easeT * targetY;
+
+        const scale = t < 0.25 ? 0.6 + t * 2.5 : Math.max(0.65, 1.25 - (t - 0.25) * 0.7);
+        const rotation = (i % 2 === 0 ? 1 : -1) * (t * 360);
+
+        coin.style.transform = `translate(${curX}px, ${curY}px) translate(-50%, -50%) scale(${scale}) rotate(${rotation}deg)`;
+        coin.style.opacity = t > 0.88 ? `${(1 - t) / 0.12}` : '1';
+
+        if (t < 1) {
+          rAF(animateStep);
+        } else {
+          coin.remove();
+          landedCount++;
+          if (landedCount === 1 || landedCount === count) {
+            this.pulseCoinCounter(targetEl);
+          }
+        }
+      };
+
+      setTimeout(() => {
+        if (coin.parentNode) {
+          coin.remove();
+        }
+      }, 2500);
+
+      rAF(animateStep);
+    }
+  }
+
+  public pulseCoinCounter(targetEl: HTMLElement | null): void {
+    const el = targetEl || this.questsCoinsValEl || this.menuCoinsEl || this.coinsEl;
+    if (!el) return;
+    el.classList.remove('coin-counter-pulse');
+    void el.offsetWidth;
+    el.classList.add('coin-counter-pulse');
+    setTimeout(() => {
+      el.classList.remove('coin-counter-pulse');
+    }, 320);
   }
 }

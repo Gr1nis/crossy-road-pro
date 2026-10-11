@@ -81,6 +81,8 @@
     .btn-badge.pulse-badge { background: #10b981; color: #fff; border-color: #34d399; animation: badgePulse 1.4s infinite; }
     .btn-badge.hidden { display: none !important; }
     @keyframes badgePulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 50% { transform: scale(1.12); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5), 0 0 0 6px rgba(245, 158, 11, 0); } }
+    #menu-daily-quests-badge { background: #f59e0b; color: #000; font-weight: 900; border-color: #fde68a; animation: pulse 1.5s infinite; }
 
     .modal-card-daily { max-height: 90vh; overflow-y: auto; padding: 28px 24px; -webkit-overflow-scrolling: touch; }
     .daily-streak-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: rgba(245, 158, 11, 0.15); border: 1.5px solid rgba(245, 158, 11, 0.4); color: #fbbf24; padding: 6px 16px; border-radius: 999px; font-weight: 800; font-size: 13px; margin: 0 auto 16px; }
@@ -171,7 +173,34 @@
     .quest-list-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; text-align: left; }
     .quest-card { display: flex; align-items: center; gap: 12px; background: rgba(15, 23, 42, 0.7); border: 2px solid #334155; border-radius: 14px; padding: 12px 14px; transition: all 0.2s ease; }
     .quest-card.in-progress { border-color: #334155; background: rgba(15, 23, 42, 0.6); }
-    .quest-card.ready { border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); box-shadow: 0 0 16px rgba(245, 158, 11, 0.25); }
+    .quest-card.ready { border-color: #f59e0b; background: rgba(245, 158, 11, 0.14); box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); }
+    .quest-card.ready .quest-btn-claim {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.5), 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+    .quest-card.ready .quest-btn-claim::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -100%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: skewX(-25deg);
+      animation: questBtnShimmer 2s infinite ease-in-out;
+      pointer-events: none;
+    }
+    @keyframes questBtnShimmer {
+      0% { left: -100%; }
+      40%, 100% { left: 200%; }
+    }
     .quest-card.claimed { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); opacity: 0.8; }
     .quest-icon-col { flex-shrink: 0; }
     .quest-icon { font-size: 26px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; }
@@ -185,11 +214,15 @@
     .quest-progress-row { display: flex; align-items: center; gap: 8px; }
     .quest-progress-row .quest-progress-bar-bg { height: 6px; flex: 1; }
     .quest-progress-text { font-size: 11px; font-weight: 800; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .quest-action-col { flex-shrink: 0; margin-left: 6px; }
+    .quest-action-col { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; }
+    .quest-super-actions { display: flex; gap: 8px; align-items: center; }
     .quest-btn { border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
     .quest-btn-claim { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
     .quest-btn-claim:hover { filter: brightness(1.1); transform: scale(1.03); }
     .quest-btn-claim:active { transform: scale(0.97); }
+    .quest-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); }
+    .quest-btn-purple:hover { filter: brightness(1.1); transform: scale(1.03); }
+    .quest-btn-purple:active { transform: scale(0.97); }
     .quest-status-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; display: inline-block; }
     .quest-status-badge.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
     .quest-status-badge.pending { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #475569; }
@@ -200,9 +233,53 @@
     .quest-super-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; }
     .quest-super-desc { font-size: 11px; color: #e2e8f0; margin-top: 2px; }
     .quest-super-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; transition: all 0.15s ease; }
+    .quest-super-btn:not(:disabled) {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+    }
+    .quest-super-btn:not(:disabled)::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -100%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: skewX(-25deg);
+      animation: questBtnShimmer 2s infinite ease-in-out;
+      pointer-events: none;
+    }
     .quest-super-btn:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); }
     .quest-super-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.8); }
     .quest-super-btn.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); opacity: 1; filter: none; cursor: default; }
+
+    /* Flying Coin VFX & Counter Pulse */
+    .flying-coin-particle {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      pointer-events: none;
+      font-size: 24px;
+      line-height: 1;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.5));
+    }
+    @keyframes coinCounterPulse {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+    .coin-counter-pulse {
+      animation: coinCounterPulse 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      display: inline-block;
+    }
 
     /* Game Over Score Card */
     .game-over-score-card { display: flex; justify-content: center; gap: 16px; margin: 0 auto 20px; max-width: 280px; }
@@ -507,7 +584,12 @@
   <!-- Модальное окно Ежедневных заданий (Daily Quests Modal) -->
   <div id="daily-quests-modal" class="modal hidden">
     <div class="modal-card modal-card-quests">
-      <h2 style="color: #fbbf24;">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <h2 style="color: #fbbf24; margin: 0;">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+        <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 13px; margin: 0;">
+          <strong id="quests-coins-val">0</strong> 🪙
+        </div>
+      </div>
       <p style="margin-bottom: 12px;">Выполняйте испытания дня и получайте монеты!</p>
 
       <div class="quest-timer-box">
@@ -534,7 +616,10 @@
             <div class="quest-super-desc">Выполните все 3 задания: <strong style="color: #facc15;">+100 🪙</strong></div>
           </div>
         </div>
-        <button id="quests-claim-bonus-btn" class="quest-btn quest-super-btn" disabled>Забрать 100 🪙</button>
+        <div class="quest-super-actions">
+          <button id="quests-claim-bonus-btn" class="quest-btn quest-super-btn" disabled>Забрать 100 🪙</button>
+          <button id="quests-claim-bonus-x2-btn" class="quest-btn quest-super-btn quest-btn-purple" style="display: none;">🎬 Забрать x2 за рекламу</button>
+        </div>
       </div>
 
       <button id="quests-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 14px;">Закрыть</button>
@@ -1609,19 +1694,21 @@ class DailyQuestTracker {
     return { newlyCompletedQuests };
   }
 
-         claimQuest(questId        )                                            {
+         claimQuest(questId        , doubleMultiplier          = false)                                                               {
     const quest = this.getQuest(questId);
     if (!quest || !quest.isCompleted || quest.isClaimed || quest.current < quest.target) {
-      return { success: false, rewardCoins: 0 };
+      return { success: false, rewardCoins: 0, isDouble: false };
     }
     quest.isClaimed = true;
-    return { success: true, rewardCoins: quest.rewardCoins };
+    const coins = doubleMultiplier ? quest.rewardCoins * 2 : quest.rewardCoins;
+    return { success: true, rewardCoins: coins, isDouble: doubleMultiplier };
   }
 
-         claimDailyBonus()                                            {
-    if (!this.canClaimDailyBonus()) return { success: false, rewardCoins: 0 };
+         claimDailyBonus(doubleMultiplier          = false)                                                               {
+    if (!this.canClaimDailyBonus()) return { success: false, rewardCoins: 0, isDouble: false };
     this._allCompletedBonusClaimed = true;
-    return { success: true, rewardCoins: DAILY_SUPER_BONUS_COINS };
+    const coins = doubleMultiplier ? DAILY_SUPER_BONUS_COINS * 2 : DAILY_SUPER_BONUS_COINS;
+    return { success: true, rewardCoins: coins, isDouble: doubleMultiplier };
   }
 
          getState()                     {
@@ -2196,24 +2283,24 @@ class ScoreTracker {
     return newlyCompletedQuests;
   }
 
-  claimDailyQuest(questId        )                                      {
-    const res = this.dailyQuests.claimQuest(questId);
+  claimDailyQuest(questId        , doubleMultiplier          = false)                                                         {
+    const res = this.dailyQuests.claimQuest(questId, doubleMultiplier);
     if (res.success && res.rewardCoins > 0) {
       this.wallet.addCoins(res.rewardCoins);
       this.saveToStorage();
-      return { success: true, coins: res.rewardCoins };
+      return { success: true, coins: res.rewardCoins, isDouble: res.isDouble };
     }
-    return { success: false, coins: 0 };
+    return { success: false, coins: 0, isDouble: false };
   }
 
-  claimDailyQuestBonus()                                      {
-    const res = this.dailyQuests.claimDailyBonus();
+  claimDailyQuestBonus(doubleMultiplier          = false)                                                         {
+    const res = this.dailyQuests.claimDailyBonus(doubleMultiplier);
     if (res.success && res.rewardCoins > 0) {
       this.wallet.addCoins(res.rewardCoins);
       this.saveToStorage();
-      return { success: true, coins: res.rewardCoins };
+      return { success: true, coins: res.rewardCoins, isDouble: res.isDouble };
     }
-    return { success: false, coins: 0 };
+    return { success: false, coins: 0, isDouble: false };
   }
 }
 
@@ -2608,12 +2695,12 @@ class GameEngine {
     return this.scoreTracker.recordDailyQuestProgress(events);
   }
 
-  claimDailyQuest(questId        )                                      {
-    return this.scoreTracker.claimDailyQuest(questId);
+  claimDailyQuest(questId        , doubleMultiplier          = false)                                                         {
+    return this.scoreTracker.claimDailyQuest(questId, doubleMultiplier);
   }
 
-  claimDailyQuestBonus()                                      {
-    return this.scoreTracker.claimDailyQuestBonus();
+  claimDailyQuestBonus(doubleMultiplier          = false)                                                         {
+    return this.scoreTracker.claimDailyQuestBonus(doubleMultiplier);
   }
 
   getDailyQuestTracker()                    {
@@ -2918,6 +3005,92 @@ class GameEngine {
   }
 }
 
+// --- Module: src/platform/ysdk.ts ---
+class PlatformBridge                       {
+          ysdk                      = null;
+          isInitStarted          = false;
+          isInitCompleted          = false;
+          simulationMode          = false;
+
+  constructor(simulationMode          = false) {
+    this.simulationMode = simulationMode;
+  }
+
+         async init()                   {
+    if (this.isInitCompleted) return this.isAvailable();
+    if (this.isInitStarted) return false;
+    this.isInitStarted = true;
+
+    if (typeof window === 'undefined') {
+      this.isInitCompleted = true;
+      return false;
+    }
+
+    if (window.crossy_sim_ads) {
+      this.simulationMode = true;
+    }
+
+    if (window.YaGames && typeof window.YaGames.init === 'function') {
+      try {
+        this.ysdk = await window.YaGames.init();
+        this.isInitCompleted = true;
+        this.ysdk?.features?.LoadingAPI?.ready?.();
+        return true;
+      } catch (err         ) {
+        console.warn('[PlatformBridge] YaGames.init failed, falling back to offline mode:', err);
+        this.ysdk = null;
+        this.isInitCompleted = true;
+        return false;
+      }
+    }
+
+    this.isInitCompleted = true;
+    return false;
+  }
+
+         isAvailable()          {
+    return Boolean(this.ysdk && this.ysdk.adv && typeof this.ysdk.adv.showRewardedVideo === 'function');
+  }
+
+         isAdReady()          {
+    return this.isAvailable() || this.simulationMode || Boolean(typeof window !== 'undefined' && window.crossy_sim_ads);
+  }
+
+         setSimulationMode(enabled         )       {
+    this.simulationMode = enabled;
+  }
+
+         showRewardedVideo(callbacks                     )       {
+    if (this.isAvailable() && this.ysdk) {
+      callbacks.onOpen?.();
+      try {
+        this.ysdk.adv.showRewardedVideo({
+          callbacks: {
+            onOpen: () => callbacks.onOpen?.(),
+            onRewarded: () => callbacks.onRewarded?.(),
+            onClose: () => callbacks.onClose?.(),
+            onError: (err         ) => callbacks.onError?.(err),
+          },
+        });
+      } catch (err         ) {
+        callbacks.onError?.(err);
+      }
+      return;
+    }
+
+    if (this.simulationMode || (typeof window !== 'undefined' && window.crossy_sim_ads)) {
+      callbacks.onOpen?.();
+      setTimeout(() => {
+        callbacks.onRewarded?.();
+        callbacks.onClose?.();
+      }, 200);
+      return;
+    }
+
+    callbacks.onError?.(new Error('Yandex SDK is not initialized and simulation is disabled'));
+  }
+}
+
 // --- Module: src/view/audioSynth.ts ---
 class AudioSynth {
           ctx                      = null;
@@ -2999,29 +3172,33 @@ class AudioSynth {
   }
 
           ensureContext(ignoreSoundFlag          = false)                      {
-    if (typeof window === 'undefined') return null;
-    if (!this.ctx) {
-      const AudioCtx =
-        window.AudioContext || (window                         ).webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-        this.masterGainNode = this.ctx.createGain();
-        this.masterGainNode.gain.setValueAtTime(1.0, this.ctx.currentTime);
-        this.masterGainNode.connect(this.ctx.destination);
-
-        this.sfxGainNode = this.ctx.createGain();
-        this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
-        this.sfxGainNode.connect(this.masterGainNode);
-
-        this.bgmGainNode = this.ctx.createGain();
-        this.bgmGainNode.gain.setValueAtTime(this.musicEnabled ? this.musicVolume : 0.0, this.ctx.currentTime);
-        this.bgmGainNode.connect(this.masterGainNode);
-
-        this.bgmFilterNode = this.ctx.createBiquadFilter();
-        this.bgmFilterNode.type = 'lowpass';
-        this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
-        this.bgmFilterNode.connect(this.bgmGainNode);
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
       }
+      return this.ctx;
+    }
+    if (typeof window === 'undefined') return null;
+    const AudioCtx =
+      window.AudioContext || (window                         ).webkitAudioContext;
+    if (AudioCtx) {
+      this.ctx = new AudioCtx();
+      this.masterGainNode = this.ctx.createGain();
+      this.masterGainNode.gain.setValueAtTime(1.0, this.ctx.currentTime);
+      this.masterGainNode.connect(this.ctx.destination);
+
+      this.sfxGainNode = this.ctx.createGain();
+      this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
+      this.sfxGainNode.connect(this.masterGainNode);
+
+      this.bgmGainNode = this.ctx.createGain();
+      this.bgmGainNode.gain.setValueAtTime(this.musicEnabled ? this.musicVolume : 0.0, this.ctx.currentTime);
+      this.bgmGainNode.connect(this.masterGainNode);
+
+      this.bgmFilterNode = this.ctx.createBiquadFilter();
+      this.bgmFilterNode.type = 'lowpass';
+      this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
+      this.bgmFilterNode.connect(this.bgmGainNode);
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
@@ -3529,6 +3706,85 @@ class AudioSynth {
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(t);
       osc.stop(t + dur + 0.02);
+    });
+  }
+
+  playQuestComplete()       {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    // Bright ascending 4-note arpeggio (C5 -> E5 -> G5 -> C6) with shimmer
+    const notes = [
+      { freq: 523.25, dur: 0.16 }, // C5
+      { freq: 659.25, dur: 0.16 }, // E5
+      { freq: 783.99, dur: 0.18 }, // G5
+      { freq: 1046.5, dur: 0.28 }, // C6
+    ];
+
+    notes.forEach(({ freq, dur }, idx) => {
+      const t = now + idx * 0.075;
+      // Main tone (Triangle for clear chime body)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.002, t + dur);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
+
+      // Shimmer decay (Sine harmonic overtone)
+      const sOsc = ctx.createOscillator();
+      const sGain = ctx.createGain();
+      sOsc.type = 'sine';
+      sOsc.frequency.setValueAtTime(freq * 2, t);
+      sGain.gain.setValueAtTime(0.001, t);
+      sGain.gain.linearRampToValueAtTime(0.06, t + 0.008);
+      sGain.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.8);
+      sOsc.connect(sGain);
+      sGain.connect(this.sfxGainNode ?? ctx.destination);
+      sOsc.start(t);
+      sOsc.stop(t + dur + 0.01);
+    });
+  }
+
+  playDailySuperBonusFanfare()       {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    // 8-bit triumphant retro fanfare (~0.8s total duration)
+    const melody = [
+      { freq: 392.0, delay: 0.0, dur: 0.08, type: 'square'                  , gain: 0.12 }, // G4
+      { freq: 523.25, delay: 0.09, dur: 0.08, type: 'square'                  , gain: 0.13 }, // C5
+      { freq: 659.25, delay: 0.18, dur: 0.08, type: 'square'                  , gain: 0.13 }, // E5
+      { freq: 783.99, delay: 0.27, dur: 0.11, type: 'square'                  , gain: 0.14 }, // G5
+      { freq: 659.25, delay: 0.38, dur: 0.07, type: 'square'                  , gain: 0.13 }, // E5
+      { freq: 783.99, delay: 0.45, dur: 0.08, type: 'square'                  , gain: 0.14 }, // G5
+      { freq: 1046.5, delay: 0.53, dur: 0.27, type: 'square'                  , gain: 0.15 }, // C6
+      { freq: 523.25, delay: 0.53, dur: 0.27, type: 'triangle'                  , gain: 0.12 }, // C5 bass
+      { freq: 1318.51, delay: 0.53, dur: 0.27, type: 'square'                  , gain: 0.09 }, // E6 harmony
+    ];
+
+    melody.forEach(({ freq, delay, dur, type, gain: noteGain }) => {
+      const t = now + delay;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(noteGain, t + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.002, t + dur);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
     });
   }
 }
@@ -5619,10 +5875,14 @@ class SceneManager {
     }
   }
 
-  spawnRecordConfetti(x        , y        , z        )       {
+  spawnRecordConfetti(x        , y        , z        , burstCount         )       {
     const colors = [0xfacc15, 0xfbbf24, 0xf59e0b, 0xffffff, 0xef4444, 0xec4899];
     const count = 32;
-    for (let i = 0; i < count; i++) {
+    const camZ = this.currentEngine ? this.currentEngine.getCameraZ() : 0;
+    const isFarSpawn = Math.abs(z - (camZ + 3.0)) > 25;
+    const spawnZ = isFarSpawn ? camZ + 3.0 : z;
+    const spawnCount = burstCount ?? (isFarSpawn ? 64 : count);
+    for (let i = 0; i < spawnCount; i++) {
       const c = colors[Math.floor(Math.random() * colors.length)];
       const size = 0.08 + Math.random() * 0.08;
       const geo = new THREE.BoxGeometry(size, size, size);
@@ -5631,7 +5891,7 @@ class SceneManager {
       mesh.position.set(
         worldToScreenX(x) + (Math.random() - 0.5) * 0.6,
         y + (Math.random() - 0.5) * 0.4,
-        z + (Math.random() - 0.5) * 0.6
+        spawnZ + (Math.random() - 0.5) * 0.6
       );
       this.scene.add(mesh);
 
@@ -6288,11 +6548,14 @@ class UIManager {
                    menuDailyQuestsBtn                    ;
                    menuDailyQuestsBadgeEl                    ;
                    questsTimerValEl                    ;
+                   questsCoinsValEl                    ;
                    questsSummaryTextEl                    ;
                    questsSummaryBarEl                    ;
                    dailyQuestsListEl                    ;
                    questsClaimBonusBtn                          ;
+                   questsClaimBonusX2Btn                          ;
                    questsCloseBtn                    ;
+                   platform            ;
           questsTimerInterval                = null;
 
   // State
@@ -6300,7 +6563,11 @@ class UIManager {
           lastCoins = -1;
           settingsReturnTo                   = 'menu';
 
-  constructor() {
+  constructor(platform             ) {
+    this.platform = platform ?? {
+      isAdReady: () => false,
+      showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
+    };
     this.scoreEl = document.getElementById('score-value');
     this.coinsEl = document.getElementById('coins-value');
     this.pauseBtn = document.getElementById('pause-btn');
@@ -6369,10 +6636,12 @@ class UIManager {
     this.menuDailyQuestsBtn = document.getElementById('menu-daily-quests-btn');
     this.menuDailyQuestsBadgeEl = document.getElementById('menu-daily-quests-badge');
     this.questsTimerValEl = document.getElementById('quests-timer-val');
+    this.questsCoinsValEl = document.getElementById('quests-coins-val');
     this.questsSummaryTextEl = document.getElementById('quests-summary-text');
     this.questsSummaryBarEl = document.getElementById('quests-summary-bar');
     this.dailyQuestsListEl = document.getElementById('daily-quests-list');
     this.questsClaimBonusBtn = document.getElementById('quests-claim-bonus-btn')                            ;
+    this.questsClaimBonusX2Btn = document.getElementById('quests-claim-bonus-x2-btn')                            ;
     this.questsCloseBtn = document.getElementById('quests-close-btn');
 
     this.setupInternalNavigation();
@@ -6560,7 +6829,8 @@ class UIManager {
     }
 
     if (this.dailyDoubleBtn) {
-      this.dailyDoubleBtn.style.display = canClaim ? 'flex' : 'none';
+      const showX2 = canClaim && this.platform.isAdReady();
+      this.dailyDoubleBtn.style.display = showX2 ? 'flex' : 'none';
       const availableDay = days.find((d) => d.status === 'available');
       if (availableDay) {
         this.dailyDoubleBtn.textContent = `🎬 Забрать x2 (${availableDay.coins * 2} 🪙)`;
@@ -6612,8 +6882,8 @@ class UIManager {
 
   renderDailyQuests(
     state                    ,
-    onClaimQuest                      ,
-    onClaimBonus            
+    onClaimQuest                                                  ,
+    onClaimBonus                                      
   )       {
     const quests = state.quests || [];
     const completedCount = quests.filter((q) => q.isCompleted).length;
@@ -6671,7 +6941,11 @@ class UIManager {
         if (q.isClaimed) {
           actionHtml = `<span class="quest-status-badge claimed">✔ Получено</span>`;
         } else if (q.isCompleted) {
-          actionHtml = `<button class="quest-btn quest-btn-claim" type="button">Забрать ${q.rewardCoins} 🪙</button>`;
+          const showX2 = this.platform.isAdReady();
+          actionHtml = `
+            <button class="quest-btn quest-btn-claim" type="button">Забрать ${q.rewardCoins} 🪙</button>
+            ${showX2 ? `<button class="quest-btn quest-btn-purple quest-btn-x2" type="button">🎬 x2 (${q.rewardCoins * 2} 🪙)</button>` : ''}
+          `;
         } else {
           actionHtml = `<span class="quest-status-badge pending">${q.current}/${q.target}</span>`;
         }
@@ -6702,7 +6976,15 @@ class UIManager {
           const claimBtn = card.querySelector('.quest-btn-claim');
           claimBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
-            onClaimQuest(q.id);
+            this.spawnFlyingCoins(claimBtn               );
+            onClaimQuest(q.id, false);
+          });
+
+          const x2Btn = card.querySelector('.quest-btn-x2');
+          x2Btn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.spawnFlyingCoins(x2Btn               , 6);
+            onClaimQuest(q.id, true);
           });
         }
 
@@ -6717,18 +6999,38 @@ class UIManager {
         this.questsClaimBonusBtn.textContent = '✔ Получено';
         this.questsClaimBonusBtn.className = 'quest-btn quest-status-badge claimed';
         this.questsClaimBonusBtn.onclick = null;
+        if (this.questsClaimBonusX2Btn) {
+          this.questsClaimBonusX2Btn.style.display = 'none';
+          this.questsClaimBonusX2Btn.onclick = null;
+        }
       } else if (canClaimSuperBonus) {
         this.questsClaimBonusBtn.disabled = false;
         this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
         this.questsClaimBonusBtn.className = 'quest-btn quest-btn-claim quest-super-btn';
         this.questsClaimBonusBtn.onclick = () => {
-          onClaimBonus();
+          this.spawnFlyingCoins(this.questsClaimBonusBtn               , 8);
+          onClaimBonus(false);
         };
+        if (this.questsClaimBonusX2Btn) {
+          const showX2 = this.platform.isAdReady();
+          this.questsClaimBonusX2Btn.style.display = showX2 ? 'block' : 'none';
+          this.questsClaimBonusX2Btn.disabled = false;
+          this.questsClaimBonusX2Btn.textContent = '🎬 Забрать x2 (200 🪙)';
+          this.questsClaimBonusX2Btn.className = 'quest-btn quest-super-btn quest-btn-purple';
+          this.questsClaimBonusX2Btn.onclick = () => {
+            this.spawnFlyingCoins(this.questsClaimBonusX2Btn               , 12);
+            onClaimBonus(true);
+          };
+        }
       } else {
         this.questsClaimBonusBtn.disabled = true;
         this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
         this.questsClaimBonusBtn.className = 'quest-btn quest-super-btn';
         this.questsClaimBonusBtn.onclick = null;
+        if (this.questsClaimBonusX2Btn) {
+          this.questsClaimBonusX2Btn.style.display = 'none';
+          this.questsClaimBonusX2Btn.onclick = null;
+        }
       }
     }
   }
@@ -6788,6 +7090,15 @@ class UIManager {
     if (this.coinsEl) {
       this.coinsEl.textContent = String(coins);
     }
+    if (this.menuCoinsEl) {
+      this.menuCoinsEl.textContent = String(coins);
+    }
+    if (this.gachaModalCoinsEl) {
+      this.gachaModalCoinsEl.textContent = String(coins);
+    }
+    if (this.questsCoinsValEl) {
+      this.questsCoinsValEl.textContent = String(coins);
+    }
   }
 
   setWarningVignette(graceRatio        )       {
@@ -6820,6 +7131,7 @@ class UIManager {
     if (this.menuCoinsEl) this.menuCoinsEl.textContent = String(coins);
     if (this.leaderboardBestScoreEl) this.leaderboardBestScoreEl.textContent = String(highScore);
     if (this.gachaModalCoinsEl) this.gachaModalCoinsEl.textContent = String(coins);
+    if (this.questsCoinsValEl) this.questsCoinsValEl.textContent = String(coins);
   }
 
   renderLeaderboard(entries                    )       {
@@ -7033,6 +7345,119 @@ class UIManager {
 
       this.achievementsListEl.appendChild(card);
     }
+  }
+
+  spawnFlyingCoins(origin                                        , coinCount = 7)       {
+    if (typeof document === 'undefined') return;
+
+    let startX = (typeof window !== 'undefined' ? window.innerWidth : 800) / 2;
+    let startY = (typeof window !== 'undefined' ? window.innerHeight : 600) / 2;
+    if ('getBoundingClientRect' in origin && typeof origin.getBoundingClientRect === 'function') {
+      const rect = origin.getBoundingClientRect();
+      if (rect.width > 0 || rect.height > 0) {
+        startX = rect.left + rect.width / 2;
+        startY = rect.top + rect.height / 2;
+      }
+    } else if (origin && 'x' in origin && typeof origin.x === 'number') {
+      startX = origin.x;
+      startY = origin.y;
+    }
+
+    const candidates = [
+      this.questsCoinsValEl,
+      this.menuCoinsEl,
+      this.coinsEl,
+      document.getElementById('quests-coins-val'),
+      document.getElementById('menu-coins'),
+      document.getElementById('coins-value'),
+    ];
+
+    let targetEl                     = null;
+    let targetX = (typeof window !== 'undefined' ? window.innerWidth : 800) - 48;
+    let targetY = 36;
+
+    for (const el of candidates) {
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.left >= 0) {
+          targetEl = el;
+          targetX = rect.left + rect.width / 2;
+          targetY = rect.top + rect.height / 2;
+          break;
+        }
+      }
+    }
+
+    const count = Math.max(5, Math.min(8, coinCount));
+    let landedCount = 0;
+
+    const rAF = (typeof requestAnimationFrame === 'function')
+      ? requestAnimationFrame
+      : (cb                       ) => setTimeout(() => cb(performance.now()), 16);
+
+    for (let i = 0; i < count; i++) {
+      const coin = document.createElement('div');
+      coin.className = 'flying-coin-particle';
+      coin.textContent = '🪙';
+      document.body.appendChild(coin);
+
+      const delay = i * 45;
+      const duration = 520 + Math.random() * 140;
+      const cpX = (startX + targetX) / 2 + (Math.random() - 0.5) * 60;
+      const cpY = Math.min(startY, targetY) - (60 + Math.random() * 80);
+
+      const startTime = performance.now() + delay;
+
+      const animateStep = (now        ) => {
+        if (now < startTime) {
+          rAF(animateStep);
+          return;
+        }
+
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        const easeT = t * t * (3 - 2 * t);
+
+        const inv = 1 - easeT;
+        const curX = inv * inv * startX + 2 * inv * easeT * cpX + easeT * easeT * targetX;
+        const curY = inv * inv * startY + 2 * inv * easeT * cpY + easeT * easeT * targetY;
+
+        const scale = t < 0.25 ? 0.6 + t * 2.5 : Math.max(0.65, 1.25 - (t - 0.25) * 0.7);
+        const rotation = (i % 2 === 0 ? 1 : -1) * (t * 360);
+
+        coin.style.transform = `translate(${curX}px, ${curY}px) translate(-50%, -50%) scale(${scale}) rotate(${rotation}deg)`;
+        coin.style.opacity = t > 0.88 ? `${(1 - t) / 0.12}` : '1';
+
+        if (t < 1) {
+          rAF(animateStep);
+        } else {
+          coin.remove();
+          landedCount++;
+          if (landedCount === 1 || landedCount === count) {
+            this.pulseCoinCounter(targetEl);
+          }
+        }
+      };
+
+      setTimeout(() => {
+        if (coin.parentNode) {
+          coin.remove();
+        }
+      }, 2500);
+
+      rAF(animateStep);
+    }
+  }
+
+         pulseCoinCounter(targetEl                    )       {
+    const el = targetEl || this.questsCoinsValEl || this.menuCoinsEl || this.coinsEl;
+    if (!el) return;
+    el.classList.remove('coin-counter-pulse');
+    void el.offsetWidth;
+    el.classList.add('coin-counter-pulse');
+    setTimeout(() => {
+      el.classList.remove('coin-counter-pulse');
+    }, 320);
   }
 }
 
@@ -7280,6 +7705,7 @@ class GameLoop {
                    sceneManager              ;
                    audio            ;
                    ui           ;
+                   platform            ;
 
           lastCoins        ;
           runStartHighScore        ;
@@ -7294,12 +7720,17 @@ class GameLoop {
     engine            ,
     sceneManager              ,
     audio            ,
-    ui           
+    ui           ,
+    platform             
   ) {
     this.engine = engine;
     this.sceneManager = sceneManager;
     this.audio = audio;
     this.ui = ui;
+    this.platform = platform ?? {
+      isAdReady: () => false,
+      showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
+    };
     this.animate = this.animate.bind(this);
     this.lastCoins = this.engine.getCoins();
     this.runStartHighScore = this.engine.getHighScore();
@@ -7651,10 +8082,32 @@ class GameLoop {
   }
 
          handleClaimDailyBonus(doubleMultiplier         )       {
+    if (doubleMultiplier) {
+      this.platform.showRewardedVideo({
+        onRewarded: () => {
+          this.executeClaimDailyBonus(true);
+        },
+        onError: () => {
+          this.ui.showToast('⚠️', 'Реклама недоступна', 'Не удалось загрузить видео. Попробуйте позже.');
+        },
+      });
+    } else {
+      this.executeClaimDailyBonus(false);
+    }
+  }
+
+          executeClaimDailyBonus(doubleMultiplier         )       {
     const res = this.engine.claimDailyReward(doubleMultiplier);
     if (res.success) {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([25, 30, 25]);
+      }
       if (res.isDouble) {
-        this.audio.playRecordFanfare();
+        if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
+          this.audio.playDailySuperBonusFanfare();
+        } else {
+          this.audio.playRecordFanfare();
+        }
       } else {
         this.audio.playCoin();
       }
@@ -7669,22 +8122,83 @@ class GameLoop {
     }
   }
 
-         handleClaimDailyQuest(questId        )       {
-    const res = this.engine.claimDailyQuest(questId);
+         handleClaimDailyQuest(questId        , doubleMultiplier          = false)       {
+    if (doubleMultiplier) {
+      this.platform.showRewardedVideo({
+        onRewarded: () => {
+          this.executeClaimDailyQuest(questId, true);
+        },
+        onError: () => {
+          this.ui.showToast('⚠️', 'Реклама недоступна', 'Не удалось загрузить видео. Попробуйте позже.');
+        },
+      });
+    } else {
+      this.executeClaimDailyQuest(questId, false);
+    }
+  }
+
+          executeClaimDailyQuest(questId        , doubleMultiplier         )       {
+    const res = this.engine.claimDailyQuest(questId, doubleMultiplier);
     if (res.success) {
-      this.audio.playCoin();
-      this.ui.showToast('🎯', 'Задание выполнено!', `+${res.coins} 🪙 зачислено на баланс!`);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([25, 30, 25]);
+      }
+      if (res.isDouble) {
+        if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
+          this.audio.playDailySuperBonusFanfare();
+        } else {
+          this.audio.playRecordFanfare();
+        }
+      } else {
+        if (typeof this.audio.playQuestComplete === 'function') {
+          this.audio.playQuestComplete();
+        } else {
+          this.audio.playCoin();
+        }
+      }
+      this.ui.showToast(
+        '🎯',
+        'Задание выполнено!',
+        `+${res.coins} 🪙 зачислено на баланс${res.isDouble ? ' (x2 за рекламу!)' : ''}!`
+      );
       this.lastCoins = this.engine.getCoins();
       this.updateMenuStats();
       this.updateDailyQuestsUI();
     }
   }
 
-         handleClaimDailyQuestBonus()       {
-    const res = this.engine.claimDailyQuestBonus();
+         handleClaimDailyQuestBonus(doubleMultiplier          = false)       {
+    if (doubleMultiplier) {
+      this.platform.showRewardedVideo({
+        onRewarded: () => {
+          this.executeClaimDailyQuestBonus(true);
+        },
+        onError: () => {
+          this.ui.showToast('⚠️', 'Реклама недоступна', 'Не удалось загрузить видео. Попробуйте позже.');
+        },
+      });
+    } else {
+      this.executeClaimDailyQuestBonus(false);
+    }
+  }
+
+          executeClaimDailyQuestBonus(doubleMultiplier         )       {
+    const res = this.engine.claimDailyQuestBonus(doubleMultiplier);
     if (res.success) {
-      this.audio.playCoin();
-      this.ui.showToast('👑', 'Супер-приз получен!', `+${res.coins} 🪙 за все задания дня!`);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([25, 30, 25]);
+      }
+      this.sceneManager.spawnRecordConfetti(0, 2.0, 100);
+      if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
+        this.audio.playDailySuperBonusFanfare();
+      } else {
+        this.audio.playRecordFanfare();
+      }
+      this.ui.showToast(
+        '👑',
+        'Супер-приз получен!',
+        `+${res.coins} 🪙 за все задания дня${res.isDouble ? ' (x2 за рекламу!)' : ''}!`
+      );
       this.lastCoins = this.engine.getCoins();
       this.updateMenuStats();
       this.updateDailyQuestsUI();
@@ -7695,8 +8209,8 @@ class GameLoop {
     const state = this.engine.getDailyQuestTracker().getState();
     this.ui.renderDailyQuests(
       state,
-      (id        ) => this.handleClaimDailyQuest(id),
-      () => this.handleClaimDailyQuestBonus()
+      (id        , doubleMultiplier          ) => this.handleClaimDailyQuest(id, Boolean(doubleMultiplier)),
+      (doubleMultiplier          ) => this.handleClaimDailyQuestBonus(Boolean(doubleMultiplier))
     );
   }
 
@@ -7725,8 +8239,8 @@ class GameLoop {
       onOpenDaily: () => this.handleOpenDailyBonus(),
       onClaimDaily: (doubleMultiplier         ) => this.handleClaimDailyBonus(doubleMultiplier),
       onOpenDailyQuests: () => this.handleOpenDailyQuests(),
-      onClaimDailyQuest: (id        ) => this.handleClaimDailyQuest(id),
-      onClaimDailyBonus: () => this.handleClaimDailyQuestBonus(),
+      onClaimDailyQuest: (id        , doubleMultiplier          ) => this.handleClaimDailyQuest(id, Boolean(doubleMultiplier)),
+      onClaimDailyBonus: (doubleMultiplier          ) => this.handleClaimDailyQuestBonus(Boolean(doubleMultiplier)),
     };
   }
 
@@ -7769,19 +8283,18 @@ const initialSeed = Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : Date.now
 const engine = new GameEngine(initialSeed, window.localStorage);
 const sceneManager = new SceneManager(container);
 const audio = new AudioSynth();
-const ui = new UIManager();
-const gameLoop = new GameLoop(engine, sceneManager, audio, ui);
+const platform = new PlatformBridge();
+const ui = new UIManager(platform);
+const gameLoop = new GameLoop(engine, sceneManager, audio, ui, platform);
 
+platform.init().catch((e         ) => console.warn(e));
 ui.bindActions(gameLoop.getUIActions());
-const inputManager = new InputManager(gameLoop.getInputCallbacks(), gameLoop.getModalStateProvider());
-inputManager.attach();
+new InputManager(gameLoop.getInputCallbacks(), gameLoop.getModalStateProvider()).attach();
 
 ui.openMainMenu();
 gameLoop.updateMenuStats();
 gameLoop.renderSkinsUI();
-if (engine.canClaimDailyReward()) {
-  gameLoop.handleOpenDailyBonus();
-}
+if (engine.canClaimDailyReward()) gameLoop.handleOpenDailyBonus();
 gameLoop.start();
 
 

@@ -1,6 +1,6 @@
 import { GameEngine } from '../core/gameEngine.ts';
 import { RECORD_FLAG_X } from '../core/collision.ts';
-import { ALL_SKINS, DeathReason, MoveDirection, WORLD_CONFIG, type MoveDirectionValue, type SkinId } from '../core/types.ts';
+import { ALL_SKINS, DeathReason, MoveDirection, WORLD_CONFIG, type AdProvider, type MoveDirectionValue, type SkinId } from '../core/types.ts';
 import type { AchievementId } from '../core/achievements.ts';
 import type { DailyQuestInstance } from '../core/dailyQuests.ts';
 import { AudioSynth } from '../view/audioSynth.ts';
@@ -25,6 +25,7 @@ export class GameLoop {
   private readonly sceneManager: SceneManager;
   private readonly audio: AudioSynth;
   private readonly ui: UIManager;
+  private readonly platform: AdProvider;
 
   private lastCoins: number;
   private runStartHighScore: number;
@@ -39,12 +40,17 @@ export class GameLoop {
     engine: GameEngine,
     sceneManager: SceneManager,
     audio: AudioSynth,
-    ui: UIManager
+    ui: UIManager,
+    platform?: AdProvider
   ) {
     this.engine = engine;
     this.sceneManager = sceneManager;
     this.audio = audio;
     this.ui = ui;
+    this.platform = platform ?? {
+      isAdReady: () => false,
+      showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
+    };
     this.animate = this.animate.bind(this);
     this.lastCoins = this.engine.getCoins();
     this.runStartHighScore = this.engine.getHighScore();
@@ -396,10 +402,32 @@ export class GameLoop {
   }
 
   public handleClaimDailyBonus(doubleMultiplier: boolean): void {
+    if (doubleMultiplier) {
+      this.platform.showRewardedVideo({
+        onRewarded: () => {
+          this.executeClaimDailyBonus(true);
+        },
+        onError: () => {
+          this.ui.showToast('⚠️', 'Реклама недоступна', 'Не удалось загрузить видео. Попробуйте позже.');
+        },
+      });
+    } else {
+      this.executeClaimDailyBonus(false);
+    }
+  }
+
+  private executeClaimDailyBonus(doubleMultiplier: boolean): void {
     const res = this.engine.claimDailyReward(doubleMultiplier);
     if (res.success) {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([25, 30, 25]);
+      }
       if (res.isDouble) {
-        this.audio.playRecordFanfare();
+        if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
+          this.audio.playDailySuperBonusFanfare();
+        } else {
+          this.audio.playRecordFanfare();
+        }
       } else {
         this.audio.playCoin();
       }
@@ -414,22 +442,83 @@ export class GameLoop {
     }
   }
 
-  public handleClaimDailyQuest(questId: string): void {
-    const res = this.engine.claimDailyQuest(questId);
+  public handleClaimDailyQuest(questId: string, doubleMultiplier: boolean = false): void {
+    if (doubleMultiplier) {
+      this.platform.showRewardedVideo({
+        onRewarded: () => {
+          this.executeClaimDailyQuest(questId, true);
+        },
+        onError: () => {
+          this.ui.showToast('⚠️', 'Реклама недоступна', 'Не удалось загрузить видео. Попробуйте позже.');
+        },
+      });
+    } else {
+      this.executeClaimDailyQuest(questId, false);
+    }
+  }
+
+  private executeClaimDailyQuest(questId: string, doubleMultiplier: boolean): void {
+    const res = this.engine.claimDailyQuest(questId, doubleMultiplier);
     if (res.success) {
-      this.audio.playCoin();
-      this.ui.showToast('🎯', 'Задание выполнено!', `+${res.coins} 🪙 зачислено на баланс!`);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([25, 30, 25]);
+      }
+      if (res.isDouble) {
+        if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
+          this.audio.playDailySuperBonusFanfare();
+        } else {
+          this.audio.playRecordFanfare();
+        }
+      } else {
+        if (typeof this.audio.playQuestComplete === 'function') {
+          this.audio.playQuestComplete();
+        } else {
+          this.audio.playCoin();
+        }
+      }
+      this.ui.showToast(
+        '🎯',
+        'Задание выполнено!',
+        `+${res.coins} 🪙 зачислено на баланс${res.isDouble ? ' (x2 за рекламу!)' : ''}!`
+      );
       this.lastCoins = this.engine.getCoins();
       this.updateMenuStats();
       this.updateDailyQuestsUI();
     }
   }
 
-  public handleClaimDailyQuestBonus(): void {
-    const res = this.engine.claimDailyQuestBonus();
+  public handleClaimDailyQuestBonus(doubleMultiplier: boolean = false): void {
+    if (doubleMultiplier) {
+      this.platform.showRewardedVideo({
+        onRewarded: () => {
+          this.executeClaimDailyQuestBonus(true);
+        },
+        onError: () => {
+          this.ui.showToast('⚠️', 'Реклама недоступна', 'Не удалось загрузить видео. Попробуйте позже.');
+        },
+      });
+    } else {
+      this.executeClaimDailyQuestBonus(false);
+    }
+  }
+
+  private executeClaimDailyQuestBonus(doubleMultiplier: boolean): void {
+    const res = this.engine.claimDailyQuestBonus(doubleMultiplier);
     if (res.success) {
-      this.audio.playCoin();
-      this.ui.showToast('👑', 'Супер-приз получен!', `+${res.coins} 🪙 за все задания дня!`);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([25, 30, 25]);
+      }
+      this.sceneManager.spawnRecordConfetti(0, 2.0, 100);
+      if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
+        this.audio.playDailySuperBonusFanfare();
+      } else {
+        this.audio.playRecordFanfare();
+      }
+      this.ui.showToast(
+        '👑',
+        'Супер-приз получен!',
+        `+${res.coins} 🪙 за все задания дня${res.isDouble ? ' (x2 за рекламу!)' : ''}!`
+      );
       this.lastCoins = this.engine.getCoins();
       this.updateMenuStats();
       this.updateDailyQuestsUI();
@@ -440,8 +529,8 @@ export class GameLoop {
     const state = this.engine.getDailyQuestTracker().getState();
     this.ui.renderDailyQuests(
       state,
-      (id: string) => this.handleClaimDailyQuest(id),
-      () => this.handleClaimDailyQuestBonus()
+      (id: string, doubleMultiplier?: boolean) => this.handleClaimDailyQuest(id, Boolean(doubleMultiplier)),
+      (doubleMultiplier?: boolean) => this.handleClaimDailyQuestBonus(Boolean(doubleMultiplier))
     );
   }
 
@@ -470,8 +559,8 @@ export class GameLoop {
       onOpenDaily: () => this.handleOpenDailyBonus(),
       onClaimDaily: (doubleMultiplier: boolean) => this.handleClaimDailyBonus(doubleMultiplier),
       onOpenDailyQuests: () => this.handleOpenDailyQuests(),
-      onClaimDailyQuest: (id: string) => this.handleClaimDailyQuest(id),
-      onClaimDailyBonus: () => this.handleClaimDailyQuestBonus(),
+      onClaimDailyQuest: (id: string, doubleMultiplier?: boolean) => this.handleClaimDailyQuest(id, Boolean(doubleMultiplier)),
+      onClaimDailyBonus: (doubleMultiplier?: boolean) => this.handleClaimDailyQuestBonus(Boolean(doubleMultiplier)),
     };
   }
 

@@ -593,23 +593,23 @@ export class ScoreTracker {
     return newlyCompletedQuests;
   }
 
-  claimDailyQuest(questId: string): { success: boolean; coins: number } {
-    const res = this.dailyQuests.claimQuest(questId);
+  claimDailyQuest(questId: string, doubleMultiplier: boolean = false): { success: boolean; coins: number; isDouble: boolean } {
+    const res = this.dailyQuests.claimQuest(questId, doubleMultiplier);
     if (res.success && res.rewardCoins > 0) {
       this.wallet.addCoins(res.rewardCoins);
       this.saveToStorage();
-      return { success: true, coins: res.rewardCoins };
+      return { success: true, coins: res.rewardCoins, isDouble: res.isDouble };
     }
-    return { success: false, coins: 0 };
+    return { success: false, coins: 0, isDouble: false };
   }
 
-  claimDailyQuestBonus(): { success: boolean; coins: number } {
-    const res = this.dailyQuests.claimDailyBonus();
+  claimDailyQuestBonus(doubleMultiplier: boolean = false): { success: boolean; coins: number; isDouble: boolean } {
+    const res = this.dailyQuests.claimDailyBonus(doubleMultiplier);
     if (res.success && res.rewardCoins > 0) {
       this.wallet.addCoins(res.rewardCoins);
       this.saveToStorage();
-      return { success: true, coins: res.rewardCoins };
+      return { success: true, coins: res.rewardCoins, isDouble: res.isDouble };
     }
-    return { success: false, coins: 0 };
+    return { success: false, coins: 0, isDouble: false };
   }
 }

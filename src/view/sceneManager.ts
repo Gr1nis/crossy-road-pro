@@ -261,10 +261,14 @@ export class SceneManager {
     }
   }
 
-  spawnRecordConfetti(x: number, y: number, z: number): void {
+  spawnRecordConfetti(x: number, y: number, z: number, burstCount?: number): void {
     const colors = [0xfacc15, 0xfbbf24, 0xf59e0b, 0xffffff, 0xef4444, 0xec4899];
     const count = 32;
-    for (let i = 0; i < count; i++) {
+    const camZ = this.currentEngine ? this.currentEngine.getCameraZ() : 0;
+    const isFarSpawn = Math.abs(z - (camZ + 3.0)) > 25;
+    const spawnZ = isFarSpawn ? camZ + 3.0 : z;
+    const spawnCount = burstCount ?? (isFarSpawn ? 64 : count);
+    for (let i = 0; i < spawnCount; i++) {
       const c = colors[Math.floor(Math.random() * colors.length)];
       const size = 0.08 + Math.random() * 0.08;
       const geo = new THREE.BoxGeometry(size, size, size);
@@ -273,7 +277,7 @@ export class SceneManager {
       mesh.position.set(
         worldToScreenX(x) + (Math.random() - 0.5) * 0.6,
         y + (Math.random() - 0.5) * 0.4,
-        z + (Math.random() - 0.5) * 0.6
+        spawnZ + (Math.random() - 0.5) * 0.6
       );
       this.scene.add(mesh);
 

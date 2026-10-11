@@ -30,6 +30,7 @@ const moduleOrder = [
   'src/core/scoreTracker.ts',
   'src/core/laneGenerator.ts',
   'src/core/gameEngine.ts',
+  'src/platform/ysdk.ts',
   'src/view/audioSynth.ts',
   'src/view/voxelPalette.ts',
   'src/view/urbanCharacters.ts',
@@ -150,6 +151,8 @@ const htmlContent = `<!DOCTYPE html>
     .btn-badge.pulse-badge { background: #10b981; color: #fff; border-color: #34d399; animation: badgePulse 1.4s infinite; }
     .btn-badge.hidden { display: none !important; }
     @keyframes badgePulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 50% { transform: scale(1.12); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5), 0 0 0 6px rgba(245, 158, 11, 0); } }
+    #menu-daily-quests-badge { background: #f59e0b; color: #000; font-weight: 900; border-color: #fde68a; animation: pulse 1.5s infinite; }
 
     .modal-card-daily { max-height: 90vh; overflow-y: auto; padding: 28px 24px; -webkit-overflow-scrolling: touch; }
     .daily-streak-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: rgba(245, 158, 11, 0.15); border: 1.5px solid rgba(245, 158, 11, 0.4); color: #fbbf24; padding: 6px 16px; border-radius: 999px; font-weight: 800; font-size: 13px; margin: 0 auto 16px; }
@@ -240,7 +243,34 @@ const htmlContent = `<!DOCTYPE html>
     .quest-list-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; text-align: left; }
     .quest-card { display: flex; align-items: center; gap: 12px; background: rgba(15, 23, 42, 0.7); border: 2px solid #334155; border-radius: 14px; padding: 12px 14px; transition: all 0.2s ease; }
     .quest-card.in-progress { border-color: #334155; background: rgba(15, 23, 42, 0.6); }
-    .quest-card.ready { border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); box-shadow: 0 0 16px rgba(245, 158, 11, 0.25); }
+    .quest-card.ready { border-color: #f59e0b; background: rgba(245, 158, 11, 0.14); box-shadow: 0 0 16px rgba(245, 158, 11, 0.35); }
+    .quest-card.ready .quest-btn-claim {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.5), 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+    .quest-card.ready .quest-btn-claim::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -100%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: skewX(-25deg);
+      animation: questBtnShimmer 2s infinite ease-in-out;
+      pointer-events: none;
+    }
+    @keyframes questBtnShimmer {
+      0% { left: -100%; }
+      40%, 100% { left: 200%; }
+    }
     .quest-card.claimed { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); opacity: 0.8; }
     .quest-icon-col { flex-shrink: 0; }
     .quest-icon { font-size: 26px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; }
@@ -254,11 +284,15 @@ const htmlContent = `<!DOCTYPE html>
     .quest-progress-row { display: flex; align-items: center; gap: 8px; }
     .quest-progress-row .quest-progress-bar-bg { height: 6px; flex: 1; }
     .quest-progress-text { font-size: 11px; font-weight: 800; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .quest-action-col { flex-shrink: 0; margin-left: 6px; }
+    .quest-action-col { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; }
+    .quest-super-actions { display: flex; gap: 8px; align-items: center; }
     .quest-btn { border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
     .quest-btn-claim { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
     .quest-btn-claim:hover { filter: brightness(1.1); transform: scale(1.03); }
     .quest-btn-claim:active { transform: scale(0.97); }
+    .quest-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); }
+    .quest-btn-purple:hover { filter: brightness(1.1); transform: scale(1.03); }
+    .quest-btn-purple:active { transform: scale(0.97); }
     .quest-status-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; display: inline-block; }
     .quest-status-badge.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
     .quest-status-badge.pending { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #475569; }
@@ -269,9 +303,53 @@ const htmlContent = `<!DOCTYPE html>
     .quest-super-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; }
     .quest-super-desc { font-size: 11px; color: #e2e8f0; margin-top: 2px; }
     .quest-super-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; transition: all 0.15s ease; }
+    .quest-super-btn:not(:disabled) {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+    }
+    .quest-super-btn:not(:disabled)::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -100%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: skewX(-25deg);
+      animation: questBtnShimmer 2s infinite ease-in-out;
+      pointer-events: none;
+    }
     .quest-super-btn:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); }
     .quest-super-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.8); }
     .quest-super-btn.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); opacity: 1; filter: none; cursor: default; }
+
+    /* Flying Coin VFX & Counter Pulse */
+    .flying-coin-particle {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      pointer-events: none;
+      font-size: 24px;
+      line-height: 1;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.5));
+    }
+    @keyframes coinCounterPulse {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+    .coin-counter-pulse {
+      animation: coinCounterPulse 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      display: inline-block;
+    }
 
     /* Game Over Score Card */
     .game-over-score-card { display: flex; justify-content: center; gap: 16px; margin: 0 auto 20px; max-width: 280px; }
@@ -576,7 +654,12 @@ const htmlContent = `<!DOCTYPE html>
   <!-- Модальное окно Ежедневных заданий (Daily Quests Modal) -->
   <div id="daily-quests-modal" class="modal hidden">
     <div class="modal-card modal-card-quests">
-      <h2 style="color: #fbbf24;">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <h2 style="color: #fbbf24; margin: 0;">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+        <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 13px; margin: 0;">
+          <strong id="quests-coins-val">0</strong> 🪙
+        </div>
+      </div>
       <p style="margin-bottom: 12px;">Выполняйте испытания дня и получайте монеты!</p>
 
       <div class="quest-timer-box">
@@ -603,7 +686,10 @@ const htmlContent = `<!DOCTYPE html>
             <div class="quest-super-desc">Выполните все 3 задания: <strong style="color: #facc15;">+100 🪙</strong></div>
           </div>
         </div>
-        <button id="quests-claim-bonus-btn" class="quest-btn quest-super-btn" disabled>Забрать 100 🪙</button>
+        <div class="quest-super-actions">
+          <button id="quests-claim-bonus-btn" class="quest-btn quest-super-btn" disabled>Забрать 100 🪙</button>
+          <button id="quests-claim-bonus-x2-btn" class="quest-btn quest-super-btn quest-btn-purple" style="display: none;">🎬 Забрать x2 за рекламу</button>
+        </div>
       </div>
 
       <button id="quests-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 14px;">Закрыть</button>

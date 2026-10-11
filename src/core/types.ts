@@ -150,6 +150,18 @@ export interface StorageAdapter {
   setItem(key: string, value: string): void;
 }
 
+export interface RewardedAdCallbacks {
+  onOpen?: () => void;
+  onRewarded?: () => void;
+  onClose?: () => void;
+  onError?: (err: unknown) => void;
+}
+
+export interface AdProvider {
+  isAdReady(): boolean;
+  showRewardedVideo(callbacks: RewardedAdCallbacks): void;
+}
+
 export const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,

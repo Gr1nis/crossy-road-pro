@@ -82,29 +82,33 @@ export class AudioSynth {
   }
 
   private ensureContext(ignoreSoundFlag: boolean = false): AudioContext | null {
-    if (typeof window === 'undefined') return null;
-    if (!this.ctx) {
-      const AudioCtx =
-        window.AudioContext || (window as WindowWithWebkitAudio).webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-        this.masterGainNode = this.ctx.createGain();
-        this.masterGainNode.gain.setValueAtTime(1.0, this.ctx.currentTime);
-        this.masterGainNode.connect(this.ctx.destination);
-
-        this.sfxGainNode = this.ctx.createGain();
-        this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
-        this.sfxGainNode.connect(this.masterGainNode);
-
-        this.bgmGainNode = this.ctx.createGain();
-        this.bgmGainNode.gain.setValueAtTime(this.musicEnabled ? this.musicVolume : 0.0, this.ctx.currentTime);
-        this.bgmGainNode.connect(this.masterGainNode);
-
-        this.bgmFilterNode = this.ctx.createBiquadFilter();
-        this.bgmFilterNode.type = 'lowpass';
-        this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
-        this.bgmFilterNode.connect(this.bgmGainNode);
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
       }
+      return this.ctx;
+    }
+    if (typeof window === 'undefined') return null;
+    const AudioCtx =
+      window.AudioContext || (window as WindowWithWebkitAudio).webkitAudioContext;
+    if (AudioCtx) {
+      this.ctx = new AudioCtx();
+      this.masterGainNode = this.ctx.createGain();
+      this.masterGainNode.gain.setValueAtTime(1.0, this.ctx.currentTime);
+      this.masterGainNode.connect(this.ctx.destination);
+
+      this.sfxGainNode = this.ctx.createGain();
+      this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
+      this.sfxGainNode.connect(this.masterGainNode);
+
+      this.bgmGainNode = this.ctx.createGain();
+      this.bgmGainNode.gain.setValueAtTime(this.musicEnabled ? this.musicVolume : 0.0, this.ctx.currentTime);
+      this.bgmGainNode.connect(this.masterGainNode);
+
+      this.bgmFilterNode = this.ctx.createBiquadFilter();
+      this.bgmFilterNode.type = 'lowpass';
+      this.bgmFilterNode.frequency.setValueAtTime(20000, this.ctx.currentTime);
+      this.bgmFilterNode.connect(this.bgmGainNode);
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
@@ -612,6 +616,85 @@ export class AudioSynth {
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(t);
       osc.stop(t + dur + 0.02);
+    });
+  }
+
+  playQuestComplete(): void {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    // Bright ascending 4-note arpeggio (C5 -> E5 -> G5 -> C6) with shimmer
+    const notes = [
+      { freq: 523.25, dur: 0.16 }, // C5
+      { freq: 659.25, dur: 0.16 }, // E5
+      { freq: 783.99, dur: 0.18 }, // G5
+      { freq: 1046.5, dur: 0.28 }, // C6
+    ];
+
+    notes.forEach(({ freq, dur }, idx) => {
+      const t = now + idx * 0.075;
+      // Main tone (Triangle for clear chime body)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.002, t + dur);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
+
+      // Shimmer decay (Sine harmonic overtone)
+      const sOsc = ctx.createOscillator();
+      const sGain = ctx.createGain();
+      sOsc.type = 'sine';
+      sOsc.frequency.setValueAtTime(freq * 2, t);
+      sGain.gain.setValueAtTime(0.001, t);
+      sGain.gain.linearRampToValueAtTime(0.06, t + 0.008);
+      sGain.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.8);
+      sOsc.connect(sGain);
+      sGain.connect(this.sfxGainNode ?? ctx.destination);
+      sOsc.start(t);
+      sOsc.stop(t + dur + 0.01);
+    });
+  }
+
+  playDailySuperBonusFanfare(): void {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    // 8-bit triumphant retro fanfare (~0.8s total duration)
+    const melody = [
+      { freq: 392.0, delay: 0.0, dur: 0.08, type: 'square' as OscillatorType, gain: 0.12 }, // G4
+      { freq: 523.25, delay: 0.09, dur: 0.08, type: 'square' as OscillatorType, gain: 0.13 }, // C5
+      { freq: 659.25, delay: 0.18, dur: 0.08, type: 'square' as OscillatorType, gain: 0.13 }, // E5
+      { freq: 783.99, delay: 0.27, dur: 0.11, type: 'square' as OscillatorType, gain: 0.14 }, // G5
+      { freq: 659.25, delay: 0.38, dur: 0.07, type: 'square' as OscillatorType, gain: 0.13 }, // E5
+      { freq: 783.99, delay: 0.45, dur: 0.08, type: 'square' as OscillatorType, gain: 0.14 }, // G5
+      { freq: 1046.5, delay: 0.53, dur: 0.27, type: 'square' as OscillatorType, gain: 0.15 }, // C6
+      { freq: 523.25, delay: 0.53, dur: 0.27, type: 'triangle' as OscillatorType, gain: 0.12 }, // C5 bass
+      { freq: 1318.51, delay: 0.53, dur: 0.27, type: 'square' as OscillatorType, gain: 0.09 }, // E6 harmony
+    ];
+
+    melody.forEach(({ freq, delay, dur, type, gain: noteGain }) => {
+      const t = now + delay;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(noteGain, t + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.002, t + dur);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
     });
   }
 }

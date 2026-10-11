@@ -203,19 +203,21 @@ export class DailyQuestTracker {
     return { newlyCompletedQuests };
   }
 
-  public claimQuest(questId: string): { success: boolean; rewardCoins: number } {
+  public claimQuest(questId: string, doubleMultiplier: boolean = false): { success: boolean; rewardCoins: number; isDouble: boolean } {
     const quest = this.getQuest(questId);
     if (!quest || !quest.isCompleted || quest.isClaimed || quest.current < quest.target) {
-      return { success: false, rewardCoins: 0 };
+      return { success: false, rewardCoins: 0, isDouble: false };
     }
     quest.isClaimed = true;
-    return { success: true, rewardCoins: quest.rewardCoins };
+    const coins = doubleMultiplier ? quest.rewardCoins * 2 : quest.rewardCoins;
+    return { success: true, rewardCoins: coins, isDouble: doubleMultiplier };
   }
 
-  public claimDailyBonus(): { success: boolean; rewardCoins: number } {
-    if (!this.canClaimDailyBonus()) return { success: false, rewardCoins: 0 };
+  public claimDailyBonus(doubleMultiplier: boolean = false): { success: boolean; rewardCoins: number; isDouble: boolean } {
+    if (!this.canClaimDailyBonus()) return { success: false, rewardCoins: 0, isDouble: false };
     this._allCompletedBonusClaimed = true;
-    return { success: true, rewardCoins: DAILY_SUPER_BONUS_COINS };
+    const coins = doubleMultiplier ? DAILY_SUPER_BONUS_COINS * 2 : DAILY_SUPER_BONUS_COINS;
+    return { success: true, rewardCoins: coins, isDouble: doubleMultiplier };
   }
 
   public getState(): DailyQuestDayState {
