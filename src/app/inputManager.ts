@@ -20,6 +20,7 @@ export interface ModalStateProvider {
   isGachaOpen: () => boolean;
   isLeaderboardOpen: () => boolean;
   isAchievementsOpen?: () => boolean;
+  isDailyBonusOpen?: () => boolean;
   isGameOverOpen: () => boolean;
   isNameInputFocused?: () => boolean;
   isPlaying: () => boolean;
@@ -156,6 +157,14 @@ export class InputManager {
 
     if (this.modalState.isAchievementsOpen?.()) {
       if (e.code === 'Escape' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      }
+      return;
+    }
+
+    if (this.modalState.isDailyBonusOpen?.()) {
+      if (e.code === 'Escape') {
         e.preventDefault();
         this.callbacks.onCloseModal();
       }

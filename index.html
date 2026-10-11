@@ -1032,6 +1032,269 @@ class AchievementTracker {
   }
 }
 
+// --- Module: src/core/dailyReward.ts ---
+const DAILY_REWARD_DAYS                                      = [
+  { day: 1, coins: 50, isMega: false },
+  { day: 2, coins: 75, isMega: false },
+  { day: 3, coins: 100, isMega: false },
+  { day: 4, coins: 150, isMega: false },
+  { day: 5, coins: 200, isMega: false },
+  { day: 6, coins: 250, isMega: false },
+  { day: 7, coins: 500, isMega: true },
+];
+
+                                                                       
+
+                                     
+                       
+                         
+                           
+                                         
+ 
+
+                                   
+                                                             
+                                                        
+                                            
+                                                                         
+                                                                             
+ 
+
+                                   
+                            
+                         
+                       
+                             
+                               
+                             
+                          
+ 
+
+function toLocalDateString(timestamp        )         {
+  const d = new Date(timestamp);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function calculateCalendarDayDiff(dateStr1        , dateStr2        )         {
+  if (!dateStr1 || !dateStr2) return 999;
+  const p1 = dateStr1.split('-').map(Number);
+  const p2 = dateStr2.split('-').map(Number);
+  if (p1.length !== 3 || p2.length !== 3) return 999;
+  const d1 = new Date(p1[0], p1[1] - 1, p1[2]);
+  const d2 = new Date(p2[0], p2[1] - 1, p2[2]);
+  const msDiff = d2.getTime() - d1.getTime();
+  return Math.round(msDiff / (1000 * 60 * 60 * 24));
+}
+class DailyRewardManager {
+          currentStreak = 1;
+          lastClaimTimestamp = 0;
+          lastClaimDate = '';
+          totalClaims = 0;
+          previousStreakBeforeBreak                     = undefined;
+
+  constructor(initialState                            ) {
+    if (initialState) {
+      if (typeof initialState.currentStreak === 'number' && initialState.currentStreak >= 1 && initialState.currentStreak <= 7) {
+        this.currentStreak = Math.floor(initialState.currentStreak);
+      }
+      if (typeof initialState.lastClaimTimestamp === 'number' && Number.isFinite(initialState.lastClaimTimestamp) && initialState.lastClaimTimestamp >= 0) {
+        this.lastClaimTimestamp = Math.floor(initialState.lastClaimTimestamp);
+      }
+      if (typeof initialState.lastClaimDate === 'string' && initialState.lastClaimDate.trim().length > 0) {
+        this.lastClaimDate = initialState.lastClaimDate.trim();
+      }
+      if (typeof initialState.totalClaims === 'number' && Number.isFinite(initialState.totalClaims) && initialState.totalClaims >= 0) {
+        this.totalClaims = Math.floor(initialState.totalClaims);
+      }
+      if (typeof initialState.previousStreakBeforeBreak === 'number') {
+        this.previousStreakBeforeBreak = initialState.previousStreakBeforeBreak;
+      }
+    }
+  }
+
+  getState()                   {
+    return {
+      currentStreak: this.currentStreak,
+      lastClaimTimestamp: this.lastClaimTimestamp,
+      lastClaimDate: this.lastClaimDate,
+      totalClaims: this.totalClaims,
+      previousStreakBeforeBreak: this.previousStreakBeforeBreak,
+    };
+  }
+
+  /**
+   * Evaluates if reward can be claimed at timestamp `now`.
+   */
+  canClaimToday(now         = Date.now())          {
+    if (this.lastClaimTimestamp > 0 && now < this.lastClaimTimestamp) {
+      // Clock moved backward or future timestamp: prevent exploit
+      return false;
+    }
+    const today = toLocalDateString(now);
+    if (!this.lastClaimDate) {
+      return true;
+    }
+    const diff = calculateCalendarDayDiff(this.lastClaimDate, today);
+    return diff >= 1;
+  }
+
+  /**
+   * Returns which day (1..7) is currently active / eligible.
+   */
+  getEligibleDay(now         = Date.now())         {
+    if (!this.lastClaimDate) {
+      return 1;
+    }
+    const today = toLocalDateString(now);
+    const diff = calculateCalendarDayDiff(this.lastClaimDate, today);
+
+    if (diff === 0) {
+      // Already claimed today: returns the day that was claimed today
+      return this.currentStreak;
+    }
+
+    if (diff === 1) {
+      // Consecutive day!
+      return this.currentStreak === 7 ? 1 : this.currentStreak + 1;
+    }
+
+    // Broken streak (>1 day missed): resets to day 1
+    return 1;
+  }
+
+  /**
+   * Can streak be restored via Rewarded Ad?
+   */
+  canRestoreStreak(now         = Date.now())          {
+    if (!this.lastClaimDate) return false;
+    const today = toLocalDateString(now);
+    const diff = calculateCalendarDayDiff(this.lastClaimDate, today);
+    // Broken streak (>1 day) and player had a streak > 1 that was broken
+    return diff > 1 && (this.previousStreakBeforeBreak ?? this.currentStreak) > 1;
+  }
+
+  /**
+   * Restore streak after watching an ad.
+   */
+  restoreStreak()          {
+    const targetStreak = this.previousStreakBeforeBreak ?? this.currentStreak;
+    if (targetStreak > 1) {
+      this.currentStreak = targetStreak === 7 ? 1 : targetStreak;
+      this.previousStreakBeforeBreak = undefined;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Claims today's daily bonus.
+   */
+  claimToday(doubleMultiplier          = false, now         = Date.now())                   {
+    if (!this.canClaimToday(now)) {
+      return {
+        success: false,
+        coins: 0,
+        day: this.currentStreak,
+        newStreak: this.currentStreak,
+        totalClaims: this.totalClaims,
+        isDouble: false,
+        error: 'ALREADY_CLAIMED_TODAY',
+      };
+    }
+
+    const today = toLocalDateString(now);
+    let targetDay = 1;
+
+    if (!this.lastClaimDate) {
+      targetDay = 1;
+    } else {
+      const diff = calculateCalendarDayDiff(this.lastClaimDate, today);
+      if (diff === 1) {
+        targetDay = this.currentStreak === 7 ? 1 : this.currentStreak + 1;
+      } else {
+        // Streak broken
+        this.previousStreakBeforeBreak = this.currentStreak;
+        targetDay = 1;
+      }
+    }
+
+    const config = DAILY_REWARD_DAYS[targetDay - 1] ?? DAILY_REWARD_DAYS[0];
+    const baseCoins = config.coins;
+    const finalCoins = doubleMultiplier ? baseCoins * 2 : baseCoins;
+
+    this.currentStreak = targetDay;
+    this.lastClaimDate = today;
+    this.lastClaimTimestamp = now;
+    this.totalClaims += 1;
+    this.previousStreakBeforeBreak = undefined;
+
+    return {
+      success: true,
+      coins: finalCoins,
+      day: targetDay,
+      newStreak: this.currentStreak,
+      totalClaims: this.totalClaims,
+      isDouble: doubleMultiplier,
+    };
+  }
+
+  /**
+   * Milliseconds remaining until next local midnight.
+   */
+  getTimeUntilNextClaimMs(now         = Date.now())         {
+    const d = new Date(now);
+    const nextMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
+    return Math.max(0, nextMidnight.getTime() - now);
+  }
+
+  /**
+   * Returns status view for all 7 days in current cycle.
+   */
+  getDaysView(now         = Date.now())                       {
+    const canClaim = this.canClaimToday(now);
+    const eligibleDay = this.getEligibleDay(now);
+
+    return DAILY_REWARD_DAYS.map((config) => {
+      let status                       ;
+
+      if (canClaim) {
+        if (config.day < eligibleDay) {
+          status = 'claimed';
+        } else if (config.day === eligibleDay) {
+          status = 'available';
+        } else {
+          status = 'locked';
+        }
+      } else {
+        // Already claimed today
+        if (config.day <= this.currentStreak) {
+          status = 'claimed';
+        } else {
+          status = 'locked';
+        }
+      }
+
+      return {
+        day: config.day,
+        coins: config.coins,
+        isMega: config.isMega,
+        status,
+      };
+    });
+  }
+
+  getStreak()         {
+    return this.currentStreak;
+  }
+
+  getTotalClaims()         {
+    return this.totalClaims;
+  }
+}
+
 // --- Module: src/core/scoreTracker.ts ---
 // Re-exports for backward compatibility
 
@@ -1062,6 +1325,7 @@ class ScoreTracker {
           inventory               ;
           gacha              ;
           achievements                    ;
+          dailyReward                    ;
 
   constructor(storage                 , initialPlayerName         ) {
     this.storage = storage;
@@ -1069,6 +1333,7 @@ class ScoreTracker {
     this.inventory = new SkinInventory(['corgi'], 'corgi');
     this.gacha = new GachaMachine();
     this.achievements = new AchievementTracker();
+    this.dailyReward = new DailyRewardManager();
 
     if (initialPlayerName && initialPlayerName.trim().length > 0) {
       this.playerName = initialPlayerName.trim();
@@ -1194,6 +1459,9 @@ class ScoreTracker {
           undefined,
           loadedClaimed
         );
+        if (data.dailyRewardState) {
+          this.dailyReward = new DailyRewardManager(data.dailyRewardState);
+        }
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -1217,6 +1485,7 @@ class ScoreTracker {
         trainsSurvived: this.achievements.getTrainsSurvived(),
         logsHopped: this.achievements.getLogsHopped(),
         gachaRolls: this.achievements.getGachaRolls(),
+        dailyRewardState: this.dailyReward.getState(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
@@ -1501,6 +1770,23 @@ class ScoreTracker {
   getAchievements(ctx                                        )                {
     return this.achievements.getAchievements(ctx);
   }
+
+  getDailyRewardManager()                     {
+    return this.dailyReward;
+  }
+
+  canClaimDailyReward(now         )          {
+    return this.dailyReward.canClaimToday(now);
+  }
+
+  claimDailyReward(doubleMultiplier          = false, now         )                   {
+    const res = this.dailyReward.claimToday(doubleMultiplier, now);
+    if (res.success && res.coins > 0) {
+      this.wallet.addCoins(res.coins);
+      this.saveToStorage();
+    }
+    return res;
+  }
 }
 
 // --- Module: src/core/laneGenerator.ts ---
@@ -1671,6 +1957,232 @@ class LaneGenerator {
       result.push(this.generateLane(i, score));
     }
     return result;
+  }
+}
+
+// --- Module: src/core/dailyQuests.ts ---
+const DAILY_SUPER_BONUS_COINS = 100;
+const DAILY_QUEST_DEFINITIONS                                      = [
+  { id: 'hop_distance', title: 'Прыжковый марафон', description: 'Сделайте 200 шагов суммарно', category: 'hops', target: 200, rewardCoins: 25, isSingleRun: false },
+  { id: 'single_run_score', title: 'Рекордный забег', description: 'Наберите 40 очков за один забег', category: 'score', target: 40, rewardCoins: 40, isSingleRun: true },
+  { id: 'coin_collector', title: 'Сборщик монет', description: 'Соберите 15 монет суммарно', category: 'coins', target: 15, rewardCoins: 25, isSingleRun: false },
+  { id: 'river_hopper', title: 'Покоритель рек', description: 'Пересеките 12 брёвен на воде', category: 'rivers', target: 12, rewardCoins: 35, isSingleRun: false },
+  { id: 'train_evader', title: 'Гроза поездов', description: 'Переживите 3 мчащихся поезда', category: 'trains', target: 3, rewardCoins: 50, isSingleRun: false },
+  { id: 'combo_rusher', title: 'Комбо-мастер', description: 'Выполните серию комбо из 4 шагов', category: 'score', target: 4, rewardCoins: 40, isSingleRun: false },
+  { id: 'forward_streak', title: 'Только вперёд', description: 'Сделайте 25 шагов вперёд без отката', category: 'hops', target: 25, rewardCoins: 50, isSingleRun: true },
+  { id: 'daily_runs', title: 'Ежедневные забеги', description: 'Сыграйте 5 забегов', category: 'score', target: 5, rewardCoins: 25, isSingleRun: false },
+  { id: 'gacha_spin', title: 'Удачный спин', description: 'Совершите 1 прокрутку в автомате', category: 'gacha', target: 1, rewardCoins: 30, isSingleRun: false },
+];
+function getDailyDateKey(dateOrTimestamp                )         {
+  const d = dateOrTimestamp instanceof Date ? dateOrTimestamp : new Date(dateOrTimestamp ?? Date.now());
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${m}-${day}`;
+}
+function getDailySeedFromDate(dateKey        )         {
+  let hash = 2166136261 ^ 37;
+  for (let i = 0; i < dateKey.length; i++) {
+    hash = Math.imul(hash ^ dateKey.charCodeAt(i), 16777619);
+  }
+  return hash >>> 0;
+}
+
+function dailyQuestCalendarDiff(d1        , d2        )         {
+  if (!d1 || !d2) return 999;
+  const p1 = d1.split('-').map(Number);
+  const p2 = d2.split('-').map(Number);
+  if (p1.length !== 3 || p2.length !== 3 || !p1.every(Number.isFinite) || !p2.every(Number.isFinite)) return 999;
+  return Math.round((Date.UTC(p2[0], p2[1] - 1, p2[2]) - Date.UTC(p1[0], p1[1] - 1, p1[2])) / 86400000);
+}
+
+function dailyQuestIsRecord(v         )                               {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+function selectDailyQuests(dateKey        )                       {
+  let seed = getDailySeedFromDate(dateKey);
+  const pool = [...DAILY_QUEST_DEFINITIONS];
+  for (let i = pool.length - 1; i > 0; i--) {
+    seed = (seed * 9301 + 49297) % 233280;
+    const j = Math.floor((seed / 233280) * (i + 1));
+    const temp = pool[i];
+    pool[i] = pool[j];
+    pool[j] = temp;
+  }
+  return pool.slice(0, 3).map((def) => ({
+    id: `${dateKey}_${def.id}`,
+    defId: def.id,
+    title: def.title,
+    description: def.description,
+    category: def.category,
+    target: def.target,
+    rewardCoins: def.rewardCoins,
+    isSingleRun: def.isSingleRun,
+    current: 0,
+    progressPercent: 0,
+    isCompleted: false,
+    isClaimed: false,
+  }));
+}
+class DailyQuestTracker {
+          _lastActiveDateKey        ;
+          _currentStreakDays        ;
+          _allCompletedBonusClaimed         ;
+          _quests                      ;
+
+  constructor(
+    dateOrState                                       ,
+    extraState                              
+  ) {
+    let dateKey = '2026-10-09';
+    let state                                          = extraState;
+    if (typeof dateOrState === 'string' && dateOrState.trim() !== '') {
+      dateKey = dateOrState.trim();
+    } else if (dailyQuestIsRecord(dateOrState)) {
+      state = dateOrState                               ;
+      if (typeof state.lastActiveDateKey === 'string' && state.lastActiveDateKey.trim() !== '') {
+        dateKey = state.lastActiveDateKey.trim();
+      }
+    }
+
+    this._lastActiveDateKey = dateKey;
+    const streak = state?.currentStreakDays;
+    this._currentStreakDays = typeof streak === 'number' && Number.isFinite(streak) && streak >= 0 ? Math.floor(streak) : 1;
+    this._allCompletedBonusClaimed = Boolean(state?.allCompletedBonusClaimed);
+    this._quests = Array.isArray(state?.quests) && state.quests.length === 3
+      ? state.quests.map((q) => ({ ...q }))
+      : selectDailyQuests(this._lastActiveDateKey);
+  }
+
+         get lastActiveDateKey()         { return this._lastActiveDateKey; }
+         get currentStreakDays()         { return this._currentStreakDays; }
+         get allCompletedBonusClaimed()          { return this._allCompletedBonusClaimed; }
+         get quests()                       { return this._quests; }
+         getQuests()                       { return this._quests; }
+
+         getQuest(idOrDefId        )                                 {
+    return this._quests.find((q) => q.id === idOrDefId || q.defId === idOrDefId);
+  }
+
+         isAllCompleted()          {
+    return this._quests.length >= 3 && this._quests.every((q) => q.isCompleted);
+  }
+
+         canClaimDailyBonus()          {
+    return !this._allCompletedBonusClaimed && this.isAllCompleted();
+  }
+
+         checkDateRollover(currentDateKey        )          {
+    if (!currentDateKey || typeof currentDateKey !== 'string') return false;
+    const diff = dailyQuestCalendarDiff(this._lastActiveDateKey, currentDateKey);
+    if (diff <= 0) return false;
+
+    this._currentStreakDays = diff === 1 && this.isAllCompleted() ? this._currentStreakDays + 1 : 1;
+    this._lastActiveDateKey = currentDateKey;
+    this._allCompletedBonusClaimed = false;
+    this._quests = selectDailyQuests(currentDateKey);
+    return true;
+  }
+
+         recordProgress(
+    eventsOrTarget                              ,
+    amount         
+  )                                                 {
+    const newlyCompletedQuests                       = [];
+
+    const applyAmount = (targetKey        , val        )       => {
+      if (!Number.isFinite(val) || val <= 0) return;
+      for (const quest of this._quests) {
+        if (quest.id === targetKey || quest.defId === targetKey || quest.category === targetKey) {
+          const wasCompleted = quest.isCompleted;
+          quest.current = quest.isSingleRun ? Math.min(quest.target, Math.max(quest.current, val)) : Math.min(quest.target, quest.current + val);
+          quest.current = Math.max(0, quest.current);
+          quest.progressPercent = quest.target > 0 ? Math.min(100, Math.max(0, Math.round((quest.current / quest.target) * 100))) : 100;
+          quest.isCompleted = quest.current >= quest.target;
+          if (!wasCompleted && quest.isCompleted && !newlyCompletedQuests.includes(quest)) newlyCompletedQuests.push(quest);
+        }
+      }
+    };
+
+    if (typeof eventsOrTarget === 'string') {
+      applyAmount(eventsOrTarget, typeof amount === 'number' ? amount : 0);
+    } else if (dailyQuestIsRecord(eventsOrTarget)) {
+      for (const [key, val] of Object.entries(eventsOrTarget)) {
+        if (typeof val === 'number') applyAmount(key, val);
+      }
+    }
+    return { newlyCompletedQuests };
+  }
+
+         claimQuest(questId        )                                            {
+    const quest = this.getQuest(questId);
+    if (!quest || !quest.isCompleted || quest.isClaimed || quest.current < quest.target) {
+      return { success: false, rewardCoins: 0 };
+    }
+    quest.isClaimed = true;
+    return { success: true, rewardCoins: quest.rewardCoins };
+  }
+
+         claimDailyBonus()                                            {
+    if (!this.canClaimDailyBonus()) return { success: false, rewardCoins: 0 };
+    this._allCompletedBonusClaimed = true;
+    return { success: true, rewardCoins: DAILY_SUPER_BONUS_COINS };
+  }
+
+         getState()                     {
+    return {
+      lastActiveDateKey: this._lastActiveDateKey,
+      currentStreakDays: this._currentStreakDays,
+      allCompletedBonusClaimed: this._allCompletedBonusClaimed,
+      quests: this._quests.map((q) => ({ ...q })),
+    };
+  }
+
+         serialize()         {
+    return JSON.stringify(this.getState());
+  }
+
+         static deserialize(json                  , fallbackDateKey         )                    {
+    const fallback = typeof fallbackDateKey === 'string' && fallbackDateKey.trim() !== '' ? fallbackDateKey.trim() : '2026-10-09';
+    try {
+      if (typeof json !== 'string') return new DailyQuestTracker(fallback);
+      const parsed          = JSON.parse(json);
+      if (!dailyQuestIsRecord(parsed)) return new DailyQuestTracker(fallback);
+
+      const dateKey = typeof parsed.lastActiveDateKey === 'string' && parsed.lastActiveDateKey.trim() !== '' ? parsed.lastActiveDateKey.trim() : fallback;
+      const streak = typeof parsed.currentStreakDays === 'number' && Number.isFinite(parsed.currentStreakDays) && parsed.currentStreakDays >= 0 ? Math.floor(parsed.currentStreakDays) : 1;
+      const bonusClaimed = Boolean(parsed.allCompletedBonusClaimed);
+
+      let quests                       = [];
+      if (Array.isArray(parsed.quests) && parsed.quests.length === 3) {
+        quests = parsed.quests.map((item         )                            => {
+          if (!dailyQuestIsRecord(item)) return null;
+          const id = typeof item.id === 'string' ? item.id : '';
+          const defId = typeof item.defId === 'string' ? item.defId : '';
+          const title = typeof item.title === 'string' ? item.title : '';
+          const description = typeof item.description === 'string' ? item.description : '';
+          const category = typeof item.category === 'string' ? (item.category                      ) : 'score';
+          const target = typeof item.target === 'number' && Number.isFinite(item.target) && item.target > 0 ? item.target : 1;
+          const rewardCoins = typeof item.rewardCoins === 'number' && Number.isFinite(item.rewardCoins) && item.rewardCoins > 0 ? item.rewardCoins : 10;
+          const isSingleRun = Boolean(item.isSingleRun);
+          const current = typeof item.current === 'number' && Number.isFinite(item.current) && item.current >= 0 ? Math.min(target, item.current) : 0;
+          const progressPercent = typeof item.progressPercent === 'number' && Number.isFinite(item.progressPercent) && item.progressPercent >= 0 && item.progressPercent <= 100
+            ? item.progressPercent
+            : Math.min(100, Math.max(0, Math.round((current / target) * 100)));
+          if (!id || !defId) return null;
+          return {
+            id, defId, title, description, category, target, rewardCoins, isSingleRun,
+            current, progressPercent,
+            isCompleted: current >= target || Boolean(item.isCompleted),
+            isClaimed: Boolean(item.isClaimed),
+          };
+        }).filter((q)                          => q !== null);
+      }
+
+      if (quests.length !== 3) quests = selectDailyQuests(dateKey);
+      return new DailyQuestTracker(dateKey, { currentStreakDays: streak, allCompletedBonusClaimed: bonusClaimed, quests });
+    } catch (_err) {
+      return new DailyQuestTracker(fallback);
+    }
   }
 }
 
@@ -1880,6 +2392,14 @@ class GameEngine {
   rollGacha() {
     this.gachaNonce += 1;
     return this.scoreTracker.rollGacha(this.gachaNonce);
+  }
+
+  canClaimDailyReward(now         )          {
+    return this.scoreTracker.canClaimDailyReward(now);
+  }
+
+  claimDailyReward(doubleMultiplier          = false, now         ) {
+    return this.scoreTracker.claimDailyReward(doubleMultiplier, now);
   }
 
   getComboMultiplier()         {
@@ -5533,6 +6053,18 @@ class UIManager {
                    restartBtn                    ;
                    toMenuBtn                    ;
 
+  // Daily Bonus
+                   dailyBonusModal                    ;
+                   menuDailyBtn                    ;
+                   menuDailyBadgeEl                    ;
+                   dailyStreakTextEl                    ;
+                   dailyBonusGridEl                    ;
+                   dailyTimerBoxEl                    ;
+                   dailyTimerValEl                    ;
+                   dailyClaimBtn                    ;
+                   dailyDoubleBtn                    ;
+                   dailyCloseBtn                    ;
+
   // State
           lastScore = -1;
           lastCoins = -1;
@@ -5592,10 +6124,23 @@ class UIManager {
     this.restartBtn = document.getElementById('restart-btn');
     this.toMenuBtn = document.getElementById('to-menu-btn');
 
+    this.dailyBonusModal = document.getElementById('daily-bonus-modal');
+    this.menuDailyBtn = document.getElementById('menu-daily-btn');
+    this.menuDailyBadgeEl = document.getElementById('menu-daily-badge');
+    this.dailyStreakTextEl = document.getElementById('daily-streak-text');
+    this.dailyBonusGridEl = document.getElementById('daily-bonus-grid');
+    this.dailyTimerBoxEl = document.getElementById('daily-timer-box');
+    this.dailyTimerValEl = document.getElementById('daily-timer-val');
+    this.dailyClaimBtn = document.getElementById('daily-claim-btn');
+    this.dailyDoubleBtn = document.getElementById('daily-double-btn');
+    this.dailyCloseBtn = document.getElementById('daily-close-btn');
+
     this.setupInternalNavigation();
   }
 
           setupInternalNavigation()       {
+    this.menuDailyBtn?.addEventListener('click', () => this.openDailyBonus());
+    this.dailyCloseBtn?.addEventListener('click', () => this.closeDailyBonus());
     this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
     this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
@@ -5617,6 +6162,7 @@ class UIManager {
     this.gachaModal?.classList.add('hidden');
     this.leaderboardModal?.classList.add('hidden');
     this.achievementsModal?.classList.add('hidden');
+    this.dailyBonusModal?.classList.add('hidden');
     this.gameOverModal?.classList.add('hidden');
   }
 
@@ -5674,6 +6220,109 @@ class UIManager {
 
   closeAchievements()       {
     this.achievementsModal?.classList.add('hidden');
+  }
+
+  openDailyBonus()       {
+    this.dailyBonusModal?.classList.remove('hidden');
+  }
+
+  closeDailyBonus()       {
+    this.dailyBonusModal?.classList.add('hidden');
+  }
+
+  isDailyBonusOpen()          {
+    return Boolean(this.dailyBonusModal && !this.dailyBonusModal.classList.contains('hidden'));
+  }
+
+  updateDailyBadge(hasReward         )       {
+    if (!this.menuDailyBadgeEl) return;
+    if (hasReward) {
+      this.menuDailyBadgeEl.classList.remove('hidden');
+    } else {
+      this.menuDailyBadgeEl.classList.add('hidden');
+    }
+  }
+
+  renderDailyBonus(
+    days                      ,
+    streak        ,
+    canClaim         ,
+    remainingMs        
+  )       {
+    if (this.dailyStreakTextEl) {
+      this.dailyStreakTextEl.textContent = `Серия: ${streak} ${streak === 1 ? 'день' : streak < 5 ? 'дня' : 'дней'}`;
+    }
+
+    if (this.dailyTimerBoxEl && this.dailyTimerValEl) {
+      if (!canClaim) {
+        this.dailyTimerBoxEl.classList.remove('hidden');
+        const totalSec = Math.floor(remainingMs / 1000);
+        const hours = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+        const secs = String(totalSec % 60).padStart(2, '0');
+        this.dailyTimerValEl.textContent = `${hours}:${mins}:${secs}`;
+      } else {
+        this.dailyTimerBoxEl.classList.add('hidden');
+      }
+    }
+
+    if (this.dailyClaimBtn) {
+      this.dailyClaimBtn.style.display = canClaim ? 'flex' : 'none';
+      const availableDay = days.find((d) => d.status === 'available');
+      if (availableDay) {
+        this.dailyClaimBtn.textContent = `Забрать ${availableDay.coins} 🪙`;
+      }
+    }
+
+    if (this.dailyDoubleBtn) {
+      this.dailyDoubleBtn.style.display = canClaim ? 'flex' : 'none';
+      const availableDay = days.find((d) => d.status === 'available');
+      if (availableDay) {
+        this.dailyDoubleBtn.textContent = `🎬 Забрать x2 (${availableDay.coins * 2} 🪙)`;
+      }
+    }
+
+    if (!this.dailyBonusGridEl) return;
+    this.dailyBonusGridEl.innerHTML = '';
+
+    for (const day of days) {
+      const card = document.createElement('div');
+      const isMega = day.isMega;
+      let cardClass = `daily-card ${day.status}`;
+      if (isMega) cardClass += ' daily-card-mega';
+      card.className = cardClass;
+
+      let icon = '🪙';
+      if (day.day >= 3 && day.day < 5) icon = '💰';
+      else if (day.day >= 5 && !isMega) icon = '🎁';
+      else if (isMega) icon = '👑';
+
+      let statusLabel = '🔒 Закрыто';
+      if (day.status === 'claimed') statusLabel = '✔ Получено';
+      else if (day.status === 'available') statusLabel = '✨ Доступно';
+
+      if (isMega) {
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="daily-card-icon">${icon}</div>
+            <div style="text-align: left;">
+              <div class="daily-card-day" style="color: #fbbf24;">ДЕНЬ 7 (СУПЕР-ПРИЗ)</div>
+              <div class="daily-card-reward">+${day.coins} 🪙 ДЖЕКПОТ</div>
+            </div>
+          </div>
+          <div class="daily-card-status">${statusLabel}</div>
+        `;
+      } else {
+        card.innerHTML = `
+          <div class="daily-card-day">День ${day.day}</div>
+          <div class="daily-card-icon">${icon}</div>
+          <div class="daily-card-reward">+${day.coins} 🪙</div>
+          <div class="daily-card-status">${statusLabel}</div>
+        `;
+      }
+
+      this.dailyBonusGridEl.appendChild(card);
+    }
   }
 
   showGameOver(reasonText        , score = 0, highScore = 0)       {
@@ -5813,6 +6462,15 @@ class UIManager {
     this.toMenuBtn?.addEventListener('click', handlers.onToMenu);
     this.restartBtn?.addEventListener('click', handlers.onRestart);
     this.gachaModalRollBtn?.addEventListener('click', handlers.onRollGacha);
+    this.menuDailyBtn?.addEventListener('click', () => {
+      handlers.onOpenDaily?.();
+    });
+    this.dailyClaimBtn?.addEventListener('click', () => {
+      handlers.onClaimDaily?.(false);
+    });
+    this.dailyDoubleBtn?.addEventListener('click', () => {
+      handlers.onClaimDaily?.(true);
+    });
 
     this.leaderboardSaveNameBtn?.addEventListener('click', () => {
       const raw = this.leaderboardNameInput?.value ?? '';
@@ -6105,6 +6763,14 @@ class InputManager {
       return;
     }
 
+    if (this.modalState.isDailyBonusOpen?.()) {
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      }
+      return;
+    }
+
     if (this.modalState.isMainMenuOpen()) {
       if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
@@ -6198,6 +6864,7 @@ class GameLoop {
           runStartHighScore        ;
           notifiedNewHighScoreThisRun = false;
           lastTime = 0;
+          lastDailyTimerTick = 0;
                    unlockedAchievements = new Set        ();
 
   constructor(
@@ -6227,6 +6894,11 @@ class GameLoop {
 
     for (const skin of ALL_SKINS) {
       this.engine.unlockSkin(skin.id);
+    }
+
+    this.updateDailyBonusUI();
+    if (this.engine.canClaimDailyReward()) {
+      this.handleOpenDailyBonus();
     }
   }
 
@@ -6277,6 +6949,7 @@ class GameLoop {
     this.isPaused = false;
     this.ui.openMainMenu();
     this.updateMenuStats();
+    this.updateDailyBonusUI();
     this.syncBackgroundMusic();
   }
 
@@ -6347,6 +7020,8 @@ class GameLoop {
          handleCloseModal()       {
     if (this.ui.isSettingsOpen()) {
       this.ui.closeSettings();
+    } else if (this.ui.isDailyBonusOpen()) {
+      this.ui.closeDailyBonus();
     } else if (this.ui.isAchievementsOpen()) {
       this.ui.closeAchievements();
     } else if (this.ui.isGachaOpen()) {
@@ -6494,7 +7169,47 @@ class GameLoop {
       this.syncBackgroundMusic();
     }
 
+    if (this.ui.isDailyBonusOpen() && now - this.lastDailyTimerTick > 1000) {
+      this.lastDailyTimerTick = now;
+      this.updateDailyBonusUI();
+    }
+
     requestAnimationFrame(this.animate);
+  }
+
+         handleOpenDailyBonus()       {
+    this.updateDailyBonusUI();
+    this.ui.openDailyBonus();
+  }
+
+         handleClaimDailyBonus(doubleMultiplier         )       {
+    const res = this.engine.claimDailyReward(doubleMultiplier);
+    if (res.success) {
+      if (res.isDouble) {
+        this.audio.playRecordFanfare();
+      } else {
+        this.audio.playCoin();
+      }
+      this.ui.showToast(
+        '🎁',
+        'Ежедневный бонус',
+        `Получено +${res.coins} 🪙 (${res.day}-й день${res.isDouble ? ' x2' : ''})!`
+      );
+      this.lastCoins = this.engine.getCoins();
+      this.updateMenuStats();
+      this.updateDailyBonusUI();
+    }
+  }
+
+         updateDailyBonusUI()       {
+    const daily = this.engine.getScoreTracker().getDailyRewardManager();
+    const canClaim = daily.canClaimToday();
+    const streak = daily.getStreak();
+    const views = daily.getDaysView();
+    const remainingMs = daily.getTimeUntilNextClaimMs();
+
+    this.ui.updateDailyBadge(canClaim);
+    this.ui.renderDailyBonus(views, streak, canClaim, remainingMs);
   }
 
          getUIActions()            {
@@ -6508,6 +7223,8 @@ class GameLoop {
       onSaveName: (name        ) => this.savePlayerName(name),
       onToggleSound: (enabled         ) => this.toggleSound(enabled),
       onToggleMusic: (enabled         ) => this.toggleMusic(enabled),
+      onOpenDaily: () => this.handleOpenDailyBonus(),
+      onClaimDaily: (doubleMultiplier         ) => this.handleClaimDailyBonus(doubleMultiplier),
     };
   }
 
@@ -6533,6 +7250,7 @@ class GameLoop {
       isGachaOpen: () => this.ui.isGachaOpen(),
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),
+      isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,

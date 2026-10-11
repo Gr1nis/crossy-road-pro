@@ -233,6 +233,14 @@ export class GameEngine {
     return this.scoreTracker.rollGacha(this.gachaNonce);
   }
 
+  canClaimDailyReward(now?: number): boolean {
+    return this.scoreTracker.canClaimDailyReward(now);
+  }
+
+  claimDailyReward(doubleMultiplier: boolean = false, now?: number) {
+    return this.scoreTracker.claimDailyReward(doubleMultiplier, now);
+  }
+
   getComboMultiplier(): number {
     if (this.comboStreak >= 6) return 3;
     if (this.comboStreak >= 3) return 2;

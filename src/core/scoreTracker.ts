@@ -17,9 +17,19 @@ import {
   type AchievementEvaluationContext,
   ACHIEVEMENT_DEFINITIONS,
 } from './achievements.ts';
+import {
+  DailyRewardManager,
+  type DailyRewardState,
+  type DailyClaimResult,
+  type DailyRewardDayView,
+} from './dailyReward.ts';
 
 // Re-exports for backward compatibility
 export {
+  DailyRewardManager,
+  type DailyRewardState,
+  type DailyClaimResult,
+  type DailyRewardDayView,
   SkinRarity,
   type SkinRarityValue,
   GACHA_DUPLICATE_CASHBACK,
@@ -74,6 +84,7 @@ interface SavedProfile {
   trainsSurvived?: number;
   logsHopped?: number;
   gachaRolls?: number;
+  dailyRewardState?: DailyRewardState;
 }
 
 export class ScoreTracker {
@@ -88,6 +99,7 @@ export class ScoreTracker {
   private inventory: SkinInventory;
   private gacha: GachaMachine;
   private achievements: AchievementTracker;
+  private dailyReward: DailyRewardManager;
 
   constructor(storage?: StorageAdapter, initialPlayerName?: string) {
     this.storage = storage;
@@ -95,6 +107,7 @@ export class ScoreTracker {
     this.inventory = new SkinInventory(['corgi'], 'corgi');
     this.gacha = new GachaMachine();
     this.achievements = new AchievementTracker();
+    this.dailyReward = new DailyRewardManager();
 
     if (initialPlayerName && initialPlayerName.trim().length > 0) {
       this.playerName = initialPlayerName.trim();
@@ -220,6 +233,9 @@ export class ScoreTracker {
           undefined,
           loadedClaimed
         );
+        if (data.dailyRewardState) {
+          this.dailyReward = new DailyRewardManager(data.dailyRewardState);
+        }
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -243,6 +259,7 @@ export class ScoreTracker {
         trainsSurvived: this.achievements.getTrainsSurvived(),
         logsHopped: this.achievements.getLogsHopped(),
         gachaRolls: this.achievements.getGachaRolls(),
+        dailyRewardState: this.dailyReward.getState(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
@@ -526,5 +543,22 @@ export class ScoreTracker {
 
   getAchievements(ctx?: Partial<AchievementEvaluationContext>): Achievement[] {
     return this.achievements.getAchievements(ctx);
+  }
+
+  getDailyRewardManager(): DailyRewardManager {
+    return this.dailyReward;
+  }
+
+  canClaimDailyReward(now?: number): boolean {
+    return this.dailyReward.canClaimToday(now);
+  }
+
+  claimDailyReward(doubleMultiplier: boolean = false, now?: number): DailyClaimResult {
+    const res = this.dailyReward.claimToday(doubleMultiplier, now);
+    if (res.success && res.coins > 0) {
+      this.wallet.addCoins(res.coins);
+      this.saveToStorage();
+    }
+    return res;
   }
 }

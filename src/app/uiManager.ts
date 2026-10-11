@@ -1,5 +1,6 @@
 import { ALL_SKINS } from '../core/types.ts';
 import type { Achievement, AchievementId } from '../core/achievements.ts';
+import type { DailyRewardDayView } from '../core/dailyReward.ts';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -19,6 +20,8 @@ export interface UIActions {
   onSaveName: (name: string) => void;
   onToggleSound: (enabled: boolean) => void;
   onToggleMusic: (enabled: boolean) => void;
+  onOpenDaily?: () => void;
+  onClaimDaily?: (doubleMultiplier: boolean) => void;
 }
 
 export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
@@ -86,6 +89,18 @@ export class UIManager {
   private readonly restartBtn: HTMLElement | null;
   private readonly toMenuBtn: HTMLElement | null;
 
+  // Daily Bonus
+  private readonly dailyBonusModal: HTMLElement | null;
+  private readonly menuDailyBtn: HTMLElement | null;
+  private readonly menuDailyBadgeEl: HTMLElement | null;
+  private readonly dailyStreakTextEl: HTMLElement | null;
+  private readonly dailyBonusGridEl: HTMLElement | null;
+  private readonly dailyTimerBoxEl: HTMLElement | null;
+  private readonly dailyTimerValEl: HTMLElement | null;
+  private readonly dailyClaimBtn: HTMLElement | null;
+  private readonly dailyDoubleBtn: HTMLElement | null;
+  private readonly dailyCloseBtn: HTMLElement | null;
+
   // State
   private lastScore = -1;
   private lastCoins = -1;
@@ -145,10 +160,23 @@ export class UIManager {
     this.restartBtn = document.getElementById('restart-btn');
     this.toMenuBtn = document.getElementById('to-menu-btn');
 
+    this.dailyBonusModal = document.getElementById('daily-bonus-modal');
+    this.menuDailyBtn = document.getElementById('menu-daily-btn');
+    this.menuDailyBadgeEl = document.getElementById('menu-daily-badge');
+    this.dailyStreakTextEl = document.getElementById('daily-streak-text');
+    this.dailyBonusGridEl = document.getElementById('daily-bonus-grid');
+    this.dailyTimerBoxEl = document.getElementById('daily-timer-box');
+    this.dailyTimerValEl = document.getElementById('daily-timer-val');
+    this.dailyClaimBtn = document.getElementById('daily-claim-btn');
+    this.dailyDoubleBtn = document.getElementById('daily-double-btn');
+    this.dailyCloseBtn = document.getElementById('daily-close-btn');
+
     this.setupInternalNavigation();
   }
 
   private setupInternalNavigation(): void {
+    this.menuDailyBtn?.addEventListener('click', () => this.openDailyBonus());
+    this.dailyCloseBtn?.addEventListener('click', () => this.closeDailyBonus());
     this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
     this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
@@ -170,6 +198,7 @@ export class UIManager {
     this.gachaModal?.classList.add('hidden');
     this.leaderboardModal?.classList.add('hidden');
     this.achievementsModal?.classList.add('hidden');
+    this.dailyBonusModal?.classList.add('hidden');
     this.gameOverModal?.classList.add('hidden');
   }
 
@@ -227,6 +256,109 @@ export class UIManager {
 
   closeAchievements(): void {
     this.achievementsModal?.classList.add('hidden');
+  }
+
+  openDailyBonus(): void {
+    this.dailyBonusModal?.classList.remove('hidden');
+  }
+
+  closeDailyBonus(): void {
+    this.dailyBonusModal?.classList.add('hidden');
+  }
+
+  isDailyBonusOpen(): boolean {
+    return Boolean(this.dailyBonusModal && !this.dailyBonusModal.classList.contains('hidden'));
+  }
+
+  updateDailyBadge(hasReward: boolean): void {
+    if (!this.menuDailyBadgeEl) return;
+    if (hasReward) {
+      this.menuDailyBadgeEl.classList.remove('hidden');
+    } else {
+      this.menuDailyBadgeEl.classList.add('hidden');
+    }
+  }
+
+  renderDailyBonus(
+    days: DailyRewardDayView[],
+    streak: number,
+    canClaim: boolean,
+    remainingMs: number
+  ): void {
+    if (this.dailyStreakTextEl) {
+      this.dailyStreakTextEl.textContent = `Серия: ${streak} ${streak === 1 ? 'день' : streak < 5 ? 'дня' : 'дней'}`;
+    }
+
+    if (this.dailyTimerBoxEl && this.dailyTimerValEl) {
+      if (!canClaim) {
+        this.dailyTimerBoxEl.classList.remove('hidden');
+        const totalSec = Math.floor(remainingMs / 1000);
+        const hours = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+        const secs = String(totalSec % 60).padStart(2, '0');
+        this.dailyTimerValEl.textContent = `${hours}:${mins}:${secs}`;
+      } else {
+        this.dailyTimerBoxEl.classList.add('hidden');
+      }
+    }
+
+    if (this.dailyClaimBtn) {
+      this.dailyClaimBtn.style.display = canClaim ? 'flex' : 'none';
+      const availableDay = days.find((d) => d.status === 'available');
+      if (availableDay) {
+        this.dailyClaimBtn.textContent = `Забрать ${availableDay.coins} 🪙`;
+      }
+    }
+
+    if (this.dailyDoubleBtn) {
+      this.dailyDoubleBtn.style.display = canClaim ? 'flex' : 'none';
+      const availableDay = days.find((d) => d.status === 'available');
+      if (availableDay) {
+        this.dailyDoubleBtn.textContent = `🎬 Забрать x2 (${availableDay.coins * 2} 🪙)`;
+      }
+    }
+
+    if (!this.dailyBonusGridEl) return;
+    this.dailyBonusGridEl.innerHTML = '';
+
+    for (const day of days) {
+      const card = document.createElement('div');
+      const isMega = day.isMega;
+      let cardClass = `daily-card ${day.status}`;
+      if (isMega) cardClass += ' daily-card-mega';
+      card.className = cardClass;
+
+      let icon = '🪙';
+      if (day.day >= 3 && day.day < 5) icon = '💰';
+      else if (day.day >= 5 && !isMega) icon = '🎁';
+      else if (isMega) icon = '👑';
+
+      let statusLabel = '🔒 Закрыто';
+      if (day.status === 'claimed') statusLabel = '✔ Получено';
+      else if (day.status === 'available') statusLabel = '✨ Доступно';
+
+      if (isMega) {
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="daily-card-icon">${icon}</div>
+            <div style="text-align: left;">
+              <div class="daily-card-day" style="color: #fbbf24;">ДЕНЬ 7 (СУПЕР-ПРИЗ)</div>
+              <div class="daily-card-reward">+${day.coins} 🪙 ДЖЕКПОТ</div>
+            </div>
+          </div>
+          <div class="daily-card-status">${statusLabel}</div>
+        `;
+      } else {
+        card.innerHTML = `
+          <div class="daily-card-day">День ${day.day}</div>
+          <div class="daily-card-icon">${icon}</div>
+          <div class="daily-card-reward">+${day.coins} 🪙</div>
+          <div class="daily-card-status">${statusLabel}</div>
+        `;
+      }
+
+      this.dailyBonusGridEl.appendChild(card);
+    }
   }
 
   showGameOver(reasonText: string, score = 0, highScore = 0): void {
@@ -366,6 +498,15 @@ export class UIManager {
     this.toMenuBtn?.addEventListener('click', handlers.onToMenu);
     this.restartBtn?.addEventListener('click', handlers.onRestart);
     this.gachaModalRollBtn?.addEventListener('click', handlers.onRollGacha);
+    this.menuDailyBtn?.addEventListener('click', () => {
+      handlers.onOpenDaily?.();
+    });
+    this.dailyClaimBtn?.addEventListener('click', () => {
+      handlers.onClaimDaily?.(false);
+    });
+    this.dailyDoubleBtn?.addEventListener('click', () => {
+      handlers.onClaimDaily?.(true);
+    });
 
     this.leaderboardSaveNameBtn?.addEventListener('click', () => {
       const raw = this.leaderboardNameInput?.value ?? '';

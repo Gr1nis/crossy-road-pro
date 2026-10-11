@@ -29,6 +29,7 @@ export class GameLoop {
   private runStartHighScore: number;
   private notifiedNewHighScoreThisRun = false;
   private lastTime = 0;
+  private lastDailyTimerTick = 0;
   private readonly unlockedAchievements = new Set<string>();
 
   constructor(
@@ -58,6 +59,11 @@ export class GameLoop {
 
     for (const skin of ALL_SKINS) {
       this.engine.unlockSkin(skin.id);
+    }
+
+    this.updateDailyBonusUI();
+    if (this.engine.canClaimDailyReward()) {
+      this.handleOpenDailyBonus();
     }
   }
 
@@ -108,6 +114,7 @@ export class GameLoop {
     this.isPaused = false;
     this.ui.openMainMenu();
     this.updateMenuStats();
+    this.updateDailyBonusUI();
     this.syncBackgroundMusic();
   }
 
@@ -178,6 +185,8 @@ export class GameLoop {
   public handleCloseModal(): void {
     if (this.ui.isSettingsOpen()) {
       this.ui.closeSettings();
+    } else if (this.ui.isDailyBonusOpen()) {
+      this.ui.closeDailyBonus();
     } else if (this.ui.isAchievementsOpen()) {
       this.ui.closeAchievements();
     } else if (this.ui.isGachaOpen()) {
@@ -325,7 +334,47 @@ export class GameLoop {
       this.syncBackgroundMusic();
     }
 
+    if (this.ui.isDailyBonusOpen() && now - this.lastDailyTimerTick > 1000) {
+      this.lastDailyTimerTick = now;
+      this.updateDailyBonusUI();
+    }
+
     requestAnimationFrame(this.animate);
+  }
+
+  public handleOpenDailyBonus(): void {
+    this.updateDailyBonusUI();
+    this.ui.openDailyBonus();
+  }
+
+  public handleClaimDailyBonus(doubleMultiplier: boolean): void {
+    const res = this.engine.claimDailyReward(doubleMultiplier);
+    if (res.success) {
+      if (res.isDouble) {
+        this.audio.playRecordFanfare();
+      } else {
+        this.audio.playCoin();
+      }
+      this.ui.showToast(
+        '🎁',
+        'Ежедневный бонус',
+        `Получено +${res.coins} 🪙 (${res.day}-й день${res.isDouble ? ' x2' : ''})!`
+      );
+      this.lastCoins = this.engine.getCoins();
+      this.updateMenuStats();
+      this.updateDailyBonusUI();
+    }
+  }
+
+  public updateDailyBonusUI(): void {
+    const daily = this.engine.getScoreTracker().getDailyRewardManager();
+    const canClaim = daily.canClaimToday();
+    const streak = daily.getStreak();
+    const views = daily.getDaysView();
+    const remainingMs = daily.getTimeUntilNextClaimMs();
+
+    this.ui.updateDailyBadge(canClaim);
+    this.ui.renderDailyBonus(views, streak, canClaim, remainingMs);
   }
 
   public getUIActions(): UIActions {
@@ -339,6 +388,8 @@ export class GameLoop {
       onSaveName: (name: string) => this.savePlayerName(name),
       onToggleSound: (enabled: boolean) => this.toggleSound(enabled),
       onToggleMusic: (enabled: boolean) => this.toggleMusic(enabled),
+      onOpenDaily: () => this.handleOpenDailyBonus(),
+      onClaimDaily: (doubleMultiplier: boolean) => this.handleClaimDailyBonus(doubleMultiplier),
     };
   }
 
@@ -364,6 +415,7 @@ export class GameLoop {
       isGachaOpen: () => this.ui.isGachaOpen(),
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),
+      isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,
