@@ -26,6 +26,12 @@ export interface UIActions {
   onOpenDailyQuests?: () => void;
   onClaimDailyQuest?: (id: string, doubleMultiplier?: boolean) => void;
   onClaimDailyBonus?: (doubleMultiplier?: boolean) => void;
+  onDevAddCoins?: () => void;
+  onDevClaimDailyBonus?: () => void;
+  onDevCompleteQuests?: () => void;
+  onDevRerollQuests?: () => void;
+  onDevCycleBiome?: () => void;
+  onDevToggleGodMode?: () => void;
 }
 
 export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
@@ -121,6 +127,17 @@ export class UIManager {
   private readonly platform: AdProvider;
   private questsTimerInterval: number | null = null;
 
+  // Dev Sandbox
+  private readonly menuDevBtn: HTMLElement | null;
+  private readonly devModal: HTMLElement | null;
+  private readonly devCloseBtn: HTMLElement | null;
+  private readonly devAddCoinsBtn: HTMLElement | null;
+  private readonly devBonusBtn: HTMLElement | null;
+  private readonly devCompleteQuestsBtn: HTMLElement | null;
+  private readonly devRerollQuestsBtn: HTMLElement | null;
+  private readonly devCycleBiomeBtn: HTMLElement | null;
+  private readonly devGodModeBtn: HTMLElement | null;
+
   // State
   private lastScore = -1;
   private lastCoins = -1;
@@ -208,6 +225,16 @@ export class UIManager {
     this.questsClaimBonusX2Btn = document.getElementById('quests-claim-bonus-x2-btn') as HTMLButtonElement | null;
     this.questsCloseBtn = document.getElementById('quests-close-btn');
 
+    this.menuDevBtn = document.getElementById('menu-dev-btn');
+    this.devModal = document.getElementById('dev-modal');
+    this.devCloseBtn = document.getElementById('dev-close-btn');
+    this.devAddCoinsBtn = document.getElementById('dev-add-coins-btn');
+    this.devBonusBtn = document.getElementById('dev-bonus-btn');
+    this.devCompleteQuestsBtn = document.getElementById('dev-complete-quests-btn');
+    this.devRerollQuestsBtn = document.getElementById('dev-reroll-quests-btn');
+    this.devCycleBiomeBtn = document.getElementById('dev-cycle-biome-btn');
+    this.devGodModeBtn = document.getElementById('dev-godmode-btn');
+
     this.setupInternalNavigation();
   }
 
@@ -216,6 +243,8 @@ export class UIManager {
     this.dailyCloseBtn?.addEventListener('click', () => this.closeDailyBonus());
     this.menuDailyQuestsBtn?.addEventListener('click', () => this.openDailyQuests());
     this.questsCloseBtn?.addEventListener('click', () => this.closeDailyQuests());
+    this.menuDevBtn?.addEventListener('click', () => this.openDevModal());
+    this.devCloseBtn?.addEventListener('click', () => this.closeDevModal());
     this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
     this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
@@ -242,18 +271,27 @@ export class UIManager {
     this.achievementsModal?.classList.add('hidden');
     this.dailyBonusModal?.classList.add('hidden');
     this.dailyQuestsModal?.classList.add('hidden');
+    this.devModal?.classList.add('hidden');
     this.stopQuestsCountdown();
     this.gameOverModal?.classList.add('hidden');
   }
 
+  showHud(): void {
+    this.hudEl?.classList.remove('hidden');
+  }
+
+  hideHud(): void {
+    this.hudEl?.classList.add('hidden');
+  }
+
   openMainMenu(): void {
     this.hideAllModals();
-    this.hudEl?.classList.add('hidden');
+    this.hideHud();
     this.mainMenuModal?.classList.remove('hidden');
   }
 
   closeMainMenu(): void {
-    this.hudEl?.classList.remove('hidden');
+    this.showHud();
     this.mainMenuModal?.classList.add('hidden');
   }
 
@@ -330,8 +368,30 @@ export class UIManager {
     return Boolean(this.dailyQuestsModal && !this.dailyQuestsModal.classList.contains('hidden'));
   }
 
+  openDevModal(): void {
+    this.devModal?.classList.remove('hidden');
+  }
+
+  closeDevModal(): void {
+    this.devModal?.classList.add('hidden');
+  }
+
+  isDevModalOpen(): boolean {
+    return Boolean(this.devModal && !this.devModal.classList.contains('hidden'));
+  }
+
+  updateGodModeButton(enabled: boolean): void {
+    if (this.devGodModeBtn) {
+      this.devGodModeBtn.textContent = `🛡️ God Mode: ${enabled ? 'ВКЛ' : 'ВЫКЛ'}`;
+      this.devGodModeBtn.style.color = enabled ? '#4ade80' : '#f87171';
+    }
+  }
+
   private updateQuestsCountdown(): void {
     if (!this.questsTimerValEl) return;
+    // === [DEV TESTING: Таймер заданий отключен для тестов] ===
+    // Для возврата стандартного обратного отсчета до полуночи раскомментируйте блок ниже:
+    /*
     const now = Date.now();
     const d = new Date(now);
     const nextMidnight = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1, 0, 0, 0, 0);
@@ -340,6 +400,8 @@ export class UIManager {
     const mins = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
     const secs = String(diffSec % 60).padStart(2, '0');
     this.questsTimerValEl.textContent = `${hours}:${mins}:${secs}`;
+    */
+    this.questsTimerValEl.textContent = '00:00:00 (DEV)';
   }
 
   private startQuestsCountdown(): void {
@@ -378,6 +440,9 @@ export class UIManager {
     }
 
     if (this.dailyTimerBoxEl && this.dailyTimerValEl) {
+      // === [DEV TESTING: Таймер ожидания бонуса скрыт для моментального тестирования] ===
+      // Для возврата стандартного таймера ожидания раскомментируйте блок ниже:
+      /*
       if (!canClaim) {
         this.dailyTimerBoxEl.classList.remove('hidden');
         const totalSec = Math.floor(remainingMs / 1000);
@@ -388,6 +453,8 @@ export class UIManager {
       } else {
         this.dailyTimerBoxEl.classList.add('hidden');
       }
+      */
+      this.dailyTimerBoxEl.classList.add('hidden');
     }
 
     if (this.dailyClaimBtn) {
@@ -606,6 +673,7 @@ export class UIManager {
   }
 
   showGameOver(reasonText: string, score = 0, highScore = 0): void {
+    this.hideHud();
     if (this.deathReasonEl) {
       this.deathReasonEl.textContent = reasonText;
     }
@@ -764,6 +832,13 @@ export class UIManager {
     this.dailyDoubleBtn?.addEventListener('click', () => {
       handlers.onClaimDaily?.(true);
     });
+
+    this.devAddCoinsBtn?.addEventListener('click', () => handlers.onDevAddCoins?.());
+    this.devBonusBtn?.addEventListener('click', () => handlers.onDevClaimDailyBonus?.());
+    this.devCompleteQuestsBtn?.addEventListener('click', () => handlers.onDevCompleteQuests?.());
+    this.devRerollQuestsBtn?.addEventListener('click', () => handlers.onDevRerollQuests?.());
+    this.devCycleBiomeBtn?.addEventListener('click', () => handlers.onDevCycleBiome?.());
+    this.devGodModeBtn?.addEventListener('click', () => handlers.onDevToggleGodMode?.());
 
     this.leaderboardSaveNameBtn?.addEventListener('click', () => {
       const raw = this.leaderboardNameInput?.value ?? '';

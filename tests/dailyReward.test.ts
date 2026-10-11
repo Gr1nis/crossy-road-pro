@@ -1,12 +1,16 @@
-import { describe, it } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   DailyRewardManager,
   DAILY_REWARD_DAYS,
   type DailyRewardState,
+  setDevDisableDailyTimers,
 } from '../src/core/dailyReward.ts';
 
 describe('Daily Reward System — Core TDD & Property-Based Suite', () => {
+  beforeEach(() => {
+    setDevDisableDailyTimers(false);
+  });
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
   // Fixed baseline: 2026-10-12 12:00:00 (Monday noon)
   const BASE_TIME = new Date(2026, 9, 12, 12, 0, 0).getTime();
@@ -162,5 +166,25 @@ describe('Daily Reward System — Core TDD & Property-Based Suite', () => {
     assert.equal(state.currentStreak, 4);
     assert.equal(state.totalClaims, 11);
     assert.equal(state.lastClaimDate, '2026-10-12');
+  });
+
+  it('Property 11 (DEV Testing Bypass): allows immediate consecutive claims without waiting', () => {
+    setDevDisableDailyTimers(true);
+    const manager = new DailyRewardManager();
+
+    // In DEV mode, day 1 is immediately available
+    assert.equal(manager.canClaimToday(BASE_TIME), true);
+    const r1 = manager.claimToday(false, BASE_TIME);
+    assert.equal(r1.success, true);
+    assert.equal(r1.day, 1);
+
+    // Immediately claim again without advancing time
+    assert.equal(manager.canClaimToday(BASE_TIME), true);
+    const r2 = manager.claimToday(false, BASE_TIME);
+    assert.equal(r2.success, true);
+    assert.equal(r2.day, 2);
+
+    // Countdown is always 0
+    assert.equal(manager.getTimeUntilNextClaimMs(BASE_TIME), 0);
   });
 });

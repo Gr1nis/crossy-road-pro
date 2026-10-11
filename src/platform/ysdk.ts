@@ -1,3 +1,13 @@
+// ============================================================================
+// ⚠️ НАПОМИНАНИЕ ПРИ РАБОТЕ С YANDEX GAMES SDK:
+// В проекте сейчас активен ТЕСТОВЫЙ РЕЖИМ (DEV Mode).
+// Перед тестированием в боевой среде или релизом отключите тест-режим:
+// 1. src/core/dailyReward.ts -> DEV_DISABLE_DAILY_TIMERS = false;
+// 2. src/app/uiManager.ts -> раскомментировать боевые таймеры
+// 3. scripts/build.mjs -> убрать/скрыть кнопку #menu-dev-btn и модалку
+// 4. npm test && npm run build
+// ============================================================================
+
 import type { AdProvider, RewardedAdCallbacks } from '../core/types.ts';
 
 export interface YsdkRewardedCallbacks {

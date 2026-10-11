@@ -265,4 +265,82 @@ describe('Daily Quests & Bonus — VFX, Juice & Polish Suite', () => {
       globalThis.window = originalWindow;
     }
   });
+
+  it('Property 5 (HUD Invariants & Top Bar Layout): index.html has global .hidden, hides HUD in menu, removes info-links, and sets menu-top-bar structure', () => {
+    const htmlPath = path.join(process.cwd(), 'index.html');
+    const html = fs.readFileSync(htmlPath, 'utf8');
+
+    // 1. Global .hidden rule
+    assert.ok(
+      html.includes('.hidden { display: none !important; }'),
+      'Must define global .hidden rule with display: none !important;'
+    );
+
+    // 2. HUD has hidden class initially
+    assert.ok(
+      html.includes('id="in-game-hud" class="hud hidden"'),
+      '#in-game-hud must have class="hud hidden" by default in HTML'
+    );
+
+    // 3. info-links must be completely removed
+    assert.ok(!html.includes('info-links'), 'Must completely remove .info-links container');
+    assert.ok(!html.includes('Архитектура (Plan)'), 'Must remove architecture plan link');
+    assert.ok(!html.includes('https://github.com/Gr1nis/crossy-road-pro'), 'Must remove github link');
+
+    // 4. Menu top bar structure
+    assert.ok(html.includes('.menu-top-left'), 'Must include .menu-top-left for coins & high score');
+    assert.ok(html.includes('.menu-top-right'), 'Must include .menu-top-right for settings gear');
+    assert.ok(html.includes('top: max(100px, calc(env(safe-area-inset-top) + 80px))'), 'Side widgets must use top >= 100px');
+
+    // 5. UIManager HUD show/hide state transitions
+    const hudClasses = new Set<string>(['hud', 'hidden']);
+    const menuClasses = new Set<string>(['modal', 'main-menu-overlay']);
+    const mockElements: Record<string, any> = {
+      'in-game-hud': {
+        classList: {
+          add: (c: string) => hudClasses.add(c),
+          remove: (c: string) => hudClasses.delete(c),
+          contains: (c: string) => hudClasses.has(c),
+        },
+      },
+      'main-menu-modal': {
+        classList: {
+          add: (c: string) => menuClasses.add(c),
+          remove: (c: string) => menuClasses.delete(c),
+          contains: (c: string) => menuClasses.has(c),
+        },
+      },
+    };
+
+    const originalDoc = globalThis.document;
+    Object.defineProperty(globalThis, 'document', {
+      value: {
+        getElementById: (id: string) => mockElements[id] ?? null,
+        querySelector: () => null,
+        querySelectorAll: () => [],
+        createElement: () => ({ classList: { add() {} }, style: {}, appendChild() {} }),
+      },
+      configurable: true,
+      writable: true,
+    });
+
+    try {
+      const ui = new UIManager();
+      assert.ok(hudClasses.has('hidden'), 'HUD must start hidden');
+
+      ui.showHud();
+      assert.ok(!hudClasses.has('hidden'), 'showHud must remove hidden class');
+
+      ui.openMainMenu();
+      assert.ok(hudClasses.has('hidden'), 'openMainMenu must add hidden class to HUD');
+
+      ui.closeMainMenu();
+      assert.ok(!hudClasses.has('hidden'), 'closeMainMenu must show HUD');
+
+      ui.showGameOver('CAR', 10, 50);
+      assert.ok(hudClasses.has('hidden'), 'showGameOver must hide HUD');
+    } finally {
+      globalThis.document = originalDoc;
+    }
+  });
 });

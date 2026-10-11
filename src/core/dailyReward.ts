@@ -60,6 +60,16 @@ function calculateCalendarDayDiff(dateStr1: string, dateStr2: string): number {
   return Math.round(msDiff / (1000 * 60 * 60 * 24));
 }
 
+// ============================================================================
+// [DEV TESTING OVERRIDE: ТАЙМЕРЫ И ПРИВЯЗКА КО ВРЕМЕНИ ДЛЯ ЕЖЕДНЕВНЫХ БОНУСОВ]
+// Позволяет забирать бонусы подряд без ожидания полуночи (День 1..7 -> 1..7).
+// Для возврата продакшн-режима установите: DEV_DISABLE_DAILY_TIMERS = false;
+// ============================================================================
+export let DEV_DISABLE_DAILY_TIMERS = true;
+export function setDevDisableDailyTimers(disabled: boolean): void {
+  DEV_DISABLE_DAILY_TIMERS = disabled;
+}
+
 export class DailyRewardManager {
   private currentStreak = 1;
   private lastClaimTimestamp = 0;
@@ -68,23 +78,13 @@ export class DailyRewardManager {
   private previousStreakBeforeBreak: number | undefined = undefined;
 
   constructor(initialState?: Partial<DailyRewardState>) {
-    if (initialState) {
-      if (typeof initialState.currentStreak === 'number' && initialState.currentStreak >= 1 && initialState.currentStreak <= 7) {
-        this.currentStreak = Math.floor(initialState.currentStreak);
-      }
-      if (typeof initialState.lastClaimTimestamp === 'number' && Number.isFinite(initialState.lastClaimTimestamp) && initialState.lastClaimTimestamp >= 0) {
-        this.lastClaimTimestamp = Math.floor(initialState.lastClaimTimestamp);
-      }
-      if (typeof initialState.lastClaimDate === 'string' && initialState.lastClaimDate.trim().length > 0) {
-        this.lastClaimDate = initialState.lastClaimDate.trim();
-      }
-      if (typeof initialState.totalClaims === 'number' && Number.isFinite(initialState.totalClaims) && initialState.totalClaims >= 0) {
-        this.totalClaims = Math.floor(initialState.totalClaims);
-      }
-      if (typeof initialState.previousStreakBeforeBreak === 'number') {
-        this.previousStreakBeforeBreak = initialState.previousStreakBeforeBreak;
-      }
-    }
+    if (!initialState) return;
+    const { currentStreak, lastClaimTimestamp, lastClaimDate, totalClaims, previousStreakBeforeBreak } = initialState;
+    if (typeof currentStreak === 'number' && currentStreak >= 1 && currentStreak <= 7) this.currentStreak = Math.floor(currentStreak);
+    if (typeof lastClaimTimestamp === 'number' && Number.isFinite(lastClaimTimestamp) && lastClaimTimestamp >= 0) this.lastClaimTimestamp = Math.floor(lastClaimTimestamp);
+    if (typeof lastClaimDate === 'string' && lastClaimDate.trim().length > 0) this.lastClaimDate = lastClaimDate.trim();
+    if (typeof totalClaims === 'number' && Number.isFinite(totalClaims) && totalClaims >= 0) this.totalClaims = Math.floor(totalClaims);
+    if (typeof previousStreakBeforeBreak === 'number') this.previousStreakBeforeBreak = previousStreakBeforeBreak;
   }
 
   getState(): DailyRewardState {
@@ -101,8 +101,11 @@ export class DailyRewardManager {
    * Evaluates if reward can be claimed at timestamp `now`.
    */
   canClaimToday(now: number = Date.now()): boolean {
+    if (DEV_DISABLE_DAILY_TIMERS) {
+      return true; // [DEV] Всегда доступно для тестирования без ожидания полуночи
+    }
+    // --- ПРОДАКШН ПРОВЕРКА ВРЕМЕНИ ---
     if (this.lastClaimTimestamp > 0 && now < this.lastClaimTimestamp) {
-      // Clock moved backward or future timestamp: prevent exploit
       return false;
     }
     const today = toLocalDateString(now);
@@ -117,6 +120,10 @@ export class DailyRewardManager {
    * Returns which day (1..7) is currently active / eligible.
    */
   getEligibleDay(now: number = Date.now()): number {
+    if (DEV_DISABLE_DAILY_TIMERS) {
+      return this.totalClaims === 0 ? 1 : (this.currentStreak === 7 ? 1 : this.currentStreak + 1);
+    }
+    // --- ПРОДАКШН РАСЧЕТ ДНЯ ---
     if (!this.lastClaimDate) {
       return 1;
     }
@@ -124,16 +131,11 @@ export class DailyRewardManager {
     const diff = calculateCalendarDayDiff(this.lastClaimDate, today);
 
     if (diff === 0) {
-      // Already claimed today: returns the day that was claimed today
       return this.currentStreak;
     }
-
     if (diff === 1) {
-      // Consecutive day!
       return this.currentStreak === 7 ? 1 : this.currentStreak + 1;
     }
-
-    // Broken streak (>1 day missed): resets to day 1
     return 1;
   }
 
@@ -165,6 +167,30 @@ export class DailyRewardManager {
    * Claims today's daily bonus.
    */
   claimToday(doubleMultiplier: boolean = false, now: number = Date.now()): DailyClaimResult {
+    if (DEV_DISABLE_DAILY_TIMERS) {
+      // [DEV] Продвигаем каждый клик на следующий день цикла (1..7 -> 1)
+      const targetDay = this.totalClaims === 0 ? 1 : (this.currentStreak === 7 ? 1 : this.currentStreak + 1);
+      const config = DAILY_REWARD_DAYS[targetDay - 1] ?? DAILY_REWARD_DAYS[0];
+      const baseCoins = config.coins;
+      const finalCoins = doubleMultiplier ? baseCoins * 2 : baseCoins;
+
+      this.currentStreak = targetDay;
+      this.lastClaimDate = toLocalDateString(now);
+      this.lastClaimTimestamp = now;
+      this.totalClaims += 1;
+      this.previousStreakBeforeBreak = undefined;
+
+      return {
+        success: true,
+        coins: finalCoins,
+        day: targetDay,
+        newStreak: this.currentStreak,
+        totalClaims: this.totalClaims,
+        isDouble: doubleMultiplier,
+      };
+    }
+
+    // --- ПРОДАКШН КЛЕЙМ (ПРОВЕРКА РАЗ В СУТКИ) ---
     if (!this.canClaimToday(now)) {
       return {
         success: false,
@@ -217,6 +243,9 @@ export class DailyRewardManager {
    * Milliseconds remaining until next local midnight.
    */
   getTimeUntilNextClaimMs(now: number = Date.now()): number {
+    if (DEV_DISABLE_DAILY_TIMERS) {
+      return 0; // [DEV] В тестовом режиме таймер ожидания равен 0
+    }
     const d = new Date(now);
     const nextMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
     return Math.max(0, nextMidnight.getTime() - now);

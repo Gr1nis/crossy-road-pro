@@ -81,9 +81,13 @@ const htmlContent = `<!DOCTYPE html>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; touch-action: none; -webkit-touch-callout: none; }
     #game-container { width: 100%; height: 100%; position: relative; touch-action: none; }
+
+    /* Global Visibility Utility */
+    .hidden { display: none !important; }
     
     /* Clean Minimal In-Game HUD: Coins, Distance & Pause button only */
     .hud { position: fixed; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
+    .hud.hidden { display: none !important; }
     .hud-stats { display: flex; gap: 14px; }
     .score-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.22); padding: 10px 22px; border-radius: 16px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
     .score-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; font-weight: 800; }
@@ -112,7 +116,7 @@ const htmlContent = `<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      padding: 0 0 max(22px, env(safe-area-inset-bottom)) 0;
       z-index: 30;
       box-sizing: border-box;
     }
@@ -126,12 +130,22 @@ const htmlContent = `<!DOCTYPE html>
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
+      box-sizing: border-box;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
       pointer-events: none;
-      gap: 12px;
       position: relative;
-      z-index: 5;
+      z-index: 10;
+    }
+    .menu-top-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+    .menu-top-right {
+      display: flex;
+      align-items: center;
+      pointer-events: auto;
     }
     .top-pill {
       pointer-events: auto;
@@ -254,7 +268,7 @@ const htmlContent = `<!DOCTYPE html>
     /* Floating Side Badges */
     .menu-side-widgets {
       position: absolute;
-      top: max(88px, calc(env(safe-area-inset-top) + 68px));
+      top: max(100px, calc(env(safe-area-inset-top) + 80px));
       left: max(16px, env(safe-area-inset-left));
       right: max(16px, env(safe-area-inset-right));
       display: flex;
@@ -349,11 +363,11 @@ const htmlContent = `<!DOCTYPE html>
     .menu-bottom-dock {
       display: flex;
       align-items: flex-end;
-      justify-content: center;
-      gap: 16px;
+      justify-content: space-between;
       width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
+      box-sizing: border-box;
+      padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left));
+      margin: 0;
       pointer-events: none;
       position: relative;
       z-index: 5;
@@ -361,9 +375,16 @@ const htmlContent = `<!DOCTYPE html>
     .dock-col {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
       pointer-events: auto;
+    }
+    .dock-col-left {
+      align-self: flex-end;
+    }
+    .dock-col-right {
+      align-self: flex-end;
+      margin-left: auto;
     }
     .dock-btn {
       background: none;
@@ -372,7 +393,7 @@ const htmlContent = `<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       padding: 0;
       transition: transform 0.12s ease;
     }
@@ -383,44 +404,45 @@ const htmlContent = `<!DOCTYPE html>
       transform: translateY(2px);
     }
     .dock-btn-inner {
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 6px 0 #0f766e, 0 10px 18px rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.7);
+      border: 2.5px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 7px 0 #0f766e, 0 12px 20px rgba(0, 0, 0, 0.35), inset 0 2px 2px rgba(255, 255, 255, 0.7);
       transition: box-shadow 0.12s ease, transform 0.12s ease;
     }
     .dock-btn-teal .dock-btn-inner {
       background: linear-gradient(180deg, #2dd4bf 0%, #0d9488 100%);
-      box-shadow: 0 6px 0 #0f766e, 0 10px 18px rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.7);
+      box-shadow: 0 7px 0 #0f766e, 0 12px 20px rgba(0, 0, 0, 0.35), inset 0 2px 2px rgba(255, 255, 255, 0.7);
     }
     .dock-btn:active .dock-btn-inner {
       box-shadow: 0 2px 0 #0f766e, 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.7);
       transform: translateY(4px);
     }
     .dock-btn-icon {
-      font-size: 28px;
+      font-size: 32px;
       line-height: 1;
       filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
     }
     .dock-badge {
       position: absolute;
-      top: -4px;
-      right: -4px;
-      padding: 1px 6px;
+      top: -5px;
+      right: -5px;
+      padding: 2px 7px;
       border-radius: 999px;
       background: #ef4444;
       color: #fff;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 900;
-      border: 1.5px solid #fff;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
     .dock-btn-label {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 800;
       color: #ffffff;
       text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0,0,0,0.9);
@@ -431,31 +453,33 @@ const htmlContent = `<!DOCTYPE html>
     /* Giant 3D Green PLAY Button */
     .hero-play-btn {
       pointer-events: auto;
-      flex: 1;
-      max-width: 240px;
-      min-width: 170px;
-      height: 88px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 280px;
+      height: 90px;
       border-radius: 28px;
       background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-      border: 3.5px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 10px 0 #15803d, 0 18px 32px rgba(22, 163, 74, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.8);
+      border: 3.5px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 0 #15803d, 0 22px 38px rgba(22, 163, 74, 0.5), inset 0 3px 2px rgba(255, 255, 255, 0.85);
       cursor: pointer;
-      position: relative;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-      margin-bottom: 4px;
+      margin: 0;
       padding: 0;
+      z-index: 10;
     }
     .hero-play-btn:hover {
       filter: brightness(1.08);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 0 #15803d, 0 22px 36px rgba(22, 163, 74, 0.5), inset 0 3px 2px rgba(255, 255, 255, 0.8);
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 14px 0 #15803d, 0 26px 42px rgba(22, 163, 74, 0.55), inset 0 3px 2px rgba(255, 255, 255, 0.85);
     }
     .hero-play-btn:active {
-      transform: translateY(6px);
+      transform: translateX(-50%) translateY(6px);
       box-shadow: 0 4px 0 #15803d, 0 8px 16px rgba(0, 0, 0, 0.35), inset 0 2px 1px rgba(255, 255, 255, 0.6);
     }
     .hero-play-sheen {
@@ -469,19 +493,19 @@ const htmlContent = `<!DOCTYPE html>
       pointer-events: none;
     }
     .hero-play-text {
-      font-size: 38px;
+      font-size: 40px;
       font-weight: 900;
       letter-spacing: -0.01em;
       color: #ffffff;
       text-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       position: relative;
       z-index: 2;
     }
     .hero-play-arrow {
-      font-size: 26px;
+      font-size: 28px;
       margin-left: 2px;
     }
 
@@ -773,9 +797,6 @@ const htmlContent = `<!DOCTYPE html>
     input[type=range]:active::-webkit-slider-thumb { transform: scale(1.1); background: #38bdf8; }
     input[type=range]:active::-moz-range-thumb { transform: scale(1.1); background: #38bdf8; }
 
-    .info-links { position: fixed; bottom: 20px; left: 24px; display: flex; gap: 10px; z-index: 15; }
-    .info-link { background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 12px; color: #e2e8f0; text-decoration: none; font-size: 13px; font-weight: 700; }
-
     /* Mobile Responsive Overrides */
     @media (max-width: 640px) {
       .hud { top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); }
@@ -833,9 +854,13 @@ const htmlContent = `<!DOCTYPE html>
       .quest-super-card { padding: 10px 12px; flex-direction: column; align-items: stretch; text-align: center; gap: 8px; }
       .quest-super-info { justify-content: center; }
 
-      .info-links { display: none; }
-
-      .menu-top-bar { max-width: 100%; gap: 8px; }
+      .main-menu-overlay {
+        padding: 0 0 max(16px, env(safe-area-inset-bottom)) 0;
+      }
+      .menu-top-bar {
+        padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+      }
+      .menu-top-left { gap: 6px; }
       .top-pill { padding: 5px 10px; }
       .top-pill-icon { font-size: 20px; }
       .top-pill-val { font-size: 16px; }
@@ -844,17 +869,91 @@ const htmlContent = `<!DOCTYPE html>
       .top-pill-score-line { font-size: 13px; }
       .top-settings-btn { width: 40px; height: 40px; border-radius: 12px; }
       .top-settings-icon { font-size: 20px; }
-      .menu-side-widgets { top: max(72px, calc(env(safe-area-inset-top) + 56px)); }
+      .menu-side-widgets {
+        top: max(100px, calc(env(safe-area-inset-top) + 80px));
+        left: max(16px, env(safe-area-inset-left));
+        right: max(16px, env(safe-area-inset-right));
+      }
       .floating-widget-icon-box { width: 52px; height: 52px; border-radius: 16px; }
       .floating-widget-icon { font-size: 28px; }
       .floating-widget-label { font-size: 10px; }
-      .menu-bottom-dock { gap: 8px; max-width: 100%; }
-      .dock-btn-inner { width: 46px; height: 46px; border-radius: 14px; }
-      .dock-btn-icon { font-size: 22px; }
-      .dock-btn-label { font-size: 10px; }
-      .hero-play-btn { height: 72px; min-width: 130px; border-radius: 22px; }
-      .hero-play-text { font-size: 28px; }
-      .hero-play-arrow { font-size: 20px; }
+      .menu-bottom-dock {
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+        box-sizing: border-box;
+      }
+      .dock-col {
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .dock-col-right {
+        margin-left: 0;
+      }
+      .dock-btn {
+        gap: 3px;
+      }
+      .dock-btn-inner {
+        width: 48px;
+        height: 48px;
+        border-radius: 15px;
+        border-width: 2px;
+        box-shadow: 0 5px 0 #0f766e, 0 8px 14px rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.7);
+      }
+      .dock-btn:active .dock-btn-inner {
+        box-shadow: 0 2px 0 #0f766e, 0 4px 6px rgba(0, 0, 0, 0.3);
+        transform: translateY(3px);
+      }
+      .dock-btn-icon {
+        font-size: 24px;
+      }
+      .dock-btn-label {
+        font-size: 10px;
+      }
+      .dock-badge {
+        top: -4px;
+        right: -4px;
+        font-size: 9px;
+        padding: 1px 5px;
+      }
+      .hero-play-btn {
+        position: static;
+        transform: none;
+        flex: 1;
+        width: auto;
+        min-width: 130px;
+        max-width: 220px;
+        height: 74px;
+        margin: 0;
+        border-radius: 22px;
+        border-width: 3px;
+        box-shadow: 0 8px 0 #15803d, 0 14px 24px rgba(22, 163, 74, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.8);
+      }
+      .hero-play-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 0 #15803d, 0 18px 28px rgba(22, 163, 74, 0.5), inset 0 3px 2px rgba(255, 255, 255, 0.8);
+      }
+      .hero-play-btn:active {
+        transform: translateY(4px);
+        box-shadow: 0 3px 0 #15803d, 0 6px 12px rgba(0, 0, 0, 0.35), inset 0 2px 1px rgba(255, 255, 255, 0.6);
+      }
+      .hero-play-text {
+        font-size: 30px;
+        gap: 6px;
+      }
+      .hero-play-arrow {
+        font-size: 22px;
+      }
+      #menu-dev-btn {
+        bottom: max(165px, calc(env(safe-area-inset-bottom) + 165px)) !important;
+        left: max(16px, env(safe-area-inset-left)) !important;
+      }
     }
   </style>
 </head>
@@ -864,7 +963,7 @@ const htmlContent = `<!DOCTYPE html>
   <div id="toast-container"></div>
 
   <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
-  <div id="in-game-hud" class="hud">
+  <div id="in-game-hud" class="hud hidden">
     <div class="hud-stats">
       <div class="score-card">
         <div class="score-label">Пройденный путь</div>
@@ -881,36 +980,36 @@ const htmlContent = `<!DOCTYPE html>
     </div>
   </div>
 
-  <div class="info-links">
-    <a class="info-link" href="./crossy_road_plan.html" target="_blank" rel="noopener">📐 Архитектура (Plan)</a>
-    <a class="info-link" href="https://github.com/Gr1nis/crossy-road-pro" target="_blank" rel="noopener">🐙 GitHub</a>
-  </div>
-
   <!-- Главное меню (Main Menu Modal) - Modern Casual Arcade HUD -->
   <div id="main-menu-modal" class="modal main-menu-overlay">
     <p class="menu-slogan" style="display: none;">Посмотрим, как далеко ты сможешь зайти!</p>
     <!-- Верхний бар (Top Header Status Bar) -->
     <div class="menu-top-bar">
-      <!-- Монеты -->
-      <div id="menu-coins-pill" class="top-pill top-pill-coins" title="Баланс монет">
-        <span class="top-pill-icon">🪙</span>
-        <span id="menu-coins" class="top-pill-val">0</span>
-        <button id="menu-coins-plus-btn" class="top-pill-plus" title="Пополнить / Магазин">+</button>
-      </div>
+      <!-- Слева: Монеты и Рекорд -->
+      <div class="menu-top-left">
+        <!-- Монеты -->
+        <div id="menu-coins-pill" class="top-pill top-pill-coins" title="Баланс монет">
+          <span class="top-pill-icon">🪙</span>
+          <span id="menu-coins" class="top-pill-val">0</span>
+          <button id="menu-coins-plus-btn" class="top-pill-plus" title="Пополнить / Магазин">+</button>
+        </div>
 
-      <!-- Рекорд -->
-      <div class="top-pill top-pill-score" title="Ваш рекорд">
-        <div class="top-pill-crown-box">👑</div>
-        <div class="top-pill-score-text">
-          <span class="top-pill-score-title">high score</span>
-          <span class="top-pill-score-line">BEST: <strong id="menu-high-score">0</strong></span>
+        <!-- Рекорд -->
+        <div class="top-pill top-pill-score" title="Ваш рекорд">
+          <div class="top-pill-crown-box">👑</div>
+          <div class="top-pill-score-text">
+            <span class="top-pill-score-title">high score</span>
+            <span class="top-pill-score-line">BEST: <strong id="menu-high-score">0</strong></span>
+          </div>
         </div>
       </div>
 
-      <!-- Кнопка Настройки -->
-      <button id="menu-settings-btn" class="top-settings-btn" title="Настройки">
-        <span class="top-settings-icon">⚙</span>
-      </button>
+      <!-- Справа у самого края экрана: Кнопка Настройки -->
+      <div class="menu-top-right">
+        <button id="menu-settings-btn" class="top-settings-btn" title="Настройки">
+          <span class="top-settings-icon">⚙</span>
+        </button>
+      </div>
     </div>
 
     <!-- Боковые плавающие виджеты наград (Floating Side Widgets) -->
@@ -941,7 +1040,7 @@ const htmlContent = `<!DOCTYPE html>
     <!-- Нижняя навигационная панель (Bottom Hero Dock) -->
     <div class="menu-bottom-dock">
       <!-- Левая колонка кнопок (Скины и Магазин) -->
-      <div class="dock-col">
+      <div class="dock-col dock-col-left">
         <button id="menu-skins-btn" class="dock-btn dock-btn-teal" title="Скины">
           <div class="dock-btn-inner">
             <span class="dock-btn-icon">🦊</span>
@@ -964,7 +1063,7 @@ const htmlContent = `<!DOCTYPE html>
       </button>
 
       <!-- Правая колонка кнопок (Лидерборд и Достижения) -->
-      <div class="dock-col">
+      <div class="dock-col dock-col-right">
         <button id="menu-leaderboard-btn" class="dock-btn dock-btn-teal" title="Таблица лидеров">
           <div class="dock-btn-inner">
             <span class="dock-btn-icon">🏆</span>
@@ -1191,6 +1290,34 @@ const htmlContent = `<!DOCTYPE html>
     </div>
   </div>
 
+  <!-- Кнопка вызова DEV-панели -->
+  <button id="menu-dev-btn" class="hud-circle-btn" style="position: fixed; bottom: max(200px, calc(env(safe-area-inset-bottom) + 200px)); left: max(24px, env(safe-area-inset-left)); z-index: 100; font-size: 13px; width: auto; padding: 0 12px; height: 38px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; color: #38bdf8; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; pointer-events: auto;" title="Панель разработчика">🛠️ DEV</button>
+
+  <!-- Модальное окно Dev Sandbox (Тестирование и Вьюер) -->
+  <div id="dev-modal" class="modal hidden">
+    <div class="modal-card" style="max-width: 440px;">
+      <h2 style="color: #38bdf8;">🛠️ DEV SANDBOX</h2>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 14px;">Тестирование механик и наград без ограничений по времени</p>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+        <button id="dev-add-coins-btn" class="menu-btn menu-btn-primary" style="font-size: 13px; padding: 10px;">🪙 +500 Монет</button>
+        <button id="dev-bonus-btn" class="menu-btn menu-btn-primary" style="font-size: 13px; padding: 10px;">🎁 Бонус дня</button>
+        <button id="dev-complete-quests-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🎯 Выполнить квесты</button>
+        <button id="dev-reroll-quests-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🔄 Обновить квесты</button>
+        <button id="dev-cycle-biome-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🌲 Сменить биом</button>
+        <button id="dev-godmode-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🛡️ God Mode: ВЫКЛ</button>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <a id="dev-open-viewer-btn" href="viewer.html" target="_blank" class="menu-btn menu-btn-secondary" style="display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
+          🔍 3D Вьюер моделей (viewer.html)
+        </a>
+      </div>
+
+      <button id="dev-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+    </div>
+  </div>
+
   <script type="module">
 ${combinedJs}
   </script>
@@ -1199,4 +1326,10 @@ ${combinedJs}
 
 fs.writeFileSync(path.join(ROOT, 'index.html'), htmlContent, 'utf8');
 fs.writeFileSync(path.join(distDir, 'index.html'), htmlContent, 'utf8');
-console.log('Build complete: index.html, dist/index.html and dist/bundle.js generated successfully.');
+
+const viewerPath = path.join(ROOT, 'viewer.html');
+if (fs.existsSync(viewerPath)) {
+  fs.copyFileSync(viewerPath, path.join(distDir, 'viewer.html'));
+}
+
+console.log('Build complete: index.html, dist/index.html, viewer.html and dist/bundle.js generated successfully.');

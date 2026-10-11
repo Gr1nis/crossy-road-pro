@@ -220,6 +220,21 @@ export class DailyQuestTracker {
     return { success: true, rewardCoins: coins, isDouble: doubleMultiplier };
   }
 
+  public devCompleteAllQuests(): void {
+    for (const q of this._quests) {
+      q.current = q.target;
+      q.progressPercent = 100;
+      q.isCompleted = true;
+    }
+  }
+
+  public devRerollQuests(): void {
+    const nextDate = `2026-10-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`;
+    this._lastActiveDateKey = nextDate;
+    this._allCompletedBonusClaimed = false;
+    this._quests = selectDailyQuests(nextDate);
+  }
+
   public getState(): DailyQuestDayState {
     return {
       lastActiveDateKey: this._lastActiveDateKey,

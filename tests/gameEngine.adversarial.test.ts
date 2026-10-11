@@ -301,6 +301,94 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
     engine.step(1.0);
     assert.equal(tracker.getTrainsSurvived(), 5, 'Train outside visibility zone (row 20) should not count');
   });
+
+  it('Invariant 11 (stepAmbient Traffic Simulation & Player Safety Invariants): continuously moves vehicles, logs, trains without moving player, scrolling camera, checking collisions or inactivity kill', () => {
+    const engine = new GameEngine(777);
+
+    // 1. Setup a road lane at row 3 with vehicles moving in both directions
+    const roadLane = engine.getLane(3);
+    roadLane.type = LaneType.ROAD;
+    roadLane.vehicles = [
+      { id: 101, x: 0, speed: 10.0, length: 2.0, color: 0xff0000, type: 'car' },
+      { id: 102, x: WORLD_CONFIG.WRAP_LIMIT - 0.5, speed: 5.0, length: 2.0, color: 0x00ff00, type: 'truck' },
+      { id: 103, x: -(WORLD_CONFIG.WRAP_LIMIT - 0.5), speed: -5.0, length: 2.0, color: 0x0000ff, type: 'car' },
+    ];
+
+    // 2. Setup a river lane at row 4 with logs
+    const riverLane = engine.getLane(4);
+    riverLane.type = LaneType.RIVER;
+    riverLane.logs = [
+      { id: 201, x: 0, speed: 4.0, length: 3.0 },
+      { id: 202, x: WORLD_CONFIG.WRAP_LIMIT - 0.5, speed: 6.0, length: 3.0 },
+    ];
+
+    // 3. Setup a railway lane at row 5
+    const railLane = engine.getLane(5);
+    railLane.type = LaneType.RAILWAY;
+    railLane.train = {
+      timer: 3.5,
+      period: 5.0,
+      warningDuration: 1.0,
+      isWarning: false,
+      isPassing: false,
+      x: 0,
+      length: 12.0,
+      speed: 60.0,
+    };
+
+    // Record initial player state & camera
+    const initialCamZ = engine.getCameraZ();
+    const initialPlayer = { ...engine.getPlayer() };
+    const tracker = engine.getScoreTracker();
+    const initialTrainsSurvived = tracker.getTrainsSurvived();
+
+    // Step 0.2s ambient
+    engine.stepAmbient(0.2);
+
+    // Assert vehicles moved
+    assert.equal(roadLane.vehicles[0].x, 2.0, 'Vehicle 101 should advance by speed * dt');
+    assert.equal(roadLane.vehicles[1].x, -WORLD_CONFIG.WRAP_LIMIT, 'Vehicle 102 should wrap around right edge');
+    assert.equal(roadLane.vehicles[2].x, WORLD_CONFIG.WRAP_LIMIT, 'Vehicle 103 should wrap around left edge');
+
+    // Assert logs moved
+    assert.equal(riverLane.logs[0].x, 0.8, 'Log 201 should advance by speed * dt');
+    assert.equal(riverLane.logs[1].x, -WORLD_CONFIG.WRAP_LIMIT, 'Log 202 should wrap around right edge');
+
+    // Train timer advanced from 3.5 to 3.7 (not yet warning, period=5.0, warning=1.0)
+    assert.equal(railLane.train.timer, 3.7);
+    assert.equal(railLane.train.isWarning, false);
+
+    // Step ambient further so train enters warning
+    engine.stepAmbient(0.5); // timer = 4.2 >= 4.0
+    assert.equal(railLane.train.isWarning, true, 'Train should trigger warning');
+    assert.equal(railLane.train.isPassing, false);
+
+    // Step ambient so train starts passing
+    engine.stepAmbient(1.0); // timer >= 5.0 -> isPassing = true
+    assert.equal(railLane.train.isPassing, true, 'Train should start passing');
+
+    // Step ambient until train finishes pass
+    engine.stepAmbient(2.0);
+    assert.equal(railLane.train.isPassing, false, 'Train should finish pass and reset');
+    assert.equal(railLane.train.timer, 0);
+
+    // Train survival count should NOT increase in ambient mode
+    assert.equal(tracker.getTrainsSurvived(), initialTrainsSurvived, 'Ambient train pass must not count towards survival stats');
+
+    // Player and camera invariants
+    const postPlayer = engine.getPlayer();
+    assert.equal(postPlayer.x, initialPlayer.x, 'Player X must remain unchanged');
+    assert.equal(postPlayer.row, initialPlayer.row, 'Player row must remain unchanged');
+    assert.equal(postPlayer.isDead, false, 'Player must remain alive');
+    assert.equal(engine.getCameraZ(), initialCamZ, 'CameraZ must not scroll');
+    assert.equal(engine.getCameraGraceTimer(), 0, 'Camera grace timer must not tick');
+
+    // Step with vehicle placed directly at player position
+    const row0 = engine.getLane(0);
+    row0.vehicles = [{ id: 999, x: 0, speed: 1.0, length: 2.0, color: 0xffffff, type: 'car' }];
+    engine.stepAmbient(1.0);
+    assert.equal(engine.getPlayer().isDead, false, 'stepAmbient must not check collisions or kill player');
+  });
 });
 
 

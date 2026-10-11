@@ -44,3 +44,10 @@
 - Ads: rewarded (coins/revive), interstitial (every 3rd game over), no banners during gameplay.
 - Must work offline after initial load (except leaderboard/ads).
 - Languages: RU (primary), EN, TR.
+
+### ⚠️ ОБЯЗАТЕЛЬНОЕ НАПОМИНАНИЕ ПРИ ПЕРЕХОДЕ К РАБОТЕ С SDK ЯНДЕКС ИГР
+Когда пользователь переходит к работе с SDK Яндекс Игр (`src/platform/ysdk.ts` или интеграция лидербордов/рекламы/сохранений), **агент ОБЯЗАН напомнить**, что в игре сейчас активен **ТЕСТОВЫЙ РЕЖИМ (DEV Mode)**, и предоставить инструкцию по его отключению:
+1. `src/core/dailyReward.ts`: изменить `export let DEV_DISABLE_DAILY_TIMERS = false;` (возвращает 24-часовой календарный цикл наград).
+2. `src/app/uiManager.ts`: раскомментировать боевой обратный отсчёт до полуночи в `updateQuestsCountdown()` и показ таймера ожидания бонуса `dailyTimerBoxEl` в `renderDailyBonus()`.
+3. `scripts/build.mjs`: скрыть или убрать кнопку `#menu-dev-btn` и `#dev-modal` перед релизом.
+4. Выполнить сборку и тесты: `npm test && npm run build`.

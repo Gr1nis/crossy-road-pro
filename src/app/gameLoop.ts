@@ -1,6 +1,6 @@
 import { GameEngine } from '../core/gameEngine.ts';
 import { RECORD_FLAG_X } from '../core/collision.ts';
-import { ALL_SKINS, DeathReason, MoveDirection, WORLD_CONFIG, type AdProvider, type MoveDirectionValue, type SkinId } from '../core/types.ts';
+import { ALL_SKINS, DeathReason, MoveDirection, WORLD_CONFIG, BIOME_ORDER, type AdProvider, type MoveDirectionValue, type SkinId, type BiomeType } from '../core/types.ts';
 import type { AchievementId } from '../core/achievements.ts';
 import type { DailyQuestInstance } from '../core/dailyQuests.ts';
 import { AudioSynth } from '../view/audioSynth.ts';
@@ -35,6 +35,7 @@ export class GameLoop {
   private lastLogsHopped = 0;
   private lastTrainsSurvived = 0;
   private readonly unlockedAchievements = new Set<string>();
+  private godMode = false;
 
   constructor(
     engine: GameEngine,
@@ -74,6 +75,47 @@ export class GameLoop {
     this.updateDailyQuestsUI();
     this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
     this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
+    this.setupDevGlobal();
+  }
+
+  private setupDevGlobal(): void {
+    if (typeof window === 'undefined') return;
+    interface CrossyDevGlobal {
+      __CROSSY_DEV__?: {
+        addCoins: (amount?: number) => void;
+        claimDailyBonus: () => void;
+        completeQuests: () => void;
+        rerollQuests: () => void;
+        toggleGodMode: () => boolean;
+        openViewer: () => void;
+      };
+    }
+    (window as Window & CrossyDevGlobal).__CROSSY_DEV__ = {
+      addCoins: (amount = 500) => {
+        this.engine.getScoreTracker().addCoins(amount);
+        this.lastCoins = this.engine.getCoins();
+        this.updateMenuStats();
+        this.ui.showToast('🪙', '+500 Монет', 'Монеты начислены на баланс!');
+      },
+      claimDailyBonus: () => this.handleClaimDailyBonus(false),
+      completeQuests: () => {
+        this.engine.getDailyQuestTracker().devCompleteAllQuests();
+        this.updateDailyQuestsUI();
+        this.ui.showToast('🎯', 'Задания выполнены', 'Все задания завершены!');
+      },
+      rerollQuests: () => {
+        this.engine.getDailyQuestTracker().devRerollQuests();
+        this.updateDailyQuestsUI();
+        this.ui.showToast('🔄', 'Новые задания', 'Квесты обновлены!');
+      },
+      toggleGodMode: () => {
+        this.godMode = !this.godMode;
+        this.ui.updateGodModeButton(this.godMode);
+        this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛ' : 'Бессмертие ВЫКЛ');
+        return this.godMode;
+      },
+      openViewer: () => window.open('viewer.html', '_blank'),
+    };
   }
 
   public getIsPlaying(): boolean {
@@ -86,7 +128,9 @@ export class GameLoop {
   }
 
   public startGame(): void {
+    this.ui.closeMainMenu();
     this.ui.hideAllModals();
+    this.ui.showHud();
     this.wasDead = false;
     this.isPaused = false;
     this.runStartHighScore = this.engine.getHighScore();
@@ -208,6 +252,8 @@ export class GameLoop {
       this.ui.closeGacha();
     } else if (this.ui.isLeaderboardOpen()) {
       this.ui.closeLeaderboard();
+    } else if (this.ui.isDevModalOpen()) {
+      this.ui.closeDevModal();
     }
   }
 
@@ -302,7 +348,9 @@ export class GameLoop {
     const dt = Math.min((now - this.lastTime) / 1000, 0.1);
     this.lastTime = now;
 
-    if (this.isPlaying && !this.isPaused) {
+    if (!this.isPlaying || this.isPaused) {
+      this.engine.stepAmbient(dt);
+    } else {
       this.engine.step(dt);
     }
     this.sceneManager.sync(this.engine, dt);
@@ -353,6 +401,11 @@ export class GameLoop {
       this.ui.setWarningVignette(this.engine.getCameraGraceRatio());
     } else {
       this.ui.setWarningVignette(0);
+    }
+
+    if (this.godMode && p.isDead) {
+      p.isDead = false;
+      p.deathReason = DeathReason.NONE;
     }
 
     if (this.isPlaying && p.isDead && !this.wasDead) {
@@ -561,6 +614,37 @@ export class GameLoop {
       onOpenDailyQuests: () => this.handleOpenDailyQuests(),
       onClaimDailyQuest: (id: string, doubleMultiplier?: boolean) => this.handleClaimDailyQuest(id, Boolean(doubleMultiplier)),
       onClaimDailyBonus: (doubleMultiplier?: boolean) => this.handleClaimDailyQuestBonus(Boolean(doubleMultiplier)),
+      onDevAddCoins: () => {
+        this.engine.getScoreTracker().addCoins(500);
+        this.lastCoins = this.engine.getCoins();
+        this.updateMenuStats();
+        this.ui.showToast('🪙', '+500 Монет', 'Монеты начислены на баланс!');
+      },
+      onDevClaimDailyBonus: () => {
+        this.handleClaimDailyBonus(false);
+      },
+      onDevCompleteQuests: () => {
+        this.engine.getDailyQuestTracker().devCompleteAllQuests();
+        this.updateDailyQuestsUI();
+        this.ui.showToast('🎯', 'Задания выполнены', 'Все 3 ежедневных задания завершены!');
+      },
+      onDevRerollQuests: () => {
+        this.engine.getDailyQuestTracker().devRerollQuests();
+        this.updateDailyQuestsUI();
+        this.ui.showToast('🔄', 'Новые задания', 'Сгенерированы новые ежедневные задания!');
+      },
+      onDevCycleBiome: () => {
+        const biomes: BiomeType[] = ['forest', 'winter', 'desert', 'neon'];
+        const currentIdx = biomes.indexOf(this.engine.getBiome());
+        const nextBiome = biomes[(currentIdx + 1) % biomes.length];
+        this.engine.setBiomeOverride(nextBiome);
+        this.ui.showToast('🌲', 'Биом изменён', `Биом переключен на: ${nextBiome}`);
+      },
+      onDevToggleGodMode: () => {
+        this.godMode = !this.godMode;
+        this.ui.updateGodModeButton(this.godMode);
+        this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛЮЧЕНО' : 'Бессмертие ВЫКЛЮЧЕНО');
+      },
     };
   }
 
@@ -588,6 +672,7 @@ export class GameLoop {
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),
       isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),
       isDailyQuestsOpen: () => this.ui.isDailyQuestsOpen(),
+      isDevModalOpen: () => this.ui.isDevModalOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,

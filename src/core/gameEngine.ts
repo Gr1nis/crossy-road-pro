@@ -47,6 +47,7 @@ export class GameEngine {
   private gachaNonce = 0;
   private forwardStreak = 0;
   private runCoins = 0;
+  private biomeOverride: BiomeType | null = null;
 
   constructor(seed: number = 42, storage?: StorageAdapter) {
     this.generator = new LaneGenerator(seed);
@@ -103,7 +104,11 @@ export class GameEngine {
   }
 
   getBiome(): BiomeType {
-    return getBiomeForScore(this.getScore());
+    return this.biomeOverride ?? getBiomeForScore(this.getScore());
+  }
+
+  setBiomeOverride(biome: BiomeType | null): void {
+    this.biomeOverride = biome;
   }
 
   getCurrentBiome(): BiomeType {
@@ -520,6 +525,49 @@ export class GameEngine {
     }
 
     this.evictOldLanes();
+  }
+
+  stepAmbient(dt: number): void {
+    if (dt <= 0) return;
+
+    const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
+
+    for (let r = minSimRow; r <= maxSimRow; r++) {
+      const lane = this.getLane(r);
+
+      for (const v of lane.vehicles) {
+        v.x += v.speed * dt;
+        if (v.speed > 0 && v.x > WRAP_LIMIT) v.x = -WRAP_LIMIT;
+        else if (v.speed < 0 && v.x < -WRAP_LIMIT) v.x = WRAP_LIMIT;
+      }
+
+      for (const log of lane.logs) {
+        log.x += log.speed * dt;
+        if (log.speed > 0 && log.x > WRAP_LIMIT) log.x = -WRAP_LIMIT;
+        else if (log.speed < 0 && log.x < -WRAP_LIMIT) log.x = WRAP_LIMIT;
+      }
+
+      if (lane.type === LaneType.RAILWAY && lane.train) {
+        const tr = lane.train;
+        if (tr.isPassing) {
+          tr.x += tr.speed * dt;
+          if (Math.abs(tr.x) > WRAP_LIMIT + 12) {
+            tr.isPassing = false;
+            tr.isWarning = false;
+            tr.timer = 0;
+          }
+        } else {
+          tr.timer += dt;
+          tr.isWarning = tr.timer >= tr.period - tr.warningDuration;
+          if (tr.timer >= tr.period) {
+            tr.isPassing = true;
+            tr.isWarning = true;
+            tr.x = tr.speed > 0 ? -(WRAP_LIMIT + 10) : WRAP_LIMIT + 10;
+          }
+        }
+      }
+    }
   }
 
   getForwardStreak(): number {
