@@ -23,9 +23,21 @@ import {
   type DailyClaimResult,
   type DailyRewardDayView,
 } from './dailyReward.ts';
+import {
+  DailyQuestTracker,
+  getDailyDateKey,
+  type DailyQuestDayState,
+  type DailyQuestEventData,
+  type DailyQuestInstance,
+} from './dailyQuests.ts';
 
 // Re-exports for backward compatibility
 export {
+  DailyQuestTracker,
+  getDailyDateKey,
+  type DailyQuestDayState,
+  type DailyQuestEventData,
+  type DailyQuestInstance,
   DailyRewardManager,
   type DailyRewardState,
   type DailyClaimResult,
@@ -85,6 +97,7 @@ interface SavedProfile {
   logsHopped?: number;
   gachaRolls?: number;
   dailyRewardState?: DailyRewardState;
+  dailyQuestState?: DailyQuestDayState;
 }
 
 export class ScoreTracker {
@@ -100,6 +113,7 @@ export class ScoreTracker {
   private gacha: GachaMachine;
   private achievements: AchievementTracker;
   private dailyReward: DailyRewardManager;
+  private dailyQuests: DailyQuestTracker;
 
   constructor(storage?: StorageAdapter, initialPlayerName?: string) {
     this.storage = storage;
@@ -108,6 +122,7 @@ export class ScoreTracker {
     this.gacha = new GachaMachine();
     this.achievements = new AchievementTracker();
     this.dailyReward = new DailyRewardManager();
+    this.dailyQuests = new DailyQuestTracker(getDailyDateKey());
 
     if (initialPlayerName && initialPlayerName.trim().length > 0) {
       this.playerName = initialPlayerName.trim();
@@ -236,6 +251,10 @@ export class ScoreTracker {
         if (data.dailyRewardState) {
           this.dailyReward = new DailyRewardManager(data.dailyRewardState);
         }
+        if (data.dailyQuestState) {
+          this.dailyQuests = new DailyQuestTracker(data.dailyQuestState);
+          this.dailyQuests.checkDateRollover(getDailyDateKey());
+        }
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -260,6 +279,7 @@ export class ScoreTracker {
         logsHopped: this.achievements.getLogsHopped(),
         gachaRolls: this.achievements.getGachaRolls(),
         dailyRewardState: this.dailyReward.getState(),
+        dailyQuestState: this.dailyQuests.getState(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
@@ -560,5 +580,36 @@ export class ScoreTracker {
       this.saveToStorage();
     }
     return res;
+  }
+
+  getDailyQuestTracker(): DailyQuestTracker {
+    return this.dailyQuests;
+  }
+
+  recordDailyQuestProgress(events: DailyQuestEventData): DailyQuestInstance[] {
+    this.dailyQuests.checkDateRollover(getDailyDateKey());
+    const { newlyCompletedQuests } = this.dailyQuests.recordProgress(events);
+    this.saveToStorage();
+    return newlyCompletedQuests;
+  }
+
+  claimDailyQuest(questId: string): { success: boolean; coins: number } {
+    const res = this.dailyQuests.claimQuest(questId);
+    if (res.success && res.rewardCoins > 0) {
+      this.wallet.addCoins(res.rewardCoins);
+      this.saveToStorage();
+      return { success: true, coins: res.rewardCoins };
+    }
+    return { success: false, coins: 0 };
+  }
+
+  claimDailyQuestBonus(): { success: boolean; coins: number } {
+    const res = this.dailyQuests.claimDailyBonus();
+    if (res.success && res.rewardCoins > 0) {
+      this.wallet.addCoins(res.rewardCoins);
+      this.saveToStorage();
+      return { success: true, coins: res.rewardCoins };
+    }
+    return { success: false, coins: 0 };
   }
 }

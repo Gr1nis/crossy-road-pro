@@ -26,9 +26,9 @@ const moduleOrder = [
   'src/core/gachaMachine.ts',
   'src/core/achievements.ts',
   'src/core/dailyReward.ts',
+  'src/core/dailyQuests.ts',
   'src/core/scoreTracker.ts',
   'src/core/laneGenerator.ts',
-  'src/core/dailyQuests.ts',
   'src/core/gameEngine.ts',
   'src/view/audioSynth.ts',
   'src/view/voxelPalette.ts',
@@ -72,6 +72,9 @@ const htmlContent = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Crossy Road 3D — Vibe-Pro Edition</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
@@ -140,6 +143,9 @@ const htmlContent = `<!DOCTYPE html>
     .rarity-legendary { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.3)); color: #fbbf24; border: 1px solid #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
     /* Daily Bonus Modal & 7-Day Grid */
+    #daily-bonus-modal { z-index: 50; }
+    #daily-bonus-modal .modal-card-daily { z-index: 51; }
+    #daily-quests-modal { z-index: 48; }
     .menu-btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
     .btn-badge.pulse-badge { background: #10b981; color: #fff; border-color: #34d399; animation: badgePulse 1.4s infinite; }
     .btn-badge.hidden { display: none !important; }
@@ -219,6 +225,53 @@ const htmlContent = `<!DOCTYPE html>
     .ach-card.claimed { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); }
     .ach-claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: transform 0.1s ease, filter 0.1s ease; white-space: nowrap; }
     .ach-claim-btn:active { transform: scale(0.96); filter: brightness(1.1); }
+
+    /* Daily Quests Modal & Cards */
+    .modal-card-quests { max-height: 88vh; display: flex; flex-direction: column; overflow-y: auto; padding: 24px 22px; -webkit-overflow-scrolling: touch; }
+    .quest-timer-box { background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; padding: 8px 14px; color: #94a3b8; font-size: 13px; font-weight: 700; margin-bottom: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    #quests-timer-val { color: #38bdf8; font-variant-numeric: tabular-nums; font-weight: 800; }
+    .quest-summary-card { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 10px 14px; margin-bottom: 12px; text-align: left; }
+    .quest-summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; font-weight: 800; color: #94a3b8; }
+    .quest-summary-header strong { color: #facc15; font-size: 13px; }
+    .quest-progress-bar-bg { width: 100%; height: 8px; background: #1e293b; border-radius: 999px; overflow: hidden; }
+    .quest-progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+    .quest-progress-bar-fill.gold { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .quest-progress-bar-fill.blue { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+    .quest-list-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; text-align: left; }
+    .quest-card { display: flex; align-items: center; gap: 12px; background: rgba(15, 23, 42, 0.7); border: 2px solid #334155; border-radius: 14px; padding: 12px 14px; transition: all 0.2s ease; }
+    .quest-card.in-progress { border-color: #334155; background: rgba(15, 23, 42, 0.6); }
+    .quest-card.ready { border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); box-shadow: 0 0 16px rgba(245, 158, 11, 0.25); }
+    .quest-card.claimed { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); opacity: 0.8; }
+    .quest-icon-col { flex-shrink: 0; }
+    .quest-icon { font-size: 26px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; }
+    .quest-card.ready .quest-icon { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+    .quest-card.claimed .quest-icon { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
+    .quest-info-col { flex: 1; min-width: 0; }
+    .quest-title-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .quest-title { font-size: 13px; font-weight: 800; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .quest-reward-pill { font-size: 11px; font-weight: 800; color: #facc15; white-space: nowrap; }
+    .quest-desc { font-size: 11px; color: #cbd5e1; margin: 2px 0 6px; line-height: 1.3; }
+    .quest-progress-row { display: flex; align-items: center; gap: 8px; }
+    .quest-progress-row .quest-progress-bar-bg { height: 6px; flex: 1; }
+    .quest-progress-text { font-size: 11px; font-weight: 800; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .quest-action-col { flex-shrink: 0; margin-left: 6px; }
+    .quest-btn { border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
+    .quest-btn-claim { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+    .quest-btn-claim:hover { filter: brightness(1.1); transform: scale(1.03); }
+    .quest-btn-claim:active { transform: scale(0.97); }
+    .quest-status-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+    .quest-status-badge.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .quest-status-badge.pending { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #475569; }
+    .quest-super-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(234, 88, 12, 0.12)); border: 2px solid #f59e0b; border-radius: 16px; padding: 12px 16px; text-align: left; }
+    .quest-super-info { display: flex; align-items: center; gap: 10px; }
+    .quest-super-icon { font-size: 30px; }
+    .quest-super-text { min-width: 0; }
+    .quest-super-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; }
+    .quest-super-desc { font-size: 11px; color: #e2e8f0; margin-top: 2px; }
+    .quest-super-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; transition: all 0.15s ease; }
+    .quest-super-btn:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .quest-super-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.8); }
+    .quest-super-btn.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); opacity: 1; filter: none; cursor: default; }
 
     /* Game Over Score Card */
     .game-over-score-card { display: flex; justify-content: center; gap: 16px; margin: 0 auto 20px; max-width: 280px; }
@@ -309,6 +362,14 @@ const htmlContent = `<!DOCTYPE html>
       .daily-card-reward { font-size: 12px; }
       .daily-card-mega { padding: 10px 14px; }
 
+      .modal-card-quests { padding: 18px 14px !important; }
+      .quest-card { padding: 10px 10px; gap: 8px; }
+      .quest-icon { width: 36px; height: 36px; font-size: 20px; }
+      .quest-title { font-size: 12px; }
+      .quest-btn { padding: 6px 10px; font-size: 11px; }
+      .quest-super-card { padding: 10px 12px; flex-direction: column; align-items: stretch; text-align: center; gap: 8px; }
+      .quest-super-info { justify-content: center; }
+
       .info-links { display: none; }
     }
   </style>
@@ -360,7 +421,10 @@ const htmlContent = `<!DOCTYPE html>
 
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
-        <button id="menu-daily-btn" class="menu-btn menu-btn-gold">🎁 Бонус дня <span id="menu-daily-badge" class="btn-badge pulse-badge hidden">ГОТОВО</span></button>
+        <button id="menu-daily-btn" class="menu-btn menu-btn-gold">🎁 Бонус дня <span id="menu-daily-badge" class="btn-badge pulse-badge">ГОТОВО</span></button>
+        <button id="menu-daily-quests-btn" class="menu-btn menu-btn-amber">
+          🎯 Задания дня <span id="menu-daily-quests-badge" class="btn-badge hidden">0/3</span>
+        </button>
         <button id="menu-achievements-btn" class="menu-btn menu-btn-emerald">🏅 Достижения <span id="menu-achievements-badge" class="btn-badge">0/10</span></button>
         <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Автомат скинов</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
@@ -509,6 +573,43 @@ const htmlContent = `<!DOCTYPE html>
     </div>
   </div>
 
+  <!-- Модальное окно Ежедневных заданий (Daily Quests Modal) -->
+  <div id="daily-quests-modal" class="modal hidden">
+    <div class="modal-card modal-card-quests">
+      <h2 style="color: #fbbf24;">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+      <p style="margin-bottom: 12px;">Выполняйте испытания дня и получайте монеты!</p>
+
+      <div class="quest-timer-box">
+        До обновления: <span id="quests-timer-val">00:00:00</span>
+      </div>
+
+      <div class="quest-summary-card">
+        <div class="quest-summary-header">
+          <span>ПРОГРЕСС ДНЯ</span>
+          <strong id="quests-summary-text">Выполнено 0 из 3</strong>
+        </div>
+        <div class="quest-progress-bar-bg">
+          <div id="quests-summary-bar" class="quest-progress-bar-fill gold" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div id="daily-quests-list" class="quest-list-box"></div>
+
+      <div class="quest-super-card">
+        <div class="quest-super-info">
+          <div class="quest-super-icon">👑</div>
+          <div class="quest-super-text">
+            <div class="quest-super-title">СУПЕР-ПРИЗ ДНЯ</div>
+            <div class="quest-super-desc">Выполните все 3 задания: <strong style="color: #facc15;">+100 🪙</strong></div>
+          </div>
+        </div>
+        <button id="quests-claim-bonus-btn" class="quest-btn quest-super-btn" disabled>Забрать 100 🪙</button>
+      </div>
+
+      <button id="quests-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 14px;">Закрыть</button>
+    </div>
+  </div>
+
   <!-- Экран Game Over -->
   <div id="game-over-modal" class="modal hidden">
     <div class="modal-card">
@@ -540,4 +641,5 @@ ${combinedJs}
 </html>`;
 
 fs.writeFileSync(path.join(ROOT, 'index.html'), htmlContent, 'utf8');
-console.log('Build complete: index.html and dist/bundle.js generated successfully.');
+fs.writeFileSync(path.join(distDir, 'index.html'), htmlContent, 'utf8');
+console.log('Build complete: index.html, dist/index.html and dist/bundle.js generated successfully.');

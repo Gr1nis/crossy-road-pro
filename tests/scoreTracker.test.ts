@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { ScoreTracker } from '../src/core/scoreTracker.ts';
+import type { AchievementId } from '../src/core/achievements.ts';
 import type { StorageAdapter } from '../src/core/types.ts';
 
 class MemoryStorage implements StorageAdapter {
@@ -185,8 +186,8 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
 
     // Verify persistence across reload
     const reloaded = new ScoreTracker(storage);
-    const expectedUnlocked = ['first_50_steps', 'train_conqueror', 'rich_hopper', 'collector', 'leaderboard_champion'];
-    assert.equal(expectedUnlocked.every((id) => reloaded.isAchievementUnlocked(id as any)), true);
+    const expectedUnlocked = ['first_50_steps', 'train_conqueror', 'rich_hopper', 'collector', 'leaderboard_champion'] as const;
+    assert.equal(expectedUnlocked.every((id) => reloaded.isAchievementUnlocked(id)), true);
   });
 
   it('Property 7 (Leaderboard Deduplication & Single Personal Best): records multiple runs for same player without duplicating entries, keeping only PB', () => {
@@ -241,5 +242,67 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     assert.equal(playerRuns.length, 1);
     assert.equal(playerRuns[0].score, 256);
   });
+
+  it('Property 9 (Daily Quests Persistence & Rewards): preserves quest progress across storage reload, grants coins on claim, and updates wallet', () => {
+    const storage = new MemoryStorage();
+    const tracker = new ScoreTracker(storage);
+
+    const initialCoins = tracker.getCoins();
+    const questTracker = tracker.getDailyQuestTracker();
+    const quests = questTracker.quests;
+    assert.equal(quests.length, 3, 'Must have 3 active daily quests');
+
+    const targetQuest = quests[0];
+    assert.equal(targetQuest.isCompleted, false);
+
+    // Record progress to complete first quest
+    const newlyCompleted = tracker.recordDailyQuestProgress({ [targetQuest.defId]: targetQuest.target });
+    assert.ok(targetQuest.isCompleted, 'Quest should now be completed');
+    assert.ok(newlyCompleted.some((q) => q.id === targetQuest.id), 'Newly completed list must include target quest');
+
+    // Reload from storage to verify hydration
+    const restored = new ScoreTracker(storage);
+    const restoredQuests = restored.getDailyQuestTracker().quests;
+    const restoredTarget = restoredQuests.find((q) => q.id === targetQuest.id);
+    assert.ok(restoredTarget, 'Target quest must exist in restored state');
+    assert.equal(restoredTarget.isCompleted, true, 'Restored quest must retain completed status');
+    assert.equal(restoredTarget.isClaimed, false, 'Restored quest must not be claimed yet');
+    assert.equal(restored.getCoins(), initialCoins, 'Coins should not change before claiming');
+
+    // Claim reward
+    const claimRes = restored.claimDailyQuest(targetQuest.id);
+    assert.equal(claimRes.success, true);
+    assert.equal(claimRes.coins, targetQuest.rewardCoins);
+    assert.equal(restored.getCoins(), initialCoins + targetQuest.rewardCoins, 'Coins must increase by rewardCoins');
+
+    // Repeat claim must fail
+    const repeatClaim = restored.claimDailyQuest(targetQuest.id);
+    assert.equal(repeatClaim.success, false);
+    assert.equal(repeatClaim.coins, 0);
+
+    // Reload again to verify claimed status is persisted
+    const restored2 = new ScoreTracker(storage);
+    assert.equal(restored2.getCoins(), initialCoins + targetQuest.rewardCoins);
+    const restoredTarget2 = restored2.getDailyQuestTracker().quests.find((q) => q.id === targetQuest.id);
+    assert.equal(restoredTarget2?.isClaimed, true);
+
+    // Complete remaining quests and claim daily bonus (+100 coins)
+    for (const q of restored2.getDailyQuestTracker().quests) {
+      if (!q.isCompleted) {
+        restored2.recordDailyQuestProgress({ [q.defId]: q.target });
+      }
+    }
+
+    const bonusClaim = restored2.claimDailyQuestBonus();
+    assert.equal(bonusClaim.success, true);
+    assert.equal(bonusClaim.coins, 100);
+    assert.equal(restored2.getCoins(), initialCoins + targetQuest.rewardCoins + 100);
+
+    // Duplicate bonus claim must fail
+    const repeatBonus = restored2.claimDailyQuestBonus();
+    assert.equal(repeatBonus.success, false);
+    assert.equal(repeatBonus.coins, 0);
+  });
 });
+
 

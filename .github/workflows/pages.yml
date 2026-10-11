@@ -38,7 +38,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run automated test suite
-        run: node --experimental-strip-types --test tests/laneGenerator.test.ts tests/scoreTracker.test.ts tests/arcadeProUpdate.test.ts tests/bugfixes.adversarial.test.ts tests/gameEngine.adversarial.test.ts
+        run: npm test
 
       - name: Build single-file bundle & index.html
         run: node scripts/build.mjs

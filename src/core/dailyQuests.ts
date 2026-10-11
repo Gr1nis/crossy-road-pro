@@ -234,8 +234,11 @@ export class DailyQuestTracker {
   public static deserialize(json: string | unknown, fallbackDateKey?: string): DailyQuestTracker {
     const fallback = typeof fallbackDateKey === 'string' && fallbackDateKey.trim() !== '' ? fallbackDateKey.trim() : '2026-10-09';
     try {
-      if (typeof json !== 'string') return new DailyQuestTracker(fallback);
-      const parsed: unknown = JSON.parse(json);
+      let parsed: unknown = json;
+      if (typeof json === 'string') {
+        if (json.trim() === '') return new DailyQuestTracker(fallback);
+        parsed = JSON.parse(json);
+      }
       if (!dailyQuestIsRecord(parsed)) return new DailyQuestTracker(fallback);
 
       const dateKey = typeof parsed.lastActiveDateKey === 'string' && parsed.lastActiveDateKey.trim() !== '' ? parsed.lastActiveDateKey.trim() : fallback;

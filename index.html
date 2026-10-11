@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Crossy Road 3D — Vibe-Pro Edition</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
@@ -71,6 +74,9 @@
     .rarity-legendary { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.3)); color: #fbbf24; border: 1px solid #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
 
     /* Daily Bonus Modal & 7-Day Grid */
+    #daily-bonus-modal { z-index: 50; }
+    #daily-bonus-modal .modal-card-daily { z-index: 51; }
+    #daily-quests-modal { z-index: 48; }
     .menu-btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
     .btn-badge.pulse-badge { background: #10b981; color: #fff; border-color: #34d399; animation: badgePulse 1.4s infinite; }
     .btn-badge.hidden { display: none !important; }
@@ -150,6 +156,53 @@
     .ach-card.claimed { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); }
     .ach-claim-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: transform 0.1s ease, filter 0.1s ease; white-space: nowrap; }
     .ach-claim-btn:active { transform: scale(0.96); filter: brightness(1.1); }
+
+    /* Daily Quests Modal & Cards */
+    .modal-card-quests { max-height: 88vh; display: flex; flex-direction: column; overflow-y: auto; padding: 24px 22px; -webkit-overflow-scrolling: touch; }
+    .quest-timer-box { background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; padding: 8px 14px; color: #94a3b8; font-size: 13px; font-weight: 700; margin-bottom: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    #quests-timer-val { color: #38bdf8; font-variant-numeric: tabular-nums; font-weight: 800; }
+    .quest-summary-card { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 10px 14px; margin-bottom: 12px; text-align: left; }
+    .quest-summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; font-weight: 800; color: #94a3b8; }
+    .quest-summary-header strong { color: #facc15; font-size: 13px; }
+    .quest-progress-bar-bg { width: 100%; height: 8px; background: #1e293b; border-radius: 999px; overflow: hidden; }
+    .quest-progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+    .quest-progress-bar-fill.gold { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .quest-progress-bar-fill.blue { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+    .quest-list-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; text-align: left; }
+    .quest-card { display: flex; align-items: center; gap: 12px; background: rgba(15, 23, 42, 0.7); border: 2px solid #334155; border-radius: 14px; padding: 12px 14px; transition: all 0.2s ease; }
+    .quest-card.in-progress { border-color: #334155; background: rgba(15, 23, 42, 0.6); }
+    .quest-card.ready { border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); box-shadow: 0 0 16px rgba(245, 158, 11, 0.25); }
+    .quest-card.claimed { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); opacity: 0.8; }
+    .quest-icon-col { flex-shrink: 0; }
+    .quest-icon { font-size: 26px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; }
+    .quest-card.ready .quest-icon { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+    .quest-card.claimed .quest-icon { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
+    .quest-info-col { flex: 1; min-width: 0; }
+    .quest-title-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .quest-title { font-size: 13px; font-weight: 800; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .quest-reward-pill { font-size: 11px; font-weight: 800; color: #facc15; white-space: nowrap; }
+    .quest-desc { font-size: 11px; color: #cbd5e1; margin: 2px 0 6px; line-height: 1.3; }
+    .quest-progress-row { display: flex; align-items: center; gap: 8px; }
+    .quest-progress-row .quest-progress-bar-bg { height: 6px; flex: 1; }
+    .quest-progress-text { font-size: 11px; font-weight: 800; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .quest-action-col { flex-shrink: 0; margin-left: 6px; }
+    .quest-btn { border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
+    .quest-btn-claim { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+    .quest-btn-claim:hover { filter: brightness(1.1); transform: scale(1.03); }
+    .quest-btn-claim:active { transform: scale(0.97); }
+    .quest-status-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+    .quest-status-badge.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .quest-status-badge.pending { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #475569; }
+    .quest-super-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(234, 88, 12, 0.12)); border: 2px solid #f59e0b; border-radius: 16px; padding: 12px 16px; text-align: left; }
+    .quest-super-info { display: flex; align-items: center; gap: 10px; }
+    .quest-super-icon { font-size: 30px; }
+    .quest-super-text { min-width: 0; }
+    .quest-super-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; }
+    .quest-super-desc { font-size: 11px; color: #e2e8f0; margin-top: 2px; }
+    .quest-super-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; transition: all 0.15s ease; }
+    .quest-super-btn:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .quest-super-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.8); }
+    .quest-super-btn.claimed { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); opacity: 1; filter: none; cursor: default; }
 
     /* Game Over Score Card */
     .game-over-score-card { display: flex; justify-content: center; gap: 16px; margin: 0 auto 20px; max-width: 280px; }
@@ -240,6 +293,14 @@
       .daily-card-reward { font-size: 12px; }
       .daily-card-mega { padding: 10px 14px; }
 
+      .modal-card-quests { padding: 18px 14px !important; }
+      .quest-card { padding: 10px 10px; gap: 8px; }
+      .quest-icon { width: 36px; height: 36px; font-size: 20px; }
+      .quest-title { font-size: 12px; }
+      .quest-btn { padding: 6px 10px; font-size: 11px; }
+      .quest-super-card { padding: 10px 12px; flex-direction: column; align-items: stretch; text-align: center; gap: 8px; }
+      .quest-super-info { justify-content: center; }
+
       .info-links { display: none; }
     }
   </style>
@@ -291,7 +352,10 @@
 
       <div class="menu-btn-stack">
         <button id="menu-play-btn" class="menu-btn menu-btn-primary">▶ Начать игру</button>
-        <button id="menu-daily-btn" class="menu-btn menu-btn-gold">🎁 Бонус дня <span id="menu-daily-badge" class="btn-badge pulse-badge hidden">ГОТОВО</span></button>
+        <button id="menu-daily-btn" class="menu-btn menu-btn-gold">🎁 Бонус дня <span id="menu-daily-badge" class="btn-badge pulse-badge">ГОТОВО</span></button>
+        <button id="menu-daily-quests-btn" class="menu-btn menu-btn-amber">
+          🎯 Задания дня <span id="menu-daily-quests-badge" class="btn-badge hidden">0/3</span>
+        </button>
         <button id="menu-achievements-btn" class="menu-btn menu-btn-emerald">🏅 Достижения <span id="menu-achievements-badge" class="btn-badge">0/10</span></button>
         <button id="menu-gacha-btn" class="menu-btn menu-btn-amber">🎰 Автомат скинов</button>
         <button id="menu-leaderboard-btn" class="menu-btn menu-btn-purple">🏆 Таблица лидеров</button>
@@ -437,6 +501,43 @@
         <button id="daily-double-btn" class="menu-btn menu-btn-purple">🎬 Забрать x2 за рекламу</button>
         <button id="daily-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно Ежедневных заданий (Daily Quests Modal) -->
+  <div id="daily-quests-modal" class="modal hidden">
+    <div class="modal-card modal-card-quests">
+      <h2 style="color: #fbbf24;">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+      <p style="margin-bottom: 12px;">Выполняйте испытания дня и получайте монеты!</p>
+
+      <div class="quest-timer-box">
+        До обновления: <span id="quests-timer-val">00:00:00</span>
+      </div>
+
+      <div class="quest-summary-card">
+        <div class="quest-summary-header">
+          <span>ПРОГРЕСС ДНЯ</span>
+          <strong id="quests-summary-text">Выполнено 0 из 3</strong>
+        </div>
+        <div class="quest-progress-bar-bg">
+          <div id="quests-summary-bar" class="quest-progress-bar-fill gold" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div id="daily-quests-list" class="quest-list-box"></div>
+
+      <div class="quest-super-card">
+        <div class="quest-super-info">
+          <div class="quest-super-icon">👑</div>
+          <div class="quest-super-text">
+            <div class="quest-super-title">СУПЕР-ПРИЗ ДНЯ</div>
+            <div class="quest-super-desc">Выполните все 3 задания: <strong style="color: #facc15;">+100 🪙</strong></div>
+          </div>
+        </div>
+        <button id="quests-claim-bonus-btn" class="quest-btn quest-super-btn" disabled>Забрать 100 🪙</button>
+      </div>
+
+      <button id="quests-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 14px;">Закрыть</button>
     </div>
   </div>
 
@@ -1355,6 +1456,235 @@ class DailyRewardManager {
   }
 }
 
+// --- Module: src/core/dailyQuests.ts ---
+const DAILY_SUPER_BONUS_COINS = 100;
+const DAILY_QUEST_DEFINITIONS                                      = [
+  { id: 'hop_distance', title: 'Прыжковый марафон', description: 'Сделайте 200 шагов суммарно', category: 'hops', target: 200, rewardCoins: 25, isSingleRun: false },
+  { id: 'single_run_score', title: 'Рекордный забег', description: 'Наберите 40 очков за один забег', category: 'score', target: 40, rewardCoins: 40, isSingleRun: true },
+  { id: 'coin_collector', title: 'Сборщик монет', description: 'Соберите 15 монет суммарно', category: 'coins', target: 15, rewardCoins: 25, isSingleRun: false },
+  { id: 'river_hopper', title: 'Покоритель рек', description: 'Пересеките 12 брёвен на воде', category: 'rivers', target: 12, rewardCoins: 35, isSingleRun: false },
+  { id: 'train_evader', title: 'Гроза поездов', description: 'Переживите 3 мчащихся поезда', category: 'trains', target: 3, rewardCoins: 50, isSingleRun: false },
+  { id: 'combo_rusher', title: 'Комбо-мастер', description: 'Выполните серию комбо из 4 шагов', category: 'score', target: 4, rewardCoins: 40, isSingleRun: false },
+  { id: 'forward_streak', title: 'Только вперёд', description: 'Сделайте 25 шагов вперёд без отката', category: 'hops', target: 25, rewardCoins: 50, isSingleRun: true },
+  { id: 'daily_runs', title: 'Ежедневные забеги', description: 'Сыграйте 5 забегов', category: 'score', target: 5, rewardCoins: 25, isSingleRun: false },
+  { id: 'gacha_spin', title: 'Удачный спин', description: 'Совершите 1 прокрутку в автомате', category: 'gacha', target: 1, rewardCoins: 30, isSingleRun: false },
+];
+function getDailyDateKey(dateOrTimestamp                )         {
+  const d = dateOrTimestamp instanceof Date ? dateOrTimestamp : new Date(dateOrTimestamp ?? Date.now());
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${m}-${day}`;
+}
+function getDailySeedFromDate(dateKey        )         {
+  let hash = 2166136261 ^ 37;
+  for (let i = 0; i < dateKey.length; i++) {
+    hash = Math.imul(hash ^ dateKey.charCodeAt(i), 16777619);
+  }
+  return hash >>> 0;
+}
+
+function dailyQuestCalendarDiff(d1        , d2        )         {
+  if (!d1 || !d2) return 999;
+  const p1 = d1.split('-').map(Number);
+  const p2 = d2.split('-').map(Number);
+  if (p1.length !== 3 || p2.length !== 3 || !p1.every(Number.isFinite) || !p2.every(Number.isFinite)) return 999;
+  return Math.round((Date.UTC(p2[0], p2[1] - 1, p2[2]) - Date.UTC(p1[0], p1[1] - 1, p1[2])) / 86400000);
+}
+
+function dailyQuestIsRecord(v         )                               {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+function selectDailyQuests(dateKey        )                       {
+  let seed = getDailySeedFromDate(dateKey);
+  const pool = [...DAILY_QUEST_DEFINITIONS];
+  for (let i = pool.length - 1; i > 0; i--) {
+    seed = (seed * 9301 + 49297) % 233280;
+    const j = Math.floor((seed / 233280) * (i + 1));
+    const temp = pool[i];
+    pool[i] = pool[j];
+    pool[j] = temp;
+  }
+  return pool.slice(0, 3).map((def) => ({
+    id: `${dateKey}_${def.id}`,
+    defId: def.id,
+    title: def.title,
+    description: def.description,
+    category: def.category,
+    target: def.target,
+    rewardCoins: def.rewardCoins,
+    isSingleRun: def.isSingleRun,
+    current: 0,
+    progressPercent: 0,
+    isCompleted: false,
+    isClaimed: false,
+  }));
+}
+class DailyQuestTracker {
+          _lastActiveDateKey        ;
+          _currentStreakDays        ;
+          _allCompletedBonusClaimed         ;
+          _quests                      ;
+
+  constructor(
+    dateOrState                                       ,
+    extraState                              
+  ) {
+    let dateKey = '2026-10-09';
+    let state                                          = extraState;
+    if (typeof dateOrState === 'string' && dateOrState.trim() !== '') {
+      dateKey = dateOrState.trim();
+    } else if (dailyQuestIsRecord(dateOrState)) {
+      state = dateOrState                               ;
+      if (typeof state.lastActiveDateKey === 'string' && state.lastActiveDateKey.trim() !== '') {
+        dateKey = state.lastActiveDateKey.trim();
+      }
+    }
+
+    this._lastActiveDateKey = dateKey;
+    const streak = state?.currentStreakDays;
+    this._currentStreakDays = typeof streak === 'number' && Number.isFinite(streak) && streak >= 0 ? Math.floor(streak) : 1;
+    this._allCompletedBonusClaimed = Boolean(state?.allCompletedBonusClaimed);
+    this._quests = Array.isArray(state?.quests) && state.quests.length === 3
+      ? state.quests.map((q) => ({ ...q }))
+      : selectDailyQuests(this._lastActiveDateKey);
+  }
+
+         get lastActiveDateKey()         { return this._lastActiveDateKey; }
+         get currentStreakDays()         { return this._currentStreakDays; }
+         get allCompletedBonusClaimed()          { return this._allCompletedBonusClaimed; }
+         get quests()                       { return this._quests; }
+         getQuests()                       { return this._quests; }
+
+         getQuest(idOrDefId        )                                 {
+    return this._quests.find((q) => q.id === idOrDefId || q.defId === idOrDefId);
+  }
+
+         isAllCompleted()          {
+    return this._quests.length >= 3 && this._quests.every((q) => q.isCompleted);
+  }
+
+         canClaimDailyBonus()          {
+    return !this._allCompletedBonusClaimed && this.isAllCompleted();
+  }
+
+         checkDateRollover(currentDateKey        )          {
+    if (!currentDateKey || typeof currentDateKey !== 'string') return false;
+    const diff = dailyQuestCalendarDiff(this._lastActiveDateKey, currentDateKey);
+    if (diff <= 0) return false;
+
+    this._currentStreakDays = diff === 1 && this.isAllCompleted() ? this._currentStreakDays + 1 : 1;
+    this._lastActiveDateKey = currentDateKey;
+    this._allCompletedBonusClaimed = false;
+    this._quests = selectDailyQuests(currentDateKey);
+    return true;
+  }
+
+         recordProgress(
+    eventsOrTarget                              ,
+    amount         
+  )                                                 {
+    const newlyCompletedQuests                       = [];
+
+    const applyAmount = (targetKey        , val        )       => {
+      if (!Number.isFinite(val) || val <= 0) return;
+      for (const quest of this._quests) {
+        if (quest.id === targetKey || quest.defId === targetKey || quest.category === targetKey) {
+          const wasCompleted = quest.isCompleted;
+          quest.current = quest.isSingleRun ? Math.min(quest.target, Math.max(quest.current, val)) : Math.min(quest.target, quest.current + val);
+          quest.current = Math.max(0, quest.current);
+          quest.progressPercent = quest.target > 0 ? Math.min(100, Math.max(0, Math.round((quest.current / quest.target) * 100))) : 100;
+          quest.isCompleted = quest.current >= quest.target;
+          if (!wasCompleted && quest.isCompleted && !newlyCompletedQuests.includes(quest)) newlyCompletedQuests.push(quest);
+        }
+      }
+    };
+
+    if (typeof eventsOrTarget === 'string') {
+      applyAmount(eventsOrTarget, typeof amount === 'number' ? amount : 0);
+    } else if (dailyQuestIsRecord(eventsOrTarget)) {
+      for (const [key, val] of Object.entries(eventsOrTarget)) {
+        if (typeof val === 'number') applyAmount(key, val);
+      }
+    }
+    return { newlyCompletedQuests };
+  }
+
+         claimQuest(questId        )                                            {
+    const quest = this.getQuest(questId);
+    if (!quest || !quest.isCompleted || quest.isClaimed || quest.current < quest.target) {
+      return { success: false, rewardCoins: 0 };
+    }
+    quest.isClaimed = true;
+    return { success: true, rewardCoins: quest.rewardCoins };
+  }
+
+         claimDailyBonus()                                            {
+    if (!this.canClaimDailyBonus()) return { success: false, rewardCoins: 0 };
+    this._allCompletedBonusClaimed = true;
+    return { success: true, rewardCoins: DAILY_SUPER_BONUS_COINS };
+  }
+
+         getState()                     {
+    return {
+      lastActiveDateKey: this._lastActiveDateKey,
+      currentStreakDays: this._currentStreakDays,
+      allCompletedBonusClaimed: this._allCompletedBonusClaimed,
+      quests: this._quests.map((q) => ({ ...q })),
+    };
+  }
+
+         serialize()         {
+    return JSON.stringify(this.getState());
+  }
+
+         static deserialize(json                  , fallbackDateKey         )                    {
+    const fallback = typeof fallbackDateKey === 'string' && fallbackDateKey.trim() !== '' ? fallbackDateKey.trim() : '2026-10-09';
+    try {
+      let parsed          = json;
+      if (typeof json === 'string') {
+        if (json.trim() === '') return new DailyQuestTracker(fallback);
+        parsed = JSON.parse(json);
+      }
+      if (!dailyQuestIsRecord(parsed)) return new DailyQuestTracker(fallback);
+
+      const dateKey = typeof parsed.lastActiveDateKey === 'string' && parsed.lastActiveDateKey.trim() !== '' ? parsed.lastActiveDateKey.trim() : fallback;
+      const streak = typeof parsed.currentStreakDays === 'number' && Number.isFinite(parsed.currentStreakDays) && parsed.currentStreakDays >= 0 ? Math.floor(parsed.currentStreakDays) : 1;
+      const bonusClaimed = Boolean(parsed.allCompletedBonusClaimed);
+
+      let quests                       = [];
+      if (Array.isArray(parsed.quests) && parsed.quests.length === 3) {
+        quests = parsed.quests.map((item         )                            => {
+          if (!dailyQuestIsRecord(item)) return null;
+          const id = typeof item.id === 'string' ? item.id : '';
+          const defId = typeof item.defId === 'string' ? item.defId : '';
+          const title = typeof item.title === 'string' ? item.title : '';
+          const description = typeof item.description === 'string' ? item.description : '';
+          const category = typeof item.category === 'string' ? (item.category                      ) : 'score';
+          const target = typeof item.target === 'number' && Number.isFinite(item.target) && item.target > 0 ? item.target : 1;
+          const rewardCoins = typeof item.rewardCoins === 'number' && Number.isFinite(item.rewardCoins) && item.rewardCoins > 0 ? item.rewardCoins : 10;
+          const isSingleRun = Boolean(item.isSingleRun);
+          const current = typeof item.current === 'number' && Number.isFinite(item.current) && item.current >= 0 ? Math.min(target, item.current) : 0;
+          const progressPercent = typeof item.progressPercent === 'number' && Number.isFinite(item.progressPercent) && item.progressPercent >= 0 && item.progressPercent <= 100
+            ? item.progressPercent
+            : Math.min(100, Math.max(0, Math.round((current / target) * 100)));
+          if (!id || !defId) return null;
+          return {
+            id, defId, title, description, category, target, rewardCoins, isSingleRun,
+            current, progressPercent,
+            isCompleted: current >= target || Boolean(item.isCompleted),
+            isClaimed: Boolean(item.isClaimed),
+          };
+        }).filter((q)                          => q !== null);
+      }
+
+      if (quests.length !== 3) quests = selectDailyQuests(dateKey);
+      return new DailyQuestTracker(dateKey, { currentStreakDays: streak, allCompletedBonusClaimed: bonusClaimed, quests });
+    } catch (_err) {
+      return new DailyQuestTracker(fallback);
+    }
+  }
+}
+
 // --- Module: src/core/scoreTracker.ts ---
 // Re-exports for backward compatibility
 
@@ -1386,6 +1716,7 @@ class ScoreTracker {
           gacha              ;
           achievements                    ;
           dailyReward                    ;
+          dailyQuests                   ;
 
   constructor(storage                 , initialPlayerName         ) {
     this.storage = storage;
@@ -1394,6 +1725,7 @@ class ScoreTracker {
     this.gacha = new GachaMachine();
     this.achievements = new AchievementTracker();
     this.dailyReward = new DailyRewardManager();
+    this.dailyQuests = new DailyQuestTracker(getDailyDateKey());
 
     if (initialPlayerName && initialPlayerName.trim().length > 0) {
       this.playerName = initialPlayerName.trim();
@@ -1522,6 +1854,10 @@ class ScoreTracker {
         if (data.dailyRewardState) {
           this.dailyReward = new DailyRewardManager(data.dailyRewardState);
         }
+        if (data.dailyQuestState) {
+          this.dailyQuests = new DailyQuestTracker(data.dailyQuestState);
+          this.dailyQuests.checkDateRollover(getDailyDateKey());
+        }
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -1546,6 +1882,7 @@ class ScoreTracker {
         logsHopped: this.achievements.getLogsHopped(),
         gachaRolls: this.achievements.getGachaRolls(),
         dailyRewardState: this.dailyReward.getState(),
+        dailyQuestState: this.dailyQuests.getState(),
       };
       this.storage.setItem(PROFILE_KEY, JSON.stringify(payload));
     } catch {
@@ -1847,6 +2184,37 @@ class ScoreTracker {
     }
     return res;
   }
+
+  getDailyQuestTracker()                    {
+    return this.dailyQuests;
+  }
+
+  recordDailyQuestProgress(events                     )                       {
+    this.dailyQuests.checkDateRollover(getDailyDateKey());
+    const { newlyCompletedQuests } = this.dailyQuests.recordProgress(events);
+    this.saveToStorage();
+    return newlyCompletedQuests;
+  }
+
+  claimDailyQuest(questId        )                                      {
+    const res = this.dailyQuests.claimQuest(questId);
+    if (res.success && res.rewardCoins > 0) {
+      this.wallet.addCoins(res.rewardCoins);
+      this.saveToStorage();
+      return { success: true, coins: res.rewardCoins };
+    }
+    return { success: false, coins: 0 };
+  }
+
+  claimDailyQuestBonus()                                      {
+    const res = this.dailyQuests.claimDailyBonus();
+    if (res.success && res.rewardCoins > 0) {
+      this.wallet.addCoins(res.rewardCoins);
+      this.saveToStorage();
+      return { success: true, coins: res.rewardCoins };
+    }
+    return { success: false, coins: 0 };
+  }
 }
 
 // --- Module: src/core/laneGenerator.ts ---
@@ -2017,232 +2385,6 @@ class LaneGenerator {
       result.push(this.generateLane(i, score));
     }
     return result;
-  }
-}
-
-// --- Module: src/core/dailyQuests.ts ---
-const DAILY_SUPER_BONUS_COINS = 100;
-const DAILY_QUEST_DEFINITIONS                                      = [
-  { id: 'hop_distance', title: 'Прыжковый марафон', description: 'Сделайте 200 шагов суммарно', category: 'hops', target: 200, rewardCoins: 25, isSingleRun: false },
-  { id: 'single_run_score', title: 'Рекордный забег', description: 'Наберите 40 очков за один забег', category: 'score', target: 40, rewardCoins: 40, isSingleRun: true },
-  { id: 'coin_collector', title: 'Сборщик монет', description: 'Соберите 15 монет суммарно', category: 'coins', target: 15, rewardCoins: 25, isSingleRun: false },
-  { id: 'river_hopper', title: 'Покоритель рек', description: 'Пересеките 12 брёвен на воде', category: 'rivers', target: 12, rewardCoins: 35, isSingleRun: false },
-  { id: 'train_evader', title: 'Гроза поездов', description: 'Переживите 3 мчащихся поезда', category: 'trains', target: 3, rewardCoins: 50, isSingleRun: false },
-  { id: 'combo_rusher', title: 'Комбо-мастер', description: 'Выполните серию комбо из 4 шагов', category: 'score', target: 4, rewardCoins: 40, isSingleRun: false },
-  { id: 'forward_streak', title: 'Только вперёд', description: 'Сделайте 25 шагов вперёд без отката', category: 'hops', target: 25, rewardCoins: 50, isSingleRun: true },
-  { id: 'daily_runs', title: 'Ежедневные забеги', description: 'Сыграйте 5 забегов', category: 'score', target: 5, rewardCoins: 25, isSingleRun: false },
-  { id: 'gacha_spin', title: 'Удачный спин', description: 'Совершите 1 прокрутку в автомате', category: 'gacha', target: 1, rewardCoins: 30, isSingleRun: false },
-];
-function getDailyDateKey(dateOrTimestamp                )         {
-  const d = dateOrTimestamp instanceof Date ? dateOrTimestamp : new Date(dateOrTimestamp ?? Date.now());
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  return `${d.getUTCFullYear()}-${m}-${day}`;
-}
-function getDailySeedFromDate(dateKey        )         {
-  let hash = 2166136261 ^ 37;
-  for (let i = 0; i < dateKey.length; i++) {
-    hash = Math.imul(hash ^ dateKey.charCodeAt(i), 16777619);
-  }
-  return hash >>> 0;
-}
-
-function dailyQuestCalendarDiff(d1        , d2        )         {
-  if (!d1 || !d2) return 999;
-  const p1 = d1.split('-').map(Number);
-  const p2 = d2.split('-').map(Number);
-  if (p1.length !== 3 || p2.length !== 3 || !p1.every(Number.isFinite) || !p2.every(Number.isFinite)) return 999;
-  return Math.round((Date.UTC(p2[0], p2[1] - 1, p2[2]) - Date.UTC(p1[0], p1[1] - 1, p1[2])) / 86400000);
-}
-
-function dailyQuestIsRecord(v         )                               {
-  return typeof v === 'object' && v !== null && !Array.isArray(v);
-}
-function selectDailyQuests(dateKey        )                       {
-  let seed = getDailySeedFromDate(dateKey);
-  const pool = [...DAILY_QUEST_DEFINITIONS];
-  for (let i = pool.length - 1; i > 0; i--) {
-    seed = (seed * 9301 + 49297) % 233280;
-    const j = Math.floor((seed / 233280) * (i + 1));
-    const temp = pool[i];
-    pool[i] = pool[j];
-    pool[j] = temp;
-  }
-  return pool.slice(0, 3).map((def) => ({
-    id: `${dateKey}_${def.id}`,
-    defId: def.id,
-    title: def.title,
-    description: def.description,
-    category: def.category,
-    target: def.target,
-    rewardCoins: def.rewardCoins,
-    isSingleRun: def.isSingleRun,
-    current: 0,
-    progressPercent: 0,
-    isCompleted: false,
-    isClaimed: false,
-  }));
-}
-class DailyQuestTracker {
-          _lastActiveDateKey        ;
-          _currentStreakDays        ;
-          _allCompletedBonusClaimed         ;
-          _quests                      ;
-
-  constructor(
-    dateOrState                                       ,
-    extraState                              
-  ) {
-    let dateKey = '2026-10-09';
-    let state                                          = extraState;
-    if (typeof dateOrState === 'string' && dateOrState.trim() !== '') {
-      dateKey = dateOrState.trim();
-    } else if (dailyQuestIsRecord(dateOrState)) {
-      state = dateOrState                               ;
-      if (typeof state.lastActiveDateKey === 'string' && state.lastActiveDateKey.trim() !== '') {
-        dateKey = state.lastActiveDateKey.trim();
-      }
-    }
-
-    this._lastActiveDateKey = dateKey;
-    const streak = state?.currentStreakDays;
-    this._currentStreakDays = typeof streak === 'number' && Number.isFinite(streak) && streak >= 0 ? Math.floor(streak) : 1;
-    this._allCompletedBonusClaimed = Boolean(state?.allCompletedBonusClaimed);
-    this._quests = Array.isArray(state?.quests) && state.quests.length === 3
-      ? state.quests.map((q) => ({ ...q }))
-      : selectDailyQuests(this._lastActiveDateKey);
-  }
-
-         get lastActiveDateKey()         { return this._lastActiveDateKey; }
-         get currentStreakDays()         { return this._currentStreakDays; }
-         get allCompletedBonusClaimed()          { return this._allCompletedBonusClaimed; }
-         get quests()                       { return this._quests; }
-         getQuests()                       { return this._quests; }
-
-         getQuest(idOrDefId        )                                 {
-    return this._quests.find((q) => q.id === idOrDefId || q.defId === idOrDefId);
-  }
-
-         isAllCompleted()          {
-    return this._quests.length >= 3 && this._quests.every((q) => q.isCompleted);
-  }
-
-         canClaimDailyBonus()          {
-    return !this._allCompletedBonusClaimed && this.isAllCompleted();
-  }
-
-         checkDateRollover(currentDateKey        )          {
-    if (!currentDateKey || typeof currentDateKey !== 'string') return false;
-    const diff = dailyQuestCalendarDiff(this._lastActiveDateKey, currentDateKey);
-    if (diff <= 0) return false;
-
-    this._currentStreakDays = diff === 1 && this.isAllCompleted() ? this._currentStreakDays + 1 : 1;
-    this._lastActiveDateKey = currentDateKey;
-    this._allCompletedBonusClaimed = false;
-    this._quests = selectDailyQuests(currentDateKey);
-    return true;
-  }
-
-         recordProgress(
-    eventsOrTarget                              ,
-    amount         
-  )                                                 {
-    const newlyCompletedQuests                       = [];
-
-    const applyAmount = (targetKey        , val        )       => {
-      if (!Number.isFinite(val) || val <= 0) return;
-      for (const quest of this._quests) {
-        if (quest.id === targetKey || quest.defId === targetKey || quest.category === targetKey) {
-          const wasCompleted = quest.isCompleted;
-          quest.current = quest.isSingleRun ? Math.min(quest.target, Math.max(quest.current, val)) : Math.min(quest.target, quest.current + val);
-          quest.current = Math.max(0, quest.current);
-          quest.progressPercent = quest.target > 0 ? Math.min(100, Math.max(0, Math.round((quest.current / quest.target) * 100))) : 100;
-          quest.isCompleted = quest.current >= quest.target;
-          if (!wasCompleted && quest.isCompleted && !newlyCompletedQuests.includes(quest)) newlyCompletedQuests.push(quest);
-        }
-      }
-    };
-
-    if (typeof eventsOrTarget === 'string') {
-      applyAmount(eventsOrTarget, typeof amount === 'number' ? amount : 0);
-    } else if (dailyQuestIsRecord(eventsOrTarget)) {
-      for (const [key, val] of Object.entries(eventsOrTarget)) {
-        if (typeof val === 'number') applyAmount(key, val);
-      }
-    }
-    return { newlyCompletedQuests };
-  }
-
-         claimQuest(questId        )                                            {
-    const quest = this.getQuest(questId);
-    if (!quest || !quest.isCompleted || quest.isClaimed || quest.current < quest.target) {
-      return { success: false, rewardCoins: 0 };
-    }
-    quest.isClaimed = true;
-    return { success: true, rewardCoins: quest.rewardCoins };
-  }
-
-         claimDailyBonus()                                            {
-    if (!this.canClaimDailyBonus()) return { success: false, rewardCoins: 0 };
-    this._allCompletedBonusClaimed = true;
-    return { success: true, rewardCoins: DAILY_SUPER_BONUS_COINS };
-  }
-
-         getState()                     {
-    return {
-      lastActiveDateKey: this._lastActiveDateKey,
-      currentStreakDays: this._currentStreakDays,
-      allCompletedBonusClaimed: this._allCompletedBonusClaimed,
-      quests: this._quests.map((q) => ({ ...q })),
-    };
-  }
-
-         serialize()         {
-    return JSON.stringify(this.getState());
-  }
-
-         static deserialize(json                  , fallbackDateKey         )                    {
-    const fallback = typeof fallbackDateKey === 'string' && fallbackDateKey.trim() !== '' ? fallbackDateKey.trim() : '2026-10-09';
-    try {
-      if (typeof json !== 'string') return new DailyQuestTracker(fallback);
-      const parsed          = JSON.parse(json);
-      if (!dailyQuestIsRecord(parsed)) return new DailyQuestTracker(fallback);
-
-      const dateKey = typeof parsed.lastActiveDateKey === 'string' && parsed.lastActiveDateKey.trim() !== '' ? parsed.lastActiveDateKey.trim() : fallback;
-      const streak = typeof parsed.currentStreakDays === 'number' && Number.isFinite(parsed.currentStreakDays) && parsed.currentStreakDays >= 0 ? Math.floor(parsed.currentStreakDays) : 1;
-      const bonusClaimed = Boolean(parsed.allCompletedBonusClaimed);
-
-      let quests                       = [];
-      if (Array.isArray(parsed.quests) && parsed.quests.length === 3) {
-        quests = parsed.quests.map((item         )                            => {
-          if (!dailyQuestIsRecord(item)) return null;
-          const id = typeof item.id === 'string' ? item.id : '';
-          const defId = typeof item.defId === 'string' ? item.defId : '';
-          const title = typeof item.title === 'string' ? item.title : '';
-          const description = typeof item.description === 'string' ? item.description : '';
-          const category = typeof item.category === 'string' ? (item.category                      ) : 'score';
-          const target = typeof item.target === 'number' && Number.isFinite(item.target) && item.target > 0 ? item.target : 1;
-          const rewardCoins = typeof item.rewardCoins === 'number' && Number.isFinite(item.rewardCoins) && item.rewardCoins > 0 ? item.rewardCoins : 10;
-          const isSingleRun = Boolean(item.isSingleRun);
-          const current = typeof item.current === 'number' && Number.isFinite(item.current) && item.current >= 0 ? Math.min(target, item.current) : 0;
-          const progressPercent = typeof item.progressPercent === 'number' && Number.isFinite(item.progressPercent) && item.progressPercent >= 0 && item.progressPercent <= 100
-            ? item.progressPercent
-            : Math.min(100, Math.max(0, Math.round((current / target) * 100)));
-          if (!id || !defId) return null;
-          return {
-            id, defId, title, description, category, target, rewardCoins, isSingleRun,
-            current, progressPercent,
-            isCompleted: current >= target || Boolean(item.isCompleted),
-            isClaimed: Boolean(item.isClaimed),
-          };
-        }).filter((q)                          => q !== null);
-      }
-
-      if (quests.length !== 3) quests = selectDailyQuests(dateKey);
-      return new DailyQuestTracker(dateKey, { currentStreakDays: streak, allCompletedBonusClaimed: bonusClaimed, quests });
-    } catch (_err) {
-      return new DailyQuestTracker(fallback);
-    }
   }
 }
 
@@ -2460,6 +2602,22 @@ class GameEngine {
 
   claimDailyReward(doubleMultiplier          = false, now         ) {
     return this.scoreTracker.claimDailyReward(doubleMultiplier, now);
+  }
+
+  recordDailyQuestProgress(events                     )                       {
+    return this.scoreTracker.recordDailyQuestProgress(events);
+  }
+
+  claimDailyQuest(questId        )                                      {
+    return this.scoreTracker.claimDailyQuest(questId);
+  }
+
+  claimDailyQuestBonus()                                      {
+    return this.scoreTracker.claimDailyQuestBonus();
+  }
+
+  getDailyQuestTracker()                    {
+    return this.scoreTracker.getDailyQuestTracker();
   }
 
   getComboMultiplier()         {
@@ -6125,6 +6283,18 @@ class UIManager {
                    dailyDoubleBtn                    ;
                    dailyCloseBtn                    ;
 
+  // Daily Quests
+                   dailyQuestsModal                    ;
+                   menuDailyQuestsBtn                    ;
+                   menuDailyQuestsBadgeEl                    ;
+                   questsTimerValEl                    ;
+                   questsSummaryTextEl                    ;
+                   questsSummaryBarEl                    ;
+                   dailyQuestsListEl                    ;
+                   questsClaimBonusBtn                          ;
+                   questsCloseBtn                    ;
+          questsTimerInterval                = null;
+
   // State
           lastScore = -1;
           lastCoins = -1;
@@ -6195,12 +6365,24 @@ class UIManager {
     this.dailyDoubleBtn = document.getElementById('daily-double-btn');
     this.dailyCloseBtn = document.getElementById('daily-close-btn');
 
+    this.dailyQuestsModal = document.getElementById('daily-quests-modal');
+    this.menuDailyQuestsBtn = document.getElementById('menu-daily-quests-btn');
+    this.menuDailyQuestsBadgeEl = document.getElementById('menu-daily-quests-badge');
+    this.questsTimerValEl = document.getElementById('quests-timer-val');
+    this.questsSummaryTextEl = document.getElementById('quests-summary-text');
+    this.questsSummaryBarEl = document.getElementById('quests-summary-bar');
+    this.dailyQuestsListEl = document.getElementById('daily-quests-list');
+    this.questsClaimBonusBtn = document.getElementById('quests-claim-bonus-btn')                            ;
+    this.questsCloseBtn = document.getElementById('quests-close-btn');
+
     this.setupInternalNavigation();
   }
 
           setupInternalNavigation()       {
     this.menuDailyBtn?.addEventListener('click', () => this.openDailyBonus());
     this.dailyCloseBtn?.addEventListener('click', () => this.closeDailyBonus());
+    this.menuDailyQuestsBtn?.addEventListener('click', () => this.openDailyQuests());
+    this.questsCloseBtn?.addEventListener('click', () => this.closeDailyQuests());
     this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
     this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
@@ -6223,6 +6405,8 @@ class UIManager {
     this.leaderboardModal?.classList.add('hidden');
     this.achievementsModal?.classList.add('hidden');
     this.dailyBonusModal?.classList.add('hidden');
+    this.dailyQuestsModal?.classList.add('hidden');
+    this.stopQuestsCountdown();
     this.gameOverModal?.classList.add('hidden');
   }
 
@@ -6292,6 +6476,47 @@ class UIManager {
 
   isDailyBonusOpen()          {
     return Boolean(this.dailyBonusModal && !this.dailyBonusModal.classList.contains('hidden'));
+  }
+
+  openDailyQuests()       {
+    this.dailyQuestsModal?.classList.remove('hidden');
+    this.startQuestsCountdown();
+  }
+
+  closeDailyQuests()       {
+    this.dailyQuestsModal?.classList.add('hidden');
+    this.stopQuestsCountdown();
+  }
+
+  isDailyQuestsOpen()          {
+    return Boolean(this.dailyQuestsModal && !this.dailyQuestsModal.classList.contains('hidden'));
+  }
+
+          updateQuestsCountdown()       {
+    if (!this.questsTimerValEl) return;
+    const now = Date.now();
+    const d = new Date(now);
+    const nextMidnight = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1, 0, 0, 0, 0);
+    const diffSec = Math.max(0, Math.floor((nextMidnight - now) / 1000));
+    const hours = String(Math.floor(diffSec / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
+    const secs = String(diffSec % 60).padStart(2, '0');
+    this.questsTimerValEl.textContent = `${hours}:${mins}:${secs}`;
+  }
+
+          startQuestsCountdown()       {
+    this.stopQuestsCountdown();
+    this.updateQuestsCountdown();
+    this.questsTimerInterval = window.setInterval(() => {
+      this.updateQuestsCountdown();
+    }, 1000);
+  }
+
+          stopQuestsCountdown()       {
+    if (this.questsTimerInterval !== null) {
+      clearInterval(this.questsTimerInterval);
+      this.questsTimerInterval = null;
+    }
   }
 
   updateDailyBadge(hasReward         )       {
@@ -6382,6 +6607,129 @@ class UIManager {
       }
 
       this.dailyBonusGridEl.appendChild(card);
+    }
+  }
+
+  renderDailyQuests(
+    state                    ,
+    onClaimQuest                      ,
+    onClaimBonus            
+  )       {
+    const quests = state.quests || [];
+    const completedCount = quests.filter((q) => q.isCompleted).length;
+    const readyCount = quests.filter((q) => q.isCompleted && !q.isClaimed).length;
+    const allCompleted = quests.length >= 3 && completedCount >= quests.length;
+    const canClaimSuperBonus = allCompleted && !state.allCompletedBonusClaimed;
+
+    // 1. Badge in Main Menu: shows count of ready-to-claim rewards, hidden if none ready
+    const totalReadyToClaim = readyCount + (canClaimSuperBonus ? 1 : 0);
+    if (this.menuDailyQuestsBadgeEl) {
+      if (totalReadyToClaim > 0) {
+        this.menuDailyQuestsBadgeEl.textContent = String(totalReadyToClaim);
+        this.menuDailyQuestsBadgeEl.classList.remove('hidden');
+      } else {
+        this.menuDailyQuestsBadgeEl.classList.add('hidden');
+      }
+    }
+
+    // 2. Day summary progress: "Выполнено X из 3" + progress bar
+    if (this.questsSummaryTextEl) {
+      this.questsSummaryTextEl.textContent = `Выполнено ${completedCount} из ${quests.length || 3}`;
+    }
+    if (this.questsSummaryBarEl) {
+      const totalPercent = quests.length > 0 ? Math.round((completedCount / quests.length) * 100) : 0;
+      this.questsSummaryBarEl.style.width = `${totalPercent}%`;
+    }
+
+    // 3. Render 3 quest cards
+    if (this.dailyQuestsListEl) {
+      this.dailyQuestsListEl.innerHTML = '';
+
+      const categoryIcons                         = {
+        score: '🎯',
+        coins: '🪙',
+        hops: '👟',
+        rivers: '🪵',
+        trains: '🚂',
+        gacha: '🎰',
+      };
+
+      for (const q of quests) {
+        const card = document.createElement('div');
+        let statusClass = 'in-progress';
+        if (q.isClaimed) {
+          statusClass = 'claimed';
+        } else if (q.isCompleted) {
+          statusClass = 'ready';
+        }
+        card.className = `quest-card ${statusClass}`;
+
+        const icon = categoryIcons[q.category] || '🎯';
+        const pct = Math.min(100, Math.max(0, q.progressPercent));
+
+        let actionHtml = '';
+        if (q.isClaimed) {
+          actionHtml = `<span class="quest-status-badge claimed">✔ Получено</span>`;
+        } else if (q.isCompleted) {
+          actionHtml = `<button class="quest-btn quest-btn-claim" type="button">Забрать ${q.rewardCoins} 🪙</button>`;
+        } else {
+          actionHtml = `<span class="quest-status-badge pending">${q.current}/${q.target}</span>`;
+        }
+
+        card.innerHTML = `
+          <div class="quest-icon-col">
+            <div class="quest-icon">${icon}</div>
+          </div>
+          <div class="quest-info-col">
+            <div class="quest-title-row">
+              <span class="quest-title">${q.title}</span>
+              <span class="quest-reward-pill">+${q.rewardCoins} 🪙</span>
+            </div>
+            <div class="quest-desc">${q.description}</div>
+            <div class="quest-progress-row">
+              <div class="quest-progress-bar-bg">
+                <div class="quest-progress-bar-fill ${q.isCompleted ? 'gold' : 'blue'}" style="width: ${pct}%;"></div>
+              </div>
+              <span class="quest-progress-text">${q.current}/${q.target} (${pct}%)</span>
+            </div>
+          </div>
+          <div class="quest-action-col">
+            ${actionHtml}
+          </div>
+        `;
+
+        if (q.isCompleted && !q.isClaimed) {
+          const claimBtn = card.querySelector('.quest-btn-claim');
+          claimBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            onClaimQuest(q.id);
+          });
+        }
+
+        this.dailyQuestsListEl.appendChild(card);
+      }
+    }
+
+    // 4. Super-prize button: active only if allCompleted && !allCompletedBonusClaimed
+    if (this.questsClaimBonusBtn) {
+      if (state.allCompletedBonusClaimed) {
+        this.questsClaimBonusBtn.disabled = true;
+        this.questsClaimBonusBtn.textContent = '✔ Получено';
+        this.questsClaimBonusBtn.className = 'quest-btn quest-status-badge claimed';
+        this.questsClaimBonusBtn.onclick = null;
+      } else if (canClaimSuperBonus) {
+        this.questsClaimBonusBtn.disabled = false;
+        this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
+        this.questsClaimBonusBtn.className = 'quest-btn quest-btn-claim quest-super-btn';
+        this.questsClaimBonusBtn.onclick = () => {
+          onClaimBonus();
+        };
+      } else {
+        this.questsClaimBonusBtn.disabled = true;
+        this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
+        this.questsClaimBonusBtn.className = 'quest-btn quest-super-btn';
+        this.questsClaimBonusBtn.onclick = null;
+      }
     }
   }
 
@@ -6524,6 +6872,9 @@ class UIManager {
     this.gachaModalRollBtn?.addEventListener('click', handlers.onRollGacha);
     this.menuDailyBtn?.addEventListener('click', () => {
       handlers.onOpenDaily?.();
+    });
+    this.menuDailyQuestsBtn?.addEventListener('click', () => {
+      handlers.onOpenDailyQuests?.();
     });
     this.dailyClaimBtn?.addEventListener('click', () => {
       handlers.onClaimDaily?.(false);
@@ -6738,6 +7089,7 @@ class InputManager {
     if (this.touchIsInteractive) return;
     if (this.callbacks.isInputBlocked?.()) return;
     if (!this.modalState.isPlaying()) return;
+    if (this.modalState.isDailyQuestsOpen?.()) return;
 
     if (e.changedTouches.length === 0) return;
     const touch = e.changedTouches[0];
@@ -6831,6 +7183,14 @@ class InputManager {
       return;
     }
 
+    if (this.modalState.isDailyQuestsOpen?.()) {
+      if (e.code === 'Escape' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      }
+      return;
+    }
+
     if (this.modalState.isMainMenuOpen()) {
       if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
@@ -6898,6 +7258,7 @@ class InputManager {
          triggerMove(dir                    )       {
     if (this.callbacks.isInputBlocked?.()) return;
     if (!this.modalState.isPlaying()) return;
+    if (this.modalState.isDailyQuestsOpen?.()) return;
     this.callbacks.onMove(dir);
   }
 }
@@ -6925,6 +7286,8 @@ class GameLoop {
           notifiedNewHighScoreThisRun = false;
           lastTime = 0;
           lastDailyTimerTick = 0;
+          lastLogsHopped = 0;
+          lastTrainsSurvived = 0;
                    unlockedAchievements = new Set        ();
 
   constructor(
@@ -6957,6 +7320,9 @@ class GameLoop {
     }
 
     this.updateDailyBonusUI();
+    this.updateDailyQuestsUI();
+    this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
+    this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
   }
 
          getIsPlaying()          {
@@ -6980,6 +7346,8 @@ class GameLoop {
     }
     this.engine.reset(Date.now());
     this.lastCoins = this.engine.getCoins();
+    this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
+    this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
     this.isPlaying = true;
     this.lastTime = performance.now();
     this.renderSkinsUI();
@@ -7028,6 +7396,8 @@ class GameLoop {
          handleGachaRoll()       {
     const res = this.engine.rollGacha();
     if (res.success && res.skinId) {
+      const completed = this.engine.recordDailyQuestProgress({ gacha: 1 });
+      this.notifyQuestsCompleted(completed);
       this.audio.playGachaRoll();
       const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
       this.audio.playGachaUnlock(isRare);
@@ -7079,6 +7449,8 @@ class GameLoop {
       this.ui.closeSettings();
     } else if (this.ui.isDailyBonusOpen()) {
       this.ui.closeDailyBonus();
+    } else if (this.ui.isDailyQuestsOpen()) {
+      this.ui.closeDailyQuests();
     } else if (this.ui.isAchievementsOpen()) {
       this.ui.closeAchievements();
     } else if (this.ui.isGachaOpen()) {
@@ -7133,6 +7505,7 @@ class GameLoop {
     this.ui.renderLeaderboard(this.engine.getScoreTracker().getLeaderboard());
     this.syncAchievements();
     this.updateDailyBonusUI();
+    this.updateDailyQuestsUI();
   }
 
          renderSkinsUI()       {
@@ -7155,6 +7528,13 @@ class GameLoop {
     if (this.unlockedAchievements.has(id)) return;
     this.unlockedAchievements.add(id);
     this.ui.showToast(icon, `Достижение: ${title}`, desc);
+  }
+
+          notifyQuestsCompleted(quests                      )       {
+    if (!quests || quests.length === 0) return;
+    for (const q of quests) {
+      this.ui.showToast('🎯', 'Задание выполнено!', q.title);
+    }
   }
 
           recordRunToLeaderboard(score        )       {
@@ -7202,6 +7582,22 @@ class GameLoop {
     this.ui.updateScore(currentScore);
     this.ui.updateCoins(currentCoins);
 
+    const currentLogs = this.engine.getScoreTracker().getLogsHopped();
+    if (currentLogs > this.lastLogsHopped) {
+      const delta = currentLogs - this.lastLogsHopped;
+      this.lastLogsHopped = currentLogs;
+      const completed = this.engine.recordDailyQuestProgress({ rivers: delta });
+      this.notifyQuestsCompleted(completed);
+    }
+
+    const currentTrains = this.engine.getScoreTracker().getTrainsSurvived();
+    if (currentTrains > this.lastTrainsSurvived) {
+      const delta = currentTrains - this.lastTrainsSurvived;
+      this.lastTrainsSurvived = currentTrains;
+      const completed = this.engine.recordDailyQuestProgress({ trains: delta });
+      this.notifyQuestsCompleted(completed);
+    }
+
     if (this.isPlaying && !this.isPaused && !p.isDead) {
       this.ui.setWarningVignette(this.engine.getCameraGraceRatio());
     } else {
@@ -7210,6 +7606,15 @@ class GameLoop {
 
     if (this.isPlaying && p.isDead && !this.wasDead) {
       this.wasDead = true;
+      const completed = this.engine.recordDailyQuestProgress({
+        score: currentScore,
+        coins: this.engine.getRunCoins(),
+        hops: p.row,
+        rivers: 0,
+        trains: 0,
+        gacha: 0,
+      });
+      this.notifyQuestsCompleted(completed);
       this.recordRunToLeaderboard(currentScore);
       this.sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
       if (p.deathReason === DeathReason.WATER) {
@@ -7240,6 +7645,11 @@ class GameLoop {
     this.ui.openDailyBonus();
   }
 
+         handleOpenDailyQuests()       {
+    this.updateDailyQuestsUI();
+    this.ui.openDailyQuests();
+  }
+
          handleClaimDailyBonus(doubleMultiplier         )       {
     const res = this.engine.claimDailyReward(doubleMultiplier);
     if (res.success) {
@@ -7257,6 +7667,37 @@ class GameLoop {
       this.updateMenuStats();
       this.updateDailyBonusUI();
     }
+  }
+
+         handleClaimDailyQuest(questId        )       {
+    const res = this.engine.claimDailyQuest(questId);
+    if (res.success) {
+      this.audio.playCoin();
+      this.ui.showToast('🎯', 'Задание выполнено!', `+${res.coins} 🪙 зачислено на баланс!`);
+      this.lastCoins = this.engine.getCoins();
+      this.updateMenuStats();
+      this.updateDailyQuestsUI();
+    }
+  }
+
+         handleClaimDailyQuestBonus()       {
+    const res = this.engine.claimDailyQuestBonus();
+    if (res.success) {
+      this.audio.playCoin();
+      this.ui.showToast('👑', 'Супер-приз получен!', `+${res.coins} 🪙 за все задания дня!`);
+      this.lastCoins = this.engine.getCoins();
+      this.updateMenuStats();
+      this.updateDailyQuestsUI();
+    }
+  }
+
+         updateDailyQuestsUI()       {
+    const state = this.engine.getDailyQuestTracker().getState();
+    this.ui.renderDailyQuests(
+      state,
+      (id        ) => this.handleClaimDailyQuest(id),
+      () => this.handleClaimDailyQuestBonus()
+    );
   }
 
          updateDailyBonusUI()       {
@@ -7283,6 +7724,9 @@ class GameLoop {
       onToggleMusic: (enabled         ) => this.toggleMusic(enabled),
       onOpenDaily: () => this.handleOpenDailyBonus(),
       onClaimDaily: (doubleMultiplier         ) => this.handleClaimDailyBonus(doubleMultiplier),
+      onOpenDailyQuests: () => this.handleOpenDailyQuests(),
+      onClaimDailyQuest: (id        ) => this.handleClaimDailyQuest(id),
+      onClaimDailyBonus: () => this.handleClaimDailyQuestBonus(),
     };
   }
 
@@ -7309,6 +7753,7 @@ class GameLoop {
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),
       isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),
+      isDailyQuestsOpen: () => this.ui.isDailyQuestsOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,

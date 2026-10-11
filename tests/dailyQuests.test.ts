@@ -1,5 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { GameEngine } from '../src/core/gameEngine.ts';
 import {
   DAILY_QUEST_DEFINITIONS,
   DAILY_SUPER_BONUS_COINS,
@@ -254,6 +257,70 @@ describe('DailyQuests — Comprehensive TDD Suite', () => {
         assert.equal(safeTracker.quests.length, 3);
       }, `Deserializing corrupted input must not throw exception: ${String(input)}`);
     }
+  });
+
+  it('Property 9 (Engine integration & claiming rewards): GameEngine tracks progress, claims rewards and increments wallet balance', () => {
+    class MemoryStorage {
+      private map = new Map<string, string>();
+      getItem(key: string): string | null { return this.map.get(key) ?? null; }
+      setItem(key: string, value: string): void { this.map.set(key, value); }
+    }
+    const storage = new MemoryStorage();
+    const engine = new GameEngine(12345, storage);
+    const tracker = engine.getDailyQuestTracker();
+    assert.ok(tracker instanceof DailyQuestTracker);
+    assert.equal(tracker.quests.length, 3);
+
+    const initialCoins = engine.getCoins();
+    const q0 = tracker.quests[0];
+    tracker.recordProgress(q0.id, q0.target);
+    assert.equal(q0.isCompleted, true);
+
+    const claimRes = engine.claimDailyQuest(q0.id);
+    assert.equal(claimRes.success, true);
+    assert.equal(claimRes.coins, q0.rewardCoins);
+    assert.equal(engine.getCoins(), initialCoins + q0.rewardCoins);
+
+    // Complete remaining quests to unlock super-bonus
+    const q1 = tracker.quests[1];
+    const q2 = tracker.quests[2];
+    tracker.recordProgress(q1.id, q1.target);
+    tracker.recordProgress(q2.id, q2.target);
+    engine.claimDailyQuest(q1.id);
+    engine.claimDailyQuest(q2.id);
+
+    const bonusRes = engine.claimDailyQuestBonus();
+    assert.equal(bonusRes.success, true);
+    assert.equal(bonusRes.coins, DAILY_SUPER_BONUS_COINS);
+    assert.equal(engine.getCoins(), initialCoins + q0.rewardCoins + q1.rewardCoins + q2.rewardCoins + DAILY_SUPER_BONUS_COINS);
+  });
+
+  it('Property 10 (HTML template & CSS styles): index.html includes daily quests button, badge, modal, timer and card styling', () => {
+    const htmlPath = path.join(process.cwd(), 'index.html');
+    assert.ok(fs.existsSync(htmlPath), 'index.html must exist');
+    const html = fs.readFileSync(htmlPath, 'utf8');
+
+    // Main Menu Button & Badge
+    assert.ok(html.includes('id="menu-daily-quests-btn"'), 'Main menu must include #menu-daily-quests-btn');
+    assert.ok(html.includes('id="menu-daily-quests-badge"'), 'Main menu button must include #menu-daily-quests-badge');
+    assert.ok(html.includes('🎯 Задания дня'), 'Button label must match 🎯 Задания дня');
+
+    // Modal & Cards
+    assert.ok(html.includes('id="daily-quests-modal"'), 'Must contain #daily-quests-modal');
+    assert.ok(html.includes('class="modal-card modal-card-quests"'), 'Must contain modal-card modal-card-quests');
+    assert.ok(html.includes('id="quests-timer-val"'), 'Must contain countdown timer #quests-timer-val');
+    assert.ok(html.includes('id="quests-summary-text"'), 'Must contain progress text #quests-summary-text');
+    assert.ok(html.includes('id="quests-summary-bar"'), 'Must contain progress bar #quests-summary-bar');
+    assert.ok(html.includes('id="daily-quests-list"'), 'Must contain #daily-quests-list');
+    assert.ok(html.includes('id="quests-claim-bonus-btn"'), 'Must contain super bonus button #quests-claim-bonus-btn');
+    assert.ok(html.includes('id="quests-close-btn"'), 'Must contain close button #quests-close-btn');
+
+    // CSS Styling
+    assert.ok(html.includes('.quest-card'), 'Must contain .quest-card CSS');
+    assert.ok(html.includes('.quest-card.ready'), 'Must contain .quest-card.ready CSS');
+    assert.ok(html.includes('.quest-card.claimed'), 'Must contain .quest-card.claimed CSS');
+    assert.ok(html.includes('.quest-card.in-progress'), 'Must contain .quest-card.in-progress CSS');
+    assert.ok(html.includes('.quest-super-card'), 'Must contain .quest-super-card CSS');
   });
 });
 

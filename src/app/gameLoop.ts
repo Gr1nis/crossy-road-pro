@@ -2,6 +2,7 @@ import { GameEngine } from '../core/gameEngine.ts';
 import { RECORD_FLAG_X } from '../core/collision.ts';
 import { ALL_SKINS, DeathReason, MoveDirection, WORLD_CONFIG, type MoveDirectionValue, type SkinId } from '../core/types.ts';
 import type { AchievementId } from '../core/achievements.ts';
+import type { DailyQuestInstance } from '../core/dailyQuests.ts';
 import { AudioSynth } from '../view/audioSynth.ts';
 import { SceneManager } from '../view/sceneManager.ts';
 import { UIManager, UI_SKIN_RARITY, type UIActions } from './uiManager.ts';
@@ -30,6 +31,8 @@ export class GameLoop {
   private notifiedNewHighScoreThisRun = false;
   private lastTime = 0;
   private lastDailyTimerTick = 0;
+  private lastLogsHopped = 0;
+  private lastTrainsSurvived = 0;
   private readonly unlockedAchievements = new Set<string>();
 
   constructor(
@@ -62,6 +65,9 @@ export class GameLoop {
     }
 
     this.updateDailyBonusUI();
+    this.updateDailyQuestsUI();
+    this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
+    this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
   }
 
   public getIsPlaying(): boolean {
@@ -85,6 +91,8 @@ export class GameLoop {
     }
     this.engine.reset(Date.now());
     this.lastCoins = this.engine.getCoins();
+    this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
+    this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
     this.isPlaying = true;
     this.lastTime = performance.now();
     this.renderSkinsUI();
@@ -133,6 +141,8 @@ export class GameLoop {
   public handleGachaRoll(): void {
     const res = this.engine.rollGacha();
     if (res.success && res.skinId) {
+      const completed = this.engine.recordDailyQuestProgress({ gacha: 1 });
+      this.notifyQuestsCompleted(completed);
       this.audio.playGachaRoll();
       const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
       this.audio.playGachaUnlock(isRare);
@@ -184,6 +194,8 @@ export class GameLoop {
       this.ui.closeSettings();
     } else if (this.ui.isDailyBonusOpen()) {
       this.ui.closeDailyBonus();
+    } else if (this.ui.isDailyQuestsOpen()) {
+      this.ui.closeDailyQuests();
     } else if (this.ui.isAchievementsOpen()) {
       this.ui.closeAchievements();
     } else if (this.ui.isGachaOpen()) {
@@ -238,6 +250,7 @@ export class GameLoop {
     this.ui.renderLeaderboard(this.engine.getScoreTracker().getLeaderboard());
     this.syncAchievements();
     this.updateDailyBonusUI();
+    this.updateDailyQuestsUI();
   }
 
   public renderSkinsUI(): void {
@@ -260,6 +273,13 @@ export class GameLoop {
     if (this.unlockedAchievements.has(id)) return;
     this.unlockedAchievements.add(id);
     this.ui.showToast(icon, `Достижение: ${title}`, desc);
+  }
+
+  private notifyQuestsCompleted(quests: DailyQuestInstance[]): void {
+    if (!quests || quests.length === 0) return;
+    for (const q of quests) {
+      this.ui.showToast('🎯', 'Задание выполнено!', q.title);
+    }
   }
 
   private recordRunToLeaderboard(score: number): void {
@@ -307,6 +327,22 @@ export class GameLoop {
     this.ui.updateScore(currentScore);
     this.ui.updateCoins(currentCoins);
 
+    const currentLogs = this.engine.getScoreTracker().getLogsHopped();
+    if (currentLogs > this.lastLogsHopped) {
+      const delta = currentLogs - this.lastLogsHopped;
+      this.lastLogsHopped = currentLogs;
+      const completed = this.engine.recordDailyQuestProgress({ rivers: delta });
+      this.notifyQuestsCompleted(completed);
+    }
+
+    const currentTrains = this.engine.getScoreTracker().getTrainsSurvived();
+    if (currentTrains > this.lastTrainsSurvived) {
+      const delta = currentTrains - this.lastTrainsSurvived;
+      this.lastTrainsSurvived = currentTrains;
+      const completed = this.engine.recordDailyQuestProgress({ trains: delta });
+      this.notifyQuestsCompleted(completed);
+    }
+
     if (this.isPlaying && !this.isPaused && !p.isDead) {
       this.ui.setWarningVignette(this.engine.getCameraGraceRatio());
     } else {
@@ -315,6 +351,15 @@ export class GameLoop {
 
     if (this.isPlaying && p.isDead && !this.wasDead) {
       this.wasDead = true;
+      const completed = this.engine.recordDailyQuestProgress({
+        score: currentScore,
+        coins: this.engine.getRunCoins(),
+        hops: p.row,
+        rivers: 0,
+        trains: 0,
+        gacha: 0,
+      });
+      this.notifyQuestsCompleted(completed);
       this.recordRunToLeaderboard(currentScore);
       this.sceneManager.spawnDeathFeathers(p.x, 0, p.row, p.deathReason);
       if (p.deathReason === DeathReason.WATER) {
@@ -345,6 +390,11 @@ export class GameLoop {
     this.ui.openDailyBonus();
   }
 
+  public handleOpenDailyQuests(): void {
+    this.updateDailyQuestsUI();
+    this.ui.openDailyQuests();
+  }
+
   public handleClaimDailyBonus(doubleMultiplier: boolean): void {
     const res = this.engine.claimDailyReward(doubleMultiplier);
     if (res.success) {
@@ -362,6 +412,37 @@ export class GameLoop {
       this.updateMenuStats();
       this.updateDailyBonusUI();
     }
+  }
+
+  public handleClaimDailyQuest(questId: string): void {
+    const res = this.engine.claimDailyQuest(questId);
+    if (res.success) {
+      this.audio.playCoin();
+      this.ui.showToast('🎯', 'Задание выполнено!', `+${res.coins} 🪙 зачислено на баланс!`);
+      this.lastCoins = this.engine.getCoins();
+      this.updateMenuStats();
+      this.updateDailyQuestsUI();
+    }
+  }
+
+  public handleClaimDailyQuestBonus(): void {
+    const res = this.engine.claimDailyQuestBonus();
+    if (res.success) {
+      this.audio.playCoin();
+      this.ui.showToast('👑', 'Супер-приз получен!', `+${res.coins} 🪙 за все задания дня!`);
+      this.lastCoins = this.engine.getCoins();
+      this.updateMenuStats();
+      this.updateDailyQuestsUI();
+    }
+  }
+
+  public updateDailyQuestsUI(): void {
+    const state = this.engine.getDailyQuestTracker().getState();
+    this.ui.renderDailyQuests(
+      state,
+      (id: string) => this.handleClaimDailyQuest(id),
+      () => this.handleClaimDailyQuestBonus()
+    );
   }
 
   public updateDailyBonusUI(): void {
@@ -388,6 +469,9 @@ export class GameLoop {
       onToggleMusic: (enabled: boolean) => this.toggleMusic(enabled),
       onOpenDaily: () => this.handleOpenDailyBonus(),
       onClaimDaily: (doubleMultiplier: boolean) => this.handleClaimDailyBonus(doubleMultiplier),
+      onOpenDailyQuests: () => this.handleOpenDailyQuests(),
+      onClaimDailyQuest: (id: string) => this.handleClaimDailyQuest(id),
+      onClaimDailyBonus: () => this.handleClaimDailyQuestBonus(),
     };
   }
 
@@ -414,6 +498,7 @@ export class GameLoop {
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),
       isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),
+      isDailyQuestsOpen: () => this.ui.isDailyQuestsOpen(),
       isGameOverOpen: () => this.ui.isGameOverOpen(),
       isNameInputFocused: () => this.ui.isNameInputFocused(),
       isPlaying: () => this.isPlaying,

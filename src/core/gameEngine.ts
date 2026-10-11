@@ -10,6 +10,11 @@ import {
 import { LaneGenerator } from './laneGenerator.ts';
 import { ScoreTracker } from './scoreTracker.ts';
 import type { AchievementId } from './achievements.ts';
+import type {
+  DailyQuestTracker,
+  DailyQuestEventData,
+  DailyQuestInstance,
+} from './dailyQuests.ts';
 import {
   DeathReason,
   getBiomeForScore,
@@ -239,6 +244,22 @@ export class GameEngine {
 
   claimDailyReward(doubleMultiplier: boolean = false, now?: number) {
     return this.scoreTracker.claimDailyReward(doubleMultiplier, now);
+  }
+
+  recordDailyQuestProgress(events: DailyQuestEventData): DailyQuestInstance[] {
+    return this.scoreTracker.recordDailyQuestProgress(events);
+  }
+
+  claimDailyQuest(questId: string): { success: boolean; coins: number } {
+    return this.scoreTracker.claimDailyQuest(questId);
+  }
+
+  claimDailyQuestBonus(): { success: boolean; coins: number } {
+    return this.scoreTracker.claimDailyQuestBonus();
+  }
+
+  getDailyQuestTracker(): DailyQuestTracker {
+    return this.scoreTracker.getDailyQuestTracker();
   }
 
   getComboMultiplier(): number {

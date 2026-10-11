@@ -140,4 +140,56 @@ describe('InputManager — Mobile Touch & Swipe Controls', () => {
 
     assert.equal(moves.length, 0, 'Tap when paused or in menu must not trigger movement');
   });
+
+  it('Touch and swipe are blocked while daily quests modal is open', () => {
+    const { input, moves } = createSetup({ isDailyQuestsOpen: () => true });
+
+    input.handleTouchStart({
+      touches: [{ clientX: 100, clientY: 200 }],
+      target: null,
+    } as any);
+
+    input.handleTouchEnd({
+      changedTouches: [{ clientX: 200, clientY: 200 }],
+    } as any);
+
+    assert.equal(moves.length, 0, 'Touch swipe must be blocked when daily quests modal is open');
+
+    input.triggerMove(MoveDirection.FORWARD);
+    assert.equal(moves.length, 0, 'triggerMove must be blocked when daily quests modal is open');
+  });
+
+  it('Escape key triggers onCloseModal when daily quests modal is open', () => {
+    let closeModalCalled = false;
+    const callbacks: InputCallbacks = {
+      onMove: () => {},
+      onStartGame: () => {},
+      onPauseGame: () => {},
+      onResumeGame: () => {},
+      onRestartGame: () => {},
+      onToMenu: () => {},
+      onGachaRoll: () => {},
+      onCloseModal: () => { closeModalCalled = true; },
+    };
+    const modalState: ModalStateProvider = {
+      isSettingsOpen: () => false,
+      isPauseOpen: () => false,
+      isMainMenuOpen: () => false,
+      isGachaOpen: () => false,
+      isLeaderboardOpen: () => false,
+      isGameOverOpen: () => false,
+      isDailyQuestsOpen: () => true,
+      isPlaying: () => true,
+    };
+    const input = new InputManager(callbacks, modalState);
+
+    let defaultPrevented = false;
+    input.handleKeyDown({
+      code: 'Escape',
+      preventDefault: () => { defaultPrevented = true; },
+    } as any);
+
+    assert.equal(closeModalCalled, true, 'Escape must call onCloseModal when daily quests modal is open');
+    assert.equal(defaultPrevented, true, 'Escape event must be prevented');
+  });
 });

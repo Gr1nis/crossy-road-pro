@@ -1,6 +1,7 @@
 import { ALL_SKINS } from '../core/types.ts';
 import type { Achievement, AchievementId } from '../core/achievements.ts';
 import type { DailyRewardDayView } from '../core/dailyReward.ts';
+import type { DailyQuestDayState } from '../core/dailyQuests.ts';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -22,6 +23,9 @@ export interface UIActions {
   onToggleMusic: (enabled: boolean) => void;
   onOpenDaily?: () => void;
   onClaimDaily?: (doubleMultiplier: boolean) => void;
+  onOpenDailyQuests?: () => void;
+  onClaimDailyQuest?: (id: string) => void;
+  onClaimDailyBonus?: () => void;
 }
 
 export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
@@ -101,6 +105,18 @@ export class UIManager {
   private readonly dailyDoubleBtn: HTMLElement | null;
   private readonly dailyCloseBtn: HTMLElement | null;
 
+  // Daily Quests
+  private readonly dailyQuestsModal: HTMLElement | null;
+  private readonly menuDailyQuestsBtn: HTMLElement | null;
+  private readonly menuDailyQuestsBadgeEl: HTMLElement | null;
+  private readonly questsTimerValEl: HTMLElement | null;
+  private readonly questsSummaryTextEl: HTMLElement | null;
+  private readonly questsSummaryBarEl: HTMLElement | null;
+  private readonly dailyQuestsListEl: HTMLElement | null;
+  private readonly questsClaimBonusBtn: HTMLButtonElement | null;
+  private readonly questsCloseBtn: HTMLElement | null;
+  private questsTimerInterval: number | null = null;
+
   // State
   private lastScore = -1;
   private lastCoins = -1;
@@ -171,12 +187,24 @@ export class UIManager {
     this.dailyDoubleBtn = document.getElementById('daily-double-btn');
     this.dailyCloseBtn = document.getElementById('daily-close-btn');
 
+    this.dailyQuestsModal = document.getElementById('daily-quests-modal');
+    this.menuDailyQuestsBtn = document.getElementById('menu-daily-quests-btn');
+    this.menuDailyQuestsBadgeEl = document.getElementById('menu-daily-quests-badge');
+    this.questsTimerValEl = document.getElementById('quests-timer-val');
+    this.questsSummaryTextEl = document.getElementById('quests-summary-text');
+    this.questsSummaryBarEl = document.getElementById('quests-summary-bar');
+    this.dailyQuestsListEl = document.getElementById('daily-quests-list');
+    this.questsClaimBonusBtn = document.getElementById('quests-claim-bonus-btn') as HTMLButtonElement | null;
+    this.questsCloseBtn = document.getElementById('quests-close-btn');
+
     this.setupInternalNavigation();
   }
 
   private setupInternalNavigation(): void {
     this.menuDailyBtn?.addEventListener('click', () => this.openDailyBonus());
     this.dailyCloseBtn?.addEventListener('click', () => this.closeDailyBonus());
+    this.menuDailyQuestsBtn?.addEventListener('click', () => this.openDailyQuests());
+    this.questsCloseBtn?.addEventListener('click', () => this.closeDailyQuests());
     this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
     this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
@@ -199,6 +227,8 @@ export class UIManager {
     this.leaderboardModal?.classList.add('hidden');
     this.achievementsModal?.classList.add('hidden');
     this.dailyBonusModal?.classList.add('hidden');
+    this.dailyQuestsModal?.classList.add('hidden');
+    this.stopQuestsCountdown();
     this.gameOverModal?.classList.add('hidden');
   }
 
@@ -268,6 +298,47 @@ export class UIManager {
 
   isDailyBonusOpen(): boolean {
     return Boolean(this.dailyBonusModal && !this.dailyBonusModal.classList.contains('hidden'));
+  }
+
+  openDailyQuests(): void {
+    this.dailyQuestsModal?.classList.remove('hidden');
+    this.startQuestsCountdown();
+  }
+
+  closeDailyQuests(): void {
+    this.dailyQuestsModal?.classList.add('hidden');
+    this.stopQuestsCountdown();
+  }
+
+  isDailyQuestsOpen(): boolean {
+    return Boolean(this.dailyQuestsModal && !this.dailyQuestsModal.classList.contains('hidden'));
+  }
+
+  private updateQuestsCountdown(): void {
+    if (!this.questsTimerValEl) return;
+    const now = Date.now();
+    const d = new Date(now);
+    const nextMidnight = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1, 0, 0, 0, 0);
+    const diffSec = Math.max(0, Math.floor((nextMidnight - now) / 1000));
+    const hours = String(Math.floor(diffSec / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
+    const secs = String(diffSec % 60).padStart(2, '0');
+    this.questsTimerValEl.textContent = `${hours}:${mins}:${secs}`;
+  }
+
+  private startQuestsCountdown(): void {
+    this.stopQuestsCountdown();
+    this.updateQuestsCountdown();
+    this.questsTimerInterval = window.setInterval(() => {
+      this.updateQuestsCountdown();
+    }, 1000);
+  }
+
+  private stopQuestsCountdown(): void {
+    if (this.questsTimerInterval !== null) {
+      clearInterval(this.questsTimerInterval);
+      this.questsTimerInterval = null;
+    }
   }
 
   updateDailyBadge(hasReward: boolean): void {
@@ -358,6 +429,129 @@ export class UIManager {
       }
 
       this.dailyBonusGridEl.appendChild(card);
+    }
+  }
+
+  renderDailyQuests(
+    state: DailyQuestDayState,
+    onClaimQuest: (id: string) => void,
+    onClaimBonus: () => void
+  ): void {
+    const quests = state.quests || [];
+    const completedCount = quests.filter((q) => q.isCompleted).length;
+    const readyCount = quests.filter((q) => q.isCompleted && !q.isClaimed).length;
+    const allCompleted = quests.length >= 3 && completedCount >= quests.length;
+    const canClaimSuperBonus = allCompleted && !state.allCompletedBonusClaimed;
+
+    // 1. Badge in Main Menu: shows count of ready-to-claim rewards, hidden if none ready
+    const totalReadyToClaim = readyCount + (canClaimSuperBonus ? 1 : 0);
+    if (this.menuDailyQuestsBadgeEl) {
+      if (totalReadyToClaim > 0) {
+        this.menuDailyQuestsBadgeEl.textContent = String(totalReadyToClaim);
+        this.menuDailyQuestsBadgeEl.classList.remove('hidden');
+      } else {
+        this.menuDailyQuestsBadgeEl.classList.add('hidden');
+      }
+    }
+
+    // 2. Day summary progress: "Выполнено X из 3" + progress bar
+    if (this.questsSummaryTextEl) {
+      this.questsSummaryTextEl.textContent = `Выполнено ${completedCount} из ${quests.length || 3}`;
+    }
+    if (this.questsSummaryBarEl) {
+      const totalPercent = quests.length > 0 ? Math.round((completedCount / quests.length) * 100) : 0;
+      this.questsSummaryBarEl.style.width = `${totalPercent}%`;
+    }
+
+    // 3. Render 3 quest cards
+    if (this.dailyQuestsListEl) {
+      this.dailyQuestsListEl.innerHTML = '';
+
+      const categoryIcons: Record<string, string> = {
+        score: '🎯',
+        coins: '🪙',
+        hops: '👟',
+        rivers: '🪵',
+        trains: '🚂',
+        gacha: '🎰',
+      };
+
+      for (const q of quests) {
+        const card = document.createElement('div');
+        let statusClass = 'in-progress';
+        if (q.isClaimed) {
+          statusClass = 'claimed';
+        } else if (q.isCompleted) {
+          statusClass = 'ready';
+        }
+        card.className = `quest-card ${statusClass}`;
+
+        const icon = categoryIcons[q.category] || '🎯';
+        const pct = Math.min(100, Math.max(0, q.progressPercent));
+
+        let actionHtml = '';
+        if (q.isClaimed) {
+          actionHtml = `<span class="quest-status-badge claimed">✔ Получено</span>`;
+        } else if (q.isCompleted) {
+          actionHtml = `<button class="quest-btn quest-btn-claim" type="button">Забрать ${q.rewardCoins} 🪙</button>`;
+        } else {
+          actionHtml = `<span class="quest-status-badge pending">${q.current}/${q.target}</span>`;
+        }
+
+        card.innerHTML = `
+          <div class="quest-icon-col">
+            <div class="quest-icon">${icon}</div>
+          </div>
+          <div class="quest-info-col">
+            <div class="quest-title-row">
+              <span class="quest-title">${q.title}</span>
+              <span class="quest-reward-pill">+${q.rewardCoins} 🪙</span>
+            </div>
+            <div class="quest-desc">${q.description}</div>
+            <div class="quest-progress-row">
+              <div class="quest-progress-bar-bg">
+                <div class="quest-progress-bar-fill ${q.isCompleted ? 'gold' : 'blue'}" style="width: ${pct}%;"></div>
+              </div>
+              <span class="quest-progress-text">${q.current}/${q.target} (${pct}%)</span>
+            </div>
+          </div>
+          <div class="quest-action-col">
+            ${actionHtml}
+          </div>
+        `;
+
+        if (q.isCompleted && !q.isClaimed) {
+          const claimBtn = card.querySelector('.quest-btn-claim');
+          claimBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            onClaimQuest(q.id);
+          });
+        }
+
+        this.dailyQuestsListEl.appendChild(card);
+      }
+    }
+
+    // 4. Super-prize button: active only if allCompleted && !allCompletedBonusClaimed
+    if (this.questsClaimBonusBtn) {
+      if (state.allCompletedBonusClaimed) {
+        this.questsClaimBonusBtn.disabled = true;
+        this.questsClaimBonusBtn.textContent = '✔ Получено';
+        this.questsClaimBonusBtn.className = 'quest-btn quest-status-badge claimed';
+        this.questsClaimBonusBtn.onclick = null;
+      } else if (canClaimSuperBonus) {
+        this.questsClaimBonusBtn.disabled = false;
+        this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
+        this.questsClaimBonusBtn.className = 'quest-btn quest-btn-claim quest-super-btn';
+        this.questsClaimBonusBtn.onclick = () => {
+          onClaimBonus();
+        };
+      } else {
+        this.questsClaimBonusBtn.disabled = true;
+        this.questsClaimBonusBtn.textContent = 'Забрать 100 🪙';
+        this.questsClaimBonusBtn.className = 'quest-btn quest-super-btn';
+        this.questsClaimBonusBtn.onclick = null;
+      }
     }
   }
 
@@ -500,6 +694,9 @@ export class UIManager {
     this.gachaModalRollBtn?.addEventListener('click', handlers.onRollGacha);
     this.menuDailyBtn?.addEventListener('click', () => {
       handlers.onOpenDaily?.();
+    });
+    this.menuDailyQuestsBtn?.addEventListener('click', () => {
+      handlers.onOpenDailyQuests?.();
     });
     this.dailyClaimBtn?.addEventListener('click', () => {
       handlers.onClaimDaily?.(false);

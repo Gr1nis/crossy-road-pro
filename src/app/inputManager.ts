@@ -21,6 +21,7 @@ export interface ModalStateProvider {
   isLeaderboardOpen: () => boolean;
   isAchievementsOpen?: () => boolean;
   isDailyBonusOpen?: () => boolean;
+  isDailyQuestsOpen?: () => boolean;
   isGameOverOpen: () => boolean;
   isNameInputFocused?: () => boolean;
   isPlaying: () => boolean;
@@ -78,6 +79,7 @@ export class InputManager {
     if (this.touchIsInteractive) return;
     if (this.callbacks.isInputBlocked?.()) return;
     if (!this.modalState.isPlaying()) return;
+    if (this.modalState.isDailyQuestsOpen?.()) return;
 
     if (e.changedTouches.length === 0) return;
     const touch = e.changedTouches[0];
@@ -171,6 +173,14 @@ export class InputManager {
       return;
     }
 
+    if (this.modalState.isDailyQuestsOpen?.()) {
+      if (e.code === 'Escape' || e.code === 'Enter') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      }
+      return;
+    }
+
     if (this.modalState.isMainMenuOpen()) {
       if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
@@ -238,6 +248,7 @@ export class InputManager {
   public triggerMove(dir: MoveDirectionValue): void {
     if (this.callbacks.isInputBlocked?.()) return;
     if (!this.modalState.isPlaying()) return;
+    if (this.modalState.isDailyQuestsOpen?.()) return;
     this.callbacks.onMove(dir);
   }
 }
