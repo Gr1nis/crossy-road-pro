@@ -527,7 +527,7 @@ export class GameEngine {
     this.evictOldLanes();
   }
 
-  stepAmbient(dt: number): void {
+  public stepAmbient(dt: number): void {
     if (dt <= 0) return;
 
     const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);

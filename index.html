@@ -14,6 +14,7 @@
 
     /* Global Visibility Utility */
     .hidden { display: none !important; }
+    #in-game-hud.hidden, .hud.hidden { display: none !important; }
     
     /* Clean Minimal In-Game HUD: Coins, Distance & Pause button only */
     .hud { position: fixed; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
@@ -28,6 +29,41 @@
     .hud-circle-btn { width: 48px; height: 48px; border-radius: 14px; background: rgba(15, 23, 42, 0.85); border: 2px solid rgba(255, 255, 255, 0.25); color: #fff; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: transform 0.1s ease, filter 0.1s; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
     .hud-circle-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
     .hud-circle-btn:active { transform: scale(0.95); }
+
+    /* Telemetry / Perf HUD */
+    .perf-hud {
+      position: fixed;
+      top: max(16px, env(safe-area-inset-top));
+      right: max(16px, env(safe-area-inset-right));
+      width: 250px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px solid rgba(56, 189, 248, 0.35);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      pointer-events: auto;
+      user-select: none;
+    }
+    .perf-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .perf-title { font-size: 11px; font-weight: 900; color: #38bdf8; letter-spacing: 0.05em; }
+    .perf-actions { display: flex; gap: 4px; }
+    .perf-btn { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #cbd5e1; font-size: 10px; padding: 2px 6px; border-radius: 6px; cursor: pointer; }
+    .perf-btn:hover { background: #38bdf8; color: #0f172a; }
+    .perf-main-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .perf-fps-box { display: flex; flex-direction: column; }
+    .perf-fps-num { font-size: 26px; font-weight: 900; line-height: 1; color: #4ade80; }
+    .perf-fps-sub { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+    .perf-canvas { border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; font-size: 10px; margin-bottom: 6px; }
+    .perf-stat { display: flex; justify-content: space-between; }
+    .perf-k { color: #94a3b8; }
+    .perf-v { font-weight: 700; color: #f8fafc; }
+    .perf-breakdown { font-size: 9px; color: #a5b4fc; background: rgba(30, 41, 59, 0.5); padding: 4px 6px; border-radius: 6px; text-align: center; }
 
     /* Danger vignette at bottom when player crosses edge */
     #warning-vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: linear-gradient(to top, rgba(239, 68, 68, 0.65) 0%, rgba(239, 68, 68, 0.2) 20%, transparent 45%); transition: opacity 0.15s ease-out; }
@@ -46,7 +82,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 0 0 max(22px, env(safe-area-inset-bottom)) 0;
+      padding: 0 0 max(24px, env(safe-area-inset-bottom)) 0;
       z-index: 30;
       box-sizing: border-box;
     }
@@ -56,12 +92,15 @@
 
     /* Top Bar Status Pills */
     .menu-top-bar {
+      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
       box-sizing: border-box;
-      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+      padding: 20px 32px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-right: max(32px, env(safe-area-inset-right));
+      padding-left: max(32px, env(safe-area-inset-left));
       pointer-events: none;
       position: relative;
       z-index: 10;
@@ -79,43 +118,48 @@
     }
     .top-pill {
       pointer-events: auto;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.42);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2.5px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.9);
       border-radius: 999px;
       display: flex;
       align-items: center;
       padding: 6px 14px;
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .top-pill:hover {
-      border-color: rgba(255, 255, 255, 0.55);
+      border-color: rgba(255, 255, 255, 1);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 1);
     }
     .top-pill-coins {
       gap: 8px;
       cursor: pointer;
     }
     .top-pill-icon {
-      font-size: 24px;
+      font-size: 26px;
       line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .top-pill-val {
       font-size: 19px;
       font-weight: 900;
-      color: #facc15;
+      color: #0f274a;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+      letter-spacing: -0.01em;
     }
     .top-pill-plus {
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      border: 1.5px solid #ffffff;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #ea580c 100%);
+      border: 2px solid #ffffff;
       color: #ffffff;
       font-size: 16px;
       font-weight: 900;
@@ -123,23 +167,36 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 3px 8px rgba(217, 119, 6, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.85);
       margin-left: 2px;
-      transition: transform 0.12s ease;
+      transition: transform 0.12s ease, filter 0.12s ease;
       padding: 0;
       line-height: 1;
     }
     .top-pill-plus:hover {
       transform: scale(1.15);
+      filter: brightness(1.1);
+    }
+    .top-pill-plus:active {
+      transform: scale(0.95);
     }
     .top-pill-score {
       gap: 10px;
       padding: 6px 18px;
     }
     .top-pill-crown-box {
-      font-size: 22px;
+      font-size: 18px;
       line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4));
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%);
+      border: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(202, 138, 4, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+      flex-shrink: 0;
     }
     .top-pill-score-text {
       display: flex;
@@ -147,60 +204,65 @@
       text-align: left;
     }
     .top-pill-score-title {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #94a3b8;
-      font-weight: 800;
+      font-size: 11px;
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      font-weight: 900;
       line-height: 1.1;
+      text-shadow: 0 1px 3px rgba(15, 23, 42, 0.7), 0 0 2px rgba(0, 0, 0, 0.5);
     }
     .top-pill-score-line {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 900;
-      color: #38bdf8;
+      color: #0f274a;
       line-height: 1.1;
       font-variant-numeric: tabular-nums;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
     }
     .top-pill-score-line strong {
-      color: #ffffff;
+      color: #d97706;
+      font-weight: 900;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
     }
     .top-settings-btn {
       pointer-events: auto;
       width: 48px;
       height: 48px;
-      border-radius: 16px;
-      background: rgba(15, 23, 42, 0.75);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: #cbd5e1;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.42);
+      border: 2.5px solid rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #3b82f6;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-      transition: transform 0.15s ease, filter 0.15s ease, color 0.15s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+      transition: transform 0.15s ease, filter 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       padding: 0;
     }
     .top-settings-btn:hover {
       transform: scale(1.06);
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.55);
+      border-color: rgba(255, 255, 255, 1);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 1);
     }
     .top-settings-btn:active {
       transform: scale(0.95);
     }
     .top-settings-icon {
-      font-size: 24px;
+      font-size: 26px;
       line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3));
     }
 
     /* Floating Side Badges */
     .menu-side-widgets {
       position: absolute;
       top: max(100px, calc(env(safe-area-inset-top) + 80px));
-      left: max(16px, env(safe-area-inset-left));
-      right: max(16px, env(safe-area-inset-right));
+      left: max(32px, env(safe-area-inset-left));
+      right: max(32px, env(safe-area-inset-right));
       display: flex;
       justify-content: space-between;
       pointer-events: none;
@@ -214,7 +276,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
       padding: 0;
     }
@@ -232,59 +294,80 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      border: 2.5px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 3px 2px rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.42);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.95);
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+      overflow: visible;
     }
-    .floating-widget-icon-box.gift-box {
-      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-      box-shadow: 0 10px 24px rgba(239, 68, 68, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.7);
+    .floating-widget-icon-box::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 6px;
+      right: 6px;
+      height: 38%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-radius: 999px;
+      pointer-events: none;
     }
+    .floating-widget-icon-box.gift-box,
     .floating-widget-icon-box.quest-box {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      box-shadow: 0 10px 24px rgba(245, 158, 11, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.42);
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.95);
     }
     .floating-widget-icon {
       font-size: 34px;
       line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+      position: relative;
+      z-index: 2;
     }
     .floating-widget-alert-badge {
       position: absolute;
-      top: -5px;
-      right: -5px;
-      width: 24px;
-      height: 24px;
+      top: -6px;
+      right: -6px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: #ef4444;
+      background: linear-gradient(135deg, #ff4d6d 0%, #ef4444 50%, #dc2626 100%);
       color: #ffffff;
       font-size: 14px;
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid #ffffff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 3px 8px rgba(239, 68, 68, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      z-index: 5;
     }
     .floating-widget-count-badge {
       position: absolute;
       top: -6px;
       right: -6px;
-      padding: 2px 7px;
+      padding: 0 7px;
+      min-width: 26px;
+      height: 26px;
       border-radius: 999px;
-      background: #10b981;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%);
       color: #ffffff;
       font-size: 11px;
       font-weight: 900;
-      border: 2px solid #ffffff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 3px 8px rgba(245, 158, 11, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      z-index: 5;
     }
     .floating-widget-label {
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 900;
       color: #ffffff;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0,0,0,0.9);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 6px rgba(0, 0, 0, 0.8);
       letter-spacing: 0.02em;
       white-space: nowrap;
     }
@@ -296,7 +379,7 @@
       justify-content: space-between;
       width: 100%;
       box-sizing: border-box;
-      padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left));
+      padding: 0 max(32px, env(safe-area-inset-right)) 0 max(32px, env(safe-area-inset-left));
       margin: 0;
       pointer-events: none;
       position: relative;
@@ -341,41 +424,67 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      border: 2.5px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 7px 0 #0f766e, 0 12px 20px rgba(0, 0, 0, 0.35), inset 0 2px 2px rgba(255, 255, 255, 0.7);
-      transition: box-shadow 0.12s ease, transform 0.12s ease;
+      background: linear-gradient(180deg, #38d9a9 0%, #06b6d4 50%, #0891b2 100%);
+      border: 3.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 0 #0e7490, 0 14px 22px rgba(0, 0, 0, 0.3), inset 0 3px 3px rgba(255, 255, 255, 0.85);
+      transition: box-shadow 0.12s ease, transform 0.12s ease, filter 0.12s ease;
+      overflow: hidden;
+    }
+    .dock-btn-inner::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 6px;
+      right: 6px;
+      height: 35%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 1;
     }
     .dock-btn-teal .dock-btn-inner {
-      background: linear-gradient(180deg, #2dd4bf 0%, #0d9488 100%);
-      box-shadow: 0 7px 0 #0f766e, 0 12px 20px rgba(0, 0, 0, 0.35), inset 0 2px 2px rgba(255, 255, 255, 0.7);
+      background: linear-gradient(180deg, #38d9a9 0%, #06b6d4 50%, #0891b2 100%);
+      border: 3.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 0 #0e7490, 0 14px 22px rgba(0, 0, 0, 0.3), inset 0 3px 3px rgba(255, 255, 255, 0.85);
+    }
+    .dock-btn:hover .dock-btn-inner {
+      filter: brightness(1.06);
     }
     .dock-btn:active .dock-btn-inner {
-      box-shadow: 0 2px 0 #0f766e, 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.7);
       transform: translateY(4px);
+      box-shadow: 0 4px 0 #0e7490, 0 6px 12px rgba(0, 0, 0, 0.25);
     }
     .dock-btn-icon {
       font-size: 32px;
       line-height: 1;
-      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+      position: relative;
+      z-index: 2;
     }
     .dock-badge {
       position: absolute;
       top: -5px;
       right: -5px;
-      padding: 2px 7px;
+      padding: 0 6px;
+      min-width: 20px;
+      height: 20px;
       border-radius: 999px;
-      background: #ef4444;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%);
       color: #fff;
       font-size: 11px;
       font-weight: 900;
       border: 2px solid #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
     }
     .dock-btn-label {
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 900;
       color: #ffffff;
-      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0,0,0,0.9);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.8);
       letter-spacing: 0.02em;
       white-space: nowrap;
     }
@@ -389,10 +498,10 @@
       bottom: 0;
       width: 280px;
       height: 90px;
-      border-radius: 28px;
-      background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-      border: 3.5px solid rgba(255, 255, 255, 0.9);
-      box-shadow: 0 12px 0 #15803d, 0 22px 38px rgba(22, 163, 74, 0.5), inset 0 3px 2px rgba(255, 255, 255, 0.85);
+      border-radius: 34px;
+      background: linear-gradient(180deg, #86efac 0%, #4ade80 40%, #22c55e 70%, #16a34a 100%);
+      border: 4px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 10px 0 #15803d, 0 20px 32px rgba(22, 163, 74, 0.4), inset 0 4px 3px rgba(255, 255, 255, 0.9);
       cursor: pointer;
       overflow: hidden;
       display: flex;
@@ -404,30 +513,30 @@
       z-index: 10;
     }
     .hero-play-btn:hover {
-      filter: brightness(1.08);
+      filter: brightness(1.06);
       transform: translateX(-50%) translateY(-2px);
-      box-shadow: 0 14px 0 #15803d, 0 26px 42px rgba(22, 163, 74, 0.55), inset 0 3px 2px rgba(255, 255, 255, 0.85);
+      box-shadow: 0 12px 0 #15803d, 0 24px 36px rgba(22, 163, 74, 0.45), inset 0 4px 3px rgba(255, 255, 255, 0.95);
     }
     .hero-play-btn:active {
       transform: translateX(-50%) translateY(6px);
-      box-shadow: 0 4px 0 #15803d, 0 8px 16px rgba(0, 0, 0, 0.35), inset 0 2px 1px rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 0 #15803d, 0 8px 16px rgba(0, 0, 0, 0.3), inset 0 3px 2px rgba(255, 255, 255, 0.8);
     }
     .hero-play-sheen {
       position: absolute;
       top: 3px;
-      left: 14px;
-      right: 14px;
-      height: 38%;
+      left: 12px;
+      right: 12px;
+      height: 40%;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.08) 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.08) 100%);
       pointer-events: none;
     }
     .hero-play-text {
-      font-size: 40px;
+      font-size: 38px;
       font-weight: 900;
       letter-spacing: -0.01em;
       color: #ffffff;
-      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+      text-shadow: 0 3px 0 #15803d, 0 6px 14px rgba(0, 0, 0, 0.35);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -437,6 +546,7 @@
     .hero-play-arrow {
       font-size: 28px;
       margin-left: 2px;
+      text-shadow: 0 3px 0 #15803d, 0 6px 14px rgba(0, 0, 0, 0.35);
     }
 
     .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 36px 40px; text-align: center; color: #f8fafc; max-width: 460px; width: 90%; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); position: relative; }
@@ -488,10 +598,11 @@
     #daily-quests-modal { z-index: 48; }
     .menu-btn-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
     .btn-badge.pulse-badge { background: #10b981; color: #fff; border-color: #34d399; animation: badgePulse 1.4s infinite; }
+    .floating-widget-alert-badge.pulse-badge { animation: badgePulse 1.4s infinite; }
     .btn-badge.hidden { display: none !important; }
-    @keyframes badgePulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
-    @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 50% { transform: scale(1.12); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5), 0 0 0 6px rgba(245, 158, 11, 0); } }
-    #menu-daily-quests-badge { background: #f59e0b; color: #000; font-weight: 900; border-color: #fde68a; animation: pulse 1.5s infinite; }
+    @keyframes badgePulse { 0% { transform: scale(1); box-shadow: 0 3px 8px rgba(239, 68, 68, 0.5); } 50% { transform: scale(1.12); box-shadow: 0 0 12px rgba(239, 68, 68, 0.7), 0 4px 10px rgba(239, 68, 68, 0.6); } 100% { transform: scale(1); box-shadow: 0 3px 8px rgba(239, 68, 68, 0.5); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 3px 8px rgba(245, 158, 11, 0.5); } 50% { transform: scale(1.12); box-shadow: 0 0 10px rgba(245, 158, 11, 0.7), 0 4px 10px rgba(245, 158, 11, 0.6); } }
+    #menu-daily-quests-badge { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%); color: #ffffff; font-weight: 900; border: 2.5px solid #ffffff; box-shadow: 0 3px 8px rgba(245, 158, 11, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8); animation: pulse 1.5s infinite; }
 
     .modal-card-daily { max-height: 90vh; overflow-y: auto; padding: 28px 24px; -webkit-overflow-scrolling: touch; }
     .daily-streak-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: rgba(245, 158, 11, 0.15); border: 1.5px solid rgba(245, 158, 11, 0.4); color: #fbbf24; padding: 6px 16px; border-radius: 999px; font-weight: 800; font-size: 13px; margin: 0 auto 16px; }
@@ -791,22 +902,25 @@
         padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
       }
       .menu-top-left { gap: 6px; }
-      .top-pill { padding: 5px 10px; }
-      .top-pill-icon { font-size: 20px; }
+      .top-pill { padding: 5px 10px; border-width: 2px; }
+      .top-pill-icon { font-size: 22px; }
       .top-pill-val { font-size: 16px; }
       .top-pill-score { padding: 5px 12px; gap: 6px; }
-      .top-pill-crown-box { font-size: 18px; }
-      .top-pill-score-line { font-size: 13px; }
-      .top-settings-btn { width: 40px; height: 40px; border-radius: 12px; }
-      .top-settings-icon { font-size: 20px; }
+      .top-pill-crown-box { width: 24px; height: 24px; font-size: 15px; }
+      .top-pill-score-title { font-size: 9px; }
+      .top-pill-score-line { font-size: 12px; }
+      .top-settings-btn { width: 40px; height: 40px; border-radius: 14px; border-width: 2px; }
+      .top-settings-icon { font-size: 22px; }
       .menu-side-widgets {
         top: max(100px, calc(env(safe-area-inset-top) + 80px));
         left: max(16px, env(safe-area-inset-left));
         right: max(16px, env(safe-area-inset-right));
       }
-      .floating-widget-icon-box { width: 52px; height: 52px; border-radius: 16px; }
+      .floating-widget-icon-box { width: 52px; height: 52px; border-radius: 16px; border-width: 2.5px; }
       .floating-widget-icon { font-size: 28px; }
-      .floating-widget-label { font-size: 10px; }
+      .floating-widget-label { font-size: 11px; }
+      .floating-widget-alert-badge { width: 22px; height: 22px; font-size: 12px; top: -5px; right: -5px; border-width: 2px; }
+      .floating-widget-count-badge { min-width: 22px; height: 22px; font-size: 10px; padding: 0 5px; top: -5px; right: -5px; border-width: 2px; }
       .menu-bottom-dock {
         position: relative;
         display: flex;
@@ -832,25 +946,27 @@
       .dock-btn-inner {
         width: 48px;
         height: 48px;
-        border-radius: 15px;
-        border-width: 2px;
-        box-shadow: 0 5px 0 #0f766e, 0 8px 14px rgba(0, 0, 0, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.7);
+        border-radius: 16px;
+        border-width: 2.5px;
+        box-shadow: 0 5px 0 #0e7490, 0 10px 16px rgba(0, 0, 0, 0.25), inset 0 2px 2px rgba(255, 255, 255, 0.85);
       }
       .dock-btn:active .dock-btn-inner {
-        box-shadow: 0 2px 0 #0f766e, 0 4px 6px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 0 #0e7490, 0 4px 6px rgba(0, 0, 0, 0.25);
         transform: translateY(3px);
       }
       .dock-btn-icon {
         font-size: 24px;
       }
       .dock-btn-label {
-        font-size: 10px;
+        font-size: 11px;
       }
       .dock-badge {
         top: -4px;
         right: -4px;
         font-size: 9px;
-        padding: 1px 5px;
+        padding: 0 5px;
+        min-width: 18px;
+        height: 18px;
       }
       .hero-play-btn {
         position: static;
@@ -861,24 +977,26 @@
         max-width: 220px;
         height: 74px;
         margin: 0;
-        border-radius: 22px;
-        border-width: 3px;
-        box-shadow: 0 8px 0 #15803d, 0 14px 24px rgba(22, 163, 74, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.8);
+        border-radius: 26px;
+        border-width: 3.5px;
+        box-shadow: 0 7px 0 #15803d, 0 14px 24px rgba(22, 163, 74, 0.4), inset 0 3px 2px rgba(255, 255, 255, 0.9);
       }
       .hero-play-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 0 #15803d, 0 18px 28px rgba(22, 163, 74, 0.5), inset 0 3px 2px rgba(255, 255, 255, 0.8);
+        box-shadow: 0 9px 0 #15803d, 0 18px 28px rgba(22, 163, 74, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.9);
       }
       .hero-play-btn:active {
         transform: translateY(4px);
-        box-shadow: 0 3px 0 #15803d, 0 6px 12px rgba(0, 0, 0, 0.35), inset 0 2px 1px rgba(255, 255, 255, 0.6);
+        box-shadow: 0 3px 0 #15803d, 0 6px 12px rgba(22, 163, 74, 0.3), inset 0 2px 1px rgba(255, 255, 255, 0.7);
       }
       .hero-play-text {
-        font-size: 30px;
+        font-size: 28px;
         gap: 6px;
+        text-shadow: 0 2.5px 0 #15803d, 0 5px 10px rgba(0, 0, 0, 0.35);
       }
       .hero-play-arrow {
-        font-size: 22px;
+        font-size: 20px;
+        text-shadow: 0 2.5px 0 #15803d, 0 5px 10px rgba(0, 0, 0, 0.35);
       }
       #menu-dev-btn {
         bottom: max(165px, calc(env(safe-area-inset-bottom) + 165px)) !important;
@@ -1236,6 +1354,8 @@
         <button id="dev-reroll-quests-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🔄 Обновить квесты</button>
         <button id="dev-cycle-biome-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🌲 Сменить биом</button>
         <button id="dev-godmode-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🛡️ God Mode: ВЫКЛ</button>
+        <button id="dev-perf-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">⚡ Perf HUD: ВЫКЛ</button>
+        <button id="dev-benchmark-btn" class="menu-btn menu-btn-slate" style="font-size: 13px; padding: 10px;">🚀 Бенчмарк (300)</button>
       </div>
 
       <div style="margin-bottom: 14px;">
@@ -3614,7 +3734,7 @@ class GameEngine {
     this.evictOldLanes();
   }
 
-  stepAmbient(dt        )       {
+         stepAmbient(dt        )       {
     if (dt <= 0) return;
 
     const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
@@ -6303,6 +6423,297 @@ class MeshFactory {
   }
 }
 
+// --- Module: src/view/modelRegistry.ts ---
+const SKIN_DESCRIPTIONS                         = {
+  corgi:
+    'Главный маскот игры. Озорной рыже-белый корги с розовыми подушечками лап, торчащими лисьими ушками, ошейником с золотым жетоном и пушистым хвостиком.',
+  pigeon_pizza:
+    'Городской голубь с переливающейся фиолетово-бирюзовой шеей, несущий в клюве аппетитный треугольный ломтик пиццы с хрустящей корочкой и пепперони.',
+  box_cat:
+    'Рыжий полосатый котик, уютно сидящий в картонной посылочной коробке со штампом "FRAGILE / DELIVERY" и свесивший белые лапки через передний бортик.',
+  raccoon_bandit:
+    'Ловкий городской енот-воришка в чёрной бандитской маске с пышным полосатым кольчатым хвостом и холщовым мешком с добычей за спиной.',
+  capybara_zen:
+    'Умиротворённая дзен-капибара в медитативной позе со спокойными прикрытыми глазками и сочным воксельным мандарином с зелёным листком на голове.',
+};
+function getCharacterModelItems()                     {
+  return ALL_SKINS.map((skin) => ({
+    id: skin.id,
+    name: skin.name,
+    icon: skin.badge,
+    cat: 'chars'         ,
+    desc:
+      SKIN_DESCRIPTIONS[skin.id] ??
+      `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
+    create: (_biome            = 'forest', isGhost = false) =>
+      createUrbanCharacter(skin.id, isGhost),
+  }));
+}
+function getVehicleModelItems()                     {
+  return [
+    {
+      id: 'taxi',
+      name: 'Городское такси',
+      icon: '🚕',
+      cat: 'vehicles',
+      desc: 'Классическое жёлтое городское такси с шашечками на крыше и крыльях, детализированными фарами, номерными знаками CITY и зеркалами заднего вида.',
+      create: () => createUrbanVehicle('taxi', 1),
+    },
+    {
+      id: 'scooter',
+      name: 'Курьерский скутер',
+      icon: '🛵',
+      cat: 'vehicles',
+      desc: 'Манёвренный скутер экспресс-доставки. За рулём сидит курьер в защитном шлеме и яркой куртке, а сзади установлена термосумка с логотипом FOOD HOT.',
+      create: () => createUrbanVehicle('scooter', 1),
+    },
+    {
+      id: 'bus',
+      name: 'Рейсовый автобус',
+      icon: '🚌',
+      cat: 'vehicles',
+      desc: 'Трёхосный пассажирский городской автобус с двустворчатыми дверями, светящимся янтарным LED-табло ROUTE 42, надписью CITY TRANSIT и блоками кондиционеров.',
+      create: () => createUrbanVehicle('bus', 1),
+    },
+    {
+      id: 'sweeper',
+      name: 'Уборочная машина',
+      icon: '🚜',
+      cat: 'vehicles',
+      desc: 'Коммунальная машина со вращающимися коническими щётками, проблесковым маячком, диагональной полосой безопасности и рельефной надписью STREET SWEEP.',
+      create: () => createUrbanVehicle('sweeper', 1),
+    },
+    {
+      id: 'train',
+      name: 'Скоростной поезд',
+      icon: '🚄',
+      cat: 'vehicles',
+      desc: 'Высокоскоростной пассажирский экспресс Сапсан с клиновидным носом, пантографом с изоляторами, вагоном CITY EXPRESS и мощным лучом освещения пути.',
+      create: () => createUrbanTrain(1),
+    },
+    {
+      id: 'pallet',
+      name: 'Речной поддон',
+      icon: '🪵',
+      cat: 'vehicles',
+      desc: 'Деревянный европоддон с опорными брусьями и фирменным клеймом PALLET. Плавает по реке, создавая белый пенный след на воде.',
+      create: () =>
+        createUrbanPallet({
+          id: 1,
+          x: 0,
+          length: 2.4,
+          speed: 1,
+        }),
+    },
+  ];
+}
+function getPropModelItems()                     {
+  return [
+    {
+      id: 'hydrant',
+      name: 'Пожарный гидрант',
+      icon: '🚒',
+      cat: 'props',
+      desc: 'Чугунный уличный пожарный гидрант с фланцевым основанием, тремя штуцерами и серебристыми соединительными гайками.',
+      create: () => createUrbanHydrant(),
+    },
+    {
+      id: 'trash',
+      name: 'Мусорный бак',
+      icon: '🗑️',
+      cat: 'props',
+      desc: 'Зелёный городской контейнер для раздельного сбора отходов с белой маркировочной панелью и ручками.',
+      create: () => createUrbanTrashCan(),
+    },
+    {
+      id: 'bench',
+      name: 'Парковая скамейка',
+      icon: '🪑',
+      cat: 'props',
+      desc: 'Уютная деревянная скамейка на чугунных ножках с анатомическими рейками сиденья и поддерживающей спинкой.',
+      create: () => createUrbanBench(),
+    },
+    {
+      id: 'lamp',
+      name: 'Фонарный столб',
+      icon: '💡',
+      cat: 'props',
+      desc: 'Высокий чугунный уличный фонарь с квадратным постаментом и светящейся камерой плафона тёплого света.',
+      create: () => createUrbanLampPost(),
+    },
+    {
+      id: 'coin',
+      name: 'Золотая монета',
+      icon: '🪙',
+      cat: 'props',
+      desc: 'Вращающаяся золотая монетка с выпуклым ободком и гравировкой. Собирается персонажем для пополнения кошелька (+1).',
+      create: () => createUrbanCoin(),
+    },
+    {
+      id: 'signal',
+      name: 'Ж/д светофор',
+      icon: '🚦',
+      cat: 'props',
+      desc: 'Сигнальный переездный железнодорожный фонарь с двумя красными предупреждающими огнями опасности.',
+      create: () => createUrbanRailwaySignal().group,
+    },
+    {
+      id: 'flag',
+      name: 'Флаг рекорда',
+      icon: '🚩',
+      cat: 'props',
+      desc: 'Постамент личного рекорда игрока (PB Flag) на обочине с золочёным древком, короной чемпиона и рубиновыми камнями.',
+      create: () => createUrbanRecordFlag(),
+    },
+    {
+      id: 'barrier',
+      name: 'Дорожный барьер',
+      icon: '🚧',
+      cat: 'props',
+      desc: 'Защитное металлическое дорожное ограждение с опорными столбиками и светоотражающими элементами.',
+      create: (b            = 'forest') => createUrbanRoadBarrier(b),
+    },
+    {
+      id: 'markings',
+      name: 'Дорожная разметка',
+      icon: '➖',
+      cat: 'props',
+      desc: 'Белая сплошная краевая полоса дорожной разметки, отделяющая проезжую часть от обочины.',
+      create: () => createUrbanRoadMarkings(),
+    },
+    {
+      id: 'riverbank',
+      name: 'Береговое укрепление',
+      icon: '🌊',
+      cat: 'props',
+      desc: 'Инженерное укрепление берега реки из просмолённых деревянных свай и каменной булыжной кладки.',
+      create: (b            = 'forest') => createUrbanRiverbankEdge('left', b),
+    },
+  ];
+}
+function getNatureModelItems()                     {
+  return [
+    {
+      id: 'tree_planter_0',
+      name: 'Дерево в кадке (А)',
+      icon: '🌲',
+      cat: 'nature',
+      desc: 'Городское дерево в деревянной кадке с геометрической кроной. Цвет листвы автоматически адаптируется под выбранный биом (Лес/Зима/Пустыня/Неон).',
+      create: (b            = 'forest') => createUrbanTreePlanter(0, b),
+    },
+    {
+      id: 'tree_planter_1',
+      name: 'Дерево в кадке (Б)',
+      icon: '🌳',
+      cat: 'nature',
+      desc: 'Раскидистое городское дерево в кадке с многослойной кроной. Реагирует на погодные условия и атмосферу биома.',
+      create: (b            = 'forest') => createUrbanTreePlanter(1, b),
+    },
+    {
+      id: 'hedge',
+      name: 'Живая изгородь',
+      icon: '🌿',
+      cat: 'nature',
+      desc: 'Аккуратно подстриженный кустарник прямоугольной формы с контрастными акцентными листьями. Меняет цвет при смене климатической зоны.',
+      create: (b            = 'forest') => createUrbanHedge(0, b),
+    },
+  ];
+}
+function getBuildingModelItems()                     {
+  return [
+    {
+      id: 'townhouse_cafe',
+      name: 'Кафе (Таунхаус А)',
+      icon: '☕',
+      cat: 'buildings',
+      desc: 'Парижский двухэтажный таунхаус цвета ультрамарин: кофейня на первом этаже, полосатая красно-белая маркиза, вывеска CAFE, мансардная крыша и цветочные кашпо.',
+      create: () => createTownhouseA(),
+    },
+    {
+      id: 'townhouse_bakery',
+      name: 'Пекарня (Таунхаус Б)',
+      icon: '🥖',
+      cat: 'buildings',
+      desc: 'Классический особняк из красного обожжённого кирпича: угловые жёлтые рустовые камни, вывеска BAKERY, три арочных окна и ступенчатая балюстрада с двумя дымоходами.',
+      create: () => createTownhouseB(),
+    },
+    {
+      id: 'townhouse_books',
+      name: 'Книги (Таунхаус В)',
+      icon: '📚',
+      cat: 'buildings',
+      desc: 'Изумрудная книжная лавка: витрина с книжными полками, вывески BOOKS, угловая вертикальная консоль, терракотовая черепичная крыша и сдвоенные печные трубы.',
+      create: () => createTownhouseC(),
+    },
+  ];
+}
+function getModelCatalog()                     {
+  return [
+    ...getCharacterModelItems(),
+    ...getVehicleModelItems(),
+    ...getPropModelItems(),
+    ...getNatureModelItems(),
+    ...getBuildingModelItems(),
+  ];
+}
+function getModelDiagnostics(group             )   
+                    
+               
+  {
+  let meshCount = 0;
+  group.traverse((c) => {
+    if ((c              ).isMesh) {
+      meshCount++;
+    }
+  });
+  const box = new THREE.Box3().setFromObject(group);
+  const w = Math.max(0.01, box.max.x - box.min.x).toFixed(2);
+  const h = Math.max(0.01, box.max.y - box.min.y).toFixed(2);
+  const d = Math.max(0.01, box.max.z - box.min.z).toFixed(2);
+  return { meshCount, dims: `${w} × ${h} × ${d}` };
+}
+function verifyModelRegistry()   
+                
+                                           
+                   
+  {
+  const catalog = getModelCatalog();
+  const countsByCategory                         = {};
+  const errors           = [];
+
+  for (const item of catalog) {
+    countsByCategory[item.cat] = (countsByCategory[item.cat] ?? 0) + 1;
+    try {
+      const mesh = item.create('forest', false);
+      if (!mesh || !mesh.isGroup) {
+        errors.push(`Model "${item.id}" did not return a THREE.Group`);
+        continue;
+      }
+      const diag = getModelDiagnostics(mesh);
+      if (diag.meshCount <= 0) {
+        errors.push(`Model "${item.id}" has 0 voxel meshes`);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      errors.push(`Model "${item.id}" failed during instantiation: ${msg}`);
+    }
+  }
+
+  // Ensure every registered character skin in ALL_SKINS has an entry
+  for (const skin of ALL_SKINS) {
+    const found = catalog.find((m) => m.id === skin.id && m.cat === 'chars');
+    if (!found) {
+      errors.push(`Skin "${skin.id}" from ALL_SKINS is missing from model catalog!`);
+    }
+  }
+
+  return {
+    total: catalog.length,
+    countsByCategory,
+    errors,
+  };
+}
+
 // --- Module: src/view/squashStretch.ts ---
 const LANDING_BOUNCE_DURATION = 0.12;
 function calculateHopSquashStretch(hopProgress        )                                      {
@@ -6441,6 +6852,8 @@ class SceneManager {
           recordFlagMesh                     = null;
           recordFlagRow                = null;
           currentEngine                    = null;
+          lastSyncMs = 0;
+          lastRenderMs = 0;
 
           disposeHierarchy(obj                )       {
     obj.traverse((child) => {
@@ -6915,6 +7328,7 @@ class SceneManager {
   }
 
   sync(engine            , dt         = 0.016)       {
+    const tSyncStart = performance.now();
     const selectedSkin = engine.getSelectedSkin();
     if (selectedSkin !== this.currentSkin) {
       this.currentSkin = selectedSkin;
@@ -7141,7 +7555,34 @@ class SceneManager {
     this.camera.lookAt(this.currentCamX, 0, camZ + 3.0);
     this.dirLight.position.set(-12 + this.currentCamX, 22, camZ - 6);
     this.dirLight.target.position.set(this.currentCamX, 0, camZ + 3);
+    const tRenderStart = performance.now();
     this.renderer.render(this.scene, this.camera);
+    const tRenderEnd = performance.now();
+    this.lastSyncMs = tRenderStart - tSyncStart;
+    this.lastRenderMs = tRenderEnd - tRenderStart;
+  }
+
+  getPerfTimings()                                       {
+    return { syncMs: this.lastSyncMs, renderMs: this.lastRenderMs };
+  }
+
+  getRenderStats()   
+                  
+                      
+                       
+                     
+                               
+                           
+    {
+    const info = this.renderer ? this.renderer.info : null;
+    return {
+      calls: info ? info.render.calls : 0,
+      triangles: info ? info.render.triangles : 0,
+      geometries: info ? info.memory.geometries : 0,
+      textures: info ? info.memory.textures : 0,
+      renderedLanesCount: this.renderedLanes.size,
+      particlesCount: this.particles.length + this.ambientParticles.length,
+    };
   }
 
   clearAll()       {
@@ -7162,6 +7603,411 @@ class SceneManager {
     this.particles = [];
     this.landingBounceTimer = 0;
     this.landingBounceElapsed = 0;
+  }
+}
+
+// --- Module: src/app/perfMetrics.ts ---
+const RING_BUFFER_CAPACITY = 120;
+const SPIKE_THRESHOLD_MS = 25.0; // Over 25ms means under 40 FPS
+class PerfMetricsTracker {
+                   history = new Float32Array(RING_BUFFER_CAPACITY);
+          head = 0;
+          count = 0;
+          latestSnapshot                      = null;
+          spikeCounter = 0;
+
+  // Benchmark session state
+          isBenchmarking = false;
+          benchStartRow = 0;
+          benchInitialGeos = 0;
+          benchFrames = 0;
+          benchDurationMs = 0;
+          benchMaxFrameTime = 0;
+          benchPeakCalls = 0;
+          benchPeakGeos = 0;
+          benchTotalCalls = 0;
+                   benchAllFrameTimes           = [];
+
+         record(snapshot              )       {
+    this.latestSnapshot = snapshot;
+    const ft = Math.max(0.1, snapshot.frameTimeMs);
+
+    this.history[this.head] = ft;
+    this.head = (this.head + 1) % RING_BUFFER_CAPACITY;
+    if (this.count < RING_BUFFER_CAPACITY) {
+      this.count++;
+    }
+
+    if (ft >= SPIKE_THRESHOLD_MS) {
+      this.spikeCounter++;
+    }
+
+    if (this.isBenchmarking) {
+      this.benchFrames++;
+      this.benchDurationMs += ft;
+      this.benchAllFrameTimes.push(ft);
+      if (ft > this.benchMaxFrameTime) this.benchMaxFrameTime = ft;
+      if (snapshot.calls > this.benchPeakCalls) this.benchPeakCalls = snapshot.calls;
+      if (snapshot.geometries > this.benchPeakGeos) this.benchPeakGeos = snapshot.geometries;
+      this.benchTotalCalls += snapshot.calls;
+    }
+  }
+
+         getHistoryArray()           {
+    const res           = [];
+    if (this.count === 0) return res;
+    const start = this.count < RING_BUFFER_CAPACITY ? 0 : this.head;
+    for (let i = 0; i < this.count; i++) {
+      const idx = (start + i) % RING_BUFFER_CAPACITY;
+      res.push(this.history[idx]);
+    }
+    return res;
+  }
+
+         getSummary()                     {
+    const snap = this.latestSnapshot ?? {
+      frameTimeMs: 16.67,
+      coreMs: 0,
+      syncMs: 0,
+      renderMs: 0,
+      calls: 0,
+      triangles: 0,
+      geometries: 0,
+      textures: 0,
+      lanesCount: 0,
+      particlesCount: 0,
+      score: 0,
+    };
+
+    if (this.count === 0) {
+      return {
+        fps: 60,
+        avgFps: 60,
+        low1PercentFps: 60,
+        minFps: 60,
+        ...snap,
+        recentSpikesCount: 0,
+      };
+    }
+
+    const currentFps = Math.min(144, Math.round(1000 / snap.frameTimeMs));
+    const samples = this.getHistoryArray();
+    let sum = 0;
+    let maxFt = 0;
+
+    for (let i = 0; i < samples.length; i++) {
+      const v = samples[i];
+      sum += v;
+      if (v > maxFt) maxFt = v;
+    }
+
+    const avgFt = sum / samples.length;
+    const avgFps = Math.round(1000 / avgFt);
+    const minFps = Math.max(1, Math.round(1000 / maxFt));
+
+    // Calculate 1% low FPS: average of the worst 1% (or worst 1 frame if sample is small)
+    const sorted = samples.slice().sort((a, b) => b - a); // slowest first
+    const worstCount = Math.max(1, Math.ceil(sorted.length * 0.02)); // worst 2% of ring buffer
+    let worstSum = 0;
+    for (let i = 0; i < worstCount; i++) {
+      worstSum += sorted[i];
+    }
+    const worstAvg = worstSum / worstCount;
+    const low1PercentFps = Math.max(1, Math.round(1000 / worstAvg));
+
+    return {
+      fps: currentFps,
+      avgFps,
+      low1PercentFps,
+      minFps,
+      ...snap,
+      recentSpikesCount: this.spikeCounter,
+    };
+  }
+
+         startBenchmark(initialGeometries        , startRow        )       {
+    this.isBenchmarking = true;
+    this.benchStartRow = startRow;
+    this.benchInitialGeos = initialGeometries;
+    this.benchFrames = 0;
+    this.benchDurationMs = 0;
+    this.benchMaxFrameTime = 0;
+    this.benchPeakCalls = 0;
+    this.benchPeakGeos = initialGeometries;
+    this.benchTotalCalls = 0;
+    this.benchAllFrameTimes.length = 0;
+  }
+
+         finishBenchmark(endGeometries        , endRow        )                      {
+    this.isBenchmarking = false;
+    const totalFrames = Math.max(1, this.benchFrames);
+    const durationSec = Math.max(0.01, this.benchDurationMs / 1000);
+    const avgFps = Math.round(totalFrames / durationSec);
+
+    const sorted = this.benchAllFrameTimes.slice().sort((a, b) => b - a);
+    const worstCount = Math.max(1, Math.ceil(sorted.length * 0.01));
+    let worstSum = 0;
+    for (let i = 0; i < worstCount; i++) {
+      worstSum += sorted[i];
+    }
+    const worstAvg = worstCount > 0 ? worstSum / worstCount : 16.6;
+    const low1PercentFps = Math.max(1, Math.round(1000 / worstAvg));
+    const minFps = sorted.length > 0 ? Math.max(1, Math.round(1000 / sorted[0])) : avgFps;
+
+    const avgCalls = Math.round(this.benchTotalCalls / totalFrames);
+    const geosDelta = endGeometries - this.benchInitialGeos;
+    const rowsTraversed = Math.max(0, endRow - this.benchStartRow);
+
+    let verdict = 'Отличная производительность (60+ FPS)';
+    if (avgFps < 45 || low1PercentFps < 30) {
+      verdict = 'Критичные просадки FPS! Требуется InstancedMesh для деревьев и объектов';
+    } else if (this.benchPeakCalls > 250) {
+      verdict = `Слишком много Draw Calls (пик ${this.benchPeakCalls})! Объединяйте меши в InstancedMesh`;
+    } else if (geosDelta > 30) {
+      verdict = `Обнаружена утечка геометрии (+${geosDelta} объектов)! Проверьте dispose()`;
+    } else if (low1PercentFps < 50) {
+      verdict = 'Хороший средний FPS, но есть микрофризы (1% Low). Оптимизируйте генерацию полос';
+    }
+
+    return {
+      totalFrames,
+      totalDurationSec: Number(durationSec.toFixed(2)),
+      avgFps,
+      low1PercentFps,
+      minFps,
+      maxFrameTimeMs: Number(this.benchMaxFrameTime.toFixed(1)),
+      avgDrawCalls: avgCalls,
+      peakDrawCalls: this.benchPeakCalls,
+      startGeometries: this.benchInitialGeos,
+      peakGeometries: this.benchPeakGeos,
+      endGeometries,
+      geometriesDelta: geosDelta,
+      rowsTraversed,
+      verdict,
+    };
+  }
+
+         isBenchmarkRunning()          {
+    return this.isBenchmarking;
+  }
+
+         getBenchmarkProgress(currentRow        , targetRows        )         {
+    if (!this.isBenchmarking || targetRows <= 0) return 0;
+    const walked = Math.max(0, currentRow - this.benchStartRow);
+    return Math.min(1, walked / targetRows);
+  }
+}
+
+// --- Module: src/app/perfMonitor.ts ---
+class PerfMonitor {
+                   tracker = new PerfMetricsTracker();
+          enabled = false;
+          rootEl                     = null;
+          canvasEl                           = null;
+          canvasCtx                                  = null;
+
+  // Cached DOM elements to avoid querySelector overhead
+          fpsValEl                     = null;
+          lowFpsValEl                     = null;
+          callsValEl                     = null;
+          trisValEl                     = null;
+          memValEl                     = null;
+          breakdownValEl                     = null;
+          worldValEl                     = null;
+
+          lastDomUpdate = 0;
+          onBenchmarkComplete                                        ;
+
+  constructor() {
+    this.createDomElements();
+  }
+
+          createDomElements()       {
+    if (typeof document === 'undefined') return;
+
+    let el = document.getElementById('perf-hud');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'perf-hud';
+      el.className = 'perf-hud hidden';
+      document.body.appendChild(el);
+    }
+    this.rootEl = el;
+
+    el.innerHTML = `
+      <div class="perf-header">
+        <span class="perf-title">⚡ PERF TELEMETRY</span>
+        <div class="perf-actions">
+          <button id="perf-bench-btn" class="perf-btn" title="Стресс-тест на 300 полос">🚀 Тест</button>
+          <button id="perf-close-btn" class="perf-btn" title="Скрыть (F3)">✖</button>
+        </div>
+      </div>
+      <div class="perf-main-row">
+        <div class="perf-fps-box">
+          <span class="perf-fps-num" id="perf-fps-val">60</span>
+          <span class="perf-fps-sub" id="perf-low-fps-val">1% Low: 60</span>
+        </div>
+        <canvas id="perf-sparkline" width="140" height="38" class="perf-canvas"></canvas>
+      </div>
+      <div class="perf-grid">
+        <div class="perf-stat"><span class="perf-k">Calls:</span><span class="perf-v" id="perf-calls-val">0</span></div>
+        <div class="perf-stat"><span class="perf-k">Tris:</span><span class="perf-v" id="perf-tris-val">0</span></div>
+        <div class="perf-stat"><span class="perf-k">GPU Mem:</span><span class="perf-v" id="perf-mem-val">0</span></div>
+        <div class="perf-stat"><span class="perf-k">World:</span><span class="perf-v" id="perf-world-val">0</span></div>
+      </div>
+      <div class="perf-breakdown" id="perf-breakdown-val">Core: 0ms | Sync: 0ms | GPU: 0ms</div>
+    `;
+
+    this.fpsValEl = document.getElementById('perf-fps-val');
+    this.lowFpsValEl = document.getElementById('perf-low-fps-val');
+    this.callsValEl = document.getElementById('perf-calls-val');
+    this.trisValEl = document.getElementById('perf-tris-val');
+    this.memValEl = document.getElementById('perf-mem-val');
+    this.breakdownValEl = document.getElementById('perf-breakdown-val');
+    this.worldValEl = document.getElementById('perf-world-val');
+
+    this.canvasEl = document.getElementById('perf-sparkline')                            ;
+    if (this.canvasEl) {
+      this.canvasCtx = this.canvasEl.getContext('2d');
+    }
+
+    document.getElementById('perf-close-btn')?.addEventListener('click', () => {
+      this.setEnabled(false);
+    });
+
+    document.getElementById('perf-bench-btn')?.addEventListener('click', () => {
+      const globalDev = (window                                                                 ).__CROSSY_DEV__;
+      globalDev?.startBenchmark?.();
+    });
+  }
+
+         isEnabled()          {
+    return this.enabled;
+  }
+
+         setEnabled(enable         )       {
+    this.enabled = enable;
+    if (!this.rootEl) return;
+    if (enable) {
+      this.rootEl.classList.remove('hidden');
+    } else {
+      this.rootEl.classList.add('hidden');
+    }
+  }
+
+         toggle()          {
+    this.setEnabled(!this.enabled);
+    return this.enabled;
+  }
+
+         recordFrame(snapshot              )       {
+    this.tracker.record(snapshot);
+    if (!this.enabled) return;
+
+    const now = performance.now();
+    // Throttle DOM textual updates to ~10Hz (every 100ms) to avoid DOM layout overhead
+    if (now - this.lastDomUpdate >= 90) {
+      this.lastDomUpdate = now;
+      this.updateView();
+    }
+  }
+
+          updateView()       {
+    const s = this.tracker.getSummary();
+    if (this.fpsValEl) {
+      this.fpsValEl.textContent = `${s.fps}`;
+      this.fpsValEl.style.color = s.fps >= 55 ? '#4ade80' : s.fps >= 40 ? '#facc15' : '#ef4444';
+    }
+    if (this.lowFpsValEl) {
+      this.lowFpsValEl.textContent = `1% Low: ${s.low1PercentFps} | Avg: ${s.avgFps}`;
+      this.lowFpsValEl.style.color = s.low1PercentFps >= 50 ? '#94a3b8' : '#f87171';
+    }
+    if (this.callsValEl) {
+      this.callsValEl.textContent = `${s.calls}`;
+      this.callsValEl.style.color = s.calls > 300 ? '#ef4444' : s.calls > 150 ? '#facc15' : '#38bdf8';
+    }
+    if (this.trisValEl) {
+      const kTris = (s.triangles / 1000).toFixed(1);
+      this.trisValEl.textContent = `${kTris}k`;
+    }
+    if (this.memValEl) {
+      this.memValEl.textContent = `${s.geometries} geo / ${s.textures} tex`;
+    }
+    if (this.worldValEl) {
+      this.worldValEl.textContent = `Lanes: ${s.lanesCount} | Part: ${s.particlesCount}`;
+    }
+    if (this.breakdownValEl) {
+      this.breakdownValEl.textContent = `Core: ${s.coreMs.toFixed(1)}ms | Sync: ${s.syncMs.toFixed(1)}ms | GPU: ${s.renderMs.toFixed(1)}ms`;
+    }
+
+    this.drawSparkline();
+  }
+
+          drawSparkline()       {
+    if (!this.canvasCtx || !this.canvasEl) return;
+    const ctx = this.canvasCtx;
+    const w = this.canvasEl.width;
+    const h = this.canvasEl.height;
+    ctx.clearRect(0, 0, w, h);
+
+    // Baseline background grid
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, w, h);
+
+    // 16.6ms green guide line (60 FPS)
+    const y60 = h - (16.67 / 40) * h;
+    ctx.strokeStyle = 'rgba(74, 222, 128, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    ctx.moveTo(0, y60);
+    ctx.lineTo(w, y60);
+    ctx.stroke();
+
+    // 33.3ms red guide line (30 FPS)
+    const y30 = h - (33.33 / 40) * h;
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+    ctx.beginPath();
+    ctx.moveTo(0, y30);
+    ctx.lineTo(w, y30);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const history = this.tracker.getHistoryArray();
+    if (history.length === 0) return;
+
+    const barWidth = Math.max(1, w / 70);
+    const startX = Math.max(0, w - history.length * barWidth);
+
+    for (let i = 0; i < history.length; i++) {
+      const ft = history[i];
+      const barH = Math.min(h, Math.max(2, (ft / 40) * h));
+      const x = startX + i * barWidth;
+      const y = h - barH;
+
+      ctx.fillStyle = ft <= 17.5 ? '#4ade80' : ft <= 28 ? '#facc15' : '#ef4444';
+      ctx.fillRect(x, y, barWidth - 0.5, barH);
+    }
+  }
+
+         getTracker()                     {
+    return this.tracker;
+  }
+
+         startBenchmarkSession(initialGeometries        , startRow        )       {
+    this.tracker.startBenchmark(initialGeometries, startRow);
+    this.setEnabled(true);
+  }
+
+         finishBenchmarkSession(
+    endGeometries        ,
+    endRow        ,
+    onComplete                                        
+  )                      {
+    const report = this.tracker.finishBenchmark(endGeometries, endRow);
+    this.onBenchmarkComplete = onComplete;
+    this.onBenchmarkComplete?.(report);
+    return report;
   }
 }
 
@@ -7268,6 +8114,8 @@ class UIManager {
                    devRerollQuestsBtn                    ;
                    devCycleBiomeBtn                    ;
                    devGodModeBtn                    ;
+                   devPerfBtn                    ;
+                   devBenchmarkBtn                    ;
 
   // State
           lastScore = -1;
@@ -7365,8 +8213,11 @@ class UIManager {
     this.devRerollQuestsBtn = document.getElementById('dev-reroll-quests-btn');
     this.devCycleBiomeBtn = document.getElementById('dev-cycle-biome-btn');
     this.devGodModeBtn = document.getElementById('dev-godmode-btn');
+    this.devPerfBtn = document.getElementById('dev-perf-btn');
+    this.devBenchmarkBtn = document.getElementById('dev-benchmark-btn');
 
     this.setupInternalNavigation();
+    this.hideHud();
   }
 
           setupInternalNavigation()       {
@@ -7515,6 +8366,13 @@ class UIManager {
     if (this.devGodModeBtn) {
       this.devGodModeBtn.textContent = `🛡️ God Mode: ${enabled ? 'ВКЛ' : 'ВЫКЛ'}`;
       this.devGodModeBtn.style.color = enabled ? '#4ade80' : '#f87171';
+    }
+  }
+
+  updatePerfButton(enabled         )       {
+    if (this.devPerfBtn) {
+      this.devPerfBtn.textContent = `⚡ Perf HUD: ${enabled ? 'ВКЛ' : 'ВЫКЛ'}`;
+      this.devPerfBtn.style.color = enabled ? '#38bdf8' : '#94a3b8';
     }
   }
 
@@ -7944,7 +8802,11 @@ class UIManager {
   }
 
   bindActions(handlers           )       {
-    this.menuPlayBtn?.addEventListener('click', handlers.onPlay);
+    this.menuPlayBtn?.addEventListener('click', () => {
+      this.closeMainMenu();
+      this.showHud();
+      handlers.onPlay();
+    });
     this.pauseBtn?.addEventListener('click', handlers.onPause);
     this.pauseResumeBtn?.addEventListener('click', handlers.onResume);
     this.pauseMenuBtn?.addEventListener('click', handlers.onToMenu);
@@ -7970,6 +8832,8 @@ class UIManager {
     this.devRerollQuestsBtn?.addEventListener('click', () => handlers.onDevRerollQuests?.());
     this.devCycleBiomeBtn?.addEventListener('click', () => handlers.onDevCycleBiome?.());
     this.devGodModeBtn?.addEventListener('click', () => handlers.onDevToggleGodMode?.());
+    this.devPerfBtn?.addEventListener('click', () => handlers.onDevTogglePerfHUD?.());
+    this.devBenchmarkBtn?.addEventListener('click', () => handlers.onDevStartBenchmark?.());
 
     this.leaderboardSaveNameBtn?.addEventListener('click', () => {
       const raw = this.leaderboardNameInput?.value ?? '';
@@ -8322,6 +9186,12 @@ class InputManager {
   };
 
          handleKeyDown = (e               )       => {
+    if (e.code === 'F3' || (e.altKey && e.code === 'KeyP')) {
+      e.preventDefault();
+      this.callbacks.onTogglePerfHUD?.();
+      return;
+    }
+
     if (this.callbacks.isInputBlocked?.()) {
       return;
     }
@@ -8505,18 +9375,24 @@ class GameLoop {
           lastTrainsSurvived = 0;
                    unlockedAchievements = new Set        ();
           godMode = false;
+                   perfMonitor             ;
+          benchmarkActive = false;
+          benchmarkTargetRow = 0;
+          lastAutoHopTime = 0;
 
   constructor(
     engine            ,
     sceneManager              ,
     audio            ,
     ui           ,
-    platform             
+    platform             ,
+    perfMonitor              
   ) {
     this.engine = engine;
     this.sceneManager = sceneManager;
     this.audio = audio;
     this.ui = ui;
+    this.perfMonitor = perfMonitor ?? new PerfMonitor();
     this.platform = platform ?? {
       isAdReady: () => false,
       showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
@@ -8556,6 +9432,8 @@ class GameLoop {
                                    
                                  
                                      
+                                     
+                                                
                                
         
      
@@ -8583,6 +9461,8 @@ class GameLoop {
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛ' : 'Бессмертие ВЫКЛ');
         return this.godMode;
       },
+      togglePerfHUD: () => this.togglePerfHUD(),
+      startBenchmark: (rows = 300) => this.startBenchmark(rows),
       openViewer: () => window.open('viewer.html', '_blank'),
     };
   }
@@ -8814,15 +9694,47 @@ class GameLoop {
   }
 
          animate(now        )       {
+    const frameStart = performance.now();
     const dt = Math.min((now - this.lastTime) / 1000, 0.1);
     this.lastTime = now;
 
-    if (!this.isPlaying || this.isPaused) {
-      this.engine.stepAmbient(dt);
-    } else {
-      this.engine.step(dt);
+    if (this.benchmarkActive && this.isPlaying && !this.isPaused) {
+      if (now - this.lastAutoHopTime >= 65) {
+        this.lastAutoHopTime = now;
+        this.engine.queueMove(MoveDirection.FORWARD);
+      }
+      if (this.engine.getPlayer().row >= this.benchmarkTargetRow) {
+        this.finishBenchmark();
+      }
     }
+
+    const coreStart = performance.now();
+    if (this.isPlaying && !this.isPaused) {
+      this.engine.step(dt);
+    } else {
+      this.engine.stepAmbient(dt);
+    }
+    const coreMs = performance.now() - coreStart;
+
     this.sceneManager.sync(this.engine, dt);
+
+    if (this.perfMonitor.isEnabled()) {
+      const timings = this.sceneManager.getPerfTimings();
+      const stats = this.sceneManager.getRenderStats();
+      this.perfMonitor.recordFrame({
+        frameTimeMs: performance.now() - frameStart,
+        coreMs,
+        syncMs: timings.syncMs,
+        renderMs: timings.renderMs,
+        calls: stats.calls,
+        triangles: stats.triangles,
+        geometries: stats.geometries,
+        textures: stats.textures,
+        lanesCount: stats.renderedLanesCount,
+        particlesCount: stats.particlesCount,
+        score: this.engine.getScore(),
+      });
+    }
 
     const currentCoins = this.engine.getCoins();
     if (currentCoins > this.lastCoins) {
@@ -9114,7 +10026,44 @@ class GameLoop {
         this.ui.updateGodModeButton(this.godMode);
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛЮЧЕНО' : 'Бессмертие ВЫКЛЮЧЕНО');
       },
+      onDevTogglePerfHUD: () => this.togglePerfHUD(),
+      onDevStartBenchmark: () => this.startBenchmark(),
     };
+  }
+
+         togglePerfHUD()          {
+    const active = this.perfMonitor.toggle();
+    this.ui.updatePerfButton(active);
+    this.ui.showToast('⚡', 'Perf Telemetry', active ? 'Монитор производительности ВКЛ (F3)' : 'Монитор ВЫКЛ');
+    return active;
+  }
+
+         startBenchmark(rows         = 300)       {
+    this.ui.closeDevModal();
+    if (!this.isPlaying) {
+      this.startGame();
+    } else if (this.isPaused) {
+      this.resumeGame();
+    }
+    this.godMode = true;
+    this.ui.updateGodModeButton(true);
+    this.benchmarkActive = true;
+    const startRow = this.engine.getPlayer().row;
+    this.benchmarkTargetRow = startRow + rows;
+    const stats = this.sceneManager.getRenderStats();
+    this.perfMonitor.startBenchmarkSession(stats.geometries, startRow);
+    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-прогон на ${rows} полос. Следите за телеметрией!`);
+  }
+
+          finishBenchmark()       {
+    this.benchmarkActive = false;
+    const stats = this.sceneManager.getRenderStats();
+    const finalRow = this.engine.getPlayer().row;
+    const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
+    const summaryMsg = `Avg: ${report.avgFps} FPS | 1% Low: ${report.low1PercentFps} | Calls: ${report.avgDrawCalls} (Пик: ${report.peakDrawCalls})`;
+    this.ui.showToast('📊', 'Бенчмарк завершён!', summaryMsg);
+    this.ui.showToast('💡', 'Диагностика', report.verdict);
+    console.log('[PERF BENCHMARK REPORT]', report);
   }
 
          getInputCallbacks()                 {
@@ -9128,6 +10077,7 @@ class GameLoop {
       onGachaRoll: () => this.handleGachaRoll(),
       onCloseModal: () => this.handleCloseModal(),
       onSavePlayerName: () => this.ui.clickSaveName(),
+      onTogglePerfHUD: () => this.togglePerfHUD(),
     };
   }
 

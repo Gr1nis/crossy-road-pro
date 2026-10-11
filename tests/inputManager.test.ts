@@ -192,4 +192,46 @@ describe('InputManager — Mobile Touch & Swipe Controls', () => {
     assert.equal(closeModalCalled, true, 'Escape must call onCloseModal when daily quests modal is open');
     assert.equal(defaultPrevented, true, 'Escape event must be prevented');
   });
+
+  it('F3 and Alt+P keys trigger onTogglePerfHUD', () => {
+    let toggleCount = 0;
+    const callbacks: InputCallbacks = {
+      onMove: () => {},
+      onStartGame: () => {},
+      onPauseGame: () => {},
+      onResumeGame: () => {},
+      onRestartGame: () => {},
+      onToMenu: () => {},
+      onGachaRoll: () => {},
+      onCloseModal: () => {},
+      onTogglePerfHUD: () => { toggleCount++; },
+    };
+    const modalState: ModalStateProvider = {
+      isSettingsOpen: () => false,
+      isPauseOpen: () => false,
+      isMainMenuOpen: () => false,
+      isGachaOpen: () => false,
+      isLeaderboardOpen: () => false,
+      isGameOverOpen: () => false,
+      isPlaying: () => true,
+    };
+    const input = new InputManager(callbacks, modalState);
+
+    let prevented = false;
+    input.handleKeyDown({
+      code: 'F3',
+      preventDefault: () => { prevented = true; },
+    } as any);
+    assert.equal(toggleCount, 1);
+    assert.equal(prevented, true);
+
+    prevented = false;
+    input.handleKeyDown({
+      code: 'KeyP',
+      altKey: true,
+      preventDefault: () => { prevented = true; },
+    } as any);
+    assert.equal(toggleCount, 2);
+    assert.equal(prevented, true);
+  });
 });

@@ -128,6 +128,8 @@ export class SceneManager {
   private recordFlagMesh: THREE.Group | null = null;
   private recordFlagRow: number | null = null;
   private currentEngine: GameEngine | null = null;
+  private lastSyncMs = 0;
+  private lastRenderMs = 0;
 
   private disposeHierarchy(obj: THREE.Object3D): void {
     obj.traverse((child) => {
@@ -602,6 +604,7 @@ export class SceneManager {
   }
 
   sync(engine: GameEngine, dt: number = 0.016): void {
+    const tSyncStart = performance.now();
     const selectedSkin = engine.getSelectedSkin();
     if (selectedSkin !== this.currentSkin) {
       this.currentSkin = selectedSkin;
@@ -828,7 +831,34 @@ export class SceneManager {
     this.camera.lookAt(this.currentCamX, 0, camZ + 3.0);
     this.dirLight.position.set(-12 + this.currentCamX, 22, camZ - 6);
     this.dirLight.target.position.set(this.currentCamX, 0, camZ + 3);
+    const tRenderStart = performance.now();
     this.renderer.render(this.scene, this.camera);
+    const tRenderEnd = performance.now();
+    this.lastSyncMs = tRenderStart - tSyncStart;
+    this.lastRenderMs = tRenderEnd - tRenderStart;
+  }
+
+  getPerfTimings(): { syncMs: number; renderMs: number } {
+    return { syncMs: this.lastSyncMs, renderMs: this.lastRenderMs };
+  }
+
+  getRenderStats(): {
+    calls: number;
+    triangles: number;
+    geometries: number;
+    textures: number;
+    renderedLanesCount: number;
+    particlesCount: number;
+  } {
+    const info = this.renderer ? this.renderer.info : null;
+    return {
+      calls: info ? info.render.calls : 0,
+      triangles: info ? info.render.triangles : 0,
+      geometries: info ? info.memory.geometries : 0,
+      textures: info ? info.memory.textures : 0,
+      renderedLanesCount: this.renderedLanes.size,
+      particlesCount: this.particles.length + this.ambientParticles.length,
+    };
   }
 
   clearAll(): void {

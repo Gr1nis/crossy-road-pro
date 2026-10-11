@@ -32,6 +32,8 @@ export interface UIActions {
   onDevRerollQuests?: () => void;
   onDevCycleBiome?: () => void;
   onDevToggleGodMode?: () => void;
+  onDevTogglePerfHUD?: () => void;
+  onDevStartBenchmark?: () => void;
 }
 
 export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
@@ -137,6 +139,8 @@ export class UIManager {
   private readonly devRerollQuestsBtn: HTMLElement | null;
   private readonly devCycleBiomeBtn: HTMLElement | null;
   private readonly devGodModeBtn: HTMLElement | null;
+  private readonly devPerfBtn: HTMLElement | null;
+  private readonly devBenchmarkBtn: HTMLElement | null;
 
   // State
   private lastScore = -1;
@@ -234,8 +238,11 @@ export class UIManager {
     this.devRerollQuestsBtn = document.getElementById('dev-reroll-quests-btn');
     this.devCycleBiomeBtn = document.getElementById('dev-cycle-biome-btn');
     this.devGodModeBtn = document.getElementById('dev-godmode-btn');
+    this.devPerfBtn = document.getElementById('dev-perf-btn');
+    this.devBenchmarkBtn = document.getElementById('dev-benchmark-btn');
 
     this.setupInternalNavigation();
+    this.hideHud();
   }
 
   private setupInternalNavigation(): void {
@@ -384,6 +391,13 @@ export class UIManager {
     if (this.devGodModeBtn) {
       this.devGodModeBtn.textContent = `🛡️ God Mode: ${enabled ? 'ВКЛ' : 'ВЫКЛ'}`;
       this.devGodModeBtn.style.color = enabled ? '#4ade80' : '#f87171';
+    }
+  }
+
+  updatePerfButton(enabled: boolean): void {
+    if (this.devPerfBtn) {
+      this.devPerfBtn.textContent = `⚡ Perf HUD: ${enabled ? 'ВКЛ' : 'ВЫКЛ'}`;
+      this.devPerfBtn.style.color = enabled ? '#38bdf8' : '#94a3b8';
     }
   }
 
@@ -813,7 +827,11 @@ export class UIManager {
   }
 
   bindActions(handlers: UIActions): void {
-    this.menuPlayBtn?.addEventListener('click', handlers.onPlay);
+    this.menuPlayBtn?.addEventListener('click', () => {
+      this.closeMainMenu();
+      this.showHud();
+      handlers.onPlay();
+    });
     this.pauseBtn?.addEventListener('click', handlers.onPause);
     this.pauseResumeBtn?.addEventListener('click', handlers.onResume);
     this.pauseMenuBtn?.addEventListener('click', handlers.onToMenu);
@@ -839,6 +857,8 @@ export class UIManager {
     this.devRerollQuestsBtn?.addEventListener('click', () => handlers.onDevRerollQuests?.());
     this.devCycleBiomeBtn?.addEventListener('click', () => handlers.onDevCycleBiome?.());
     this.devGodModeBtn?.addEventListener('click', () => handlers.onDevToggleGodMode?.());
+    this.devPerfBtn?.addEventListener('click', () => handlers.onDevTogglePerfHUD?.());
+    this.devBenchmarkBtn?.addEventListener('click', () => handlers.onDevStartBenchmark?.());
 
     this.leaderboardSaveNameBtn?.addEventListener('click', () => {
       const raw = this.leaderboardNameInput?.value ?? '';

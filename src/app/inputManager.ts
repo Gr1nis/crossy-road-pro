@@ -10,6 +10,7 @@ export interface InputCallbacks {
   onGachaRoll: () => void;
   onCloseModal: () => void;
   onSavePlayerName?: () => void;
+  onTogglePerfHUD?: () => void;
   isInputBlocked?: () => boolean;
 }
 
@@ -107,6 +108,12 @@ export class InputManager {
   };
 
   public handleKeyDown = (e: KeyboardEvent): void => {
+    if (e.code === 'F3' || (e.altKey && e.code === 'KeyP')) {
+      e.preventDefault();
+      this.callbacks.onTogglePerfHUD?.();
+      return;
+    }
+
     if (this.callbacks.isInputBlocked?.()) {
       return;
     }

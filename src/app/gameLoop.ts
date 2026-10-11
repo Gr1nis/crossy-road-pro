@@ -7,6 +7,7 @@ import { AudioSynth } from '../view/audioSynth.ts';
 import { SceneManager } from '../view/sceneManager.ts';
 import { UIManager, UI_SKIN_RARITY, type UIActions } from './uiManager.ts';
 import { type InputCallbacks, type ModalStateProvider } from './inputManager.ts';
+import { PerfMonitor } from './perfMonitor.ts';
 
 const DEATH_LABELS: Record<string, string> = {
   [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
@@ -36,18 +37,24 @@ export class GameLoop {
   private lastTrainsSurvived = 0;
   private readonly unlockedAchievements = new Set<string>();
   private godMode = false;
+  private readonly perfMonitor: PerfMonitor;
+  private benchmarkActive = false;
+  private benchmarkTargetRow = 0;
+  private lastAutoHopTime = 0;
 
   constructor(
     engine: GameEngine,
     sceneManager: SceneManager,
     audio: AudioSynth,
     ui: UIManager,
-    platform?: AdProvider
+    platform?: AdProvider,
+    perfMonitor?: PerfMonitor
   ) {
     this.engine = engine;
     this.sceneManager = sceneManager;
     this.audio = audio;
     this.ui = ui;
+    this.perfMonitor = perfMonitor ?? new PerfMonitor();
     this.platform = platform ?? {
       isAdReady: () => false,
       showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
@@ -87,6 +94,8 @@ export class GameLoop {
         completeQuests: () => void;
         rerollQuests: () => void;
         toggleGodMode: () => boolean;
+        togglePerfHUD: () => boolean;
+        startBenchmark: (rows?: number) => void;
         openViewer: () => void;
       };
     }
@@ -114,6 +123,8 @@ export class GameLoop {
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛ' : 'Бессмертие ВЫКЛ');
         return this.godMode;
       },
+      togglePerfHUD: () => this.togglePerfHUD(),
+      startBenchmark: (rows = 300) => this.startBenchmark(rows),
       openViewer: () => window.open('viewer.html', '_blank'),
     };
   }
@@ -345,15 +356,47 @@ export class GameLoop {
   }
 
   public animate(now: number): void {
+    const frameStart = performance.now();
     const dt = Math.min((now - this.lastTime) / 1000, 0.1);
     this.lastTime = now;
 
-    if (!this.isPlaying || this.isPaused) {
-      this.engine.stepAmbient(dt);
-    } else {
-      this.engine.step(dt);
+    if (this.benchmarkActive && this.isPlaying && !this.isPaused) {
+      if (now - this.lastAutoHopTime >= 65) {
+        this.lastAutoHopTime = now;
+        this.engine.queueMove(MoveDirection.FORWARD);
+      }
+      if (this.engine.getPlayer().row >= this.benchmarkTargetRow) {
+        this.finishBenchmark();
+      }
     }
+
+    const coreStart = performance.now();
+    if (this.isPlaying && !this.isPaused) {
+      this.engine.step(dt);
+    } else {
+      this.engine.stepAmbient(dt);
+    }
+    const coreMs = performance.now() - coreStart;
+
     this.sceneManager.sync(this.engine, dt);
+
+    if (this.perfMonitor.isEnabled()) {
+      const timings = this.sceneManager.getPerfTimings();
+      const stats = this.sceneManager.getRenderStats();
+      this.perfMonitor.recordFrame({
+        frameTimeMs: performance.now() - frameStart,
+        coreMs,
+        syncMs: timings.syncMs,
+        renderMs: timings.renderMs,
+        calls: stats.calls,
+        triangles: stats.triangles,
+        geometries: stats.geometries,
+        textures: stats.textures,
+        lanesCount: stats.renderedLanesCount,
+        particlesCount: stats.particlesCount,
+        score: this.engine.getScore(),
+      });
+    }
 
     const currentCoins = this.engine.getCoins();
     if (currentCoins > this.lastCoins) {
@@ -645,7 +688,44 @@ export class GameLoop {
         this.ui.updateGodModeButton(this.godMode);
         this.ui.showToast('🛡️', 'Режим бога', this.godMode ? 'Бессмертие ВКЛЮЧЕНО' : 'Бессмертие ВЫКЛЮЧЕНО');
       },
+      onDevTogglePerfHUD: () => this.togglePerfHUD(),
+      onDevStartBenchmark: () => this.startBenchmark(),
     };
+  }
+
+  public togglePerfHUD(): boolean {
+    const active = this.perfMonitor.toggle();
+    this.ui.updatePerfButton(active);
+    this.ui.showToast('⚡', 'Perf Telemetry', active ? 'Монитор производительности ВКЛ (F3)' : 'Монитор ВЫКЛ');
+    return active;
+  }
+
+  public startBenchmark(rows: number = 300): void {
+    this.ui.closeDevModal();
+    if (!this.isPlaying) {
+      this.startGame();
+    } else if (this.isPaused) {
+      this.resumeGame();
+    }
+    this.godMode = true;
+    this.ui.updateGodModeButton(true);
+    this.benchmarkActive = true;
+    const startRow = this.engine.getPlayer().row;
+    this.benchmarkTargetRow = startRow + rows;
+    const stats = this.sceneManager.getRenderStats();
+    this.perfMonitor.startBenchmarkSession(stats.geometries, startRow);
+    this.ui.showToast('🚀', 'Бенчмарк запущен!', `Авто-прогон на ${rows} полос. Следите за телеметрией!`);
+  }
+
+  private finishBenchmark(): void {
+    this.benchmarkActive = false;
+    const stats = this.sceneManager.getRenderStats();
+    const finalRow = this.engine.getPlayer().row;
+    const report = this.perfMonitor.finishBenchmarkSession(stats.geometries, finalRow);
+    const summaryMsg = `Avg: ${report.avgFps} FPS | 1% Low: ${report.low1PercentFps} | Calls: ${report.avgDrawCalls} (Пик: ${report.peakDrawCalls})`;
+    this.ui.showToast('📊', 'Бенчмарк завершён!', summaryMsg);
+    this.ui.showToast('💡', 'Диагностика', report.verdict);
+    console.log('[PERF BENCHMARK REPORT]', report);
   }
 
   public getInputCallbacks(): InputCallbacks {
@@ -659,6 +739,7 @@ export class GameLoop {
       onGachaRoll: () => this.handleGachaRoll(),
       onCloseModal: () => this.handleCloseModal(),
       onSavePlayerName: () => this.ui.clickSaveName(),
+      onTogglePerfHUD: () => this.togglePerfHUD(),
     };
   }
 
