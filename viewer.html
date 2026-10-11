@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crossy Road 3D — 3D Model Viewer & Dev Sandbox</title>
+  <title>Crossy Road 3D — 3D Model Viewer & Dev Studio</title>
   <script type="importmap">
   {
     "imports": {
@@ -34,7 +34,7 @@
 
     /* Left Sidebar: Catalog & Categories */
     .sidebar {
-      position: absolute; top: 80px; bottom: 80px; left: 16px; width: 310px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; z-index: 20; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+      position: absolute; top: 80px; bottom: 80px; left: 16px; width: 320px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; z-index: 20; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
     }
     .category-tabs {
       display: flex; gap: 4px; padding: 10px; background: rgba(2, 6, 23, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.08); overflow-x: auto;
@@ -44,7 +44,7 @@
     }
     .cat-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
     .cat-tab.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
-    
+
     .model-list {
       flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px;
     }
@@ -56,7 +56,7 @@
     .model-card-btn:hover { background: rgba(51, 65, 85, 0.7); border-color: rgba(255, 255, 255, 0.2); color: #fff; transform: translateX(3px); }
     .model-card-btn.active { background: linear-gradient(135deg, rgba(2, 132, 199, 0.4), rgba(14, 165, 233, 0.2)); border-color: #38bdf8; color: #fff; font-weight: 700; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); }
     .model-card-title { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-    .model-card-badge { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; background: rgba(0, 0, 0, 0.4); color: #94a3b8; }
+    .model-card-badge { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; background: rgba(0, 0, 0, 0.4); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
 
     /* Bottom Toolbar */
     .bottom-bar {
@@ -78,7 +78,7 @@
 
     /* Right Info Panel */
     .info-panel {
-      position: absolute; top: 80px; right: 16px; width: 280px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; padding: 18px; z-index: 20; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+      position: absolute; top: 80px; right: 16px; width: 290px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; padding: 18px; z-index: 20; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
     }
     .info-title { font-size: 17px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .info-category { font-size: 11px; text-transform: uppercase; font-weight: 800; color: #38bdf8; letter-spacing: 0.06em; margin-bottom: 12px; }
@@ -86,9 +86,8 @@
     .info-item { background: rgba(2, 6, 23, 0.4); border: 1px solid rgba(255, 255, 255, 0.06); padding: 8px; border-radius: 10px; }
     .info-label { font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
     .info-val { font-size: 14px; font-weight: 900; color: #facc15; }
-    .info-desc { font-size: 12px; color: #94a3b8; line-height: 1.4; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px; }
+    .info-desc { font-size: 12px; color: #cbd5e1; line-height: 1.45; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px; }
 
-    /* Hints Overlay */
     .hint-chip {
       position: absolute; bottom: 80px; right: 16px; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 10px; font-size: 11px; color: #94a3b8; z-index: 10; pointer-events: none;
     }
@@ -133,7 +132,7 @@
       </div>
       <div class="info-item">
         <div class="info-label">Габариты (Ш×В×Г)</div>
-        <div id="info-dims" class="info-val">0.4 × 0.8 × 0.5</div>
+        <div id="info-dims" class="info-val">0.38 × 0.78 × 0.46</div>
       </div>
     </div>
     <div id="info-desc" class="info-desc">
@@ -185,425 +184,2308 @@
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    // === VOXEL PALETTE ===
-    const VOXEL_PALETTE = {
-      corgiOrange: 0xd97706, white: 0xffffff, capybaraBrown: 0x78350f, orangeFruit: 0xf97316,
-      pigeonGrey: 0x64748b, purpleNeck: 0x8b5cf6, pizzaRed: 0xb91c1c, pizzaCheese: 0xfacc15,
-      catOrange: 0xea580c, cardboard: 0xb45309, raccoonGrey: 0x475569, maskBlack: 0x0f172a,
-      darkCharcoal: 0x1e293b, nosePink: 0xf472b6, greenLeaf: 0x16a34a, ghostYellow: 0xfbbf24,
-      burlapBag: 0xd4b285, bagRope: 0x854d0e, capybaraCaramel: 0x925227, capybaraMuzzle: 0x542d13,
-      capybaraPaws: 0x2b170a, pigeonFootRed: 0xf43f5e, deliveryRed: 0xdc2626, catStripe: 0x9a3412,
-      boxFlap: 0x92400e, pizzaCrust: 0xb45309, pigeonTeal: 0x8b5cf6, catEye: 0xfacc15, capybaraDark: 0x1e293b
+// --- Module: src/core/types.ts ---
+const LaneType = {
+  GRASS: 'GRASS',
+  ROAD: 'ROAD',
+  RIVER: 'RIVER',
+  RAILWAY: 'RAILWAY',
+}         ;
+const MoveDirection = {
+  FORWARD: 'FORWARD',
+  BACKWARD: 'BACKWARD',
+  LEFT: 'LEFT',
+  RIGHT: 'RIGHT',
+}         ;
+const DeathReason = {
+  NONE: 'NONE',
+  CAR: 'CAR',
+  TRAIN: 'TRAIN',
+  WATER: 'WATER',
+  OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
+  CAMERA_BEHIND: 'CAMERA_BEHIND',
+}         ;
+const DEFAULT_SKIN_ID         = 'corgi';
+const ALL_SKINS                                                             = [
+  { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
+  { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
+  { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
+  { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
+  { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
+];
+const Biome = {
+  FOREST: 'forest',
+  WINTER: 'winter',
+  DESERT: 'desert',
+  NEON: 'neon',
+}         ;
+const BIOME_ORDER                           = [
+  Biome.FOREST,
+  Biome.WINTER,
+  Biome.DESERT,
+  Biome.NEON,
+];
+const BIOME_INTERVAL = 25;
+function getBiomeForScore(score        )            {
+  const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
+  const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
+  return BIOME_ORDER[biomeIndex];
+}
+const WORLD_CONFIG = {
+  MIN_X: -9,
+  MAX_X: 9,
+  OUT_OF_BOUNDS_X: 9.6,
+  WRAP_LIMIT: 22,
+  HOP_DURATION: 0.12,
+  PLAYER_WIDTH: 0.65,
+  LOG_MARGIN: 0.12,
+  CAMERA_BACK_LIMIT: 18.0,
+  CAMERA_GRACE_PERIOD: 0.4,
+  BASE_CAMERA_SPEED: 0.85,
+  GACHA_COST: 100,
+  BIOME_INTERVAL: 25,
+  CAMERA_OFFSET: {
+    X: -7.5,
+    Y: 12.5,
+    Z: -7.5,
+  },
+  FRUSTUM_SIZE: 11,
+}         ;
+
+// --- Module: src/core/collision.ts ---
+function checkVehicleCollision(playerX        , vehicles           )                 {
+  for (const v of vehicles) {
+    const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + v.length) / 2;
+    if (Math.abs(playerX - v.x) < halfSpan) {
+      return v;
+    }
+  }
+  return null;
+}
+function findSupportingLog(playerX        , logs               )                     {
+  for (const log of logs) {
+    const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
+    if (Math.abs(playerX - log.x) <= halfLen) {
+      return log;
+    }
+  }
+  return null;
+}
+
+/**
+ * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
+ * relative to the center of the log, so the character cleanly magnets to a log section.
+ */
+function snapToLogSlot(landingX        , log             )         {
+  const rel = landingX - log.x;
+  // Discrete 1.0-spaced slots centered on log
+  const snappedRel = Math.round(rel);
+  const maxRel = Math.max(0, (log.length - 1.0) / 2);
+  const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
+  return log.x + clampedRel;
+}
+function isOutOfBoundsX(playerX        )          {
+  return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
+}
+function quantizeLandX(x        )         {
+  const rounded = Math.round(x);
+  return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
+}
+
+/**
+ * Maps logical world X coordinate to Three.js right-handed X coordinate
+ * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
+ */
+function worldToScreenX(x        )         {
+  return x === 0 ? 0 : -x;
+}
+function vehicleScreenRotationY(speed        )         {
+  return speed > 0 ? Math.PI : 0;
+}
+const RECORD_FLAG_X = 3.8;
+function getRecordFlagPosition(
+  highScore        ,
+  shoulderX         = RECORD_FLAG_X
+)                            {
+  if (!Number.isFinite(highScore) || highScore <= 0) {
+    return null;
+  }
+  return {
+    x: shoulderX,
+    row: Math.floor(highScore),
+  };
+}
+const CAMERA_CONFIG = {
+  MOBILE_VIEW_HEIGHT: 15.0,
+  DESKTOP_VIEW_HEIGHT: 12.5,
+  PLAYER_SCREEN_Y_RATIO: 0.28,
+  BASE_PLAYER_VIEW_Y: -0.44,
+  MAX_PAN_CORRIDOR_HALF: 10.0,
+  FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
+}         ;
+function getCameraFrustumDimensions(aspect         = 9 / 16)   
+                     
+                    
+                 
+              
+  {
+  const t = Math.max(0, Math.min(1, (aspect - 0.5625) / (1.7778 - 0.5625)));
+  const viewHeight =
+    CAMERA_CONFIG.MOBILE_VIEW_HEIGHT +
+    t * (CAMERA_CONFIG.DESKTOP_VIEW_HEIGHT - CAMERA_CONFIG.MOBILE_VIEW_HEIGHT);
+  const halfWidth = (viewHeight * aspect) / 2;
+  const bottom =
+    CAMERA_CONFIG.BASE_PLAYER_VIEW_Y -
+    CAMERA_CONFIG.PLAYER_SCREEN_Y_RATIO * viewHeight;
+  const top = bottom + viewHeight;
+  return { viewHeight, halfWidth, bottom, top };
+}
+
+/**
+ * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
+ * of the player character under the isometric orthographic camera.
+ * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
+ */
+function getCameraFrustumNdcY(
+  playerX        ,
+  playerRow        ,
+  camZ        ,
+  aspect         = 9 / 16
+)         {
+  const sx = -playerX + 0.35;
+  const sy = 0.65;
+  const sz = playerRow + 0.35;
+  const dx = sx - WORLD_CONFIG.CAMERA_OFFSET.X;
+  const dy = sy - WORLD_CONFIG.CAMERA_OFFSET.Y;
+  const dz = sz - camZ - WORLD_CONFIG.CAMERA_OFFSET.Z;
+  const vy =
+    dx * 0.42426406871192857 +
+    dy * 0.7071067811865476 +
+    dz * 0.565685424949238;
+  const { viewHeight, bottom } = getCameraFrustumDimensions(aspect);
+  return (2 * (vy - bottom)) / viewHeight - 1.0;
+}
+
+/**
+ * Returns true when the player touches or crosses below the visible
+ * bottom edge of the screen (NDC Y < -0.98).
+ */
+function isPlayerBehindCameraFrustum(
+  playerX        ,
+  playerRow        ,
+  camZ        ,
+  aspect         = 9 / 16
+)          {
+  return getCameraFrustumNdcY(playerX, playerRow, camZ, aspect) < CAMERA_CONFIG.FRUSTUM_EDGE_NDC_THRESHOLD;
+}
+
+// --- Module: src/view/voxelPalette.ts ---
+const VOXEL_PALETTE = {
+  // 16 Standard Color Palette
+  corgiOrange: 0xd97706,
+  white: 0xffffff,
+  capybaraBrown: 0x78350f,
+  orangeFruit: 0xf97316,
+  pigeonGrey: 0x64748b,
+  purpleNeck: 0x8b5cf6,
+  pizzaRed: 0xb91c1c,
+  pizzaCheese: 0xfacc15,
+  catOrange: 0xea580c,
+  cardboard: 0xb45309,
+  raccoonGrey: 0x475569,
+  maskBlack: 0x0f172a,
+  darkCharcoal: 0x1e293b,
+  nosePink: 0xf472b6,
+  greenLeaf: 0x16a34a,
+  ghostYellow: 0xfbbf24,
+  burlapBag: 0xd4b285,
+  bagRope: 0x854d0e,
+  capybaraCaramel: 0x925227,
+  capybaraMuzzle: 0x542d13,
+  capybaraPaws: 0x2b170a,
+  pigeonFootRed: 0xf43f5e,
+  deliveryRed: 0xdc2626,
+  catStripe: 0x9a3412,
+  boxFlap: 0x92400e,
+
+  // Backward compatibility & environment aliases
+  corgiTan: 0xd97706,
+  corgiWhite: 0xffffff,
+  corgiNose: 0x1e293b,
+  corgiTongue: 0xf472b6,
+  corgiCollar: 0xb91c1c,
+  corgiGold: 0xfacc15,
+  pigeonDark: 0x1e293b,
+  pigeonBeak: 0xf97316,
+  pigeonTeal: 0x8b5cf6,
+  pizzaCrust: 0xb45309,
+  pizzaPepperoni: 0xb91c1c,
+  boxTan: 0xb45309,
+  boxTape: 0xf97316,
+  catWhite: 0xffffff,
+  catNose: 0xf472b6,
+  catEye: 0xfacc15,
+  raccoonDark: 0x0f172a,
+  raccoonWhite: 0xffffff,
+  sodaSilver: 0x64748b,
+  capybaraDark: 0x1e293b,
+  mandarinOrange: 0xf97316,
+  mandarinLeaf: 0x16a34a,
+  hydrantRed: 0xb91c1c,
+  woodLight: 0xd97706,
+  concreteGrey: 0x64748b,
+  goldCoin: 0xfacc15,
+  rubyRed: 0xb91c1c,
+}         ;
+class VoxelPalette {
+          static          geoCache = new Map                           ();
+          static          matCache = new Map                                   ();
+          static          basicMatCache = new Map                                 ();
+          static ghostMaterial                                   = null;
+
+  static getGhostMaterial()                            {
+    if (!VoxelPalette.ghostMaterial) {
+      VoxelPalette.ghostMaterial = new THREE.MeshLambertMaterial({
+        color: VOXEL_PALETTE.ghostYellow,
+        transparent: true,
+        opacity: 0.42,
+      });
+    }
+    return VoxelPalette.ghostMaterial;
+  }
+
+  static getMaterial(
+    colorKey                        ,
+    isGhost = false
+  )                            {
+    if (isGhost) {
+      return VoxelPalette.getGhostMaterial();
+    }
+    const hex = typeof colorKey === 'number' ? colorKey : VOXEL_PALETTE[colorKey];
+    let mat = VoxelPalette.matCache.get(hex);
+    if (!mat) {
+      mat = new THREE.MeshLambertMaterial({ color: hex });
+      VoxelPalette.matCache.set(hex, mat);
+    }
+    return mat;
+  }
+
+  static getBasicMaterial(
+    color        ,
+    transparent = false,
+    opacity = 1.0
+  )                          {
+    const key = `${color}_${transparent ? 1 : 0}_${opacity}`;
+    let mat = VoxelPalette.basicMatCache.get(key);
+    if (!mat) {
+      mat = new THREE.MeshBasicMaterial({ color, transparent, opacity });
+      VoxelPalette.basicMatCache.set(key, mat);
+    }
+    return mat;
+  }
+
+  static getBox(w        , h        , d        )                    {
+    const key = `${w}_${h}_${d}`;
+    let geo = VoxelPalette.geoCache.get(key);
+    if (!geo) {
+      geo = new THREE.BoxGeometry(w, h, d);
+      VoxelPalette.geoCache.set(key, geo);
+    }
+    return geo;
+  }
+}
+
+// Pre-populate standard geometries and materials to avoid runtime allocations
+const voxelStandardSizes                             = [
+  [0.1, 0.1, 0.1],
+  [0.14, 0.14, 0.14],
+  [0.2, 0.2, 0.2],
+  [0.3, 0.3, 0.3],
+  [0.4, 0.4, 0.4],
+  [0.5, 0.5, 0.5],
+  [0.6, 0.6, 0.6],
+  [0.1, 0.14, 0.12],
+  [0.14, 0.04, 0.22],
+];
+
+for (const [w, h, d] of voxelStandardSizes) {
+  VoxelPalette.getBox(w, h, d);
+}
+
+for (const key of Object.keys(VOXEL_PALETTE)                   ) {
+  VoxelPalette.getMaterial(key, false);
+}
+VoxelPalette.getGhostMaterial();
+function createVoxelMaterial(
+  colorKey                        ,
+  isGhost = false
+)                            {
+  return VoxelPalette.getMaterial(colorKey, isGhost);
+}
+function createVoxelBasicMaterial(
+  color        ,
+  transparent = false,
+  opacity = 1.0
+)                          {
+  return VoxelPalette.getBasicMaterial(color, transparent, opacity);
+}
+function createVoxelMesh(
+  w        ,
+  h        ,
+  d        ,
+  mat                ,
+  x = 0,
+  y = 0,
+  z = 0,
+  castShadow = true,
+  receiveShadow = true
+)             {
+  const mesh = new THREE.Mesh(VoxelPalette.getBox(w, h, d), mat);
+  mesh.position.set(x, y, z);
+  mesh.castShadow = castShadow;
+  mesh.receiveShadow = receiveShadow;
+  return mesh;
+}
+
+// --- Module: src/view/urbanCharacters.ts ---
+function addCharVoxel(
+  group             ,
+  w        ,
+  h        ,
+  d        ,
+  color                        ,
+  x        ,
+  y        ,
+  z        ,
+  isGhost         
+)       {
+  const mat = VoxelPalette.getMaterial(color, isGhost);
+  const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
+  group.add(mesh);
+}
+function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+  const group = new THREE.Group();
+
+  if (skinId === 'corgi') {
+    // 32 voxels: Corgi with stubby paws, pink pads, white chest & blaze, tongue, upright ears, peach tail
+    // 4 Stubby paws with pink pads
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, 0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, -0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, -0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, -0.16, isGhost);
+    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, -0.16, isGhost);
+    // Body, underbelly, fluffy chest & rear bum
+    addCharVoxel(group, 0.38, 0.22, 0.46, 'corgiOrange', 0, 0.25, -0.01, isGhost);
+    addCharVoxel(group, 0.26, 0.04, 0.38, 'white', 0, 0.15, -0.01, isGhost);
+    addCharVoxel(group, 0.34, 0.20, 0.12, 'white', 0, 0.26, 0.18, isGhost);
+    addCharVoxel(group, 0.36, 0.20, 0.08, 'corgiOrange', 0, 0.26, -0.24, isGhost);
+    addCharVoxel(group, 0.16, 0.12, 0.03, 'white', 0, 0.25, -0.28, isGhost);
+    addCharVoxel(group, 0.12, 0.12, 0.10, 'corgiOrange', 0, 0.35, -0.27, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.05, 'white', 0, 0.37, -0.31, isGhost);
+    // Collar & golden tag
+    addCharVoxel(group, 0.32, 0.04, 0.22, 'pizzaRed', 0, 0.35, 0.15, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.03, 'pizzaCheese', 0, 0.33, 0.26, isGhost);
+    // Head, blaze, muzzle, nose, tongue, expressive eyes
+    addCharVoxel(group, 0.36, 0.26, 0.30, 'corgiOrange', 0, 0.48, 0.18, isGhost);
+    addCharVoxel(group, 0.08, 0.22, 0.12, 'white', 0, 0.50, 0.28, isGhost);
+    addCharVoxel(group, 0.20, 0.12, 0.14, 'white', 0, 0.42, 0.35, isGhost);
+    addCharVoxel(group, 0.08, 0.06, 0.06, 'darkCharcoal', 0, 0.46, 0.42, isGhost);
+    addCharVoxel(group, 0.06, 0.03, 0.08, 'nosePink', 0.03, 0.38, 0.41, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', -0.11, 0.51, 0.33, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', -0.11, 0.53, 0.35, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', 0.11, 0.51, 0.33, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', 0.11, 0.53, 0.35, isGhost);
+    // Big fox ears with pink inner layer
+    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', -0.14, 0.66, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', -0.15, 0.76, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', -0.14, 0.67, 0.18, isGhost);
+    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', 0.14, 0.66, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', 0.15, 0.76, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', 0.14, 0.67, 0.18, isGhost);
+  } else if (skinId === 'pigeon_pizza') {
+    // 33 voxels: Pigeon with iridescent neck, wing stripes, and triangular pepperoni pizza
+    // Coral feet & legs
+    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', -0.10, 0.015, 0.02, isGhost);
+    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', -0.10, 0.07, 0.00, isGhost);
+    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', 0.10, 0.015, 0.02, isGhost);
+    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', 0.10, 0.07, 0.00, isGhost);
+    // Body, light chest, tail feathers
+    addCharVoxel(group, 0.40, 0.28, 0.42, 'pigeonGrey', 0, 0.28, -0.04, isGhost);
+    addCharVoxel(group, 0.30, 0.20, 0.12, 'white', 0, 0.28, 0.12, isGhost);
+    addCharVoxel(group, 0.22, 0.08, 0.18, 'pigeonGrey', 0, 0.26, -0.28, isGhost);
+    addCharVoxel(group, 0.18, 0.05, 0.12, 'darkCharcoal', 0, 0.24, -0.38, isGhost);
+    // Wings with black bars & tips
+    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', -0.22, 0.32, -0.04, isGhost);
+    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', -0.22, 0.28, -0.06, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', -0.20, 0.24, -0.20, isGhost);
+    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', 0.22, 0.32, -0.04, isGhost);
+    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', 0.22, 0.28, -0.06, isGhost);
+    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', 0.20, 0.24, -0.20, isGhost);
+    // Iridescent shimmering neck & collar
+    addCharVoxel(group, 0.28, 0.12, 0.26, 'purpleNeck', 0, 0.43, 0.10, isGhost);
+    addCharVoxel(group, 0.29, 0.04, 0.27, 'pigeonTeal', 0, 0.41, 0.10, isGhost);
+    // Head, eyes with orange ring, beak & cere
+    addCharVoxel(group, 0.26, 0.22, 0.26, 'pigeonGrey', 0, 0.56, 0.14, isGhost);
+    addCharVoxel(group, 0.18, 0.06, 0.18, 'pigeonGrey', 0, 0.68, 0.14, isGhost);
+    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', -0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', -0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', 0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', 0.14, 0.60, 0.17, isGhost);
+    addCharVoxel(group, 0.09, 0.06, 0.12, 'orangeFruit', 0, 0.55, 0.26, isGhost);
+    addCharVoxel(group, 0.08, 0.04, 0.08, 'orangeFruit', 0, 0.50, 0.24, isGhost);
+    addCharVoxel(group, 0.08, 0.04, 0.04, 'white', 0, 0.59, 0.23, isGhost);
+    // Realistic triangular pizza slice with cheese, crust & pepperoni
+    addCharVoxel(group, 0.08, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.26, isGhost);
+    addCharVoxel(group, 0.16, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.31, isGhost);
+    addCharVoxel(group, 0.24, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.36, isGhost);
+    addCharVoxel(group, 0.26, 0.06, 0.06, 'pizzaCrust', 0, 0.53, 0.41, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', -0.05, 0.54, 0.36, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', 0.05, 0.54, 0.32, isGhost);
+    addCharVoxel(group, 0.04, 0.02, 0.04, 'pizzaRed', 0, 0.54, 0.28, isGhost);
+    addCharVoxel(group, 0.03, 0.02, 0.03, 'greenLeaf', -0.02, 0.54, 0.33, isGhost);
+  } else if (skinId === 'box_cat') {
+    // 37 voxels: Ginger cat in cardboard parcel box with flaps, FRAGILE stamp & paws on rim
+    // Corrugated box & angled flaps
+    addCharVoxel(group, 0.52, 0.04, 0.52, 'cardboard', 0, 0.02, 0, isGhost);
+    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, 0.24, isGhost);
+    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, -0.24, isGhost);
+    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', -0.24, 0.17, 0, isGhost);
+    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', 0.24, 0.17, 0, isGhost);
+    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, 0.31, isGhost);
+    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, -0.31, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', -0.31, 0.29, 0, isGhost);
+    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', 0.31, 0.29, 0, isGhost);
+    // Red DELIVERY / FRAGILE stamp label
+    addCharVoxel(group, 0.22, 0.12, 0.02, 'deliveryRed', 0.10, 0.15, 0.262, isGhost);
+    addCharVoxel(group, 0.16, 0.04, 0.02, 'white', 0.10, 0.16, 0.272, isGhost);
+    addCharVoxel(group, 0.04, 0.05, 0.02, 'darkCharcoal', 0.02, 0.15, 0.274, isGhost);
+    // Cat body & white chest
+    addCharVoxel(group, 0.38, 0.22, 0.38, 'catOrange', 0, 0.20, 0, isGhost);
+    addCharVoxel(group, 0.20, 0.14, 0.06, 'white', 0, 0.26, 0.18, isGhost);
+    // Paws resting over the front rim
+    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', -0.13, 0.32, 0.24, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', -0.13, 0.29, 0.26, isGhost);
+    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', 0.13, 0.32, 0.24, isGhost);
+    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', 0.13, 0.29, 0.26, isGhost);
+    // Cat head, tabby stripes, cheeks & nose
+    addCharVoxel(group, 0.34, 0.26, 0.30, 'catOrange', 0, 0.44, 0.06, isGhost);
+    addCharVoxel(group, 0.05, 0.12, 0.26, 'catStripe', 0, 0.52, 0.06, isGhost);
+    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', -0.09, 0.51, 0.06, isGhost);
+    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', 0.09, 0.51, 0.06, isGhost);
+    addCharVoxel(group, 0.18, 0.09, 0.08, 'white', 0, 0.39, 0.21, isGhost);
+    addCharVoxel(group, 0.05, 0.04, 0.04, 'nosePink', 0, 0.42, 0.25, isGhost);
+    // Expressive cat eyes with dark pupils
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', -0.08, 0.46, 0.212, isGhost);
+    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', -0.08, 0.46, 0.216, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', 0.08, 0.46, 0.212, isGhost);
+    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', 0.08, 0.46, 0.216, isGhost);
+    // Ears with pink inner lining
+    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', -0.12, 0.60, 0.06, isGhost);
+    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', -0.12, 0.59, 0.08, isGhost);
+    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', 0.12, 0.60, 0.06, isGhost);
+    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', 0.12, 0.59, 0.08, isGhost);
+    // Striped tail sticking straight up out of the back
+    addCharVoxel(group, 0.07, 0.14, 0.07, 'catOrange', 0.06, 0.35, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.44, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.07, 'catOrange', 0.06, 0.51, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.58, -0.21, isGhost);
+    addCharVoxel(group, 0.07, 0.07, 0.08, 'white', 0.06, 0.65, -0.19, isGhost);
+  } else if (skinId === 'raccoon_bandit') {
+    // 41 voxels: Bandit Raccoon with mask, fur cheeks, striped tail & canvas loot bag
+    // 4 Stubby paws & legs
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, 0.14, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, 0.14, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, -0.13, isGhost);
+    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, -0.13, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, 0.14, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, 0.14, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, -0.13, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, -0.13, isGhost);
+
+    // Ash-grey body & white underbelly / chest
+    addCharVoxel(group, 0.36, 0.22, 0.38, 'raccoonGrey', 0, 0.23, 0, isGhost);
+    addCharVoxel(group, 0.24, 0.16, 0.24, 'white', 0, 0.20, 0.06, isGhost);
+    addCharVoxel(group, 0.24, 0.16, 0.06, 'white', 0, 0.25, 0.19, isGhost);
+    addCharVoxel(group, 0.28, 0.08, 0.20, 'raccoonGrey', 0, 0.34, 0.12, isGhost);
+
+    // Head core & white fur cheeks
+    addCharVoxel(group, 0.32, 0.22, 0.24, 'raccoonGrey', 0, 0.45, 0.16, isGhost);
+    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', -0.17, 0.42, 0.18, isGhost);
+    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', 0.17, 0.42, 0.18, isGhost);
+
+    // Bandit mask & eye features
+    addCharVoxel(group, 0.22, 0.08, 0.05, 'maskBlack', 0, 0.46, 0.28, isGhost);
+    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', -0.12, 0.46, 0.28, isGhost);
+    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', 0.12, 0.46, 0.28, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', -0.11, 0.46, 0.31, isGhost);
+    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', 0.11, 0.46, 0.31, isGhost);
+    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', -0.11, 0.53, 0.27, isGhost);
+    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', 0.11, 0.53, 0.27, isGhost);
+
+    // White snout, black nose & chin
+    addCharVoxel(group, 0.14, 0.09, 0.10, 'white', 0, 0.39, 0.31, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.04, 'maskBlack', 0, 0.42, 0.36, isGhost);
+    addCharVoxel(group, 0.10, 0.04, 0.06, 'white', 0, 0.34, 0.28, isGhost);
+
+    // Pointed ears with white inner rim
+    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', -0.13, 0.58, 0.14, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', -0.13, 0.57, 0.16, isGhost);
+    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', 0.13, 0.58, 0.14, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', 0.13, 0.57, 0.16, isGhost);
+
+    // 5-segment alternating ringed fluffy tail
+    addCharVoxel(group, 0.14, 0.14, 0.06, 'raccoonGrey', 0, 0.24, -0.21, isGhost);
+    addCharVoxel(group, 0.15, 0.15, 0.06, 'maskBlack', 0, 0.26, -0.26, isGhost);
+    addCharVoxel(group, 0.15, 0.15, 0.06, 'raccoonGrey', 0, 0.28, -0.31, isGhost);
+    addCharVoxel(group, 0.14, 0.14, 0.06, 'maskBlack', 0, 0.30, -0.36, isGhost);
+    addCharVoxel(group, 0.10, 0.10, 0.05, 'raccoonGrey', 0, 0.32, -0.41, isGhost);
+
+    // Burlap loot sack on back with tied rope neck & patches
+    addCharVoxel(group, 0.26, 0.18, 0.20, 'burlapBag', 0, 0.37, -0.08, isGhost);
+    addCharVoxel(group, 0.22, 0.10, 0.16, 'burlapBag', 0, 0.47, -0.08, isGhost);
+    addCharVoxel(group, 0.12, 0.04, 0.12, 'bagRope', 0, 0.53, -0.08, isGhost);
+    addCharVoxel(group, 0.14, 0.06, 0.12, 'burlapBag', 0, 0.57, -0.08, isGhost);
+    addCharVoxel(group, 0.27, 0.03, 0.21, 'bagRope', 0, 0.43, -0.08, isGhost);
+    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', -0.135, 0.38, -0.08, isGhost);
+    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', 0.135, 0.38, -0.08, isGhost);
+  } else if (skinId === 'capybara_zen') {
+    // 32 voxels: Zen Capybara in grounded meditative pose with mandarin on flat head
+    // 4 Paws touching ground & front leg pillars
+    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', -0.14, 0.04, 0.15, isGhost);
+    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', 0.14, 0.04, 0.15, isGhost);
+    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', -0.15, 0.04, -0.15, isGhost);
+    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', 0.15, 0.04, -0.15, isGhost);
+    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', -0.14, 0.14, 0.15, isGhost);
+    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', 0.14, 0.14, 0.15, isGhost);
+
+    // Caramel monolithic torso, underbelly tone & wide zen haunches
+    addCharVoxel(group, 0.38, 0.32, 0.42, 'capybaraCaramel', 0, 0.24, -0.02, isGhost);
+    addCharVoxel(group, 0.28, 0.08, 0.34, 'capybaraMuzzle', 0, 0.10, -0.02, isGhost);
+    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', -0.19, 0.20, -0.12, isGhost);
+    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', 0.19, 0.20, -0.12, isGhost);
+    addCharVoxel(group, 0.32, 0.26, 0.08, 'capybaraCaramel', 0, 0.22, -0.26, isGhost);
+    addCharVoxel(group, 0.06, 0.05, 0.04, 'capybaraDark', 0, 0.24, -0.31, isGhost);
+
+    // Neck slope & heavy square flat-topped capybara head
+    addCharVoxel(group, 0.32, 0.22, 0.14, 'capybaraCaramel', 0, 0.32, 0.16, isGhost);
+    addCharVoxel(group, 0.30, 0.24, 0.26, 'capybaraCaramel', 0, 0.46, 0.19, isGhost);
+    addCharVoxel(group, 0.26, 0.20, 0.14, 'capybaraCaramel', 0, 0.42, 0.33, isGhost);
+    addCharVoxel(group, 0.04, 0.12, 0.02, 'capybaraDark', 0, 0.41, 0.405, isGhost);
+    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', -0.05, 0.42, 0.405, isGhost);
+    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', 0.05, 0.42, 0.405, isGhost);
+    addCharVoxel(group, 0.20, 0.06, 0.10, 'capybaraMuzzle', 0, 0.30, 0.32, isGhost);
+
+    // Serene meditative closed slit eyes & cute rounded ears
+    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', -0.155, 0.48, 0.22, isGhost);
+    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', 0.155, 0.48, 0.22, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', -0.155, 0.50, 0.22, isGhost);
+    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', 0.155, 0.50, 0.22, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', -0.16, 0.57, 0.12, isGhost);
+    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', 0.16, 0.57, 0.12, isGhost);
+    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', -0.16, 0.56, 0.13, isGhost);
+    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', 0.16, 0.56, 0.13, isGhost);
+
+    // Round voxel mandarin/yuzu on head with green stem & leaf
+    addCharVoxel(group, 0.14, 0.03, 0.14, 'orangeFruit', 0, 0.595, 0.19, isGhost);
+    addCharVoxel(group, 0.18, 0.08, 0.18, 'orangeFruit', 0, 0.64, 0.19, isGhost);
+    addCharVoxel(group, 0.12, 0.03, 0.12, 'orangeFruit', 0, 0.69, 0.19, isGhost);
+    addCharVoxel(group, 0.03, 0.05, 0.03, 'greenLeaf', 0, 0.725, 0.19, isGhost);
+    addCharVoxel(group, 0.06, 0.03, 0.04, 'greenLeaf', 0.035, 0.73, 0.21, isGhost);
+  } else {
+    // Fallback to Corgi mascot
+    return createUrbanCharacter('corgi', isGhost);
+  }
+
+  return group;
+}
+
+// --- Module: src/view/urbanVehicles.ts ---
+const urbanGeoCache = new Map                           ();
+const urbanMatCache = new Map                        ();
+
+function getUrbanGeo(w        , h        , d        )                    {
+  const key = `${w}_${h}_${d}`;
+  let geo = urbanGeoCache.get(key);
+  if (!geo) {
+    geo = new THREE.BoxGeometry(w, h, d);
+    urbanGeoCache.set(key, geo);
+  }
+  return geo;
+}
+
+function getUrbanMat(
+  color        ,
+  basic = false,
+  transparent = false,
+  opacity = 1.0
+)                 {
+  const key = `${color}_${basic ? 1 : 0}_${transparent ? 1 : 0}_${opacity}`;
+  let mat = urbanMatCache.get(key);
+  if (!mat) {
+    mat = basic
+      ? new THREE.MeshBasicMaterial({ color, transparent, opacity })
+      : new THREE.MeshLambertMaterial({ color, transparent, opacity });
+    urbanMatCache.set(key, mat);
+  }
+  return mat;
+}
+
+                       
+              
+              
+              
+              
+              
+              
+                  
+                             
+                     
+  
+
+function buildUrbanVoxels(group             , specs                  )       {
+  for (let i = 0; i < specs.length; i++) {
+    const s = specs[i];
+    const transparent = (s[8] ?? 1.0) < 1.0;
+    const mesh = new THREE.Mesh(
+      getUrbanGeo(s[0], s[1], s[2]),
+      getUrbanMat(s[6], !!s[7], transparent, s[8] ?? 1.0)
+    );
+    mesh.position.set(s[3], s[4], s[5]);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+}
+
+function buildTaxi(color         = 0xfacc15)                   {
+  const taxiYellow = 0xfacc15;
+  const c = color === 0xeab308 || color === 0xfacc15 || !color ? taxiYellow : color;
+  const black = 0x0f172a;
+  const wheel = 0x111827;
+  const rim = 0x94a3b8;
+  const bumper = 0x475569;
+  const white = 0xffffff;
+  const red = 0xef4444;
+  const headlight = 0xfef08a;
+  const turnSignal = 0xf97316;
+  const plateBlue = 0x1d4ed8;
+  const glass = 0x1e293b;
+
+  const specs                   = [
+    // 4 Wheels & Rims (center Y = 0.12, touches ground strictly at Y = 0)
+    [0.24, 0.24, 0.12, 0.46, 0.12, 0.33, wheel],
+    [0.24, 0.24, 0.12, 0.46, 0.12, -0.33, wheel],
+    [0.24, 0.24, 0.12, -0.46, 0.12, 0.33, wheel],
+    [0.24, 0.24, 0.12, -0.46, 0.12, -0.33, wheel],
+    [0.12, 0.12, 0.03, 0.46, 0.12, 0.395, rim],
+    [0.12, 0.12, 0.03, 0.46, 0.12, -0.395, rim],
+    [0.12, 0.12, 0.03, -0.46, 0.12, 0.395, rim],
+    [0.12, 0.12, 0.03, -0.46, 0.12, -0.395, rim],
+
+    // Undercarriage base & Bumpers
+    [1.36, 0.08, 0.58, 0, 0.08, 0, bumper],
+    [0.12, 0.12, 0.68, 0.74, 0.16, 0, bumper],
+    [0.12, 0.12, 0.68, -0.74, 0.16, 0, bumper],
+
+    // Solid Monolithic Body (100% opaque, seamless solid tier)
+    [1.38, 0.14, 0.64, 0, 0.19, 0, c],
+    [0.50, 0.12, 0.64, 0.44, 0.32, 0, c],
+    [0.30, 0.10, 0.64, -0.54, 0.31, 0, c],
+    [0.58, 0.12, 0.64, -0.10, 0.32, 0, c],
+
+    // Upper Cabin Glass Core & Roof
+    [0.56, 0.18, 0.56, -0.10, 0.47, 0, glass],
+    [0.08, 0.16, 0.56, 0.18, 0.46, 0, glass],
+    [0.08, 0.16, 0.56, -0.38, 0.46, 0, glass],
+    [0.56, 0.05, 0.62, -0.10, 0.585, 0, c],
+
+    // Cabin Pillars (A, B, C pillars framing side windows)
+    [0.06, 0.18, 0.05, 0.16, 0.47, 0.305, c],
+    [0.06, 0.18, 0.05, 0.16, 0.47, -0.305, c],
+    [0.08, 0.18, 0.05, -0.10, 0.47, 0.305, c],
+    [0.08, 0.18, 0.05, -0.10, 0.47, -0.305, c],
+    [0.08, 0.18, 0.05, -0.36, 0.47, 0.305, c],
+    [0.08, 0.18, 0.05, -0.36, 0.47, -0.305, c],
+
+    // Door Handles & Side Mirrors
+    [0.07, 0.03, 0.04, 0.06, 0.30, 0.34, black],
+    [0.07, 0.03, 0.04, 0.06, 0.30, -0.34, black],
+    [0.07, 0.03, 0.04, -0.22, 0.30, 0.34, black],
+    [0.07, 0.03, 0.04, -0.22, 0.30, -0.34, black],
+    [0.04, 0.03, 0.06, 0.16, 0.43, 0.35, black],
+    [0.04, 0.03, 0.06, 0.16, 0.43, -0.35, black],
+    [0.05, 0.07, 0.04, 0.16, 0.43, 0.39, black],
+    [0.05, 0.07, 0.04, 0.16, 0.43, -0.39, black],
+
+    // Front Fascia: Grille Slats, Headlights, Turn Signals & Blue "CITY" Plate
+    [0.04, 0.10, 0.30, 0.70, 0.31, 0, glass],
+    [0.03, 0.02, 0.26, 0.73, 0.34, 0, rim],
+    [0.03, 0.02, 0.26, 0.73, 0.31, 0, rim],
+    [0.03, 0.02, 0.26, 0.73, 0.28, 0, rim],
+    [0.04, 0.09, 0.11, 0.71, 0.31, 0.22, headlight, true],
+    [0.04, 0.09, 0.11, 0.71, 0.31, -0.22, headlight, true],
+    [0.04, 0.09, 0.06, 0.71, 0.31, 0.29, turnSignal, true],
+    [0.04, 0.09, 0.06, 0.71, 0.31, -0.29, turnSignal, true],
+    [0.05, 0.08, 0.22, 0.80, 0.16, 0, plateBlue, true],
+    [0.02, 0.04, 0.16, 0.83, 0.16, 0, white, true],
+
+    // Rear Fascia: Taillights & Blue Plate
+    [0.04, 0.09, 0.13, -0.71, 0.30, 0.23, red, true],
+    [0.04, 0.09, 0.13, -0.71, 0.30, -0.23, red, true],
+    [0.04, 0.07, 0.18, -0.76, 0.16, 0, plateBlue, true],
+    [0.02, 0.04, 0.12, -0.785, 0.16, 0, white, true],
+
+    // Roof TAXI Sign: Black Base, White Sign Box, Orange Beacon & Checkers
+    [0.32, 0.04, 0.20, -0.10, 0.63, 0, black],
+    [0.26, 0.12, 0.16, -0.09, 0.71, 0, white, true],
+    [0.06, 0.10, 0.12, -0.23, 0.71, 0, turnSignal, true],
+    [0.05, 0.04, 0.02, -0.16, 0.73, 0.09, black],
+    [0.05, 0.04, 0.02, -0.08, 0.73, 0.09, black],
+    [0.05, 0.04, 0.02, 0.00, 0.73, 0.09, black],
+    [0.05, 0.04, 0.02, -0.12, 0.68, 0.09, black],
+    [0.05, 0.04, 0.02, -0.04, 0.68, 0.09, black],
+    [0.05, 0.04, 0.02, -0.16, 0.73, -0.09, black],
+    [0.05, 0.04, 0.02, -0.08, 0.73, -0.09, black],
+    [0.05, 0.04, 0.02, 0.00, 0.73, -0.09, black],
+    [0.05, 0.04, 0.02, -0.12, 0.68, -0.09, black],
+    [0.05, 0.04, 0.02, -0.04, 0.68, -0.09, black],
+  ];
+
+  // Side Checkerboard Pattern on Front & Rear Fenders (Solid non-overlapping blocks)
+  const frontXs = [0.33, 0.40, 0.47, 0.54];
+  for (let i = 0; i < frontXs.length; i++) {
+    const fx = frontXs[i];
+    const topCol = i % 2 === 0 ? black : white;
+    const btmCol = i % 2 === 0 ? white : black;
+    specs.push([0.065, 0.035, 0.03, fx, 0.335, 0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, fx, 0.30, 0.335, btmCol, true]);
+    specs.push([0.065, 0.035, 0.03, fx, 0.335, -0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, fx, 0.30, -0.335, btmCol, true]);
+  }
+
+  const rearXs = [-0.43, -0.50, -0.57, -0.64];
+  for (let i = 0; i < rearXs.length; i++) {
+    const rx = rearXs[i];
+    const topCol = i % 2 === 0 ? black : white;
+    const btmCol = i % 2 === 0 ? white : black;
+    specs.push([0.065, 0.035, 0.03, rx, 0.335, 0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, rx, 0.30, 0.335, btmCol, true]);
+    specs.push([0.065, 0.035, 0.03, rx, 0.335, -0.335, topCol, true]);
+    specs.push([0.065, 0.035, 0.03, rx, 0.30, -0.335, btmCol, true]);
+  }
+
+  return specs;
+}
+
+function buildScooter(color         = 0x84cc16)                   {
+  const limeGreen = color === 0x3b82f6 || !color ? 0x84cc16 : color;
+  const darkGreen = 0x3f6212;
+  const bagGreen = 0x22c55e;
+  const bagDark = 0x15803d;
+  const wheel = 0x0f172a;
+  const rim = 0x94a3b8;
+  const chrome = 0xe2e8f0;
+  const seatDark = 0x1e293b;
+  const darkGrey = 0x334155;
+  const headlight = 0xfef08a;
+  const taillight = 0xef4444;
+  const jeanBlue = 0x2563eb;
+  const jacketOrange = 0xf97316;
+  const skin = 0xfdba74;
+  const white = 0xffffff;
+  const mirrorGlass = 0x93c5fd;
+
+  return [
+    // 2 Wheels with grey rims (center Y = 0.12, bottom touches ground Y = 0)
+    [0.24, 0.24, 0.08, 0.44, 0.12, 0, wheel],
+    [0.12, 0.12, 0.01, 0.44, 0.12, 0.045, rim],
+    [0.12, 0.12, 0.01, 0.44, 0.12, -0.045, rim],
+    [0.24, 0.24, 0.08, -0.40, 0.12, 0, wheel],
+    [0.12, 0.12, 0.01, -0.40, 0.12, 0.045, rim],
+    [0.12, 0.12, 0.01, -0.40, 0.12, -0.045, rim],
+
+    // Front Mudguard & Fork Struts
+    [0.22, 0.05, 0.12, 0.44, 0.255, 0, limeGreen],
+    [0.08, 0.08, 0.12, 0.52, 0.21, 0, limeGreen],
+    [0.04, 0.16, 0.03, 0.40, 0.20, 0.05, chrome],
+    [0.04, 0.16, 0.03, 0.40, 0.20, -0.05, chrome],
+
+    // Floorboard Chassis & Rubber Mat
+    [0.38, 0.05, 0.22, 0.02, 0.085, 0, darkGrey],
+    [0.34, 0.04, 0.32, 0.04, 0.12, 0, limeGreen],
+    [0.26, 0.02, 0.24, 0.04, 0.145, 0, darkGrey],
+
+    // Front Retro Apron, Leg Shield & Glowing Square Headlight
+    [0.10, 0.18, 0.34, 0.24, 0.22, 0, limeGreen],
+    [0.10, 0.22, 0.32, 0.30, 0.38, 0, limeGreen],
+    [0.12, 0.10, 0.26, 0.28, 0.50, 0, limeGreen],
+    [0.04, 0.10, 0.12, 0.35, 0.48, 0, headlight, true],
+
+    // Rear Body, Side Cowls, Seat & Red Taillight
+    [0.38, 0.16, 0.26, -0.22, 0.23, 0, limeGreen],
+    [0.32, 0.14, 0.07, -0.26, 0.21, 0.16, limeGreen],
+    [0.32, 0.14, 0.07, -0.26, 0.21, -0.16, limeGreen],
+    [0.14, 0.14, 0.22, -0.45, 0.21, 0, limeGreen],
+    [0.28, 0.07, 0.20, -0.10, 0.33, 0, seatDark],
+    [0.04, 0.07, 0.10, -0.53, 0.24, 0, taillight, true],
+
+    // Chrome Steering Column, Handlebars & Side Mirrors
+    [0.05, 0.10, 0.05, 0.25, 0.58, 0, chrome],
+    [0.04, 0.04, 0.46, 0.25, 0.62, 0, chrome],
+    [0.05, 0.05, 0.06, 0.25, 0.62, 0.21, darkGrey],
+    [0.05, 0.05, 0.06, 0.25, 0.62, -0.21, darkGrey],
+    [0.03, 0.08, 0.03, 0.25, 0.67, 0.19, chrome],
+    [0.03, 0.08, 0.03, 0.25, 0.67, -0.19, chrome],
+    [0.04, 0.06, 0.06, 0.25, 0.73, 0.19, chrome],
+    [0.015, 0.045, 0.045, 0.235, 0.73, 0.19, mirrorGlass, true],
+    [0.04, 0.06, 0.06, 0.25, 0.73, -0.19, chrome],
+    [0.015, 0.045, 0.045, 0.235, 0.73, -0.19, mirrorGlass, true],
+
+    // Courier Legs (Blue Jeans) & Shoes on Footboard
+    [0.18, 0.10, 0.22, -0.08, 0.39, 0, jeanBlue],
+    [0.18, 0.09, 0.09, 0.05, 0.38, 0.10, jeanBlue],
+    [0.18, 0.09, 0.09, 0.05, 0.38, -0.10, jeanBlue],
+    [0.09, 0.16, 0.09, 0.12, 0.26, 0.10, jeanBlue],
+    [0.09, 0.16, 0.09, 0.12, 0.26, -0.10, jeanBlue],
+    [0.14, 0.06, 0.08, 0.13, 0.155, 0.10, darkGrey],
+    [0.14, 0.06, 0.08, 0.13, 0.155, -0.10, darkGrey],
+
+    // Courier Torso (Orange Jacket), Collar & Extended Arms
+    [0.20, 0.24, 0.22, -0.06, 0.52, 0, jacketOrange],
+    [0.02, 0.16, 0.04, 0.042, 0.53, 0, white],
+    [0.10, 0.10, 0.07, -0.03, 0.58, 0.14, jacketOrange],
+    [0.10, 0.10, 0.07, -0.03, 0.58, -0.14, jacketOrange],
+    [0.16, 0.07, 0.07, 0.10, 0.58, 0.16, jacketOrange],
+    [0.16, 0.07, 0.07, 0.10, 0.58, -0.16, jacketOrange],
+    [0.06, 0.06, 0.06, 0.21, 0.60, 0.18, skin],
+    [0.06, 0.06, 0.06, 0.21, 0.60, -0.18, skin],
+
+    // Courier Head, Face & Lime Green Helmet with Visor
+    [0.08, 0.06, 0.08, -0.05, 0.63, 0, skin],
+    [0.15, 0.14, 0.16, -0.04, 0.68, 0, skin],
+    [0.19, 0.10, 0.20, -0.06, 0.77, 0, limeGreen],
+    [0.12, 0.14, 0.20, -0.09, 0.69, 0, limeGreen],
+    [0.14, 0.05, 0.16, -0.06, 0.83, 0, limeGreen],
+    [0.09, 0.04, 0.18, 0.06, 0.73, 0, darkGreen],
+
+    // Rear Chrome Rack Supporting Delivery Box
+    [0.24, 0.03, 0.26, -0.34, 0.35, 0, chrome],
+    [0.03, 0.12, 0.22, -0.42, 0.29, 0, chrome],
+
+    // Cubic Thermal Delivery Backpack
+    [0.26, 0.04, 0.28, -0.35, 0.38, 0, darkGrey],
+    [0.32, 0.36, 0.36, -0.35, 0.57, 0, bagGreen],
+    [0.34, 0.05, 0.38, -0.35, 0.74, 0, bagDark],
+    [0.34, 0.04, 0.38, -0.35, 0.40, 0, bagDark],
+    [0.03, 0.26, 0.26, -0.185, 0.57, 0, bagDark],
+
+    // "FOOD HOT" Placards: Rear Face
+    [0.02, 0.22, 0.26, -0.52, 0.57, 0, white, true],
+    [0.02, 0.07, 0.20, -0.531, 0.63, 0, bagDark, true],
+    [0.02, 0.07, 0.16, -0.531, 0.52, 0, taillight, true],
+
+    // "FOOD HOT" Placards: Left Side Face (+Z)
+    [0.22, 0.22, 0.02, -0.35, 0.57, 0.19, white, true],
+    [0.18, 0.07, 0.02, -0.35, 0.63, 0.201, bagDark, true],
+    [0.14, 0.07, 0.02, -0.35, 0.52, 0.201, taillight, true],
+
+    // "FOOD HOT" Placards: Right Side Face (-Z)
+    [0.22, 0.22, 0.02, -0.35, 0.57, -0.19, white, true],
+    [0.18, 0.07, 0.02, -0.35, 0.63, -0.201, bagDark, true],
+    [0.14, 0.07, 0.02, -0.35, 0.52, -0.201, taillight, true],
+  ];
+}
+
+
+function buildBus(_color        )                   {
+  const transitGreen = 0x16a34a;
+  const roofGreen = 0x15803d;
+  const lowerOrange = 0xea580c;
+  const upperOrange = 0xf97316;
+  const darkBelt = 0x1e293b;
+  const bumperDark = 0x334155;
+  const glass = 0x1e293b;
+  const acBody = 0x15803d;
+  const acVent = 0x334155;
+  const wheel = 0x0f172a;
+  const rim = 0x94a3b8;
+  const amberLed = 0xf59e0b;
+  const headlight = 0xfef08a;
+  const taillight = 0xef4444;
+  const signWhite = 0xf8fafc;
+  const signCream = 0xffedd5;
+  const badgeYellow = 0xfacc15;
+  const mirrorDark = 0x0f172a;
+
+  return [
+    // 6 Wheels (2 front at X=1.05, 4 tandem rear at X=-0.58 & -1.08; touches ground Y=0)
+    [0.30, 0.28, 0.12, 1.05, 0.14, 0.37, wheel],
+    [0.30, 0.28, 0.12, 1.05, 0.14, -0.37, wheel],
+    [0.14, 0.14, 0.02, 1.05, 0.14, 0.435, rim],
+    [0.14, 0.14, 0.02, 1.05, 0.14, -0.435, rim],
+    [0.30, 0.28, 0.12, -0.58, 0.14, 0.37, wheel],
+    [0.30, 0.28, 0.12, -0.58, 0.14, -0.37, wheel],
+    [0.14, 0.14, 0.02, -0.58, 0.14, 0.435, rim],
+    [0.14, 0.14, 0.02, -0.58, 0.14, -0.435, rim],
+    [0.30, 0.28, 0.12, -1.08, 0.14, 0.37, wheel],
+    [0.30, 0.28, 0.12, -1.08, 0.14, -0.37, wheel],
+    [0.14, 0.14, 0.02, -1.08, 0.14, 0.435, rim],
+    [0.14, 0.14, 0.02, -1.08, 0.14, -0.435, rim],
+
+    // Chassis, Skirts & Heavy Dark Bumpers
+    [2.96, 0.10, 0.68, 0, 0.13, 0, darkBelt],
+    [0.12, 0.14, 0.78, 1.60, 0.17, 0, bumperDark],
+    [0.02, 0.08, 0.22, 1.67, 0.16, 0, signWhite, true],
+    [0.12, 0.14, 0.78, -1.60, 0.17, 0, bumperDark],
+
+    // Lower Warm Orange Body & Dividing Dark Belt
+    [3.10, 0.26, 0.72, 0, 0.33, 0, lowerOrange],
+    [3.12, 0.04, 0.73, 0, 0.48, 0, darkBelt],
+    [3.12, 0.06, 0.73, 0, 0.53, 0, transitGreen],
+
+    // Front Fascia: Grille Slats, Headlights, Amber Indicators
+    [0.02, 0.035, 0.26, 1.60, 0.34, 0, darkBelt],
+    [0.02, 0.035, 0.26, 1.60, 0.27, 0, darkBelt],
+    [0.03, 0.08, 0.12, 1.60, 0.31, 0.21, headlight, true],
+    [0.03, 0.08, 0.12, 1.60, 0.31, -0.21, headlight, true],
+    [0.03, 0.08, 0.06, 1.60, 0.31, 0.31, amberLed, true],
+    [0.03, 0.08, 0.06, 1.60, 0.31, -0.31, amberLed, true],
+
+    // Rear Fascia: Taillights & Rear Turn Signals
+    [0.03, 0.10, 0.08, -1.60, 0.38, 0.28, taillight, true],
+    [0.03, 0.10, 0.08, -1.60, 0.38, -0.28, taillight, true],
+    [0.03, 0.06, 0.08, -1.60, 0.28, 0.28, amberLed, true],
+    [0.03, 0.06, 0.08, -1.60, 0.28, -0.28, amberLed, true],
+
+    // Route '42' Side Badges on Green Belt
+    [0.18, 0.05, 0.02, 0.62, 0.53, 0.38, badgeYellow, true],
+    [0.18, 0.05, 0.02, 0.85, 0.53, -0.38, badgeYellow, true],
+
+    // Cabin Core & Windshields (Opaque Indigo Glass, 0% Transparency)
+    [3.06, 0.28, 0.70, 0, 0.70, 0, glass],
+    [0.06, 0.30, 0.66, 1.54, 0.71, 0, glass],
+    [0.08, 0.30, 0.05, 1.54, 0.71, 0.36, transitGreen],
+    [0.08, 0.30, 0.05, 1.54, 0.71, -0.36, transitGreen],
+    [0.06, 0.26, 0.62, -1.54, 0.70, 0, glass],
+    [0.08, 0.26, 0.06, -1.54, 0.70, 0.35, transitGreen],
+    [0.08, 0.26, 0.06, -1.54, 0.70, -0.35, transitGreen],
+
+    // Left Side (Driver Side, -Z): Continuous Passenger Windows with Green Pillars
+    [0.05, 0.28, 0.04, 0.90, 0.70, -0.375, transitGreen],
+    [0.05, 0.28, 0.04, 0.35, 0.70, -0.375, transitGreen],
+    [0.05, 0.28, 0.04, -0.20, 0.70, -0.375, transitGreen],
+    [0.05, 0.28, 0.04, -0.75, 0.70, -0.375, transitGreen],
+    [2.80, 0.025, 0.035, 0, 0.76, -0.365, darkBelt],
+
+    // Right Side (Passenger Side, +Z): Dual Double-Leaf Passenger Doors
+    // Front Door Assembly (X=1.12)
+    [0.38, 0.58, 0.03, 1.12, 0.52, 0.375, darkBelt],
+    [0.14, 0.52, 0.03, 1.205, 0.52, 0.385, glass],
+    [0.14, 0.52, 0.03, 1.035, 0.52, 0.385, glass],
+    [0.04, 0.56, 0.035, 1.12, 0.52, 0.405, transitGreen],
+    [0.34, 0.04, 0.035, 1.12, 0.48, 0.405, darkBelt],
+    // Middle Door Assembly (X=-0.05)
+    [0.38, 0.58, 0.03, -0.05, 0.52, 0.375, darkBelt],
+    [0.14, 0.52, 0.03, 0.035, 0.52, 0.385, glass],
+    [0.14, 0.52, 0.03, -0.135, 0.52, 0.385, glass],
+    [0.04, 0.56, 0.035, -0.05, 0.52, 0.405, transitGreen],
+    [0.34, 0.04, 0.035, -0.05, 0.48, 0.405, darkBelt],
+    // Windows on Passenger Side
+    [0.28, 0.06, 0.02, 0.54, 0.78, 0.38, darkBelt],
+    [0.20, 0.04, 0.02, 0.54, 0.78, 0.395, amberLed, true],
+    [0.05, 0.28, 0.04, -0.76, 0.70, 0.375, transitGreen],
+
+    // Upper Orange Frieze & "CITY TRANSIT" Branding
+    [3.12, 0.10, 0.73, 0, 0.89, 0, upperOrange],
+    // "CITY TRANSIT" lettering on Right Side (+Z, Delta >= 0.045)
+    [0.05, 0.06, 0.02, 0.78, 0.89, 0.405, signCream, true],
+    [0.025, 0.06, 0.02, 0.70, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, 0.62, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, 0.54, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, 0.40, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, 0.31, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, 0.22, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, 0.13, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, 0.04, 0.89, 0.405, signCream, true],
+    [0.025, 0.06, 0.02, -0.04, 0.89, 0.405, signCream, true],
+    [0.05, 0.06, 0.02, -0.12, 0.89, 0.405, signCream, true],
+
+    // Front Illuminated "ROUTE 42" LED Destination Display
+    [0.10, 0.14, 0.66, 1.56, 0.94, 0, transitGreen],
+    [0.04, 0.10, 0.58, 1.61, 0.94, 0, 0x050505, true],
+    // ROUTE 42 Amber LED Pixels (Delta >= 0.04 over panel)
+    [0.02, 0.06, 0.045, 1.65, 0.94, -0.22, amberLed, true], // R
+    [0.02, 0.06, 0.045, 1.65, 0.94, -0.15, amberLed, true], // O
+    [0.02, 0.06, 0.045, 1.65, 0.94, -0.08, amberLed, true], // U
+    [0.02, 0.06, 0.045, 1.65, 0.94, -0.01, amberLed, true], // T
+    [0.02, 0.06, 0.045, 1.65, 0.94, 0.06, amberLed, true],  // E
+    [0.02, 0.06, 0.045, 1.65, 0.94, 0.15, amberLed, true],  // 4
+    [0.02, 0.06, 0.045, 1.65, 0.94, 0.22, amberLed, true],  // 2
+
+    // Extended Side Mirrors on Sturdy Brackets
+    [0.06, 0.03, 0.10, 1.48, 0.72, -0.42, mirrorDark],
+    [0.06, 0.16, 0.05, 1.50, 0.70, -0.47, mirrorDark],
+    [0.01, 0.13, 0.04, 1.47, 0.70, -0.47, 0x94a3b8, true],
+    [0.06, 0.03, 0.10, 1.48, 0.72, 0.42, mirrorDark],
+    [0.06, 0.16, 0.05, 1.50, 0.70, 0.47, mirrorDark],
+    [0.01, 0.13, 0.04, 1.47, 0.70, 0.47, 0x94a3b8, true],
+
+    // Roof & Climate Control (AC) Unit
+    [3.16, 0.06, 0.76, 0, 0.97, 0, roofGreen],
+    [1.60, 0.07, 0.52, 0, 1.035, 0, acBody],
+    [1.36, 0.03, 0.44, 0, 1.085, 0, transitGreen],
+    [0.36, 0.02, 0.34, 0.42, 1.11, 0, acVent],
+    [0.36, 0.02, 0.34, -0.42, 1.11, 0, acVent],
+  ];
+}
+
+function buildSweeper(color        )                   {
+  const cabOrange = color || 0xf97316;
+  const hopperGrey = 0x475569;
+  const hopperDark = 0x334155;
+  const hazardYellow = 0xfacc15;
+  const hazardDark = 0x0f172a;
+  const glass = 0x1e293b;
+  const wheel = 0x0f172a;
+  const rim = 0x94a3b8;
+  const frameDark = 0x1e293b;
+  const brushCore = 0x18181b;
+  const brushBristle = 0x27272a;
+  const beacon = 0xfacc15;
+  const headlight = 0xfef08a;
+  const taillight = 0xef4444;
+  const labelWhite = 0xf1f5f9;
+
+  const specs                   = [
+    // 4 Heavy Road Wheels & Rims (center Y = 0.13, touches ground strictly at Y = 0)
+    [0.26, 0.26, 0.12, 0.48, 0.13, 0.35, wheel],
+    [0.26, 0.26, 0.12, 0.48, 0.13, -0.35, wheel],
+    [0.12, 0.12, 0.03, 0.48, 0.13, 0.42, rim],
+    [0.12, 0.12, 0.03, 0.48, 0.13, -0.42, rim],
+    [0.26, 0.26, 0.12, -0.62, 0.13, 0.35, wheel],
+    [0.26, 0.26, 0.12, -0.62, 0.13, -0.35, wheel],
+    [0.12, 0.12, 0.03, -0.62, 0.13, 0.42, rim],
+    [0.12, 0.12, 0.03, -0.62, 0.13, -0.42, rim],
+
+    // Chassis Frame, Undercarriage Vacuum Unit & Bumpers
+    [2.04, 0.12, 0.66, -0.08, 0.14, 0, frameDark],
+    [0.40, 0.10, 0.48, -0.06, 0.06, 0, frameDark],
+    [0.14, 0.14, 0.74, 0.78, 0.16, 0, frameDark],
+    [0.10, 0.16, 0.72, -1.04, 0.18, 0, frameDark],
+
+    // Front Dual Conical Sweeper Brushes (Clean 3-tier stepped solid volumes, zero coplanar faces)
+    // Left Brush (Z = +0.38)
+    [0.18, 0.05, 0.10, 0.86, 0.165, 0.38, frameDark],
+    [0.24, 0.04, 0.24, 0.94, 0.12, 0.38, rim],
+    [0.38, 0.05, 0.38, 0.94, 0.075, 0.38, brushCore],
+    [0.48, 0.05, 0.48, 0.94, 0.025, 0.38, brushBristle],
+    // Right Brush (Z = -0.38)
+    [0.18, 0.05, 0.10, 0.86, 0.165, -0.38, frameDark],
+    [0.24, 0.04, 0.24, 0.94, 0.12, -0.38, rim],
+    [0.38, 0.05, 0.38, 0.94, 0.075, -0.38, brushCore],
+    [0.48, 0.05, 0.48, 0.94, 0.025, -0.38, brushBristle],
+
+    // Municipal Orange Cab Body, Front Grille, Headlights & Handles
+    [0.72, 0.28, 0.70, 0.44, 0.34, 0, cabOrange],
+    [0.03, 0.10, 0.12, 0.81, 0.34, 0.24, headlight, true],
+    [0.03, 0.10, 0.12, 0.81, 0.34, -0.24, headlight, true],
+    [0.03, 0.08, 0.26, 0.81, 0.34, 0, 0xc2410c],
+    [0.06, 0.03, 0.03, 0.36, 0.36, 0.365, 0x0f172a],
+    [0.06, 0.03, 0.03, 0.36, 0.36, -0.365, 0x0f172a],
+
+    // Panoramic Windshield, Low Observation Glass & Cab Roof
+    [0.04, 0.35, 0.61, 0.79, 0.655, 0, glass],
+    [0.06, 0.35, 0.05, 0.79, 0.655, 0.33, cabOrange],
+    [0.06, 0.35, 0.05, 0.79, 0.655, -0.33, cabOrange],
+    [0.55, 0.35, 0.03, 0.45, 0.655, 0.34, glass],
+    [0.55, 0.35, 0.03, 0.45, 0.655, -0.34, glass],
+    [0.20, 0.12, 0.02, 0.65, 0.41, 0.36, glass],
+    [0.20, 0.12, 0.02, 0.65, 0.41, -0.36, glass],
+    [0.08, 0.35, 0.70, 0.12, 0.655, 0, cabOrange],
+    [0.72, 0.06, 0.72, 0.44, 0.86, 0, cabOrange],
+
+    // Flashing Safety Beacon & Side Mirrors
+    [0.16, 0.04, 0.16, 0.44, 0.91, 0, frameDark],
+    [0.14, 0.12, 0.14, 0.44, 0.99, 0, beacon, true],
+    [0.04, 0.03, 0.08, 0.72, 0.65, 0.39, 0x0f172a],
+    [0.05, 0.14, 0.04, 0.72, 0.65, 0.44, 0x0f172a],
+    [0.04, 0.03, 0.08, 0.72, 0.65, -0.39, 0x0f172a],
+    [0.05, 0.14, 0.04, 0.72, 0.65, -0.44, 0x0f172a],
+
+    // Rear Waste Hopper with Sloped / Stepped Chamfered Top & Taillights
+    [1.08, 0.50, 0.72, -0.48, 0.47, 0, hopperGrey],
+    [0.72, 0.06, 0.70, -0.34, 0.75, 0, hopperDark],
+    [0.16, 0.06, 0.70, -0.78, 0.72, 0, hopperDark],
+    [0.12, 0.06, 0.70, -0.90, 0.66, 0, hopperDark],
+    [0.08, 0.08, 0.70, -0.98, 0.59, 0, hopperDark],
+    [0.03, 0.10, 0.12, -1.03, 0.36, 0.26, taillight, true],
+    [0.03, 0.10, 0.12, -1.03, 0.36, -0.26, taillight, true],
+
+    // Solid Contrast Black Hazard Band Plate (Z = +/-0.375)
+    [0.96, 0.12, 0.03, -0.48, 0.34, 0.375, hazardDark],
+    [0.96, 0.12, 0.03, -0.48, 0.34, -0.375, hazardDark],
+  ];
+
+  // Alternating Hazard Chevrons (Yellow Slanted Slashes sitting cleanly at Z = +/-0.395)
+  for (let x = -0.08; x >= -0.88; x -= 0.13) {
+    specs.push([0.05, 0.055, 0.02, x, 0.31, 0.395, hazardYellow, true]);
+    specs.push([0.05, 0.055, 0.02, x - 0.035, 0.365, 0.395, hazardYellow, true]);
+    specs.push([0.05, 0.055, 0.02, x, 0.31, -0.395, hazardYellow, true]);
+    specs.push([0.05, 0.055, 0.02, x - 0.035, 0.365, -0.395, hazardYellow, true]);
+  }
+
+  // Relief "STREET SWEEP" Typography (Clean non-overlapping macro glyph blocks at Z = +/-0.375)
+  const addGlyph = (type        , cx        , cy        ) => {
+    const addBox = (w        , h        , x        , y        ) => {
+      specs.push([w, h, 0.03, x, y, 0.375, labelWhite, true]);
+      specs.push([w, h, 0.03, x, y, -0.375, labelWhite, true]);
     };
+    if (type === 'S') {
+      addBox(0.08, 0.02, cx, cy + 0.04);
+      addBox(0.08, 0.02, cx, cy);
+      addBox(0.08, 0.02, cx, cy - 0.04);
+      addBox(0.025, 0.02, cx - 0.0275, cy + 0.02);
+      addBox(0.025, 0.02, cx + 0.0275, cy - 0.02);
+    } else if (type === 'T') {
+      addBox(0.08, 0.02, cx, cy + 0.04);
+      addBox(0.025, 0.08, cx, cy - 0.01);
+    } else if (type === 'R') {
+      addBox(0.025, 0.10, cx - 0.0275, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy + 0.04);
+      addBox(0.055, 0.02, cx + 0.0125, cy);
+      addBox(0.025, 0.02, cx + 0.0275, cy + 0.02);
+      addBox(0.025, 0.04, cx + 0.0275, cy - 0.03);
+    } else if (type === 'E') {
+      addBox(0.025, 0.10, cx - 0.0275, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy + 0.04);
+      addBox(0.045, 0.02, cx + 0.0075, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy - 0.04);
+    } else if (type === 'W') {
+      addBox(0.025, 0.10, cx - 0.035, cy);
+      addBox(0.025, 0.10, cx + 0.035, cy);
+      addBox(0.02, 0.06, cx, cy - 0.02);
+      addBox(0.09, 0.02, cx, cy - 0.04);
+    } else if (type === 'P') {
+      addBox(0.025, 0.10, cx - 0.0275, cy);
+      addBox(0.055, 0.02, cx + 0.0125, cy + 0.04);
+      addBox(0.055, 0.02, cx + 0.0125, cy);
+      addBox(0.025, 0.02, cx + 0.0275, cy + 0.02);
+    }
+  };
 
-    const matCache = new Map();
-    function getMat(colorKeyOrHex, isGhost = false) {
-      if (isGhost) {
-        return new THREE.MeshLambertMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.45 });
+  const streetWord = 'STREET';
+  for (let i = 0; i < streetWord.length; i++) {
+    addGlyph(streetWord[i], -0.16 - i * 0.11, 0.63);
+  }
+  const sweepWord = 'SWEEP';
+  for (let i = 0; i < sweepWord.length; i++) {
+    addGlyph(sweepWord[i], -0.21 - i * 0.11, 0.50);
+  }
+
+  return specs;
+}
+
+function buildTrain()                   {
+  const whiteBody = 0xf1f5f9;
+  const whiteRoof = 0xe2e8f0;
+  const speedBlue = 0x2563eb;
+  const goldStripe = 0xfacc15;
+  const glass = 0x1e293b;
+  const chassisDark = 0x0f172a;
+  const wheelDark = 0x111827;
+  const rimGrey = 0x94a3b8;
+  const fairingDark = 0x334155;
+  const roofPod = 0xcfd8dc;
+  const roofVent = 0x64748b;
+  const copperOrange = 0xd97706;
+  const spotlight = 0xfef08a;
+  const taillight = 0xef4444;
+  const signWhite = 0xffffff;
+
+  return [
+    // --- 1. Undercarriage, Bogies & Wheels (sitting directly above rails at Y = 0) ---
+    // Front Bogie (Center X = +4.00, 4 wheels at Z = +-0.36)
+    [1.60, 0.08, 0.70, 4.00, 0.12, 0, chassisDark],
+    [0.24, 0.22, 0.08, 4.50, 0.11, 0.36, wheelDark],
+    [0.24, 0.22, 0.08, 4.50, 0.11, -0.36, wheelDark],
+    [0.24, 0.22, 0.08, 3.50, 0.11, 0.36, wheelDark],
+    [0.24, 0.22, 0.08, 3.50, 0.11, -0.36, wheelDark],
+    [0.10, 0.10, 0.02, 4.50, 0.11, 0.405, rimGrey],
+    [0.10, 0.10, 0.02, 4.50, 0.11, -0.405, rimGrey],
+    [0.10, 0.10, 0.02, 3.50, 0.11, 0.405, rimGrey],
+    [0.10, 0.10, 0.02, 3.50, 0.11, -0.405, rimGrey],
+
+    // Rear Bogie (Center X = -4.50, 4 wheels at Z = +-0.36)
+    [1.60, 0.08, 0.70, -4.50, 0.12, 0, chassisDark],
+    [0.24, 0.22, 0.08, -4.00, 0.11, 0.36, wheelDark],
+    [0.24, 0.22, 0.08, -4.00, 0.11, -0.36, wheelDark],
+    [0.24, 0.22, 0.08, -5.00, 0.11, 0.36, wheelDark],
+    [0.24, 0.22, 0.08, -5.00, 0.11, -0.36, wheelDark],
+    [0.10, 0.10, 0.02, -4.00, 0.11, 0.405, rimGrey],
+    [0.10, 0.10, 0.02, -4.00, 0.11, -0.405, rimGrey],
+    [0.10, 0.10, 0.02, -5.00, 0.11, 0.405, rimGrey],
+    [0.10, 0.10, 0.02, -5.00, 0.11, -0.405, rimGrey],
+
+    // Underfloor Equipment Pods & Skirt (between bogies)
+    [5.60, 0.12, 0.68, -0.25, 0.11, 0, fairingDark],
+    [2.20, 0.08, 0.72, -0.40, 0.09, 0, chassisDark],
+
+    // --- 2. Main Body & Livery (White Body, Gold & Speed Blue Stripes) ---
+    // Lower White Skirt
+    [11.00, 0.16, 0.80, -1.30, 0.24, 0, whiteBody],
+    // Gold Speed Stripe (Delta = 0.04 over body width)
+    [11.00, 0.04, 0.84, -1.30, 0.34, 0, goldStripe, true],
+    // Speed Blue Stripe (Delta = 0.04)
+    [11.00, 0.14, 0.84, -1.30, 0.43, 0, speedBlue, true],
+    // White Belt below Windows
+    [11.00, 0.07, 0.80, -1.30, 0.535, 0, whiteBody],
+
+    // Passenger Door (curbside & opposite behind cab at X = +3.60)
+    [0.48, 0.50, 0.835, 3.60, 0.53, 0, whiteBody],
+    [0.22, 0.24, 0.845, 3.60, 0.68, 0, glass],
+    [0.04, 0.10, 0.85, 3.76, 0.48, 0, fairingDark],
+
+    // Continuous Tinted Window Ribbon & Dividing Pillars (5 distinct passenger windows)
+    [10.80, 0.24, 0.80, -1.30, 0.69, 0, glass],
+    [0.40, 0.24, 0.825, 3.16, 0.69, 0, whiteBody],
+    [0.24, 0.24, 0.825, 1.48, 0.69, 0, whiteBody],
+    [0.24, 0.24, 0.825, -0.20, 0.69, 0, whiteBody],
+    [0.24, 0.24, 0.825, -1.88, 0.69, 0, whiteBody],
+    [0.24, 0.24, 0.825, -3.56, 0.69, 0, whiteBody],
+    [1.65, 0.24, 0.825, -6.00, 0.69, 0, whiteBody],
+
+    // Upper Cabin Wall & Lettering
+    [11.00, 0.11, 0.80, -1.30, 0.865, 0, whiteBody],
+    // "CITY EXPRESS" Blue Banner & White Lettering (Above windows)
+    [3.60, 0.07, 0.84, -2.60, 0.87, 0, speedBlue, true],
+    [3.20, 0.035, 0.85, -2.60, 0.87, 0, signWhite, true],
+    // "A-1" Train Car Designation (Rear lower flank on blue stripe)
+    [0.60, 0.06, 0.85, -5.80, 0.43, 0, signWhite, true],
+
+    // --- 3. Aerodynamic Wedge Nose (Sapsan / Shinkansen profile) ---
+    // Stepped nose base & speed accents
+    [0.80, 0.16, 0.78, 4.60, 0.24, 0, whiteBody],
+    [0.80, 0.04, 0.82, 4.60, 0.34, 0, goldStripe, true],
+    [0.80, 0.14, 0.82, 4.60, 0.43, 0, speedBlue, true],
+    [0.75, 0.16, 0.72, 5.375, 0.22, 0, whiteBody],
+    [0.75, 0.12, 0.75, 5.375, 0.36, 0, speedBlue, true],
+    [0.60, 0.04, 0.74, 5.30, 0.28, 0, goldStripe, true],
+    [0.70, 0.16, 0.62, 6.10, 0.20, 0, whiteBody],
+    [0.60, 0.08, 0.64, 6.05, 0.32, 0, speedBlue, true],
+    [0.50, 0.16, 0.48, 6.70, 0.18, 0, whiteBody],
+    [0.30, 0.10, 0.38, 6.90, 0.15, 0, whiteRoof],
+
+    // Aerodynamic Sloped Driver Cockpit Windshield & Cab Brow
+    [0.70, 0.20, 0.72, 4.65, 0.72, 0, glass],
+    [0.65, 0.18, 0.66, 5.25, 0.58, 0, glass],
+    [0.55, 0.14, 0.58, 5.75, 0.45, 0, glass],
+    [0.50, 0.18, 0.79, 4.45, 0.70, 0, glass],
+    [0.60, 0.08, 0.74, 4.40, 0.90, 0, speedBlue, true],
+    [0.70, 0.06, 0.77, 4.55, 0.83, 0, speedBlue, true],
+
+    // Front Nose Cheeks, Dynamic Blue Chevron & Twin Headlights
+    [0.10, 0.12, 0.22, 6.46, 0.27, 0, speedBlue, true],
+    [0.08, 0.12, 0.12, 6.46, 0.27, 0.19, spotlight, true],
+    [0.08, 0.12, 0.12, 6.46, 0.27, -0.19, spotlight, true],
+    [0.06, 0.05, 0.26, 6.66, 0.22, 0, spotlight, true],
+    // High-Intensity Forward Rail Illumination Beam
+    [4.20, 0.08, 0.96, 8.90, 0.10, 0, spotlight, true, 0.38],
+
+    // --- 4. Curved Roof, Equipment Housing & Voxel Pantograph ---
+    [11.40, 0.07, 0.76, -1.10, 0.935, 0, whiteRoof],
+    [10.80, 0.05, 0.58, -1.30, 0.975, 0, whiteRoof],
+    // Raised Roof Equipment Pod & Cooling Louvers
+    [4.60, 0.10, 0.46, -0.50, 1.03, 0, roofPod],
+    [4.20, 0.04, 0.36, -0.50, 1.09, 0, roofVent],
+    [0.70, 0.02, 0.38, 0.80, 1.11, 0, chassisDark],
+    [0.70, 0.02, 0.38, -0.50, 1.11, 0, chassisDark],
+    [0.70, 0.02, 0.38, -1.80, 1.11, 0, chassisDark],
+
+    // Voxel Pantograph (Mounting Base, 4 Insulators, Arms & Collector Head)
+    [0.70, 0.04, 0.32, -4.00, 1.00, 0, fairingDark],
+    [0.08, 0.06, 0.08, -3.80, 1.04, 0.12, rimGrey],
+    [0.08, 0.06, 0.08, -3.80, 1.04, -0.12, rimGrey],
+    [0.08, 0.06, 0.08, -4.20, 1.04, 0.12, rimGrey],
+    [0.08, 0.06, 0.08, -4.20, 1.04, -0.12, rimGrey],
+    [0.08, 0.04, 0.28, -4.15, 1.07, 0, fairingDark],
+    [0.34, 0.05, 0.10, -3.95, 1.12, 0, fairingDark],
+    [0.08, 0.06, 0.12, -3.75, 1.16, 0, roofVent],
+    [0.30, 0.05, 0.08, -3.90, 1.20, 0, fairingDark],
+    [0.10, 0.04, 0.44, -4.05, 1.24, 0, chassisDark],
+    [0.06, 0.03, 0.38, -4.05, 1.265, 0, copperOrange, true],
+    [0.08, 0.03, 0.04, -4.05, 1.22, 0.23, roofVent],
+    [0.08, 0.03, 0.04, -4.05, 1.22, -0.23, roofVent],
+
+    // --- 5. Rear End (Diaphragm Gangway, Coupler & Taillights) ---
+    [0.12, 0.68, 0.78, -6.85, 0.56, 0, whiteBody],
+    [0.14, 0.58, 0.46, -6.92, 0.54, 0, chassisDark],
+    [0.22, 0.10, 0.24, -6.94, 0.18, 0, fairingDark],
+    [0.06, 0.08, 0.08, -6.90, 0.28, 0.32, taillight, true],
+    [0.06, 0.08, 0.08, -6.90, 0.28, -0.32, taillight, true],
+  ];
+}
+function createUrbanVehicle(
+  vOrType                                                           ,
+  speed         ,
+  colorOverride         
+)              {
+  const group = new THREE.Group();
+  let specs                  ;
+  let spd        ;
+
+  if (typeof vOrType === 'object') {
+    spd = vOrType.speed;
+    const col = vOrType.color;
+    if (vOrType.type === 'truck') {
+      specs = Math.abs(vOrType.id) % 2 === 0 ? buildBus(col) : buildSweeper(col);
+    } else {
+      specs = Math.abs(vOrType.id) % 2 === 0 ? buildTaxi(col) : buildScooter(col);
+    }
+  } else {
+    spd = speed ?? 1;
+    switch (vOrType) {
+      case 'taxi': specs = buildTaxi(colorOverride ?? 0xeab308); break;
+      case 'scooter': specs = buildScooter(colorOverride ?? 0x3b82f6); break;
+      case 'bus': specs = buildBus(colorOverride ?? 0x38bdf8); break;
+      case 'sweeper': specs = buildSweeper(colorOverride ?? 0xf97316); break;
+      case 'train': return createUrbanTrain(spd);
+      default: specs = buildTaxi(colorOverride ?? 0xeab308); break;
+    }
+  }
+
+  buildUrbanVoxels(group, specs);
+  group.rotation.y = vehicleScreenRotationY(spd);
+  return group;
+}
+function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+  const group = new THREE.Group();
+  buildUrbanVoxels(group, buildTrain());
+  const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
+  group.rotation.y = vehicleScreenRotationY(actualSpeed);
+  return group;
+}
+function createUrbanPallet(log             )              {
+  const group = new THREE.Group();
+  const timberColor = 0xd97706; // Light timber planks
+  const darkWood = 0x78350f;    // Stringers, blocks, stamp
+  const foamColor = 0xf8fafc;   // Water foam ripples
+  const waterColor = 0x0284c7;  // Submerged keel
+
+  const specs                   = [
+    // Submerged buoyancy keel
+    [log.length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
+    // White foam wake around floating pallet
+    [log.length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor, true, 0.85],
+    // 3 Longitudinal bottom skids
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, -0.28, darkWood],
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0, darkWood],
+    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0.28, darkWood],
+  ];
+
+  // 9 Support spacer blocks along pallet length
+  const blockXPositions = [-log.length * 0.42, 0, log.length * 0.42];
+  for (const bx of blockXPositions) {
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, -0.28, darkWood]);
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, 0, darkWood]);
+    specs.push([0.14, 0.06, 0.12, bx, 0.05, 0.28, darkWood]);
+  }
+
+  // 3 Cross stringer beams on top of blocks
+  for (const bx of blockXPositions) {
+    specs.push([0.10, 0.04, 0.72, bx, 0.10, 0, darkWood]);
+  }
+
+  // 5 Top longitudinal timber boards with realistic gaps (Ref: 20_euro_pallet_turnaround.jpg)
+  const boardZ = [-0.29, -0.15, 0, 0.15, 0.29];
+  for (const bz of boardZ) {
+    specs.push([log.length, 0.04, 0.11, 0, 0.14, bz, timberColor]);
+  }
+
+  // Burned wood 'PALLET' stamp brand on front board
+  specs.push([0.48, 0.042, 0.02, 0, 0.14, 0.35, darkWood]);
+
+  // Discrete 1.0-spaced slot notches for hop magnetism
+  const slotCount = Math.floor(log.length);
+  for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+    if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
+      specs.push([0.04, 0.045, 0.74, s, 0.14, 0, 0x92400e]);
+    }
+  }
+
+  buildUrbanVoxels(group, specs);
+  return group;
+}
+
+// --- Module: src/view/urbanEnvironment.ts ---
+/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */
+function createUrbanHydrant()              {
+  const group = new THREE.Group();
+  const redMat = createVoxelMaterial(0xef4444);
+  const silverMat = createVoxelMaterial(0xcbd5e1);
+
+  // Flanged base, barrel, collar, domed cap & top square nut
+  group.add(
+    createVoxelMesh(0.44, 0.08, 0.44, redMat, 0, 0.04, 0),
+    createVoxelMesh(0.34, 0.44, 0.34, redMat, 0, 0.30, 0),
+    createVoxelMesh(0.40, 0.08, 0.40, redMat, 0, 0.48, 0),
+    createVoxelMesh(0.28, 0.14, 0.28, redMat, 0, 0.59, 0),
+    createVoxelMesh(0.10, 0.10, 0.10, silverMat, 0, 0.71, 0),
+    // Side & front nozzles
+    createVoxelMesh(0.14, 0.14, 0.16, redMat, -0.22, 0.34, 0),
+    createVoxelMesh(0.08, 0.10, 0.12, silverMat, -0.29, 0.34, 0),
+    createVoxelMesh(0.14, 0.14, 0.16, redMat, 0.22, 0.34, 0),
+    createVoxelMesh(0.08, 0.10, 0.12, silverMat, 0.29, 0.34, 0),
+    createVoxelMesh(0.16, 0.16, 0.14, redMat, 0, 0.34, 0.22),
+    createVoxelMesh(0.10, 0.10, 0.08, silverMat, 0, 0.34, 0.29)
+  );
+  return group;
+}
+
+/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */
+function createUrbanTrashCan()              {
+  const group = new THREE.Group();
+  const greenMat = createVoxelMaterial(0x15803d);
+  const darkMat = createVoxelMaterial(0x1e293b);
+  const whiteMat = createVoxelBasicMaterial(0xf8fafc);
+  const greyMat = createVoxelMaterial(0x64748b);
+
+  group.add(
+    createVoxelMesh(0.46, 0.52, 0.46, greenMat, 0, 0.33, 0),
+    createVoxelMesh(0.32, 0.08, 0.02, whiteMat, 0, 0.46, 0.24, false, false),
+    createVoxelMesh(0.52, 0.10, 0.52, greenMat, 0, 0.64, 0),
+    createVoxelMesh(0.26, 0.06, 0.16, greenMat, 0, 0.72, 0),
+    createVoxelMesh(0.08, 0.14, 0.14, darkMat, -0.22, 0.07, -0.16),
+    createVoxelMesh(0.08, 0.14, 0.14, darkMat, 0.22, 0.07, -0.16),
+    createVoxelMesh(0.08, 0.07, 0.08, darkMat, -0.18, 0.035, 0.16),
+    createVoxelMesh(0.08, 0.07, 0.08, darkMat, 0.18, 0.035, 0.16),
+    createVoxelMesh(0.06, 0.06, 0.18, greyMat, -0.25, 0.45, 0),
+    createVoxelMesh(0.06, 0.06, 0.18, greyMat, 0.25, 0.45, 0)
+  );
+  return group;
+}
+
+/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */
+function createUrbanBench()              {
+  const group = new THREE.Group();
+  const woodMat = createVoxelMaterial(0x854d0e);
+  const ironMat = createVoxelMaterial(0x1e293b);
+
+  // Cast iron legs & frame
+  for (const lx of [-0.34, 0.34]) {
+    group.add(createVoxelMesh(0.08, 0.22, 0.08, ironMat, lx, 0.11, 0.14)); // Front leg
+    group.add(createVoxelMesh(0.08, 0.54, 0.08, ironMat, lx, 0.27, -0.14)); // Rear upright
+    group.add(createVoxelMesh(0.06, 0.06, 0.36, ironMat, lx, 0.28, 0)); // Armrest
+  }
+  // Seat slats (4 horizontal wooden slats)
+  for (let i = 0; i < 4; i++) {
+    const zPos = -0.10 + i * 0.09;
+    group.add(createVoxelMesh(0.84, 0.04, 0.07, woodMat, 0, 0.22, zPos));
+  }
+  // Backrest slats (3 horizontal wooden slats)
+  for (let i = 0; i < 3; i++) {
+    const yPos = 0.32 + i * 0.10;
+    group.add(createVoxelMesh(0.84, 0.08, 0.04, woodMat, 0, yPos, -0.14));
+  }
+  return group;
+}
+
+/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */
+function createUrbanLampPost()              {
+  const group = new THREE.Group();
+  const ironMat = createVoxelMaterial(0x0f172a);
+  const glowMat = createVoxelBasicMaterial(0xfef08a);
+
+  // Stepped square base pedestal & slender pole
+  group.add(createVoxelMesh(0.34, 0.08, 0.34, ironMat, 0, 0.04, 0));
+  group.add(createVoxelMesh(0.26, 0.24, 0.26, ironMat, 0, 0.20, 0));
+  group.add(createVoxelMesh(0.10, 1.10, 0.10, ironMat, 0, 0.87, 0));
+  // Crossbar collar
+  group.add(createVoxelMesh(0.36, 0.06, 0.08, ironMat, 0, 1.34, 0));
+  group.add(createVoxelMesh(0.20, 0.06, 0.20, ironMat, 0, 1.45, 0));
+  // Glowing yellow lantern chamber & cap
+  group.add(createVoxelMesh(0.24, 0.30, 0.24, glowMat, 0, 1.63, 0, false, false));
+  group.add(createVoxelMesh(0.28, 0.06, 0.28, ironMat, 0, 1.81, 0));
+  group.add(createVoxelMesh(0.10, 0.08, 0.10, ironMat, 0, 1.88, 0));
+  return group;
+}
+
+/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */
+function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
+  const group = new THREE.Group();
+  const absSeed = Math.abs(seedVariant);
+  const boxMat = createVoxelMaterial(0x78350f);
+  const darkWood = createVoxelMaterial(0x451a03);
+  const trunkMat = createVoxelMaterial(0x854d0e);
+
+  const leafColor =
+    biome === 'winter'
+      ? 0x0f766e
+      : biome === 'neon'
+        ? absSeed % 2 === 0 ? 0x06b6d4 : 0xd946ef
+        : biome === 'desert' ? 0xa16207 : 0x16a34a;
+  const leafMat = createVoxelMaterial(leafColor);
+  const accentMat = createVoxelMaterial(biome === 'winter' ? 0xf8fafc : 0x4ade80);
+
+  group.add(
+    createVoxelMesh(0.64, 0.44, 0.64, boxMat, 0, 0.22, 0),
+    createVoxelMesh(0.68, 0.06, 0.68, darkWood, 0, 0.42, 0),
+    createVoxelMesh(0.54, 0.04, 0.54, leafMat, 0, 0.44, 0),
+    createVoxelMesh(0.16, 0.56, 0.16, trunkMat, 0, 0.70, 0),
+    createVoxelMesh(0.72, 0.80, 0.72, leafMat, 0, 1.34, 0),
+    createVoxelMesh(0.78, 0.64, 0.78, leafMat, 0, 1.34, 0),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, 0.20, 1.48, 0.40),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, -0.20, 1.25, 0.40),
+    createVoxelMesh(0.08, 0.08, 0.08, accentMat, 0.40, 1.38, -0.15)
+  );
+  return group;
+}
+
+/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */
+function createUrbanHedge(seedVariant        , biome            = 'forest')              {
+  const group = new THREE.Group();
+  const absSeed = Math.abs(seedVariant);
+  const hedgeColor =
+    biome === 'winter'
+      ? 0xdbeafe
+      : biome === 'neon'
+        ? 0x7e22ce
+        : biome === 'desert' ? 0xb45309 : 0x84cc16;
+  const hedgeMat = createVoxelMaterial(hedgeColor);
+  const accentMat = createVoxelMaterial(biome === 'winter' ? 0xf8fafc : 0x4ade80);
+
+  // Stepped monolithic rectangular hedge block
+  group.add(createVoxelMesh(0.76, 0.06, 0.56, hedgeMat, 0, 0.03, 0));
+  group.add(createVoxelMesh(0.82, 0.52, 0.62, hedgeMat, 0, 0.29, 0));
+  group.add(createVoxelMesh(0.76, 0.08, 0.56, hedgeMat, 0, 0.58, 0));
+  // Leaf accent cubes
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, 0.18, 0.35, 0.32));
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, -0.22, 0.22, 0.32));
+  group.add(createVoxelMesh(0.07, 0.07, 0.07, accentMat, 0.10, 0.62, -0.12));
+  return group;
+}
+
+/** Obstacle Dispatcher */
+function createUrbanObstacle(
+  kind              ,
+  seedVariant        ,
+  biomeOrSnow                      = false
+)              {
+  const biome            =
+    typeof biomeOrSnow === 'boolean' ? (biomeOrSnow ? 'winter' : 'forest') : biomeOrSnow;
+  const absSeed = Math.abs(seedVariant);
+
+  if (kind === 'rock') {
+    // 50% Fire Hydrant (Asset 16), 50% Green Street Trash Can (Asset 17)
+    return absSeed % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+  }
+  if (kind === 'bush') {
+    // 50% Park Wooden Bench (Asset 14), 50% Trimmed Cubic Bush Hedge (Asset 19)
+    return absSeed % 2 === 0 ? createUrbanBench() : createUrbanHedge(absSeed, biome);
+  }
+  // kind === 'tree':
+  // 60% Square Tree in Planter Box (Asset 18), 40% City Street Lamp Post (Asset 15)
+  return absSeed % 5 < 3
+    ? createUrbanTreePlanter(absSeed, biome)
+    : createUrbanLampPost();
+}
+function createUrbanCoin()              {
+  const group = new THREE.Group();
+  const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
+  const innerMat = createVoxelMaterial(0xef4444);
+  group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
+  group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
+  return group;
+}
+function createUrbanRailwaySignal()                                                {
+  const group = new THREE.Group();
+  const poleMat = createVoxelMaterial(0x1e293b);
+  const lightMat = createVoxelBasicMaterial(0x334155);
+  group.add(createVoxelMesh(0.14, 1.20, 0.14, poleMat, 0, 0.60, 0));
+  group.add(createVoxelMesh(0.36, 0.28, 0.24, poleMat, 0, 1.22, 0));
+  const lightMesh = createVoxelMesh(0.22, 0.16, 0.28, lightMat, 0, 1.22, 0, false, false);
+  group.add(lightMesh);
+  return { group, lightMesh };
+}
+function createUrbanRoadMarkings()              {
+  const group = new THREE.Group();
+  const whiteLineMat = createVoxelBasicMaterial(0xf8fafc);
+  group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(-9.5), 0.015, 0, false, false));
+  group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(9.5), 0.015, 0, false, false));
+  return group;
+}
+function createUrbanRoadBarrier(biome            = 'forest')              {
+  const group = new THREE.Group();
+  const postColor = biome === 'neon' ? 0x1e1b4b : biome === 'winter' ? 0x475569 : 0x64748b;
+  const railColor = biome === 'neon' ? 0x06b6d4 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
+  const reflectorColor = biome === 'neon' ? 0xec4899 : 0xfacc15;
+
+  const postMat = createVoxelMaterial(postColor);
+  const railMat = createVoxelMaterial(railColor);
+  const reflectorMat = createVoxelBasicMaterial(reflectorColor);
+
+  group.add(createVoxelMesh(0.12, 0.42, 0.12, postMat, 0, 0.21, -0.32));
+  group.add(createVoxelMesh(0.12, 0.42, 0.12, postMat, 0, 0.21, 0.32));
+  group.add(createVoxelMesh(0.14, 0.18, 0.96, railMat, 0, 0.28, 0));
+  group.add(createVoxelMesh(0.15, 0.08, 0.18, reflectorMat, 0, 0.28, 0, false, false));
+  return group;
+}
+function createUrbanRiverbankEdge(
+  side                  ,
+  biome            = 'forest'
+)              {
+  const group = new THREE.Group();
+  const woodColor = biome === 'winter' ? 0x475569 : biome === 'neon' ? 0x1e1b4b : 0x78350f;
+  const capColor = biome === 'winter' ? 0xf1f5f9 : biome === 'neon' ? 0x06b6d4 : 0x451a03;
+  const rockColor = biome === 'winter' ? 0x94a3b8 : biome === 'neon' ? 0x312e81 : 0x64748b;
+
+  const woodMat = createVoxelMaterial(woodColor);
+  const capMat = createVoxelMaterial(capColor);
+  const rockMat = createVoxelMaterial(rockColor);
+
+  group.add(createVoxelMesh(0.28, 0.44, 0.28, woodMat, 0, 0.16, -0.22));
+  group.add(createVoxelMesh(0.32, 0.08, 0.32, capMat, 0, 0.40, -0.22));
+  const bx = side === 'left' ? 0.2 : -0.2;
+  group.add(createVoxelMesh(0.36, 0.22, 0.32, rockMat, bx, 0.07, 0.2));
+  group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
+  return group;
+}
+function createUrbanRecordFlag()              {
+  const group = new THREE.Group();
+  group.name = 'recordFlag';
+
+  const baseMat = createVoxelMaterial(0x334155);
+  const trimMat = createVoxelMaterial(0xf59e0b);
+  const poleMat = createVoxelMaterial(0x94a3b8);
+  const clothMat = createVoxelMaterial(0xfbbf24);
+  const crownMat = createVoxelMaterial(0xf59e0b);
+  const rubyMat = createVoxelMaterial(VOXEL_PALETTE.rubyRed);
+
+  group.add(createVoxelMesh(0.70, 0.12, 0.70, baseMat, 0, 0.06, 0));
+  group.add(createVoxelMesh(0.76, 0.04, 0.76, trimMat, 0, 0.02, 0));
+  group.add(createVoxelMesh(0.10, 1.80, 0.10, poleMat, 0, 1.02, 0));
+  group.add(createVoxelMesh(0.18, 0.14, 0.18, crownMat, 0, 1.99, 0));
+
+  const clothGroup = new THREE.Group();
+  clothGroup.name = 'flagCloth';
+  clothGroup.position.set(0.05, 1.45, 0);
+
+  clothGroup.add(createVoxelMesh(0.75, 0.44, 0.04, clothMat, 0.375, 0, 0));
+  clothGroup.add(createVoxelMesh(0.20, 0.14, 0.042, clothMat, 0.85, 0.14, 0));
+  clothGroup.add(createVoxelMesh(0.20, 0.14, 0.042, clothMat, 0.85, -0.14, 0));
+
+  // Crown emblem 👑 on flag
+  clothGroup.add(createVoxelMesh(0.36, 0.06, 0.07, crownMat, 0.375, -0.08, 0));
+  clothGroup.add(createVoxelMesh(0.08, 0.16, 0.07, crownMat, 0.24, -0.01, 0));
+  clothGroup.add(createVoxelMesh(0.09, 0.22, 0.07, crownMat, 0.375, 0.02, 0));
+  clothGroup.add(createVoxelMesh(0.08, 0.16, 0.07, crownMat, 0.51, -0.01, 0));
+
+  // Ruby gems
+  clothGroup.add(createVoxelMesh(0.06, 0.06, 0.08, rubyMat, 0.24, 0.09, 0));
+  clothGroup.add(createVoxelMesh(0.07, 0.07, 0.08, rubyMat, 0.375, 0.15, 0));
+  clothGroup.add(createVoxelMesh(0.06, 0.06, 0.08, rubyMat, 0.51, 0.09, 0));
+
+  group.add(clothGroup);
+  return group;
+}
+const createUrbanTree = (seedVariant        , biome                      )              =>
+  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
+const createUrbanRock = (seedVariant        , _biome            )              =>
+  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+const createUrbanBush = (seedVariant        , biome                      )              =>
+  Math.abs(seedVariant) % 2 === 0
+    ? createUrbanBench()
+    : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
+
+// --- Module: src/view/urbanBuildings.ts ---
+const buildingGeoCache = new Map                           ();
+const buildingMatCache = new Map                        ();
+
+function getBldgGeo(w        , h        , d        )                    {
+  const key = `${w.toFixed(2)}_${h.toFixed(2)}_${d.toFixed(2)}`;
+  let geo = buildingGeoCache.get(key);
+  if (!geo) {
+    geo = new THREE.BoxGeometry(w, h, d);
+    buildingGeoCache.set(key, geo);
+  }
+  return geo;
+}
+
+function getBldgMat(color        , basic = false)                 {
+  const key = `${color}_${basic ? 1 : 0}`;
+  let mat = buildingMatCache.get(key);
+  if (!mat) {
+    mat = basic
+      ? new THREE.MeshBasicMaterial({ color })
+      : new THREE.MeshLambertMaterial({ color });
+    buildingMatCache.set(key, mat);
+  }
+  return mat;
+}
+
+                                                                                    
+
+function buildVoxels(group             , specs             )       {
+  for (const [w, h, d, x, y, z, color, basic] of specs) {
+    const geo = getBldgGeo(w, h, d);
+    const mat = getBldgMat(color, basic ?? false);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+}
+
+/** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */
+function createTownhouseA()              {
+  const group = new THREE.Group();
+  const voxels              = [
+    // Foundation & 1st Floor
+    [1.60, 0.12, 1.40, 0, 0.06, 0, 0x94a3b8],
+    [1.50, 1.30, 1.30, 0, 0.77, 0, 0x2563eb],
+    [0.34, 0.90, 0.04, -0.42, 0.60, 0.66, 0x78350f],     // Door
+    [0.26, 0.40, 0.05, -0.42, 0.72, 0.665, 0xfef08a, true], // Door glass
+    [0.72, 0.70, 0.04, 0.26, 0.70, 0.66, 0xfef08a, true],  // Cafe window
+    [0.76, 0.08, 0.06, 0.26, 0.32, 0.67, 0x1e3a8a],
+    // Striped Awning (Red & White)
+    [0.86, 0.14, 0.36, 0.26, 1.15, 0.80, 0xdc2626],
+    [0.28, 0.15, 0.37, 0.26, 1.15, 0.80, 0xf8fafc],
+    // Sign 'CAFE'
+    [0.72, 0.24, 0.08, 0.26, 1.38, 0.68, 0x78350f],
+    [0.54, 0.14, 0.09, 0.26, 1.38, 0.68, 0xfef08a, true],
+    // Cornice Belt between 1st & 2nd floors
+    [1.62, 0.12, 1.42, 0, 1.50, 0, 0xf8fafc],
+    // 2nd Floor
+    [1.50, 1.20, 1.30, 0, 2.16, 0, 0x3b82f6],
+    [0.32, 0.60, 0.05, -0.38, 2.16, 0.66, 0xfef08a, true], // Window L
+    [0.36, 0.66, 0.03, -0.38, 2.16, 0.65, 0xf8fafc],
+    [0.32, 0.60, 0.05, 0.38, 2.16, 0.66, 0xfef08a, true],  // Window R
+    [0.36, 0.66, 0.03, 0.38, 2.16, 0.65, 0xf8fafc],
+    // Planter boxes under 2nd floor windows
+    [0.38, 0.12, 0.14, -0.38, 1.80, 0.70, 0x854d0e],
+    [0.32, 0.08, 0.10, -0.38, 1.88, 0.70, 0x16a34a],
+    [0.38, 0.12, 0.14, 0.38, 1.80, 0.70, 0x854d0e],
+    [0.32, 0.08, 0.10, 0.38, 1.88, 0.70, 0x16a34a],
+    // Roof cornice
+    [1.64, 0.14, 1.44, 0, 2.82, 0, 0xf8fafc],
+    // Mansard Roof (Terracotta Tiles)
+    [1.46, 0.85, 1.26, 0, 3.28, 0, 0xb45309],
+    [1.30, 0.20, 1.10, 0, 3.75, 0, 0x92400e],
+    // Dormer window on roof
+    [0.40, 0.38, 0.36, 0, 3.32, 0.58, 0x3b82f6],
+    [0.26, 0.24, 0.05, 0, 3.32, 0.76, 0xfef08a, true],
+    [0.44, 0.12, 0.38, 0, 3.55, 0.58, 0x92400e],
+    // Chimney
+    [0.22, 0.60, 0.22, -0.45, 3.85, -0.25, 0x64748b],
+    [0.26, 0.10, 0.26, -0.45, 4.18, -0.25, 0x475569],
+  ];
+  buildVoxels(group, voxels);
+  return group;
+}
+
+/** Townhouse B: Red Brick Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */
+function createTownhouseB()              {
+  const group = new THREE.Group();
+  const voxels              = [
+    // Base & 1st Floor
+    [1.60, 0.12, 1.40, 0, 0.06, 0, 0xfacc15],
+    [1.50, 1.30, 1.30, 0, 0.77, 0, 0xdc2626],
+    // Yellow quoin stones on corners
+    [0.14, 1.30, 0.14, -0.70, 0.77, 0.60, 0xfacc15],
+    [0.14, 1.30, 0.14, 0.70, 0.77, 0.60, 0xfacc15],
+    // Door
+    [0.34, 0.90, 0.04, -0.42, 0.60, 0.66, 0x78350f],
+    [0.26, 0.34, 0.05, -0.42, 0.75, 0.665, 0xfef08a, true],
+    // Bakery window & display
+    [0.74, 0.68, 0.04, 0.26, 0.71, 0.66, 0xfef08a, true],
+    // Awning (Red & White)
+    [0.86, 0.14, 0.36, 0.26, 1.15, 0.80, 0xef4444],
+    [0.30, 0.15, 0.37, 0.26, 1.15, 0.80, 0xf8fafc],
+    // Sign 'BAKERY'
+    [0.88, 0.26, 0.08, 0.22, 1.38, 0.68, 0x78350f],
+    [0.72, 0.16, 0.09, 0.22, 1.38, 0.68, 0xfef08a, true],
+    // Mid Cornice
+    [1.62, 0.14, 1.42, 0, 1.50, 0, 0xfacc15],
+    // 2nd Floor (Brick Red)
+    [1.50, 1.25, 1.30, 0, 2.18, 0, 0xb91c1c],
+    [0.14, 1.25, 0.14, -0.70, 2.18, 0.60, 0xfacc15],
+    [0.14, 1.25, 0.14, 0.70, 2.18, 0.60, 0xfacc15],
+    // 3 Arched Windows
+    [0.26, 0.60, 0.05, -0.42, 2.20, 0.66, 0xfef08a, true],
+    [0.30, 0.66, 0.03, -0.42, 2.20, 0.65, 0xfacc15],
+    [0.26, 0.60, 0.05, 0, 2.20, 0.66, 0xfef08a, true],
+    [0.30, 0.66, 0.03, 0, 2.20, 0.65, 0xfacc15],
+    [0.26, 0.60, 0.05, 0.42, 2.20, 0.66, 0xfef08a, true],
+    [0.30, 0.66, 0.03, 0.42, 2.20, 0.65, 0xfacc15],
+    // Roof Cornice & Stepped Parapet Balustrade
+    [1.64, 0.16, 1.44, 0, 2.86, 0, 0xfacc15],
+    [1.50, 0.40, 1.30, 0, 3.12, 0, 0xb91c1c],
+    [0.70, 0.36, 0.12, 0, 3.42, 0.60, 0xdc2626],
+    [0.40, 0.16, 0.06, 0, 3.42, 0.66, 0x38bdf8, true], // Top decorative attic arch
+    [0.76, 0.08, 0.14, 0, 3.62, 0.60, 0xfacc15],
+    // Double Chimneys
+    [0.24, 0.54, 0.24, 0.44, 3.50, -0.20, 0x991b1b],
+    [0.28, 0.10, 0.28, 0.44, 3.80, -0.20, 0x475569],
+  ];
+  buildVoxels(group, voxels);
+  return group;
+}
+
+/** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */
+function createTownhouseC()              {
+  const group = new THREE.Group();
+  const voxels              = [
+    // Base & 1st Floor
+    [1.56, 0.12, 1.40, 0, 0.06, 0, 0x854d0e],
+    [1.48, 1.30, 1.30, 0, 0.77, 0, 0x15803d],
+    // Door
+    [0.34, 0.90, 0.04, -0.40, 0.60, 0.66, 0x78350f],
+    [0.26, 0.36, 0.05, -0.40, 0.74, 0.665, 0xfef08a, true],
+    // Books Window with interior shelves
+    [0.74, 0.70, 0.04, 0.24, 0.70, 0.66, 0xfef08a, true],
+    [0.68, 0.20, 0.08, 0.24, 0.48, 0.67, 0x9333ea], // Books display
+    // Emerald Awning
+    [0.84, 0.14, 0.36, 0.24, 1.15, 0.80, 0x166534],
+    [0.26, 0.15, 0.37, 0.24, 1.15, 0.80, 0x4ade80],
+    // Sign 'BOOKS'
+    [0.82, 0.26, 0.08, 0.18, 1.38, 0.68, 0x14532d],
+    [0.68, 0.16, 0.09, 0.18, 1.38, 0.68, 0xa3e635, true],
+    // Vertical blade sign 'BOOKS' on corner
+    [0.10, 0.55, 0.24, -0.74, 1.80, 0.45, 0x78350f],
+    [0.08, 0.45, 0.20, -0.74, 1.80, 0.45, 0xa3e635, true],
+    // Mid Cornice
+    [1.58, 0.12, 1.42, 0, 1.48, 0, 0xdcfce7],
+    // 2nd Floor (Olive Green)
+    [1.48, 1.20, 1.30, 0, 2.14, 0, 0x16a34a],
+    // 3 Upper Windows
+    [0.24, 0.58, 0.05, -0.40, 2.15, 0.66, 0xfef08a, true],
+    [0.28, 0.64, 0.03, -0.40, 2.15, 0.65, 0xdcfce7],
+    [0.24, 0.58, 0.05, 0, 2.15, 0.66, 0xfef08a, true],
+    [0.28, 0.64, 0.03, 0, 2.15, 0.65, 0xdcfce7],
+    [0.24, 0.58, 0.05, 0.40, 2.15, 0.66, 0xfef08a, true],
+    [0.28, 0.64, 0.03, 0.40, 2.15, 0.65, 0xdcfce7],
+    // Gable Roof (Terracotta Tile Pitch)
+    [1.54, 0.14, 1.44, 0, 2.78, 0, 0xdcfce7],
+    [1.44, 0.60, 1.32, 0, 3.12, 0, 0xc2410c],
+    [1.24, 0.40, 1.20, 0, 3.52, 0, 0x9a3412],
+    [0.96, 0.24, 1.08, 0, 3.78, 0, 0x7c2d12],
+    // Chimney with terracotta pots
+    [0.26, 0.68, 0.26, 0.40, 3.72, -0.22, 0x854d0e],
+    [0.10, 0.16, 0.10, 0.36, 4.12, -0.22, 0xc2410c],
+    [0.10, 0.16, 0.10, 0.44, 4.12, -0.22, 0xc2410c],
+  ];
+  buildVoxels(group, voxels);
+  return group;
+}
+function createUrbanTownhouse(seed        , biome            = 'forest')              {
+  const root = new THREE.Group();
+  root.name = 'urbanTownhouse';
+  const variant = Math.abs(seed) % 3;
+  let bldg             ;
+  if (variant === 0) bldg = createTownhouseA();
+  else if (variant === 1) bldg = createTownhouseB();
+  else bldg = createTownhouseC();
+
+  // Special lighting or tinting for night / winter biomes if needed
+  if (biome === 'winter') {
+    const snowGeo = getBldgGeo(1.48, 0.08, 1.28);
+    const snowMat = getBldgMat(0xf8fafc);
+    const snowCap = new THREE.Mesh(snowGeo, snowMat);
+    snowCap.position.set(0, 3.82, 0);
+    bldg.add(snowCap);
+  }
+
+  // Center depth around Z=0 and scale so building spans across 2 lanes (depth ~1.62 < 2.0)
+  bldg.position.z = -0.1325;
+  root.add(bldg);
+  root.scale.set(0.95, 0.95, 0.95);
+  return root;
+}
+
+// --- Module: src/view/meshFactory.ts ---
+class MeshFactory {
+  static createTownhouse(seedVariant        , biome            = 'forest')              {
+    return createUrbanTownhouse(seedVariant, biome);
+  }
+
+  static createCharacter(skinId         = 'corgi', isGhost = false)              {
+    return createUrbanCharacter(skinId, isGhost);
+  }
+
+  static createChicken()              {
+    return createUrbanCharacter('corgi');
+  }
+
+  static createObstacle(
+    kind              ,
+    seedVariant        ,
+    biomeOrSnow                      = false
+  )              {
+    return createUrbanObstacle(kind, seedVariant, biomeOrSnow);
+  }
+
+  static createTree(seedVariant        , biomeOrSnow                      = false)              {
+    return createUrbanTree(seedVariant, biomeOrSnow);
+  }
+
+  static createRock(seedVariant        , biome            = 'forest')              {
+    return createUrbanRock(seedVariant, biome);
+  }
+
+  static createBush(seedVariant        , biomeOrSnow                      = false)              {
+    return createUrbanBush(seedVariant, biomeOrSnow);
+  }
+
+  static createCoin()              {
+    return createUrbanCoin();
+  }
+
+  static createRailwaySignal()                                                {
+    return createUrbanRailwaySignal();
+  }
+
+  static createTrain(length        , speed        )              {
+    return createUrbanTrain(length, speed);
+  }
+
+  static createVehicle(v         )              {
+    return createUrbanVehicle(v);
+  }
+
+  static createLog(log             )              {
+    return createUrbanPallet(log);
+  }
+
+  static createRiverbankEdge(side                  , biome            = 'forest')              {
+    return createUrbanRiverbankEdge(side, biome);
+  }
+
+  static createWaterfallEdge(side                  , biome            = 'forest')              {
+    return createUrbanRiverbankEdge(side, biome);
+  }
+
+  static createRoadMarkings()              {
+    return createUrbanRoadMarkings();
+  }
+
+  static createLaneDivider()              {
+    const group = new THREE.Group();
+    const dividerMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
+
+    for (let x = -8.5; x <= 8.5; x += 1.6) {
+      const dash = new THREE.Mesh(dashGeo, dividerMat);
+      dash.position.set(x, 0.015, 0.5);
+      group.add(dash);
+    }
+
+    return group;
+  }
+
+  static createRoadBarrier(biome            = 'forest')              {
+    return createUrbanRoadBarrier(biome);
+  }
+
+  static createRecordFlag()              {
+    return createUrbanRecordFlag();
+  }
+}
+
+// --- Module: src/view/modelRegistry.ts ---
+const SKIN_DESCRIPTIONS                         = {
+  corgi:
+    'Главный маскот игры. Озорной рыже-белый корги с розовыми подушечками лап, торчащими лисьими ушками, ошейником с золотым жетоном и пушистым хвостиком.',
+  pigeon_pizza:
+    'Городской голубь с переливающейся фиолетово-бирюзовой шеей, несущий в клюве аппетитный треугольный ломтик пиццы с хрустящей корочкой и пепперони.',
+  box_cat:
+    'Рыжий полосатый котик, уютно сидящий в картонной посылочной коробке со штампом "FRAGILE / DELIVERY" и свесивший белые лапки через передний бортик.',
+  raccoon_bandit:
+    'Ловкий городской енот-воришка в чёрной бандитской маске с пышным полосатым кольчатым хвостом и холщовым мешком с добычей за спиной.',
+  capybara_zen:
+    'Умиротворённая дзен-капибара в медитативной позе со спокойными прикрытыми глазками и сочным воксельным мандарином с зелёным листком на голове.',
+};
+function getCharacterModelItems()                     {
+  return ALL_SKINS.map((skin) => ({
+    id: skin.id,
+    name: skin.name,
+    icon: skin.badge,
+    cat: 'chars'         ,
+    desc:
+      SKIN_DESCRIPTIONS[skin.id] ??
+      `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
+    create: (_biome            = 'forest', isGhost = false) =>
+      createUrbanCharacter(skin.id, isGhost),
+  }));
+}
+function getVehicleModelItems()                     {
+  return [
+    {
+      id: 'taxi',
+      name: 'Городское такси',
+      icon: '🚕',
+      cat: 'vehicles',
+      desc: 'Классическое жёлтое городское такси с шашечками на крыше и крыльях, детализированными фарами, номерными знаками CITY и зеркалами заднего вида.',
+      create: () => createUrbanVehicle('taxi', 1),
+    },
+    {
+      id: 'scooter',
+      name: 'Курьерский скутер',
+      icon: '🛵',
+      cat: 'vehicles',
+      desc: 'Манёвренный скутер экспресс-доставки. За рулём сидит курьер в защитном шлеме и яркой куртке, а сзади установлена термосумка с логотипом FOOD HOT.',
+      create: () => createUrbanVehicle('scooter', 1),
+    },
+    {
+      id: 'bus',
+      name: 'Рейсовый автобус',
+      icon: '🚌',
+      cat: 'vehicles',
+      desc: 'Трёхосный пассажирский городской автобус с двустворчатыми дверями, светящимся янтарным LED-табло ROUTE 42, надписью CITY TRANSIT и блоками кондиционеров.',
+      create: () => createUrbanVehicle('bus', 1),
+    },
+    {
+      id: 'sweeper',
+      name: 'Уборочная машина',
+      icon: '🚜',
+      cat: 'vehicles',
+      desc: 'Коммунальная машина со вращающимися коническими щётками, проблесковым маячком, диагональной полосой безопасности и рельефной надписью STREET SWEEP.',
+      create: () => createUrbanVehicle('sweeper', 1),
+    },
+    {
+      id: 'train',
+      name: 'Скоростной поезд',
+      icon: '🚄',
+      cat: 'vehicles',
+      desc: 'Высокоскоростной пассажирский экспресс Сапсан с клиновидным носом, пантографом с изоляторами, вагоном CITY EXPRESS и мощным лучом освещения пути.',
+      create: () => createUrbanTrain(1),
+    },
+    {
+      id: 'pallet',
+      name: 'Речной поддон',
+      icon: '🪵',
+      cat: 'vehicles',
+      desc: 'Деревянный европоддон с опорными брусьями и фирменным клеймом PALLET. Плавает по реке, создавая белый пенный след на воде.',
+      create: () =>
+        createUrbanPallet({
+          id: 1,
+          x: 0,
+          length: 2.4,
+          speed: 1,
+        }),
+    },
+  ];
+}
+function getPropModelItems()                     {
+  return [
+    {
+      id: 'hydrant',
+      name: 'Пожарный гидрант',
+      icon: '🚒',
+      cat: 'props',
+      desc: 'Чугунный уличный пожарный гидрант с фланцевым основанием, тремя штуцерами и серебристыми соединительными гайками.',
+      create: () => createUrbanHydrant(),
+    },
+    {
+      id: 'trash',
+      name: 'Мусорный бак',
+      icon: '🗑️',
+      cat: 'props',
+      desc: 'Зелёный городской контейнер для раздельного сбора отходов с белой маркировочной панелью и ручками.',
+      create: () => createUrbanTrashCan(),
+    },
+    {
+      id: 'bench',
+      name: 'Парковая скамейка',
+      icon: '🪑',
+      cat: 'props',
+      desc: 'Уютная деревянная скамейка на чугунных ножках с анатомическими рейками сиденья и поддерживающей спинкой.',
+      create: () => createUrbanBench(),
+    },
+    {
+      id: 'lamp',
+      name: 'Фонарный столб',
+      icon: '💡',
+      cat: 'props',
+      desc: 'Высокий чугунный уличный фонарь с квадратным постаментом и светящейся камерой плафона тёплого света.',
+      create: () => createUrbanLampPost(),
+    },
+    {
+      id: 'coin',
+      name: 'Золотая монета',
+      icon: '🪙',
+      cat: 'props',
+      desc: 'Вращающаяся золотая монетка с выпуклым ободком и гравировкой. Собирается персонажем для пополнения кошелька (+1).',
+      create: () => createUrbanCoin(),
+    },
+    {
+      id: 'signal',
+      name: 'Ж/д светофор',
+      icon: '🚦',
+      cat: 'props',
+      desc: 'Сигнальный переездный железнодорожный фонарь с двумя красными предупреждающими огнями опасности.',
+      create: () => createUrbanRailwaySignal().group,
+    },
+    {
+      id: 'flag',
+      name: 'Флаг рекорда',
+      icon: '🚩',
+      cat: 'props',
+      desc: 'Постамент личного рекорда игрока (PB Flag) на обочине с золочёным древком, короной чемпиона и рубиновыми камнями.',
+      create: () => createUrbanRecordFlag(),
+    },
+    {
+      id: 'barrier',
+      name: 'Дорожный барьер',
+      icon: '🚧',
+      cat: 'props',
+      desc: 'Защитное металлическое дорожное ограждение с опорными столбиками и светоотражающими элементами.',
+      create: (b            = 'forest') => createUrbanRoadBarrier(b),
+    },
+    {
+      id: 'markings',
+      name: 'Дорожная разметка',
+      icon: '➖',
+      cat: 'props',
+      desc: 'Белая сплошная краевая полоса дорожной разметки, отделяющая проезжую часть от обочины.',
+      create: () => createUrbanRoadMarkings(),
+    },
+    {
+      id: 'riverbank',
+      name: 'Береговое укрепление',
+      icon: '🌊',
+      cat: 'props',
+      desc: 'Инженерное укрепление берега реки из просмолённых деревянных свай и каменной булыжной кладки.',
+      create: (b            = 'forest') => createUrbanRiverbankEdge('left', b),
+    },
+  ];
+}
+function getNatureModelItems()                     {
+  return [
+    {
+      id: 'tree_planter_0',
+      name: 'Дерево в кадке (А)',
+      icon: '🌲',
+      cat: 'nature',
+      desc: 'Городское дерево в деревянной кадке с геометрической кроной. Цвет листвы автоматически адаптируется под выбранный биом (Лес/Зима/Пустыня/Неон).',
+      create: (b            = 'forest') => createUrbanTreePlanter(0, b),
+    },
+    {
+      id: 'tree_planter_1',
+      name: 'Дерево в кадке (Б)',
+      icon: '🌳',
+      cat: 'nature',
+      desc: 'Раскидистое городское дерево в кадке с многослойной кроной. Реагирует на погодные условия и атмосферу биома.',
+      create: (b            = 'forest') => createUrbanTreePlanter(1, b),
+    },
+    {
+      id: 'hedge',
+      name: 'Живая изгородь',
+      icon: '🌿',
+      cat: 'nature',
+      desc: 'Аккуратно подстриженный кустарник прямоугольной формы с контрастными акцентными листьями. Меняет цвет при смене климатической зоны.',
+      create: (b            = 'forest') => createUrbanHedge(0, b),
+    },
+  ];
+}
+function getBuildingModelItems()                     {
+  return [
+    {
+      id: 'townhouse_cafe',
+      name: 'Кафе (Таунхаус А)',
+      icon: '☕',
+      cat: 'buildings',
+      desc: 'Парижский двухэтажный таунхаус цвета ультрамарин: кофейня на первом этаже, полосатая красно-белая маркиза, вывеска CAFE, мансардная крыша и цветочные кашпо.',
+      create: () => createTownhouseA(),
+    },
+    {
+      id: 'townhouse_bakery',
+      name: 'Пекарня (Таунхаус Б)',
+      icon: '🥖',
+      cat: 'buildings',
+      desc: 'Классический особняк из красного обожжённого кирпича: угловые жёлтые рустовые камни, вывеска BAKERY, три арочных окна и ступенчатая балюстрада с двумя дымоходами.',
+      create: () => createTownhouseB(),
+    },
+    {
+      id: 'townhouse_books',
+      name: 'Книги (Таунхаус В)',
+      icon: '📚',
+      cat: 'buildings',
+      desc: 'Изумрудная книжная лавка: витрина с книжными полками, вывески BOOKS, угловая вертикальная консоль, терракотовая черепичная крыша и сдвоенные печные трубы.',
+      create: () => createTownhouseC(),
+    },
+  ];
+}
+function getModelCatalog()                     {
+  return [
+    ...getCharacterModelItems(),
+    ...getVehicleModelItems(),
+    ...getPropModelItems(),
+    ...getNatureModelItems(),
+    ...getBuildingModelItems(),
+  ];
+}
+function getModelDiagnostics(group             )   
+                    
+               
+  {
+  let meshCount = 0;
+  group.traverse((c) => {
+    if ((c              ).isMesh) {
+      meshCount++;
+    }
+  });
+  const box = new THREE.Box3().setFromObject(group);
+  const w = Math.max(0.01, box.max.x - box.min.x).toFixed(2);
+  const h = Math.max(0.01, box.max.y - box.min.y).toFixed(2);
+  const d = Math.max(0.01, box.max.z - box.min.z).toFixed(2);
+  return { meshCount, dims: `${w} × ${h} × ${d}` };
+}
+function verifyModelRegistry()   
+                
+                                           
+                   
+  {
+  const catalog = getModelCatalog();
+  const countsByCategory                         = {};
+  const errors           = [];
+
+  for (const item of catalog) {
+    countsByCategory[item.cat] = (countsByCategory[item.cat] ?? 0) + 1;
+    try {
+      const mesh = item.create('forest', false);
+      if (!mesh || !mesh.isGroup) {
+        errors.push(`Model "${item.id}" did not return a THREE.Group`);
+        continue;
       }
-      const hex = typeof colorKeyOrHex === 'number' ? colorKeyOrHex : (VOXEL_PALETTE[colorKeyOrHex] ?? 0xffffff);
-      if (!matCache.has(hex)) {
-        matCache.set(hex, new THREE.MeshLambertMaterial({ color: hex }));
+      const diag = getModelDiagnostics(mesh);
+      if (diag.meshCount <= 0) {
+        errors.push(`Model "${item.id}" has 0 voxel meshes`);
       }
-      return matCache.get(hex);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      errors.push(`Model "${item.id}" failed during instantiation: ${msg}`);
     }
+  }
 
-    const geoCache = new Map();
-    function getGeo(w, h, d) {
-      const key = `${w}_${h}_${d}`;
-      if (!geoCache.has(key)) geoCache.set(key, new THREE.BoxGeometry(w, h, d));
-      return geoCache.get(key);
+  // Ensure every registered character skin in ALL_SKINS has an entry
+  for (const skin of ALL_SKINS) {
+    const found = catalog.find((m) => m.id === skin.id && m.cat === 'chars');
+    if (!found) {
+      errors.push(`Skin "${skin.id}" from ALL_SKINS is missing from model catalog!`);
     }
+  }
 
-    function addVoxel(group, w, h, d, color, x, y, z, isGhost = false) {
-      const mesh = new THREE.Mesh(getGeo(w, h, d), getMat(color, isGhost));
-      mesh.position.set(x, y, z);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      group.add(mesh);
-      return mesh;
-    }
+  return {
+    total: catalog.length,
+    countsByCategory,
+    errors,
+  };
+}
 
-    // === CHARACTER FACTORIES ===
-    function createCorgi(isGhost = false) {
-      const g = new THREE.Group();
-      // Paws
-      addVoxel(g, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, 0.16, isGhost);
-      addVoxel(g, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, 0.16, isGhost);
-      addVoxel(g, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, 0.16, isGhost);
-      addVoxel(g, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, 0.16, isGhost);
-      addVoxel(g, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, -0.16, isGhost);
-      addVoxel(g, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, -0.16, isGhost);
-      addVoxel(g, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, -0.16, isGhost);
-      addVoxel(g, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, -0.16, isGhost);
-      // Body & belly
-      addVoxel(g, 0.38, 0.22, 0.46, 'corgiOrange', 0, 0.25, -0.01, isGhost);
-      addVoxel(g, 0.26, 0.04, 0.38, 'white', 0, 0.15, -0.01, isGhost);
-      addVoxel(g, 0.34, 0.20, 0.12, 'white', 0, 0.26, 0.18, isGhost);
-      addVoxel(g, 0.36, 0.20, 0.08, 'corgiOrange', 0, 0.26, -0.24, isGhost);
-      addVoxel(g, 0.16, 0.12, 0.03, 'white', 0, 0.25, -0.28, isGhost);
-      addVoxel(g, 0.12, 0.12, 0.10, 'corgiOrange', 0, 0.35, -0.27, isGhost);
-      addVoxel(g, 0.08, 0.08, 0.05, 'white', 0, 0.37, -0.31, isGhost);
-      // Collar & gold tag
-      addVoxel(g, 0.32, 0.04, 0.22, 'pizzaRed', 0, 0.35, 0.15, isGhost);
-      addVoxel(g, 0.04, 0.04, 0.03, 'pizzaCheese', 0, 0.33, 0.26, isGhost);
-      // Head, muzzle, eyes & tongue
-      addVoxel(g, 0.36, 0.26, 0.30, 'corgiOrange', 0, 0.48, 0.18, isGhost);
-      addVoxel(g, 0.08, 0.22, 0.12, 'white', 0, 0.50, 0.28, isGhost);
-      addVoxel(g, 0.20, 0.12, 0.14, 'white', 0, 0.42, 0.35, isGhost);
-      addVoxel(g, 0.08, 0.06, 0.06, 'darkCharcoal', 0, 0.46, 0.42, isGhost);
-      addVoxel(g, 0.06, 0.03, 0.08, 'nosePink', 0.03, 0.38, 0.41, isGhost);
-      addVoxel(g, 0.05, 0.06, 0.04, 'darkCharcoal', -0.11, 0.51, 0.33, isGhost);
-      addVoxel(g, 0.02, 0.02, 0.02, 'white', -0.11, 0.53, 0.35, isGhost);
-      addVoxel(g, 0.05, 0.06, 0.04, 'darkCharcoal', 0.11, 0.51, 0.33, isGhost);
-      addVoxel(g, 0.02, 0.02, 0.02, 'white', 0.11, 0.53, 0.35, isGhost);
-      // Ears with pink lining
-      addVoxel(g, 0.10, 0.16, 0.06, 'corgiOrange', -0.14, 0.66, 0.16, isGhost);
-      addVoxel(g, 0.06, 0.08, 0.05, 'corgiOrange', -0.15, 0.76, 0.16, isGhost);
-      addVoxel(g, 0.06, 0.14, 0.03, 'nosePink', -0.14, 0.67, 0.18, isGhost);
-      addVoxel(g, 0.10, 0.16, 0.06, 'corgiOrange', 0.14, 0.66, 0.16, isGhost);
-      addVoxel(g, 0.06, 0.08, 0.05, 'corgiOrange', 0.15, 0.76, 0.16, isGhost);
-      addVoxel(g, 0.06, 0.14, 0.03, 'nosePink', 0.14, 0.67, 0.18, isGhost);
-      return g;
-    }
 
-    function createPigeon(isGhost = false) {
-      const g = new THREE.Group();
-      addVoxel(g, 0.12, 0.03, 0.14, 'pigeonFootRed', -0.10, 0.015, 0.02, isGhost);
-      addVoxel(g, 0.05, 0.10, 0.05, 'pigeonFootRed', -0.10, 0.07, 0.00, isGhost);
-      addVoxel(g, 0.12, 0.03, 0.14, 'pigeonFootRed', 0.10, 0.015, 0.02, isGhost);
-      addVoxel(g, 0.05, 0.10, 0.05, 'pigeonFootRed', 0.10, 0.07, 0.00, isGhost);
-      addVoxel(g, 0.40, 0.28, 0.42, 'pigeonGrey', 0, 0.28, -0.04, isGhost);
-      addVoxel(g, 0.30, 0.20, 0.12, 'white', 0, 0.28, 0.12, isGhost);
-      addVoxel(g, 0.22, 0.08, 0.18, 'pigeonGrey', 0, 0.26, -0.28, isGhost);
-      addVoxel(g, 0.18, 0.05, 0.12, 'darkCharcoal', 0, 0.24, -0.38, isGhost);
-      addVoxel(g, 0.06, 0.22, 0.32, 'pigeonGrey', -0.22, 0.32, -0.04, isGhost);
-      addVoxel(g, 0.07, 0.05, 0.22, 'darkCharcoal', -0.22, 0.28, -0.06, isGhost);
-      addVoxel(g, 0.06, 0.08, 0.14, 'darkCharcoal', -0.20, 0.24, -0.20, isGhost);
-      addVoxel(g, 0.06, 0.22, 0.32, 'pigeonGrey', 0.22, 0.32, -0.04, isGhost);
-      addVoxel(g, 0.07, 0.05, 0.22, 'darkCharcoal', 0.22, 0.28, -0.06, isGhost);
-      addVoxel(g, 0.06, 0.08, 0.14, 'darkCharcoal', 0.20, 0.24, -0.20, isGhost);
-      addVoxel(g, 0.28, 0.12, 0.26, 'purpleNeck', 0, 0.43, 0.10, isGhost);
-      addVoxel(g, 0.29, 0.04, 0.27, 'pigeonTeal', 0, 0.41, 0.10, isGhost);
-      addVoxel(g, 0.26, 0.22, 0.26, 'pigeonGrey', 0, 0.56, 0.14, isGhost);
-      addVoxel(g, 0.18, 0.06, 0.18, 'pigeonGrey', 0, 0.68, 0.14, isGhost);
-      addVoxel(g, 0.03, 0.07, 0.07, 'orangeFruit', -0.14, 0.60, 0.17, isGhost);
-      addVoxel(g, 0.04, 0.04, 0.04, 'darkCharcoal', -0.14, 0.60, 0.17, isGhost);
-      addVoxel(g, 0.03, 0.07, 0.07, 'orangeFruit', 0.14, 0.60, 0.17, isGhost);
-      addVoxel(g, 0.04, 0.04, 0.04, 'darkCharcoal', 0.14, 0.60, 0.17, isGhost);
-      // Pizza slice
-      addVoxel(g, 0.08, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.26, isGhost);
-      addVoxel(g, 0.16, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.31, isGhost);
-      addVoxel(g, 0.24, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.36, isGhost);
-      addVoxel(g, 0.26, 0.06, 0.06, 'pizzaCrust', 0, 0.53, 0.41, isGhost);
-      addVoxel(g, 0.06, 0.02, 0.06, 'pizzaRed', -0.05, 0.54, 0.36, isGhost);
-      addVoxel(g, 0.06, 0.02, 0.06, 'pizzaRed', 0.05, 0.54, 0.32, isGhost);
-      return g;
-    }
-
-    function createCat(isGhost = false) {
-      const g = new THREE.Group();
-      // Box
-      addVoxel(g, 0.52, 0.04, 0.52, 'cardboard', 0, 0.02, 0, isGhost);
-      addVoxel(g, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, 0.24, isGhost);
-      addVoxel(g, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, -0.24, isGhost);
-      addVoxel(g, 0.04, 0.26, 0.44, 'cardboard', -0.24, 0.17, 0, isGhost);
-      addVoxel(g, 0.04, 0.26, 0.44, 'cardboard', 0.24, 0.17, 0, isGhost);
-      // Flaps & Stamp
-      addVoxel(g, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, 0.31, isGhost);
-      addVoxel(g, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, -0.31, isGhost);
-      addVoxel(g, 0.22, 0.12, 0.02, 'deliveryRed', 0.10, 0.15, 0.262, isGhost);
-      // Cat body & paws on rim
-      addVoxel(g, 0.38, 0.22, 0.38, 'catOrange', 0, 0.20, 0, isGhost);
-      addVoxel(g, 0.09, 0.07, 0.10, 'white', -0.13, 0.32, 0.24, isGhost);
-      addVoxel(g, 0.09, 0.07, 0.10, 'white', 0.13, 0.32, 0.24, isGhost);
-      // Head, ears, eyes
-      addVoxel(g, 0.34, 0.26, 0.30, 'catOrange', 0, 0.44, 0.06, isGhost);
-      addVoxel(g, 0.05, 0.04, 0.04, 'nosePink', 0, 0.42, 0.25, isGhost);
-      addVoxel(g, 0.05, 0.06, 0.04, 'catEye', -0.08, 0.46, 0.212, isGhost);
-      addVoxel(g, 0.05, 0.06, 0.04, 'catEye', 0.08, 0.46, 0.212, isGhost);
-      addVoxel(g, 0.09, 0.10, 0.06, 'catOrange', -0.12, 0.60, 0.06, isGhost);
-      addVoxel(g, 0.09, 0.10, 0.06, 'catOrange', 0.12, 0.60, 0.06, isGhost);
-      // Tail
-      addVoxel(g, 0.07, 0.28, 0.07, 'catOrange', 0.06, 0.45, -0.21, isGhost);
-      return g;
-    }
-
-    function createRaccoon(isGhost = false) {
-      const g = new THREE.Group();
-      // Legs
-      addVoxel(g, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, 0.14, isGhost);
-      addVoxel(g, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, 0.14, isGhost);
-      addVoxel(g, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, -0.13, isGhost);
-      addVoxel(g, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, -0.13, isGhost);
-      // Body & head
-      addVoxel(g, 0.36, 0.22, 0.38, 'raccoonGrey', 0, 0.23, 0, isGhost);
-      addVoxel(g, 0.32, 0.22, 0.24, 'raccoonGrey', 0, 0.45, 0.16, isGhost);
-      // Bandit mask
-      addVoxel(g, 0.22, 0.08, 0.05, 'maskBlack', 0, 0.46, 0.28, isGhost);
-      addVoxel(g, 0.08, 0.10, 0.05, 'maskBlack', -0.12, 0.46, 0.28, isGhost);
-      addVoxel(g, 0.08, 0.10, 0.05, 'maskBlack', 0.12, 0.46, 0.28, isGhost);
-      // Ears & nose
-      addVoxel(g, 0.08, 0.09, 0.05, 'raccoonGrey', -0.13, 0.58, 0.14, isGhost);
-      addVoxel(g, 0.08, 0.09, 0.05, 'raccoonGrey', 0.13, 0.58, 0.14, isGhost);
-      addVoxel(g, 0.06, 0.05, 0.04, 'maskBlack', 0, 0.42, 0.36, isGhost);
-      // Striped tail
-      addVoxel(g, 0.14, 0.14, 0.06, 'raccoonGrey', 0, 0.24, -0.21, isGhost);
-      addVoxel(g, 0.15, 0.15, 0.06, 'maskBlack', 0, 0.26, -0.26, isGhost);
-      addVoxel(g, 0.15, 0.15, 0.06, 'raccoonGrey', 0, 0.28, -0.31, isGhost);
-      // Loot bag
-      addVoxel(g, 0.26, 0.18, 0.20, 'burlapBag', 0, 0.37, -0.08, isGhost);
-      addVoxel(g, 0.12, 0.04, 0.12, 'bagRope', 0, 0.53, -0.08, isGhost);
-      return g;
-    }
-
-    function createCapybara(isGhost = false) {
-      const g = new THREE.Group();
-      // Paws
-      addVoxel(g, 0.09, 0.08, 0.10, 'capybaraPaws', -0.14, 0.04, 0.15, isGhost);
-      addVoxel(g, 0.09, 0.08, 0.10, 'capybaraPaws', 0.14, 0.04, 0.15, isGhost);
-      addVoxel(g, 0.10, 0.08, 0.11, 'capybaraPaws', -0.15, 0.04, -0.15, isGhost);
-      addVoxel(g, 0.10, 0.08, 0.11, 'capybaraPaws', 0.15, 0.04, -0.15, isGhost);
-      // Body & Zen block head
-      addVoxel(g, 0.38, 0.32, 0.42, 'capybaraCaramel', 0, 0.24, -0.02, isGhost);
-      addVoxel(g, 0.30, 0.24, 0.26, 'capybaraCaramel', 0, 0.46, 0.19, isGhost);
-      addVoxel(g, 0.26, 0.20, 0.14, 'capybaraCaramel', 0, 0.42, 0.33, isGhost);
-      // Closed calm eyes & nose
-      addVoxel(g, 0.02, 0.03, 0.07, 'maskBlack', -0.155, 0.48, 0.22, isGhost);
-      addVoxel(g, 0.02, 0.03, 0.07, 'maskBlack', 0.155, 0.48, 0.22, isGhost);
-      addVoxel(g, 0.04, 0.12, 0.02, 'capybaraDark', 0, 0.41, 0.405, isGhost);
-      // Mandarin on head
-      addVoxel(g, 0.18, 0.08, 0.18, 'orangeFruit', 0, 0.64, 0.19, isGhost);
-      addVoxel(g, 0.03, 0.05, 0.03, 'greenLeaf', 0, 0.725, 0.19, isGhost);
-      return g;
-    }
-
-    // === VEHICLE FACTORIES ===
-    function createTaxi() {
-      const g = new THREE.Group();
-      // Body
-      addVoxel(g, 1.8, 0.45, 0.9, 0xeab308, 0, 0.35, 0);
-      // Cabin
-      addVoxel(g, 0.9, 0.35, 0.75, 0x1e293b, -0.1, 0.75, 0);
-      // Taxi checker / sign
-      addVoxel(g, 0.35, 0.15, 0.25, 0xffffff, -0.1, 0.98, 0);
-      // Wheels
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, -0.55, 0.18, 0.45);
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, 0.55, 0.18, 0.45);
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, -0.55, 0.18, -0.45);
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, 0.55, 0.18, -0.45);
-      // Lights
-      addVoxel(g, 0.1, 0.15, 0.2, 0xfacc15, 0.9, 0.35, 0.28);
-      addVoxel(g, 0.1, 0.15, 0.2, 0xfacc15, 0.9, 0.35, -0.28);
-      addVoxel(g, 0.1, 0.15, 0.2, 0xef4444, -0.9, 0.35, 0.28);
-      addVoxel(g, 0.1, 0.15, 0.2, 0xef4444, -0.9, 0.35, -0.28);
-      return g;
-    }
-
-    function createScooter() {
-      const g = new THREE.Group();
-      addVoxel(g, 0.9, 0.15, 0.3, 0x3b82f6, 0, 0.2, 0);
-      addVoxel(g, 0.15, 0.45, 0.25, 0x3b82f6, 0.35, 0.45, 0);
-      addVoxel(g, 0.1, 0.15, 0.5, 0x0f172a, 0.35, 0.7, 0);
-      // Thermal delivery bag
-      addVoxel(g, 0.35, 0.35, 0.35, 0xf97316, -0.25, 0.45, 0);
-      // Wheels
-      addVoxel(g, 0.25, 0.25, 0.1, 0x0f172a, 0.35, 0.13, 0);
-      addVoxel(g, 0.25, 0.25, 0.1, 0x0f172a, -0.35, 0.13, 0);
-      return g;
-    }
-
-    function createBus() {
-      const g = new THREE.Group();
-      addVoxel(g, 3.2, 0.9, 1.1, 0x38bdf8, 0, 0.65, 0);
-      addVoxel(g, 2.8, 0.35, 1.12, 0x0f172a, 0, 0.85, 0);
-      // Wheels
-      addVoxel(g, 0.4, 0.4, 0.2, 0x0f172a, -1.0, 0.2, 0.55);
-      addVoxel(g, 0.4, 0.4, 0.2, 0x0f172a, 1.0, 0.2, 0.55);
-      addVoxel(g, 0.4, 0.4, 0.2, 0x0f172a, -1.0, 0.2, -0.55);
-      addVoxel(g, 0.4, 0.4, 0.2, 0x0f172a, 1.0, 0.2, -0.55);
-      return g;
-    }
-
-    function createSweeper() {
-      const g = new THREE.Group();
-      addVoxel(g, 2.2, 0.7, 1.0, 0xf97316, 0, 0.5, 0);
-      addVoxel(g, 0.8, 0.45, 0.9, 0x1e293b, 0.6, 0.75, 0);
-      // Street brushes
-      addVoxel(g, 0.4, 0.2, 0.4, 0xfacc15, 1.0, 0.15, 0.4);
-      addVoxel(g, 0.4, 0.2, 0.4, 0xfacc15, 1.0, 0.15, -0.4);
-      // Wheels
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, -0.7, 0.18, 0.5);
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, 0.5, 0.18, 0.5);
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, -0.7, 0.18, -0.5);
-      addVoxel(g, 0.35, 0.35, 0.15, 0x0f172a, 0.5, 0.18, -0.5);
-      return g;
-    }
-
-    function createTrain() {
-      const g = new THREE.Group();
-      // Aerodynamic High-speed locomotive
-      addVoxel(g, 5.5, 1.1, 1.1, 0xdc2626, 0, 0.8, 0);
-      addVoxel(g, 0.8, 0.8, 1.08, 0xb91c1c, 2.7, 0.7, 0);
-      addVoxel(g, 4.6, 0.25, 1.12, 0x1e293b, 0, 0.95, 0);
-      addVoxel(g, 5.5, 0.12, 1.14, 0xffffff, 0, 0.6, 0);
-      // Front headlight
-      addVoxel(g, 0.15, 0.25, 0.3, 0xfacc15, 3.1, 0.75, 0);
-      return g;
-    }
-
-    function createPallet() {
-      const g = new THREE.Group();
-      addVoxel(g, 2.4, 0.15, 0.8, 0xd97706, 0, 0.15, 0);
-      addVoxel(g, 2.3, 0.1, 0.2, 0x78350f, 0, 0.05, 0.3);
-      addVoxel(g, 2.3, 0.1, 0.2, 0x78350f, 0, 0.05, 0);
-      addVoxel(g, 2.3, 0.1, 0.2, 0x78350f, 0, 0.05, -0.3);
-      return g;
-    }
-
-    // === ENVIRONMENT PROPS ===
-    function createHydrant() {
-      const g = new THREE.Group();
-      addVoxel(g, 0.35, 0.12, 0.35, 0x7f1d1d, 0, 0.06, 0);
-      addVoxel(g, 0.25, 0.45, 0.25, 0xdc2626, 0, 0.34, 0);
-      addVoxel(g, 0.45, 0.12, 0.12, 0xb91c1c, 0, 0.38, 0);
-      addVoxel(g, 0.18, 0.1, 0.18, 0xfacc15, 0, 0.6, 0);
-      return g;
-    }
-
-    function createTrashCan() {
-      const g = new THREE.Group();
-      addVoxel(g, 0.45, 0.65, 0.45, 0x0284c7, 0, 0.33, 0);
-      addVoxel(g, 0.5, 0.1, 0.5, 0x0369a1, 0, 0.7, 0);
-      addVoxel(g, 0.2, 0.2, 0.05, 0xffffff, 0, 0.4, 0.23);
-      return g;
-    }
-
-    function createBench() {
-      const g = new THREE.Group();
-      // Legs
-      addVoxel(g, 0.1, 0.35, 0.4, 0x1e293b, -0.4, 0.18, 0);
-      addVoxel(g, 0.1, 0.35, 0.4, 0x1e293b, 0.4, 0.18, 0);
-      // Slats
-      addVoxel(g, 1.1, 0.06, 0.45, 0xb45309, 0, 0.35, 0);
-      addVoxel(g, 1.1, 0.35, 0.06, 0xb45309, 0, 0.55, -0.2);
-      return g;
-    }
-
-    function createLampPost() {
-      const g = new THREE.Group();
-      addVoxel(g, 0.3, 0.15, 0.3, 0x1e293b, 0, 0.08, 0);
-      addVoxel(g, 0.12, 1.8, 0.12, 0x334155, 0, 0.95, 0);
-      addVoxel(g, 0.45, 0.1, 0.12, 0x334155, 0.15, 1.85, 0);
-      addVoxel(g, 0.22, 0.15, 0.22, 0xfef08a, 0.35, 1.8, 0);
-      return g;
-    }
-
-    function createCoin() {
-      const g = new THREE.Group();
-      addVoxel(g, 0.35, 0.35, 0.12, 0xfacc15, 0, 0.5, 0);
-      addVoxel(g, 0.22, 0.22, 0.14, 0xeab308, 0, 0.5, 0);
-      return g;
-    }
-
-    function createSignal() {
-      const g = new THREE.Group();
-      addVoxel(g, 0.1, 1.6, 0.1, 0x334155, 0, 0.8, 0);
-      addVoxel(g, 0.5, 0.25, 0.15, 0x0f172a, 0, 1.5, 0);
-      addVoxel(g, 0.15, 0.15, 0.18, 0xef4444, -0.12, 1.5, 0);
-      addVoxel(g, 0.15, 0.15, 0.18, 0xef4444, 0.12, 1.5, 0);
-      return g;
-    }
-
-    function createRecordFlag() {
-      const g = new THREE.Group();
-      addVoxel(g, 0.4, 0.1, 0.4, 0x1e293b, 0, 0.05, 0);
-      addVoxel(g, 0.08, 2.0, 0.08, 0xe2e8f0, 0, 1.05, 0);
-      addVoxel(g, 0.65, 0.45, 0.04, 0xef4444, 0.35, 1.7, 0);
-      addVoxel(g, 0.25, 0.25, 0.06, 0xfacc15, 0.35, 1.7, 0); // Crown emblem
-      return g;
-    }
-
-    // === VEGETATION & BIOMES ===
-    function createTree(biome = 'forest', variant = 0) {
-      const g = new THREE.Group();
-      let trunkCol = 0x78350f;
-      let foliageCol = 0x16a34a;
-      if (biome === 'winter') { foliageCol = 0xe2e8f0; }
-      else if (biome === 'desert') { foliageCol = 0xca8a04; }
-      else if (biome === 'neon') { foliageCol = 0x06b6d4; trunkCol = 0x4f46e5; }
-
-      // Pot / Planter
-      addVoxel(g, 0.5, 0.3, 0.5, 0x475569, 0, 0.15, 0);
-      addVoxel(g, 0.18, 1.0, 0.18, trunkCol, 0, 0.7, 0);
-      if (variant === 0) {
-        addVoxel(g, 0.9, 0.9, 0.9, foliageCol, 0, 1.5, 0);
-        addVoxel(g, 0.65, 0.65, 0.65, foliageCol, 0, 2.1, 0);
-      } else {
-        addVoxel(g, 1.1, 0.6, 1.1, foliageCol, 0, 1.4, 0);
-        addVoxel(g, 0.8, 0.6, 0.8, foliageCol, 0, 1.8, 0);
-      }
-      return g;
-    }
-
-    function createHedge(biome = 'forest') {
-      const g = new THREE.Group();
-      let col = 0x15803d;
-      if (biome === 'winter') col = 0xcbd5e1;
-      else if (biome === 'desert') col = 0xa16207;
-      else if (biome === 'neon') col = 0x8b5cf6;
-      addVoxel(g, 0.9, 0.5, 0.5, col, 0, 0.25, 0);
-      return g;
-    }
-
-    function createTownhouse(variant = 'A') {
-      const g = new THREE.Group();
-      const wallCol = variant === 'A' ? 0x94a3b8 : variant === 'B' ? 0xb45309 : 0x0284c7;
-      addVoxel(g, 1.8, 2.8, 1.8, wallCol, 0, 1.4, 0);
-      addVoxel(g, 1.9, 0.2, 1.9, 0x1e293b, 0, 2.8, 0);
-      // Door & windows
-      addVoxel(g, 0.45, 0.8, 0.05, 0x78350f, 0, 0.4, 0.92);
-      addVoxel(g, 0.4, 0.5, 0.05, 0x38bdf8, -0.45, 1.6, 0.92);
-      addVoxel(g, 0.4, 0.5, 0.05, 0x38bdf8, 0.45, 1.6, 0.92);
-      return g;
-    }
-
-    // === MODEL CATALOG METADATA ===
-    const MODELS = [
-      // Chars
-      { id: 'corgi', name: 'Весёлый Корги', icon: '🐶', cat: 'chars', voxels: 32, dims: '0.38 × 0.78 × 0.46', desc: 'Главный герой Crossy Road. Милый корги с розовыми лапками, торчащими лисьими ушками и ошейником.', create: () => createCorgi() },
-      { id: 'pigeon', name: 'Пицца-Голубь', icon: '🐦', cat: 'chars', voxels: 33, dims: '0.40 × 0.70 × 0.42', desc: 'Городской голубь с переливающейся фиолетово-бирюзовой шеей, несущий в клюве аппетитный кусочек пиццы.', create: () => createPigeon() },
-      { id: 'cat', name: 'Кот в коробке', icon: '📦', cat: 'chars', voxels: 37, dims: '0.52 × 0.65 × 0.52', desc: 'Рыжий котик, уютно сидящий в посылочной коробке со штампом "FRAGILE" и свесив лапки через край.', create: () => createCat() },
-      { id: 'raccoon', name: 'Енот-воришка', icon: '🦝', cat: 'chars', voxels: 41, dims: '0.36 × 0.60 × 0.45', desc: 'Ночной воришка в бандитской маске с полосатым пушистым хвостом и холщовым мешком добычи за спиной.', create: () => createRaccoon() },
-      { id: 'capybara', name: 'Дзен-Капибара', icon: '🍊', cat: 'chars', voxels: 32, dims: '0.38 × 0.73 × 0.42', desc: 'Умиротворённая капибара в состоянии абсолютного дзена с сочным мандарином на плоской голове.', create: () => createCapybara() },
-
-      // Vehicles
-      { id: 'taxi', name: 'Городское такси', icon: '🚕', cat: 'vehicles', voxels: 28, dims: '1.8 × 1.0 × 0.9', desc: 'Классическое жёлтое такси с шашечками на крыше, детализированными фарами и чёрными дисками.', create: () => createTaxi() },
-      { id: 'scooter', name: 'Курьерский скутер', icon: '🛵', cat: 'vehicles', voxels: 14, dims: '0.9 × 0.7 × 0.5', desc: 'Манёвренный мопед службы экспресс-доставки с термосумкой для горячей пиццы.', create: () => createScooter() },
-      { id: 'bus', name: 'Рейсовый автобус', icon: '🚌', cat: 'vehicles', voxels: 38, dims: '3.2 × 1.3 × 1.1', desc: 'Городской пассажирский автобус с панорамными тёмными окнами и широкой колёсной базой.', create: () => createBus() },
-      { id: 'sweeper', name: 'Уборочная машина', icon: '🚜', cat: 'vehicles', voxels: 24, dims: '2.2 × 1.0 × 1.0', desc: 'Коммунальная уборочная машина со вращающимися передними щётками и сигнальными маячками.', create: () => createSweeper() },
-      { id: 'train', name: 'Скоростной поезд', icon: '🚄', cat: 'vehicles', voxels: 44, dims: '5.5 × 1.3 × 1.1', desc: 'Сверхзвуковой пассажирский экспресс. Мчится по рельсам и сметает всё на своём пути!', create: () => createTrain() },
-      { id: 'pallet', name: 'Речной поддон', icon: '🪵', cat: 'vehicles', voxels: 12, dims: '2.4 × 0.2 × 0.8', desc: 'Деревянный брусчатый поддон, мирно плывущий по реке для безопасной переправы персонажей.', create: () => createPallet() },
-
-      // Props
-      { id: 'hydrant', name: 'Пожарный гидрант', icon: '🚒', cat: 'props', voxels: 12, dims: '0.45 × 0.65 × 0.45', desc: 'Ярко-красный уличный гидрант с латунными соединительными гайками.', create: () => createHydrant() },
-      { id: 'trash', name: 'Мусорный бак', icon: '🗑️', cat: 'props', voxels: 10, dims: '0.5 × 0.7 × 0.5', desc: 'Уличный контейнер для раздельного сбора отходов с белой маркировкой.', create: () => createTrashCan() },
-      { id: 'bench', name: 'Парковая скамейка', icon: '🪑', cat: 'props', voxels: 14, dims: '1.1 × 0.6 × 0.45', desc: 'Уютная деревянная скамейка на чугунных ножках для парковых полос.', create: () => createBench() },
-      { id: 'lamp', name: 'Фонарный столб', icon: '💡', cat: 'props', voxels: 10, dims: '0.45 × 1.9 × 0.3', desc: 'Высокий уличный светильник с тёплым светящимся плафоном.', create: () => createLampPost() },
-      { id: 'coin', name: 'Золотая монета', icon: '🪙', cat: 'props', voxels: 8, dims: '0.35 × 0.35 × 0.14', desc: 'Вращающаяся золотая монетка с выпуклым ободком. Добавляет +1 к балансу игрока.', create: () => createCoin() },
-      { id: 'signal', name: 'Ж/д светофор', icon: '🚦', cat: 'props', voxels: 12, dims: '0.5 × 1.6 × 0.18', desc: 'Сигнальный фонарь железнодорожного переезда с мигающими красными огнями опасности.', create: () => createSignal() },
-      { id: 'flag', name: 'Флаг рекорда', icon: '🚩', cat: 'props', voxels: 16, dims: '0.65 × 2.0 × 0.4', desc: 'Личный рекорд игрока (PB Flag) на обочине с золотой короной чемпиона.', create: () => createRecordFlag() },
-
-      // Nature
-      { id: 'tree_0', name: 'Дерево (Стандарт)', icon: '🌲', cat: 'nature', voxels: 22, dims: '0.9 × 2.2 × 0.9', desc: 'Городское дерево в кадке. Меняет цвет листвы и снежный покров в зависимости от биома.', create: (b) => createTree(b, 0) },
-      { id: 'tree_1', name: 'Дерево (Широкое)', icon: '🌳', cat: 'nature', voxels: 24, dims: '1.1 × 2.0 × 1.1', desc: 'Раскидистое парковое дерево с пышной многослойной кроной.', create: (b) => createTree(b, 1) },
-      { id: 'hedge', name: 'Живая изгородь', icon: '🌿', cat: 'nature', voxels: 8, dims: '0.9 × 0.5 × 0.5', desc: 'Аккуратно подстриженный декоративный кустарник вдоль дорог.', create: (b) => createHedge(b) },
-
-      // Buildings
-      { id: 'town_a', name: 'Таунхаус А (Серый)', icon: '🏢', cat: 'buildings', voxels: 36, dims: '1.9 × 2.9 × 1.9', desc: 'Многоэтажный жилой дом в классическом городском стиле.', create: () => createTownhouse('A') },
-      { id: 'town_b', name: 'Таунхаус Б (Кирпич)', icon: '🏬', cat: 'buildings', voxels: 36, dims: '1.9 × 2.9 × 1.9', desc: 'Уютный особняк из терракотового обожжённого кирпича.', create: () => createTownhouse('B') },
-      { id: 'town_c', name: 'Таунхаус В (Синий)', icon: '🏛️', cat: 'buildings', voxels: 36, dims: '1.9 × 2.9 × 1.9', desc: 'Современный синий жилой комплекс с парадным входом.', create: () => createTownhouse('C') }
-    ];
 
     // === THREE.JS STAGE SETUP ===
     const container = document.getElementById('canvas-container');
@@ -624,13 +2506,13 @@
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.target.set(0, 0.5, 0);
-    controls.maxPolarAngle = Math.PI / 2 + 0.05; // prevent going below ground
+    controls.maxPolarAngle = Math.PI / 2 + 0.05;
 
     // Lights
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.7);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.75);
     scene.add(hemiLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.25);
     dirLight.position.set(5, 10, 7);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 2048;
@@ -638,7 +2520,7 @@
     dirLight.shadow.bias = -0.0005;
     scene.add(dirLight);
 
-    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
     fillLight.position.set(-6, 4, -4);
     scene.add(fillLight);
 
@@ -650,13 +2532,16 @@
     pedestal.receiveShadow = true;
     scene.add(pedestal);
 
-    const grid = new THREE.GridHelper(5, 20, 0x0284c7, 0x1e293b);
+    const grid = new THREE.GridHelper(6, 24, 0x0284c7, 0x1e293b);
     grid.position.y = 0.002;
     scene.add(grid);
 
+    // Dynamic Model Registry from Game Code
+    const MODELS = getModelCatalog();
+
     // Current State
     let activeCategory = 'chars';
-    let currentModelId = 'corgi';
+    let currentModelId = MODELS[0] ? MODELS[0].id : 'corgi';
     let currentMesh = null;
     let autoSpin = true;
     let hopTest = false;
@@ -669,7 +2554,7 @@
 
     function loadModel(id) {
       currentModelId = id;
-      const def = MODELS.find(m => m.id === id);
+      const def = MODELS.find(m => m.id === id) || MODELS[0];
       if (!def) return;
 
       while (modelRoot.children.length > 0) {
@@ -679,18 +2564,21 @@
       currentMesh = def.create(currentBiome, ghostMode);
       modelRoot.add(currentMesh);
 
-      // Center model
+      // Center model on pedestal
       const box = new THREE.Box3().setFromObject(currentMesh);
       const center = box.getCenter(new THREE.Vector3());
       currentMesh.position.x = -center.x;
       currentMesh.position.z = -center.z;
       currentMesh.position.y = -box.min.y;
 
+      // Dynamic diagnostics from actual 3D geometry
+      const diag = getModelDiagnostics(currentMesh);
+
       // Update Info Panel
-      document.getElementById('info-title').textContent = `${def.icon} ${def.name}`;
+      document.getElementById('info-title').textContent = def.icon + ' ' + def.name;
       document.getElementById('info-category').textContent = def.cat.toUpperCase();
-      document.getElementById('info-voxels').textContent = String(def.voxels);
-      document.getElementById('info-dims').textContent = def.dims;
+      document.getElementById('info-voxels').textContent = String(diag.meshCount);
+      document.getElementById('info-dims').textContent = diag.dims;
       document.getElementById('info-desc').textContent = def.desc;
 
       // Update sidebar buttons
@@ -706,15 +2594,25 @@
 
       filtered.forEach(m => {
         const btn = document.createElement('button');
-        btn.className = `model-card-btn ${m.id === currentModelId ? 'active' : ''}`;
+        btn.className = 'model-card-btn ' + (m.id === currentModelId ? 'active' : '');
         btn.dataset.id = m.id;
-        btn.innerHTML = `
-          <div class="model-card-title">
-            <span style="font-size: 18px;">${m.icon}</span>
-            <span>${m.name}</span>
-          </div>
-          <span class="model-card-badge">${m.voxels} vx</span>
-        `;
+
+        // Quick voxel badge
+        let badgeText = '3D';
+        try {
+          const testGroup = m.create(currentBiome, false);
+          const d = getModelDiagnostics(testGroup);
+          badgeText = d.meshCount + ' vx';
+        } catch {
+          badgeText = '3D';
+        }
+
+        btn.innerHTML =
+          '<div class="model-card-title">' +
+            '<span style="font-size: 18px;">' + m.icon + '</span>' +
+            '<span>' + m.name + '</span>' +
+          '</div>' +
+          '<span class="model-card-badge">' + badgeText + '</span>';
         btn.addEventListener('click', () => loadModel(m.id));
         listEl.appendChild(btn);
       });
@@ -800,7 +2698,7 @@
       controls.target.set(0, 0.5, 0);
     });
 
-    // Window Resize
+    // Resize Handler
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -808,49 +2706,33 @@
     });
 
     // Animation Loop
-    let clock = new THREE.Clock();
-    let hopTimer = 0;
-
+    const clock = new THREE.Clock();
     function animate() {
       requestAnimationFrame(animate);
       const delta = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
 
-      controls.update();
-
-      if (autoSpin) {
+      if (autoSpin && modelRoot && !hopTest) {
         modelRoot.rotation.y += delta * 0.8;
       }
 
-      // Procedural Hop with Squash & Stretch
-      if (hopTest) {
-        hopTimer += delta * 2.8;
-        const cycle = hopTimer % 1.0;
-        const hopY = Math.sin(cycle * Math.PI) * 0.7;
-        modelRoot.position.y = Math.max(0, hopY);
-
-        if (cycle < 0.2) {
-          // Takeoff squash
-          const t = cycle / 0.2;
-          modelRoot.scale.y = 1.0 - (1.0 - 0.72) * (1.0 - t);
-          modelRoot.scale.x = 1.0 / Math.sqrt(modelRoot.scale.y);
-          modelRoot.scale.z = modelRoot.scale.x;
-        } else if (cycle <= 0.8) {
-          // Flight stretch
-          modelRoot.scale.y = 1.25;
-          modelRoot.scale.x = 1.0 / Math.sqrt(1.25);
-          modelRoot.scale.z = modelRoot.scale.x;
-        } else {
-          // Landing recovery
-          modelRoot.scale.set(1, 1, 1);
-        }
+      if (hopTest && modelRoot) {
+        const cycle = (elapsed * 3.5) % Math.PI;
+        const hopHeight = Math.sin(cycle) * 0.45;
+        modelRoot.position.y = hopHeight;
+        const squish = hopHeight > 0.08 ? 1.15 : 0.90;
+        modelRoot.scale.set(1 / Math.sqrt(squish), squish, 1 / Math.sqrt(squish));
+      } else if (!hopTest && modelRoot) {
+        modelRoot.position.y = 0;
+        modelRoot.scale.set(1, 1, 1);
       }
 
+      controls.update();
       renderer.render(scene, camera);
     }
 
-    // Init
     renderSidebar();
-    loadModel('corgi');
+    loadModel(currentModelId);
     animate();
   </script>
 </body>

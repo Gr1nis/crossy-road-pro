@@ -3255,6 +3255,8 @@ class GameEngine {
           forwardStreak = 0;
           runCoins = 0;
           biomeOverride                   = null;
+          godMode = false;
+          ignoreObstacles = false;
 
   constructor(seed         = 42, storage                 ) {
     this.generator = new LaneGenerator(seed);
@@ -3320,6 +3322,22 @@ class GameEngine {
 
   getCurrentBiome()            {
     return this.getBiome();
+  }
+
+  setGodMode(enabled         )       {
+    this.godMode = enabled;
+  }
+
+  isGodMode()          {
+    return this.godMode;
+  }
+
+  setIgnoreObstacles(enabled         )       {
+    this.ignoreObstacles = enabled;
+  }
+
+  isIgnoreObstacles()          {
+    return this.ignoreObstacles;
   }
 
   getGameState()            {
@@ -3517,13 +3535,13 @@ class GameEngine {
 
       if (destLane.type !== LaneType.RIVER) {
         const quantized = Math.round(nextX);
-        if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
+        if (!this.ignoreObstacles && (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X)) {
           continue;
         }
         nextX = quantizeLandX(nextX);
       }
 
-      if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
+      if (!this.ignoreObstacles && destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
         continue;
       }
 

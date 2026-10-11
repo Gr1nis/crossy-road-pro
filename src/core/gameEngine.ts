@@ -48,6 +48,8 @@ export class GameEngine {
   private forwardStreak = 0;
   private runCoins = 0;
   private biomeOverride: BiomeType | null = null;
+  private godMode = false;
+  private ignoreObstacles = false;
 
   constructor(seed: number = 42, storage?: StorageAdapter) {
     this.generator = new LaneGenerator(seed);
@@ -113,6 +115,22 @@ export class GameEngine {
 
   getCurrentBiome(): BiomeType {
     return this.getBiome();
+  }
+
+  setGodMode(enabled: boolean): void {
+    this.godMode = enabled;
+  }
+
+  isGodMode(): boolean {
+    return this.godMode;
+  }
+
+  setIgnoreObstacles(enabled: boolean): void {
+    this.ignoreObstacles = enabled;
+  }
+
+  isIgnoreObstacles(): boolean {
+    return this.ignoreObstacles;
   }
 
   getGameState(): GameState {
@@ -310,13 +328,13 @@ export class GameEngine {
 
       if (destLane.type !== LaneType.RIVER) {
         const quantized = Math.round(nextX);
-        if (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X) {
+        if (!this.ignoreObstacles && (quantized < WORLD_CONFIG.MIN_X || quantized > WORLD_CONFIG.MAX_X)) {
           continue;
         }
         nextX = quantizeLandX(nextX);
       }
 
-      if (destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
+      if (!this.ignoreObstacles && destLane.type === LaneType.GRASS && destLane.obstacles.includes(Math.round(nextX))) {
         continue;
       }
 
@@ -455,7 +473,8 @@ export class GameEngine {
             this.scoreTracker.recordLogHopped();
           } else {
             this.killPlayer(DeathReason.WATER);
-            return;
+            if (!this.godMode) return;
+            this.player.ridingLogId = null;
           }
         } else {
           this.player.x = quantizeLandX(this.player.x);
@@ -475,14 +494,14 @@ export class GameEngine {
       const support = findSupportingLog(this.player.x, currentLane.logs);
       if (!support) {
         this.killPlayer(DeathReason.WATER);
-        return;
+        if (!this.godMode) return;
       }
-      this.player.ridingLogId = support.id;
+      this.player.ridingLogId = support ? support.id : null;
     }
 
     if (isOutOfBoundsX(this.player.x)) {
       this.killPlayer(DeathReason.OUT_OF_BOUNDS);
-      return;
+      if (!this.godMode) return;
     }
 
     const activeRow = Math.round(this.player.row);
@@ -493,14 +512,14 @@ export class GameEngine {
       const hitCar = checkVehicleCollision(this.player.x, activeLane.vehicles);
       if (hitCar) {
         this.killPlayer(DeathReason.CAR);
-        return;
+        if (!this.godMode) return;
       }
     } else if (activeLane.type === LaneType.RAILWAY && activeLane.train?.isPassing) {
       const tr = activeLane.train;
       const halfSpan = (WORLD_CONFIG.PLAYER_WIDTH + tr.length) / 2;
       if (Math.abs(this.player.x - tr.x) < halfSpan) {
         this.killPlayer(DeathReason.TRAIN);
-        return;
+        if (!this.godMode) return;
       }
     }
 
@@ -518,7 +537,7 @@ export class GameEngine {
       this.cameraGraceTimer += dt;
       if (this.cameraGraceTimer >= WORLD_CONFIG.CAMERA_GRACE_PERIOD) {
         this.killPlayer(DeathReason.CAMERA_BEHIND);
-        return;
+        if (!this.godMode) return;
       }
     } else {
       this.cameraGraceTimer = 0;

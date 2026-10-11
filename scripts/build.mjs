@@ -1450,9 +1450,546 @@ ${combinedJs}
 fs.writeFileSync(path.join(ROOT, 'index.html'), htmlContent, 'utf8');
 fs.writeFileSync(path.join(distDir, 'index.html'), htmlContent, 'utf8');
 
-const viewerPath = path.join(ROOT, 'viewer.html');
-if (fs.existsSync(viewerPath)) {
-  fs.copyFileSync(viewerPath, path.join(distDir, 'viewer.html'));
+// ============================================================================
+// 3D MODEL VIEWER — DEPLOY AUDIT & DYNAMIC GENERATION
+// ============================================================================
+function auditDeployModels() {
+  console.log('\n===============================================================');
+  console.log('🔍 [3D Model Viewer Deploy Check] Auditing models in game codebase...');
+
+  const typesSource = fs.readFileSync(path.join(ROOT, 'src/core/types.ts'), 'utf8');
+  const charsSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanCharacters.ts'), 'utf8');
+  const vehSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanVehicles.ts'), 'utf8');
+  const envSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanEnvironment.ts'), 'utf8');
+  const bldgSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanBuildings.ts'), 'utf8');
+
+  // Check skins
+  const skinMatches = Array.from(typesSource.matchAll(/id:\s*['"]([^'"]+)['"]/g)).map((m) => m[1]);
+  const uniqueSkins = Array.from(new Set(skinMatches));
+  if (uniqueSkins.length === 0) {
+    throw new Error('Deploy Check Error: No skins found in src/core/types.ts');
+  }
+
+  for (const s of uniqueSkins) {
+    if (!charsSource.includes(`'${s}'`)) {
+      throw new Error(`Deploy Check Error: Skin "${s}" from ALL_SKINS is missing from src/view/urbanCharacters.ts!`);
+    }
+  }
+  console.log(`✔ Verified ${uniqueSkins.length} character skins in ALL_SKINS: ${uniqueSkins.join(', ')}`);
+
+  // Check vehicles
+  const vehicles = ['taxi', 'scooter', 'bus', 'sweeper', 'train', 'pallet'];
+  for (const v of vehicles) {
+    const fnName = v === 'train' ? 'createUrbanTrain' : v === 'pallet' ? 'createUrbanPallet' : `build${v.charAt(0).toUpperCase() + v.slice(1)}`;
+    if (!vehSource.includes(fnName)) {
+      throw new Error(`Deploy Check Error: Vehicle generator "${fnName}" missing in src/view/urbanVehicles.ts!`);
+    }
+  }
+  console.log(`✔ Verified ${vehicles.length} urban vehicles: ${vehicles.join(', ')}`);
+
+  // Check props & nature
+  const props = [
+    'createUrbanHydrant',
+    'createUrbanTrashCan',
+    'createUrbanBench',
+    'createUrbanLampPost',
+    'createUrbanCoin',
+    'createUrbanRailwaySignal',
+    'createUrbanRecordFlag',
+    'createUrbanRoadBarrier',
+    'createUrbanRoadMarkings',
+    'createUrbanRiverbankEdge',
+    'createUrbanTreePlanter',
+    'createUrbanHedge',
+  ];
+  for (const p of props) {
+    if (!envSource.includes(p)) {
+      throw new Error(`Deploy Check Error: Prop "${p}" missing in src/view/urbanEnvironment.ts!`);
+    }
+  }
+  console.log(`✔ Verified ${props.length} environment & biome props.`);
+
+  // Check buildings
+  const buildings = ['createTownhouseA', 'createTownhouseB', 'createTownhouseC'];
+  for (const b of buildings) {
+    if (!bldgSource.includes(b)) {
+      throw new Error(`Deploy Check Error: Building "${b}" missing in src/view/urbanBuildings.ts!`);
+    }
+  }
+  console.log(`✔ Verified ${buildings.length} architectural townhouses (Cafe, Bakery, Books).`);
+
+  const total = uniqueSkins.length + vehicles.length + props.length + buildings.length;
+  console.log(`🎯 Total verified models: ${total}. All game models synchronized!`);
+  console.log('===============================================================\n');
 }
+
+auditDeployModels();
+
+// Extract view & core modules required by 3D Model Viewer
+const viewerModuleOrder = [
+  'src/core/types.ts',
+  'src/core/collision.ts',
+  'src/view/voxelPalette.ts',
+  'src/view/urbanCharacters.ts',
+  'src/view/urbanVehicles.ts',
+  'src/view/urbanEnvironment.ts',
+  'src/view/urbanBuildings.ts',
+  'src/view/meshFactory.ts',
+  'src/view/modelRegistry.ts',
+];
+
+let viewerModulesJs = '';
+for (const relPath of viewerModuleOrder) {
+  const fullPath = path.join(ROOT, relPath);
+  const tsSource = fs.readFileSync(fullPath, 'utf8');
+  let jsCode = stripTypes(tsSource);
+  jsCode = jsCode
+    .replace(/^\s*import\s+[\s\S]*?from\s+['"][^'"]+['"];?\s*$/gm, '')
+    .replace(/^\s*export\s*\{[\s\S]*?\};?\s*$/gm, '')
+    .replace(/^\s*export\s+(class|function|const|let|var)/gm, '$1');
+  viewerModulesJs += `// --- Module: ${relPath} ---\n${jsCode.trim()}\n\n`;
+}
+
+const viewerHtmlContent = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crossy Road 3D — 3D Model Viewer & Dev Studio</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #0b0f19; color: #f8fafc; }
+    #canvas-container { width: 100%; height: 100%; position: absolute; inset: 0; }
+
+    /* Top Navigation Header */
+    .top-header {
+      position: absolute; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 20;
+    }
+    .brand-box {
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 10px 18px; border-radius: 14px; pointer-events: auto; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .brand-title { font-size: 16px; font-weight: 900; letter-spacing: 0.04em; color: #38bdf8; }
+    .brand-subtitle { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .header-links { display: flex; gap: 10px; pointer-events: auto; }
+    .nav-btn {
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: transform 0.1s, border-color 0.2s, background 0.2s; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    .nav-btn:hover { background: rgba(30, 41, 59, 0.95); border-color: #38bdf8; transform: translateY(-1px); }
+
+    /* Left Sidebar: Catalog & Categories */
+    .sidebar {
+      position: absolute; top: 80px; bottom: 80px; left: 16px; width: 320px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; z-index: 20; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    }
+    .category-tabs {
+      display: flex; gap: 4px; padding: 10px; background: rgba(2, 6, 23, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.08); overflow-x: auto;
+    }
+    .cat-tab {
+      padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; border: 1px solid transparent; background: transparent; color: #94a3b8; white-space: nowrap; transition: all 0.15s;
+    }
+    .cat-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+    .cat-tab.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+
+    .model-list {
+      flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .model-list::-webkit-scrollbar { width: 6px; }
+    .model-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+    .model-card-btn {
+      display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); color: #cbd5e1; cursor: pointer; text-align: left; transition: all 0.15s;
+    }
+    .model-card-btn:hover { background: rgba(51, 65, 85, 0.7); border-color: rgba(255, 255, 255, 0.2); color: #fff; transform: translateX(3px); }
+    .model-card-btn.active { background: linear-gradient(135deg, rgba(2, 132, 199, 0.4), rgba(14, 165, 233, 0.2)); border-color: #38bdf8; color: #fff; font-weight: 700; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); }
+    .model-card-title { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .model-card-badge { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; background: rgba(0, 0, 0, 0.4); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+
+    /* Bottom Toolbar */
+    .bottom-bar {
+      position: absolute; bottom: 16px; left: 16px; right: 16px; display: flex; justify-content: center; pointer-events: none; z-index: 20;
+    }
+    .toolbar-dock {
+      background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 16px; border-radius: 18px; display: flex; align-items: center; gap: 12px; pointer-events: auto; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5); flex-wrap: wrap; justify-content: center;
+    }
+    .tool-group { display: flex; align-items: center; gap: 6px; border-right: 1px solid rgba(255, 255, 255, 0.1); padding-right: 12px; }
+    .tool-group:last-child { border-right: none; padding-right: 0; }
+    .tool-btn {
+      background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+    }
+    .tool-btn:hover { background: rgba(51, 65, 85, 1); color: #fff; border-color: #38bdf8; }
+    .tool-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+    .tool-select {
+      background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 10px; cursor: pointer; outline: none;
+    }
+
+    /* Right Info Panel */
+    .info-panel {
+      position: absolute; top: 80px; right: 16px; width: 290px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; padding: 18px; z-index: 20; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    }
+    .info-title { font-size: 17px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .info-category { font-size: 11px; text-transform: uppercase; font-weight: 800; color: #38bdf8; letter-spacing: 0.06em; margin-bottom: 12px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .info-item { background: rgba(2, 6, 23, 0.4); border: 1px solid rgba(255, 255, 255, 0.06); padding: 8px; border-radius: 10px; }
+    .info-label { font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
+    .info-val { font-size: 14px; font-weight: 900; color: #facc15; }
+    .info-desc { font-size: 12px; color: #cbd5e1; line-height: 1.45; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px; }
+
+    .hint-chip {
+      position: absolute; bottom: 80px; right: 16px; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 10px; font-size: 11px; color: #94a3b8; z-index: 10; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <!-- Header -->
+  <header class="top-header">
+    <div class="brand-box">
+      <div>
+        <div class="brand-title">CROSSY ROAD 3D</div>
+        <div class="brand-subtitle">3D Model Viewer & Dev Studio</div>
+      </div>
+    </div>
+    <div class="header-links">
+      <a href="index.html" class="nav-btn">🎮 Запустить игру</a>
+    </div>
+  </header>
+
+  <!-- Left Sidebar (Models Catalog) -->
+  <aside class="sidebar">
+    <div class="category-tabs">
+      <button class="cat-tab active" data-cat="chars">Персонажи</button>
+      <button class="cat-tab" data-cat="vehicles">Транспорт</button>
+      <button class="cat-tab" data-cat="props">Окружение</button>
+      <button class="cat-tab" data-cat="nature">Биомы</button>
+      <button class="cat-tab" data-cat="buildings">Здания</button>
+    </div>
+    <div id="model-list" class="model-list"></div>
+  </aside>
+
+  <!-- Right Info Panel -->
+  <div class="info-panel">
+    <div id="info-title" class="info-title">🐶 Весёлый Корги</div>
+    <div id="info-category" class="info-category">Персонаж (Mascot)</div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Воксели / Меши</div>
+        <div id="info-voxels" class="info-val">32</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Габариты (Ш×В×Г)</div>
+        <div id="info-dims" class="info-val">0.38 × 0.78 × 0.46</div>
+      </div>
+    </div>
+    <div id="info-desc" class="info-desc">
+      Главный маскот игры. Озорной рыже-белый корги с розовыми лапками, торчащими ушками и ошейником.
+    </div>
+  </div>
+
+  <div class="hint-chip">
+    🖱️ ЛКМ — Вращение | ПКМ — Сдвиг | Колесо — Зум
+  </div>
+
+  <!-- Bottom Toolbar -->
+  <footer class="bottom-bar">
+    <div class="toolbar-dock">
+      <div class="tool-group">
+        <button id="btn-spin" class="tool-btn active">🔄 360° Вращение</button>
+        <button id="btn-hop" class="tool-btn">🦘 Тест прыжка</button>
+        <button id="btn-ghost" class="tool-btn">👻 Ghost Mode</button>
+      </div>
+
+      <div class="tool-group">
+        <label style="font-size: 11px; font-weight: 700; color: #94a3b8;">Биом:</label>
+        <select id="biome-select" class="tool-select">
+          <option value="forest">🌲 Лес (Forest)</option>
+          <option value="winter">❄️ Зима (Winter)</option>
+          <option value="desert">🏜️ Пустыня (Desert)</option>
+          <option value="neon">⚡ Неон (Cyberpunk)</option>
+        </select>
+      </div>
+
+      <div class="tool-group">
+        <label style="font-size: 11px; font-weight: 700; color: #94a3b8;">Свет:</label>
+        <select id="light-select" class="tool-select">
+          <option value="studio">💡 Студийный</option>
+          <option value="sun">☀️ Солнечный день</option>
+          <option value="sunset">🌅 Закат</option>
+          <option value="cyber">🌆 Неоновый вечер</option>
+        </select>
+      </div>
+
+      <div class="tool-group">
+        <button id="btn-grid" class="tool-btn active">📐 Сетка пола</button>
+        <button id="btn-reset-cam" class="tool-btn">📷 Сброс камеры</button>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+${viewerModulesJs}
+
+    // === THREE.JS STAGE SETUP ===
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b0f19);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(3.2, 2.5, 4.0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(0, 0.5, 0);
+    controls.maxPolarAngle = Math.PI / 2 + 0.05;
+
+    // Lights
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.75);
+    scene.add(hemiLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.25);
+    dirLight.position.set(5, 10, 7);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    dirLight.shadow.bias = -0.0005;
+    scene.add(dirLight);
+
+    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
+    fillLight.position.set(-6, 4, -4);
+    scene.add(fillLight);
+
+    // Floor Pedestal & Grid
+    const pedestalGeo = new THREE.CylinderGeometry(2.4, 2.5, 0.1, 48);
+    const pedestalMat = new THREE.MeshLambertMaterial({ color: 0x111827 });
+    const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
+    pedestal.position.y = -0.05;
+    pedestal.receiveShadow = true;
+    scene.add(pedestal);
+
+    const grid = new THREE.GridHelper(6, 24, 0x0284c7, 0x1e293b);
+    grid.position.y = 0.002;
+    scene.add(grid);
+
+    // Dynamic Model Registry from Game Code
+    const MODELS = getModelCatalog();
+
+    // Current State
+    let activeCategory = 'chars';
+    let currentModelId = MODELS[0] ? MODELS[0].id : 'corgi';
+    let currentMesh = null;
+    let autoSpin = true;
+    let hopTest = false;
+    let ghostMode = false;
+    let currentBiome = 'forest';
+
+    // Model Mount Node
+    const modelRoot = new THREE.Group();
+    scene.add(modelRoot);
+
+    function loadModel(id) {
+      currentModelId = id;
+      const def = MODELS.find(m => m.id === id) || MODELS[0];
+      if (!def) return;
+
+      while (modelRoot.children.length > 0) {
+        modelRoot.remove(modelRoot.children[0]);
+      }
+
+      currentMesh = def.create(currentBiome, ghostMode);
+      modelRoot.add(currentMesh);
+
+      // Center model on pedestal
+      const box = new THREE.Box3().setFromObject(currentMesh);
+      const center = box.getCenter(new THREE.Vector3());
+      currentMesh.position.x = -center.x;
+      currentMesh.position.z = -center.z;
+      currentMesh.position.y = -box.min.y;
+
+      // Dynamic diagnostics from actual 3D geometry
+      const diag = getModelDiagnostics(currentMesh);
+
+      // Update Info Panel
+      document.getElementById('info-title').textContent = def.icon + ' ' + def.name;
+      document.getElementById('info-category').textContent = def.cat.toUpperCase();
+      document.getElementById('info-voxels').textContent = String(diag.meshCount);
+      document.getElementById('info-dims').textContent = diag.dims;
+      document.getElementById('info-desc').textContent = def.desc;
+
+      // Update sidebar buttons
+      document.querySelectorAll('.model-card-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.id === id);
+      });
+    }
+
+    function renderSidebar() {
+      const listEl = document.getElementById('model-list');
+      listEl.innerHTML = '';
+      const filtered = MODELS.filter(m => m.cat === activeCategory);
+
+      filtered.forEach(m => {
+        const btn = document.createElement('button');
+        btn.className = 'model-card-btn ' + (m.id === currentModelId ? 'active' : '');
+        btn.dataset.id = m.id;
+
+        // Quick voxel badge
+        let badgeText = '3D';
+        try {
+          const testGroup = m.create(currentBiome, false);
+          const d = getModelDiagnostics(testGroup);
+          badgeText = d.meshCount + ' vx';
+        } catch {
+          badgeText = '3D';
+        }
+
+        btn.innerHTML =
+          '<div class="model-card-title">' +
+            '<span style="font-size: 18px;">' + m.icon + '</span>' +
+            '<span>' + m.name + '</span>' +
+          '</div>' +
+          '<span class="model-card-badge">' + badgeText + '</span>';
+        btn.addEventListener('click', () => loadModel(m.id));
+        listEl.appendChild(btn);
+      });
+    }
+
+    // Category Tabs
+    document.querySelectorAll('.cat-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeCategory = tab.dataset.cat;
+        renderSidebar();
+        const first = MODELS.find(m => m.cat === activeCategory);
+        if (first) loadModel(first.id);
+      });
+    });
+
+    // Toolbar Controls
+    const btnSpin = document.getElementById('btn-spin');
+    btnSpin.addEventListener('click', () => {
+      autoSpin = !autoSpin;
+      btnSpin.classList.toggle('active', autoSpin);
+    });
+
+    const btnHop = document.getElementById('btn-hop');
+    btnHop.addEventListener('click', () => {
+      hopTest = !hopTest;
+      btnHop.classList.toggle('active', hopTest);
+      if (!hopTest && modelRoot) {
+        modelRoot.scale.set(1, 1, 1);
+        modelRoot.position.y = 0;
+      }
+    });
+
+    const btnGhost = document.getElementById('btn-ghost');
+    btnGhost.addEventListener('click', () => {
+      ghostMode = !ghostMode;
+      btnGhost.classList.toggle('active', ghostMode);
+      loadModel(currentModelId);
+    });
+
+    const biomeSelect = document.getElementById('biome-select');
+    biomeSelect.addEventListener('change', (e) => {
+      currentBiome = e.target.value;
+      loadModel(currentModelId);
+    });
+
+    const lightSelect = document.getElementById('light-select');
+    lightSelect.addEventListener('change', (e) => {
+      const v = e.target.value;
+      if (v === 'studio') {
+        scene.background.set(0x0b0f19);
+        hemiLight.color.set(0xffffff);
+        dirLight.color.set(0xffffff);
+        fillLight.color.set(0x38bdf8);
+      } else if (v === 'sun') {
+        scene.background.set(0x38bdf8);
+        hemiLight.color.set(0xbae6fd);
+        dirLight.color.set(0xffedd5);
+        fillLight.color.set(0x60a5fa);
+      } else if (v === 'sunset') {
+        scene.background.set(0x4c1d95);
+        hemiLight.color.set(0xf472b6);
+        dirLight.color.set(0xf97316);
+        fillLight.color.set(0x818cf8);
+      } else if (v === 'cyber') {
+        scene.background.set(0x050510);
+        hemiLight.color.set(0x06b6d4);
+        dirLight.color.set(0xd946ef);
+        fillLight.color.set(0x3b82f6);
+      }
+    });
+
+    const btnGrid = document.getElementById('btn-grid');
+    btnGrid.addEventListener('click', () => {
+      grid.visible = !grid.visible;
+      btnGrid.classList.toggle('active', grid.visible);
+    });
+
+    const btnResetCam = document.getElementById('btn-reset-cam');
+    btnResetCam.addEventListener('click', () => {
+      camera.position.set(3.2, 2.5, 4.0);
+      controls.target.set(0, 0.5, 0);
+    });
+
+    // Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animation Loop
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
+
+      if (autoSpin && modelRoot && !hopTest) {
+        modelRoot.rotation.y += delta * 0.8;
+      }
+
+      if (hopTest && modelRoot) {
+        const cycle = (elapsed * 3.5) % Math.PI;
+        const hopHeight = Math.sin(cycle) * 0.45;
+        modelRoot.position.y = hopHeight;
+        const squish = hopHeight > 0.08 ? 1.15 : 0.90;
+        modelRoot.scale.set(1 / Math.sqrt(squish), squish, 1 / Math.sqrt(squish));
+      } else if (!hopTest && modelRoot) {
+        modelRoot.position.y = 0;
+        modelRoot.scale.set(1, 1, 1);
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    renderSidebar();
+    loadModel(currentModelId);
+    animate();
+  </script>
+</body>
+</html>`;
+
+fs.writeFileSync(path.join(ROOT, 'viewer.html'), viewerHtmlContent, 'utf8');
+fs.writeFileSync(path.join(distDir, 'viewer.html'), viewerHtmlContent, 'utf8');
 
 console.log('Build complete: index.html, dist/index.html, viewer.html and dist/bundle.js generated successfully.');
