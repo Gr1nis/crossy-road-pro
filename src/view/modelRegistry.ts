@@ -1,30 +1,14 @@
 import * as THREE from 'three';
 import { ALL_SKINS, type BiomeType, type SkinId } from '../core/types.ts';
 import { createUrbanCharacter } from './urbanCharacters.ts';
+import { createUrbanPallet, createUrbanTrain, createUrbanVehicle } from './urbanVehicles.ts';
 import {
-  createUrbanPallet,
-  createUrbanTrain,
-  createUrbanVehicle,
-} from './urbanVehicles.ts';
-import {
-  createUrbanBench,
-  createUrbanCoin,
-  createUrbanHedge,
-  createUrbanHydrant,
-  createUrbanLampPost,
-  createUrbanRailwaySignal,
-  createUrbanRecordFlag,
-  createUrbanRiverbankEdge,
-  createUrbanRoadBarrier,
-  createUrbanRoadMarkings,
-  createUrbanTrashCan,
-  createUrbanTreePlanter,
+  createUrbanBench, createUrbanCoin, createUrbanHedge, createUrbanHydrant,
+  createUrbanLampPost, createUrbanRailwaySignal, createUrbanRecordFlag,
+  createUrbanRiverbankEdge, createUrbanRoadBarrier, createUrbanRoadMarkings,
+  createUrbanTrashCan, createUrbanTreePlanter,
 } from './urbanEnvironment.ts';
-import {
-  createTownhouseA,
-  createTownhouseB,
-  createTownhouseC,
-} from './urbanBuildings.ts';
+import { createTownhouseA, createTownhouseB, createTownhouseC } from './urbanBuildings.ts';
 
 export type ModelCategoryKey = 'chars' | 'vehicles' | 'props' | 'nature' | 'buildings';
 
@@ -38,16 +22,11 @@ export interface ModelCatalogItem {
 }
 
 const SKIN_DESCRIPTIONS: Record<SkinId, string> = {
-  corgi:
-    'Главный маскот игры. Озорной рыже-белый корги с розовыми подушечками лап, торчащими лисьими ушками, ошейником с золотым жетоном и пушистым хвостиком.',
-  pigeon_pizza:
-    'Городской голубь с переливающейся фиолетово-бирюзовой шеей, несущий в клюве аппетитный треугольный ломтик пиццы с хрустящей корочкой и пепперони.',
-  box_cat:
-    'Рыжий полосатый котик, уютно сидящий в картонной посылочной коробке со штампом "FRAGILE / DELIVERY" и свесивший белые лапки через передний бортик.',
-  raccoon_bandit:
-    'Ловкий городской енот-воришка в чёрной бандитской маске с пышным полосатым кольчатым хвостом и холщовым мешком с добычей за спиной.',
-  capybara_zen:
-    'Умиротворённая дзен-капибара в медитативной позе со спокойными прикрытыми глазками и сочным воксельным мандарином с зелёным листком на голове.',
+  corgi: 'Главный маскот игры. Озорной рыже-белый корги с розовыми подушечками лап, торчащими ушками и ошейником с золотым жетоном.',
+  pigeon_pizza: 'Городской голубь с переливающейся фиолетово-бирюзовой шеей и аппетитным ломтиком пиццы с пепперони.',
+  box_cat: 'Рыжий котик в посылочной коробке со штампом "FRAGILE / DELIVERY", свесивший лапки через бортик.',
+  raccoon_bandit: 'Городской енот-воришка в чёрной бандитской маске с кольчатым хвостом и холщовым мешком за спиной.',
+  capybara_zen: 'Умиротворённая дзен-капибара в медитативной позе со спелым воксельным мандарином на голове.',
 };
 
 export function getCharacterModelItems(): ModelCatalogItem[] {
@@ -56,11 +35,8 @@ export function getCharacterModelItems(): ModelCatalogItem[] {
     name: skin.name,
     icon: skin.badge,
     cat: 'chars' as const,
-    desc:
-      SKIN_DESCRIPTIONS[skin.id] ??
-      `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
-    create: (_biome: BiomeType = 'forest', isGhost = false) =>
-      createUrbanCharacter(skin.id, isGhost),
+    desc: SKIN_DESCRIPTIONS[skin.id] ?? `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
+    create: (_biome: BiomeType = 'forest', isGhost = false) => createUrbanCharacter(skin.id, isGhost),
   }));
 }
 
@@ -71,7 +47,7 @@ export function getVehicleModelItems(): ModelCatalogItem[] {
       name: 'Городское такси',
       icon: '🚕',
       cat: 'vehicles',
-      desc: 'Классическое жёлтое городское такси с шашечками на крыше и крыльях, детализированными фарами, номерными знаками CITY и зеркалами заднего вида.',
+      desc: 'Классическое жёлтое такси с шашечками на крыше, детальными фарами, номерами CITY и зеркалами.',
       create: () => createUrbanVehicle('taxi', 1),
     },
     {
@@ -79,7 +55,7 @@ export function getVehicleModelItems(): ModelCatalogItem[] {
       name: 'Курьерский скутер',
       icon: '🛵',
       cat: 'vehicles',
-      desc: 'Манёвренный скутер экспресс-доставки. За рулём сидит курьер в защитном шлеме и яркой куртке, а сзади установлена термосумка с логотипом FOOD HOT.',
+      desc: 'Манёвренный скутер: за рулём курьер в шлеме и яркой куртке, сзади термосумка FOOD HOT.',
       create: () => createUrbanVehicle('scooter', 1),
     },
     {
@@ -87,7 +63,7 @@ export function getVehicleModelItems(): ModelCatalogItem[] {
       name: 'Рейсовый автобус',
       icon: '🚌',
       cat: 'vehicles',
-      desc: 'Трёхосный пассажирский городской автобус с двустворчатыми дверями, светящимся янтарным LED-табло ROUTE 42, надписью CITY TRANSIT и блоками кондиционеров.',
+      desc: 'Трёхосный автобус с двустворчатыми дверями, янтарным табло ROUTE 42, надписью CITY TRANSIT и блоками AC.',
       create: () => createUrbanVehicle('bus', 1),
     },
     {
@@ -95,7 +71,7 @@ export function getVehicleModelItems(): ModelCatalogItem[] {
       name: 'Уборочная машина',
       icon: '🚜',
       cat: 'vehicles',
-      desc: 'Коммунальная машина со вращающимися коническими щётками, проблесковым маячком, диагональной полосой безопасности и рельефной надписью STREET SWEEP.',
+      desc: 'Коммунальная машина с вращающимися коническими щётками, маячком и рельефной надписью STREET SWEEP.',
       create: () => createUrbanVehicle('sweeper', 1),
     },
     {
@@ -103,7 +79,7 @@ export function getVehicleModelItems(): ModelCatalogItem[] {
       name: 'Скоростной поезд',
       icon: '🚄',
       cat: 'vehicles',
-      desc: 'Высокоскоростной пассажирский экспресс Сапсан с клиновидным носом, пантографом с изоляторами, вагоном CITY EXPRESS и мощным лучом освещения пути.',
+      desc: 'Высокоскоростной экспресс Сапсан с клиновидным носом, пантографом, вагоном CITY EXPRESS и мощным лучом прожектора.',
       create: () => createUrbanTrain(1),
     },
     {
@@ -111,14 +87,8 @@ export function getVehicleModelItems(): ModelCatalogItem[] {
       name: 'Речной поддон',
       icon: '🪵',
       cat: 'vehicles',
-      desc: 'Деревянный европоддон с опорными брусьями и фирменным клеймом PALLET. Плавает по реке, создавая белый пенный след на воде.',
-      create: () =>
-        createUrbanPallet({
-          id: 1,
-          x: 0,
-          length: 2.4,
-          speed: 1,
-        }),
+      desc: 'Деревянный европоддон с опорными брусьями и клеймом PALLET. Плавает по реке с белым пенным следом.',
+      create: () => createUrbanPallet({ id: 1, x: 0, length: 2.4, speed: 1 }),
     },
   ];
 }
@@ -130,7 +100,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Пожарный гидрант',
       icon: '🚒',
       cat: 'props',
-      desc: 'Чугунный уличный пожарный гидрант с фланцевым основанием, тремя штуцерами и серебристыми соединительными гайками.',
+      desc: 'Чугунный пожарный гидрант с фланцевым основанием, тремя штуцерами и серебристыми гайками.',
       create: () => createUrbanHydrant(),
     },
     {
@@ -138,7 +108,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Мусорный бак',
       icon: '🗑️',
       cat: 'props',
-      desc: 'Зелёный городской контейнер для раздельного сбора отходов с белой маркировочной панелью и ручками.',
+      desc: 'Зелёный городской контейнер для раздельного сбора отходов с белой маркировочной панелью.',
       create: () => createUrbanTrashCan(),
     },
     {
@@ -146,7 +116,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Парковая скамейка',
       icon: '🪑',
       cat: 'props',
-      desc: 'Уютная деревянная скамейка на чугунных ножках с анатомическими рейками сиденья и поддерживающей спинкой.',
+      desc: 'Деревянная скамейка на чугунных ножках с рейками сиденья и поддерживающей спинкой.',
       create: () => createUrbanBench(),
     },
     {
@@ -154,7 +124,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Фонарный столб',
       icon: '💡',
       cat: 'props',
-      desc: 'Высокий чугунный уличный фонарь с квадратным постаментом и светящейся камерой плафона тёплого света.',
+      desc: 'Высокий чугунный фонарь с квадратным постаментом и светящейся камерой плафона тёплого света.',
       create: () => createUrbanLampPost(),
     },
     {
@@ -162,7 +132,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Золотая монета',
       icon: '🪙',
       cat: 'props',
-      desc: 'Вращающаяся золотая монетка с выпуклым ободком и гравировкой. Собирается персонажем для пополнения кошелька (+1).',
+      desc: 'Вращающаяся золотая монетка с выпуклым ободком (+1 к балансу игрока).',
       create: () => createUrbanCoin(),
     },
     {
@@ -170,7 +140,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Ж/д светофор',
       icon: '🚦',
       cat: 'props',
-      desc: 'Сигнальный переездный железнодорожный фонарь с двумя красными предупреждающими огнями опасности.',
+      desc: 'Сигнальный железнодорожный фонарь с двумя красными предупреждающими огнями опасности.',
       create: () => createUrbanRailwaySignal().group,
     },
     {
@@ -178,7 +148,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Флаг рекорда',
       icon: '🚩',
       cat: 'props',
-      desc: 'Постамент личного рекорда игрока (PB Flag) на обочине с золочёным древком, короной чемпиона и рубиновыми камнями.',
+      desc: 'Постамент рекорда (PB Flag) на обочине с золочёным древком, короной чемпиона и рубинами.',
       create: () => createUrbanRecordFlag(),
     },
     {
@@ -186,7 +156,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Дорожный барьер',
       icon: '🚧',
       cat: 'props',
-      desc: 'Защитное металлическое дорожное ограждение с опорными столбиками и светоотражающими элементами.',
+      desc: 'Металлическое дорожное ограждение с опорными столбиками и светоотражателями.',
       create: (b: BiomeType = 'forest') => createUrbanRoadBarrier(b),
     },
     {
@@ -194,7 +164,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Дорожная разметка',
       icon: '➖',
       cat: 'props',
-      desc: 'Белая сплошная краевая полоса дорожной разметки, отделяющая проезжую часть от обочины.',
+      desc: 'Белая сплошная краевая полоса дорожной разметки проезжей части.',
       create: () => createUrbanRoadMarkings(),
     },
     {
@@ -202,7 +172,7 @@ export function getPropModelItems(): ModelCatalogItem[] {
       name: 'Береговое укрепление',
       icon: '🌊',
       cat: 'props',
-      desc: 'Инженерное укрепление берега реки из просмолённых деревянных свай и каменной булыжной кладки.',
+      desc: 'Инженерное укрепление берега реки из просмолённых деревянных свай и каменной кладки.',
       create: (b: BiomeType = 'forest') => createUrbanRiverbankEdge('left', b),
     },
   ];
@@ -215,7 +185,7 @@ export function getNatureModelItems(): ModelCatalogItem[] {
       name: 'Дерево в кадке (А)',
       icon: '🌲',
       cat: 'nature',
-      desc: 'Городское дерево в деревянной кадке с геометрической кроной. Цвет листвы автоматически адаптируется под выбранный биом (Лес/Зима/Пустыня/Неон).',
+      desc: 'Городское дерево в деревянной кадке. Листва автоматически адаптируется под биом (Лес/Зима/Пустыня/Неон).',
       create: (b: BiomeType = 'forest') => createUrbanTreePlanter(0, b),
     },
     {
@@ -223,7 +193,7 @@ export function getNatureModelItems(): ModelCatalogItem[] {
       name: 'Дерево в кадке (Б)',
       icon: '🌳',
       cat: 'nature',
-      desc: 'Раскидистое городское дерево в кадке с многослойной кроной. Реагирует на погодные условия и атмосферу биома.',
+      desc: 'Раскидистое дерево в кадке с многослойной кроной, реагирующее на атмосферу активного биома.',
       create: (b: BiomeType = 'forest') => createUrbanTreePlanter(1, b),
     },
     {
@@ -231,7 +201,7 @@ export function getNatureModelItems(): ModelCatalogItem[] {
       name: 'Живая изгородь',
       icon: '🌿',
       cat: 'nature',
-      desc: 'Аккуратно подстриженный кустарник прямоугольной формы с контрастными акцентными листьями. Меняет цвет при смене климатической зоны.',
+      desc: 'Подстриженный кустарник с акцентными листьями. Меняет цвет при смене климатической зоны.',
       create: (b: BiomeType = 'forest') => createUrbanHedge(0, b),
     },
   ];
@@ -244,7 +214,7 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
       name: 'Кафе (Таунхаус А)',
       icon: '☕',
       cat: 'buildings',
-      desc: 'Парижский двухэтажный таунхаус цвета ультрамарин: кофейня на первом этаже, полосатая красно-белая маркиза, вывеска CAFE, мансардная крыша и цветочные кашпо.',
+      desc: 'Парижский таунхаус цвета ультрамарин: кофейня, полосатая маркиза, вывеска CAFE, мансарда и кашпо.',
       create: () => createTownhouseA(),
     },
     {
@@ -252,7 +222,7 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
       name: 'Пекарня (Таунхаус Б)',
       icon: '🥖',
       cat: 'buildings',
-      desc: 'Классический особняк из красного обожжённого кирпича: угловые жёлтые рустовые камни, вывеска BAKERY, три арочных окна и ступенчатая балюстрада с двумя дымоходами.',
+      desc: 'Особняк из красного кирпича: жёлтые рустовые камни, вывеска BAKERY, 3 арочных окна и балюстрада с дымоходами.',
       create: () => createTownhouseB(),
     },
     {
@@ -260,7 +230,7 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
       name: 'Книги (Таунхаус В)',
       icon: '📚',
       cat: 'buildings',
-      desc: 'Изумрудная книжная лавка: витрина с книжными полками, вывески BOOKS, угловая вертикальная консоль, терракотовая черепичная крыша и сдвоенные печные трубы.',
+      desc: 'Изумрудная лавка: витрина с книжными полками, вывески BOOKS, угловая консоль и черепичная крыша.',
       create: () => createTownhouseC(),
     },
   ];
@@ -276,15 +246,10 @@ export function getModelCatalog(): ModelCatalogItem[] {
   ];
 }
 
-export function getModelDiagnostics(group: THREE.Group): {
-  meshCount: number;
-  dims: string;
-} {
+export function getModelDiagnostics(group: THREE.Group): { meshCount: number; dims: string } {
   let meshCount = 0;
   group.traverse((c) => {
-    if ((c as THREE.Mesh).isMesh) {
-      meshCount++;
-    }
+    if ((c as THREE.Mesh).isMesh) meshCount++;
   });
   const box = new THREE.Box3().setFromObject(group);
   const w = Math.max(0.01, box.max.x - box.min.x).toFixed(2);
@@ -311,26 +276,18 @@ export function verifyModelRegistry(): {
         continue;
       }
       const diag = getModelDiagnostics(mesh);
-      if (diag.meshCount <= 0) {
-        errors.push(`Model "${item.id}" has 0 voxel meshes`);
-      }
+      if (diag.meshCount <= 0) errors.push(`Model "${item.id}" has 0 voxel meshes`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      errors.push(`Model "${item.id}" failed during instantiation: ${msg}`);
+      errors.push(`Model "${item.id}" failed: ${msg}`);
     }
   }
 
-  // Ensure every registered character skin in ALL_SKINS has an entry
   for (const skin of ALL_SKINS) {
-    const found = catalog.find((m) => m.id === skin.id && m.cat === 'chars');
-    if (!found) {
-      errors.push(`Skin "${skin.id}" from ALL_SKINS is missing from model catalog!`);
+    if (!catalog.some((m) => m.id === skin.id && m.cat === 'chars')) {
+      errors.push(`Skin "${skin.id}" missing from model catalog!`);
     }
   }
 
-  return {
-    total: catalog.length,
-    countsByCategory,
-    errors,
-  };
+  return { total: catalog.length, countsByCategory, errors };
 }

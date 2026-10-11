@@ -126,7 +126,7 @@ export class GameLoop {
       },
       togglePerfHUD: () => this.togglePerfHUD(),
       startBenchmark: (rows = 300) => this.startBenchmark(rows),
-      openViewer: () => window.open('viewer.html', '_blank'),
+      openViewer: () => window.open('model-viewer.html?v=' + Date.now(), '_blank'),
     };
   }
 

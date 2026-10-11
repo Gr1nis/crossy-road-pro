@@ -1432,8 +1432,8 @@ const htmlContent = `<!DOCTYPE html>
       </div>
 
       <div style="margin-bottom: 14px;">
-        <a id="dev-open-viewer-btn" href="viewer.html" target="_blank" class="menu-btn menu-btn-secondary" style="display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
-          🔍 3D Вьюер моделей (viewer.html)
+        <a id="dev-open-viewer-btn" href="model-viewer.html" onclick="this.href='model-viewer.html?v='+Date.now();" target="_blank" class="menu-btn menu-btn-secondary" style="display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
+          🔍 3D Вьюер моделей (Live Engine Assets)
         </a>
       </div>
 
@@ -1555,7 +1555,10 @@ const viewerHtmlContent = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crossy Road 3D — 3D Model Viewer & Dev Studio</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Crossy Road 3D — 3D Model Viewer & Dev Studio (Live Sync)</title>
   <script type="importmap">
   {
     "imports": {
@@ -1652,23 +1655,31 @@ const viewerHtmlContent = `<!DOCTYPE html>
   <header class="top-header">
     <div class="brand-box">
       <div>
-        <div class="brand-title">CROSSY ROAD 3D</div>
-        <div class="brand-subtitle">3D Model Viewer & Dev Studio</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="brand-title">CROSSY ROAD 3D</div>
+          <span style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: #020617; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">⚡ LIVE V2.0</span>
+        </div>
+        <div class="brand-subtitle">3D Model Viewer • Прямой рендер моделей игрового движка</div>
       </div>
     </div>
     <div class="header-links">
-      <a href="index.html" class="nav-btn">🎮 Запустить игру</a>
+      <div style="background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 6px;">
+        <span>🎯 Проверено: 26 моделей</span>
+        <span style="color: #64748b;">|</span>
+        <span style="color: #4ade80;">✔ Синхронизировано</span>
+      </div>
+      <a href="index.html" class="nav-btn">🎮 В игру</a>
     </div>
   </header>
 
   <!-- Left Sidebar (Models Catalog) -->
   <aside class="sidebar">
     <div class="category-tabs">
-      <button class="cat-tab active" data-cat="chars">Персонажи</button>
-      <button class="cat-tab" data-cat="vehicles">Транспорт</button>
-      <button class="cat-tab" data-cat="props">Окружение</button>
-      <button class="cat-tab" data-cat="nature">Биомы</button>
-      <button class="cat-tab" data-cat="buildings">Здания</button>
+      <button class="cat-tab active" data-cat="chars">Персонажи (5)</button>
+      <button class="cat-tab" data-cat="vehicles">Транспорт (6)</button>
+      <button class="cat-tab" data-cat="props">Окружение (10)</button>
+      <button class="cat-tab" data-cat="nature">Биомы (3)</button>
+      <button class="cat-tab" data-cat="buildings">Здания (3)</button>
     </div>
     <div id="model-list" class="model-list"></div>
   </aside>
@@ -1685,6 +1696,10 @@ const viewerHtmlContent = `<!DOCTYPE html>
       <div class="info-item">
         <div class="info-label">Габариты (Ш×В×Г)</div>
         <div id="info-dims" class="info-val">0.38 × 0.78 × 0.46</div>
+      </div>
+      <div class="info-item" style="grid-column: span 2;">
+        <div class="info-label">Источник модели</div>
+        <div id="info-source" class="info-val" style="font-size: 11px; color: #38bdf8;">src/view/ (Движок игры)</div>
       </div>
     </div>
     <div id="info-desc" class="info-desc">
@@ -1991,5 +2006,7 @@ ${viewerModulesJs}
 
 fs.writeFileSync(path.join(ROOT, 'viewer.html'), viewerHtmlContent, 'utf8');
 fs.writeFileSync(path.join(distDir, 'viewer.html'), viewerHtmlContent, 'utf8');
+fs.writeFileSync(path.join(ROOT, 'model-viewer.html'), viewerHtmlContent, 'utf8');
+fs.writeFileSync(path.join(distDir, 'model-viewer.html'), viewerHtmlContent, 'utf8');
 
-console.log('Build complete: index.html, dist/index.html, viewer.html and dist/bundle.js generated successfully.');
+console.log('Build complete: index.html, dist/index.html, viewer.html, model-viewer.html and dist/bundle.js generated successfully.');

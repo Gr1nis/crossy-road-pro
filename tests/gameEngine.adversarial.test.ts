@@ -389,6 +389,34 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
     engine.stepAmbient(1.0);
     assert.equal(engine.getPlayer().isDead, false, 'stepAmbient must not check collisions or kill player');
   });
+
+  it('Invariant 12 (Benchmark Noclip & GodMode Passing Invariants): player passes through trees, water, and obstacles without blocking or dying', () => {
+    const engine = new GameEngine(777);
+    engine.setGodMode(true);
+    engine.setIgnoreObstacles(true);
+
+    const lane1 = engine.getLane(1);
+    lane1.type = LaneType.GRASS;
+    lane1.obstacles = [0]; // Obstacle directly at x=0
+
+    engine.queueMove(MoveDirection.FORWARD);
+    engine.step(WORLD_CONFIG.HOP_DURATION + 0.05);
+
+    const p = engine.getPlayer();
+    assert.equal(p.row, 1, 'Player must pass directly into obstacle tile when ignoreObstacles is true');
+    assert.equal(p.isDead, false, 'Player must remain alive in godMode');
+
+    // Test passing into empty water tile without log
+    const lane2 = engine.getLane(2);
+    lane2.type = LaneType.RIVER;
+    lane2.logs = [];
+
+    engine.queueMove(MoveDirection.FORWARD);
+    engine.step(WORLD_CONFIG.HOP_DURATION + 0.05);
+
+    assert.equal(p.row, 2, 'Player must jump forward across water');
+    assert.equal(p.isDead, false, 'Player must not drown in water when godMode is true');
+  });
 });
 
 

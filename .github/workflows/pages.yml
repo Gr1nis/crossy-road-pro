@@ -49,6 +49,7 @@ jobs:
           cp index.html _site/index.html
           cp crossy_road_plan.html _site/crossy_road_plan.html
           cp viewer.html _site/viewer.html 2>/dev/null || true
+          cp model-viewer.html _site/model-viewer.html 2>/dev/null || true
           touch _site/.nojekyll
 
       - name: Deploy to gh-pages branch
