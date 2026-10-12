@@ -5,6 +5,7 @@
 ## 🌐 Live Demo (GitHub Pages)
 
 - 🎮 **Играть в браузере:** **[https://gr1nis.github.io/crossy-road-pro/](https://gr1nis.github.io/crossy-road-pro/)**
+- 🎨 **3D-просмотрщик моделей (Model Viewer):** **[https://gr1nis.github.io/crossy-road-pro/model-viewer.html](https://gr1nis.github.io/crossy-road-pro/model-viewer.html)**
 - 📐 **Инженерный план и архитектура:** **[https://gr1nis.github.io/crossy-road-pro/crossy_road_plan.html](https://gr1nis.github.io/crossy-road-pro/crossy_road_plan.html)**
 
 ---
