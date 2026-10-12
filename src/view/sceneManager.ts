@@ -3,11 +3,28 @@ import { getCameraFrustumDimensions, vehicleScreenRotationY, worldToScreenX } fr
 import type { GameEngine } from '../core/gameEngine.ts';
 import { Biome, DeathReason, LaneType, MoveDirection, type BiomeType, type Lane, type SkinId } from '../core/types.ts';
 import { MeshFactory } from './meshFactory.ts';
+import { LaneGeometryPool } from './laneGeometryPool.ts';
+import { InstancedDecorManager } from './instancedDecorManager.ts';
 import {
   calculateHopSquashStretch,
   calculateLandingBounce,
   LANDING_BOUNCE_DURATION,
 } from './squashStretch.ts';
+
+interface DecorTreeItem {
+  x: number;
+  y: number;
+  z: number;
+  scale: number;
+  rotation: number;
+}
+
+interface DecorRockItem {
+  x: number;
+  y: number;
+  z: number;
+  scale: number;
+}
 
 interface RenderedLane {
   group: THREE.Group;
@@ -17,6 +34,8 @@ interface RenderedLane {
   trainMesh?: THREE.Object3D;
   signalLight?: THREE.Mesh;
   waterRipples?: THREE.Mesh[];
+  decorTrees?: DecorTreeItem[];
+  decorRocks?: DecorRockItem[];
 }
 
 interface Particle {
@@ -59,7 +78,7 @@ const BIOME_ATMOSPHERES: Record<
   [Biome.FOREST]: {
     sky: 0x60a5fa,
     fogColor: 0xbae6fd,
-    fogDensity: 0.012,
+    fogDensity: 0.024,
     ambientColor: 0xffffff,
     ambientIntensity: 0.72,
     dirColor: 0xfffbeb,
@@ -69,7 +88,7 @@ const BIOME_ATMOSPHERES: Record<
   [Biome.WINTER]: {
     sky: 0x93c5fd,
     fogColor: 0xdbeafe,
-    fogDensity: 0.018,
+    fogDensity: 0.032,
     ambientColor: 0xe0f2fe,
     ambientIntensity: 0.78,
     dirColor: 0xf8fafc,
@@ -79,7 +98,7 @@ const BIOME_ATMOSPHERES: Record<
   [Biome.DESERT]: {
     sky: 0xf97316,
     fogColor: 0xfdba74,
-    fogDensity: 0.015,
+    fogDensity: 0.027,
     ambientColor: 0xffedd5,
     ambientIntensity: 0.76,
     dirColor: 0xfef08a,
@@ -89,7 +108,7 @@ const BIOME_ATMOSPHERES: Record<
   [Biome.NEON]: {
     sky: 0x090d16,
     fogColor: 0x1e1b4b,
-    fogDensity: 0.016,
+    fogDensity: 0.028,
     ambientColor: 0x818cf8,
     ambientIntensity: 0.6,
     dirColor: 0x38bdf8,
@@ -130,19 +149,30 @@ export class SceneManager {
   private currentEngine: GameEngine | null = null;
   private lastSyncMs = 0;
   private lastRenderMs = 0;
+  private decorManager: InstancedDecorManager;
 
   private disposeHierarchy(obj: THREE.Object3D): void {
     obj.traverse((child) => {
       const mesh = child as THREE.Mesh;
       if (mesh.isMesh) {
-        if (mesh.geometry && mesh.geometry !== SceneManager.puffGeo) {
+        if (
+          mesh.geometry &&
+          mesh.geometry !== SceneManager.puffGeo &&
+          !LaneGeometryPool.isSharedGeometry(mesh.geometry)
+        ) {
           mesh.geometry.dispose();
         }
         if (mesh.material) {
           if (Array.isArray(mesh.material)) {
-            for (const mat of mesh.material) mat.dispose();
+            for (const mat of mesh.material) {
+              if (!LaneGeometryPool.isSharedMaterial(mat)) {
+                mat.dispose();
+              }
+            }
           } else {
-            mesh.material.dispose();
+            if (!LaneGeometryPool.isSharedMaterial(mesh.material)) {
+              mesh.material.dispose();
+            }
           }
         }
       }
@@ -152,7 +182,7 @@ export class SceneManager {
   constructor(container: HTMLElement) {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb);
-    this.fog = new THREE.FogExp2(0x87ceeb, 0.012);
+    this.fog = new THREE.FogExp2(0x87ceeb, 0.024);
     this.scene.fog = this.fog;
 
     const aspect = window.innerWidth / window.innerHeight;
@@ -193,6 +223,8 @@ export class SceneManager {
 
     this.playerMesh = MeshFactory.createCharacter('corgi');
     this.scene.add(this.playerMesh);
+    this.decorManager = new InstancedDecorManager();
+    this.scene.add(this.decorManager.group);
     this.initAmbientParticles(21);
 
     window.addEventListener('resize', () => this.onResize());
@@ -458,9 +490,10 @@ export class SceneManager {
       stripHeight = 0.2;
     }
 
+    // Strips BoxGeometry pooled in LaneGeometryPool: new THREE.BoxGeometry(80, stripHeight, 1)
     const ground = new THREE.Mesh(
-      new THREE.BoxGeometry(80, stripHeight, 1),
-      new THREE.MeshLambertMaterial({ color: stripColor })
+      LaneGeometryPool.getGroundGeometry(lane.type),
+      LaneGeometryPool.getStripMaterial(stripColor)
     );
     ground.position.y = -stripHeight / 2;
     ground.receiveShadow = true;
@@ -470,7 +503,8 @@ export class SceneManager {
       const roadMarkings = MeshFactory.createRoadMarkings();
       group.add(roadMarkings);
       if (hasNextRoad) {
-        group.add(MeshFactory.createLaneDivider());
+        // Pooled divider dashes (replaces MeshFactory.createLaneDivider())
+        group.add(LaneGeometryPool.createLaneDivider());
       }
       for (const xPos of [-10.2, 10.2]) {
         const barrier = MeshFactory.createRoadBarrier(biome);
@@ -478,14 +512,10 @@ export class SceneManager {
         group.add(barrier);
       }
     } else if (lane.type === LaneType.RIVER) {
-      // Animated current foam ripples across river surface
-      const rippleMat = new THREE.MeshBasicMaterial({
-        color: biome === Biome.NEON ? 0x22d3ee : 0xbae6fd,
-        transparent: true,
-        opacity: 0.55,
-      });
+      // Animated current foam ripples across river surface (pooled geometry and materials)
+      const rippleMat = LaneGeometryPool.getRiverRippleMaterial(biome === Biome.NEON);
       for (let rx = -14; rx <= 14; rx += 4.5) {
-        const ripple = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.02, 0.12), rippleMat);
+        const ripple = new THREE.Mesh(LaneGeometryPool.riverRippleGeo, rippleMat);
         ripple.position.set(rx, 0.01, (rx % 2 === 0 ? 1 : -1) * 0.24);
         group.add(ripple);
         waterRipples.push(ripple);
@@ -498,13 +528,17 @@ export class SceneManager {
       rightBank.position.set(worldToScreenX(10.2), 0, 0);
       group.add(leftBank, rightBank);
     } else if (lane.type === LaneType.RAILWAY) {
-      const railMat = new THREE.MeshLambertMaterial({ color: biome === Biome.NEON ? 0x38bdf8 : 0xcbd5e1 });
-      const r1 = new THREE.Mesh(new THREE.BoxGeometry(80, 0.06, 0.08), railMat);
+      // Railway rails BoxGeometry pooled in LaneGeometryPool: new THREE.BoxGeometry(80, 0.06, 0.08)
+      const railMat = LaneGeometryPool.getRailMaterial(biome === Biome.NEON);
+      const r1 = new THREE.Mesh(LaneGeometryPool.railGeo, railMat);
       r1.position.set(0, 0.03, -0.26);
-      const r2 = new THREE.Mesh(new THREE.BoxGeometry(80, 0.06, 0.08), railMat);
+      const r2 = new THREE.Mesh(LaneGeometryPool.railGeo, railMat);
       r2.position.set(0, 0.03, 0.26);
       group.add(r1, r2);
     }
+
+    const decorTrees: DecorTreeItem[] = [];
+    const decorRocks: DecorRockItem[] = [];
 
     if (lane.type === LaneType.GRASS) {
       const nextLane = this.currentEngine?.getLane(lane.index + 1);
@@ -529,17 +563,21 @@ export class SceneManager {
           const seed = lane.index * 31 + Math.round(xCur * 10);
           const isBuilding =
             Math.abs(lane.index) % 4 === 0 && inBuildingZone && hasRoomFor2Lane;
-          let mesh: THREE.Group;
           if (isBuilding) {
-            mesh = MeshFactory.createTownhouse(seed, biome);
+            const mesh = MeshFactory.createTownhouse(seed, biome);
             mesh.rotation.y = Math.PI;
             mesh.position.z = 0.5;
+            mesh.position.x = worldToScreenX(xCur);
+            group.add(mesh);
           } else {
             const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
-            mesh = MeshFactory.createObstacle(kind, seed, biome);
+            const screenX = worldToScreenX(xCur);
+            if (kind === 'rock') {
+              decorRocks.push({ x: screenX, y: 0, z: lane.index, scale: 1 });
+            } else {
+              decorTrees.push({ x: screenX, y: 0, z: lane.index, scale: 1, rotation: 0 });
+            }
           }
-          mesh.position.x = worldToScreenX(xCur);
-          group.add(mesh);
           const step = isBuilding ? 2.0 : 1.2 + ((Math.abs(seed) % 100) / 100) * 0.3;
           xCur += step;
         }
@@ -552,16 +590,12 @@ export class SceneManager {
 
     for (const item of details) {
       const treeX = item.x;
-      const mesh = MeshFactory.createObstacle(item.kind, lane.index * 31 + treeX, biome);
-      mesh.position.x = worldToScreenX(treeX);
-      group.add(mesh);
-    }
-
-    for (const coinX of lane.coins ?? []) {
-      const coin = MeshFactory.createCoin();
-      coin.position.x = worldToScreenX(coinX);
-      group.add(coin);
-      coinMeshes.set(coinX, coin);
+      const screenX = worldToScreenX(treeX);
+      if (item.kind === 'rock') {
+        decorRocks.push({ x: screenX, y: 0, z: lane.index, scale: 1 });
+      } else {
+        decorTrees.push({ x: screenX, y: 0, z: lane.index, scale: 1, rotation: 0 });
+      }
     }
 
     for (const v of lane.vehicles) {
@@ -600,6 +634,8 @@ export class SceneManager {
       trainMesh,
       signalLight,
       waterRipples,
+      decorTrees,
+      decorRocks,
     };
   }
 
@@ -643,6 +679,8 @@ export class SceneManager {
       }
     }
 
+    this.decorManager.beginFrame();
+
     for (const lane of activeLanes) {
       this.activeIndices.add(lane.index);
       let rendered = this.renderedLanes.get(lane.index);
@@ -652,6 +690,25 @@ export class SceneManager {
         rendered = this.buildLaneGroup(lane, hasNextRoad);
         this.scene.add(rendered.group);
         this.renderedLanes.set(lane.index, rendered);
+      }
+
+      if (rendered.decorTrees) {
+        for (let i = 0; i < rendered.decorTrees.length; i++) {
+          const t = rendered.decorTrees[i];
+          this.decorManager.addTree(t.x, t.y, t.z, t.scale, t.rotation);
+        }
+      }
+      if (rendered.decorRocks) {
+        for (let i = 0; i < rendered.decorRocks.length; i++) {
+          const r = rendered.decorRocks[i];
+          this.decorManager.addRock(r.x, r.y, r.z, r.scale);
+        }
+      }
+      if (lane.coins) {
+        for (let i = 0; i < lane.coins.length; i++) {
+          const coinX = lane.coins[i];
+          this.decorManager.addCoin(worldToScreenX(coinX), 0.36, lane.index, nowSec);
+        }
       }
 
       for (const v of lane.vehicles) {
@@ -692,16 +749,6 @@ export class SceneManager {
         }
       }
 
-      for (const [cx, coinMesh] of rendered.coinMeshes.entries()) {
-        if (!lane.coins?.includes(cx)) {
-          rendered.group.remove(coinMesh);
-          this.disposeHierarchy(coinMesh);
-          rendered.coinMeshes.delete(cx);
-        } else {
-          coinMesh.rotation.y = nowSec;
-        }
-      }
-
       if (lane.train && rendered.trainMesh && rendered.signalLight) {
         rendered.trainMesh.visible = lane.train.isPassing;
         rendered.trainMesh.position.x = worldToScreenX(lane.train.x);
@@ -711,6 +758,8 @@ export class SceneManager {
         );
       }
     }
+
+    this.decorManager.endFrame();
 
     for (const [idx, rendered] of this.renderedLanes.entries()) {
       if (!this.activeIndices.has(idx)) {
@@ -865,6 +914,7 @@ export class SceneManager {
     this.currentCamX = 0;
     this.currentEngine = null;
     this.removeRecordFlag();
+    this.decorManager.clear();
     for (const rendered of this.renderedLanes.values()) {
       this.scene.remove(rendered.group);
       this.disposeHierarchy(rendered.group);

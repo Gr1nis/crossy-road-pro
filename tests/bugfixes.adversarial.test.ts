@@ -284,7 +284,7 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
     );
   });
 
-  it('Bug 10 (16:9 Viewport & Horizon Draw Distance Optimization): camera positioned at y=13.5, camZ-8.0 looking at camZ+3.0, lanes drawn up to +38 rows forward, and ambient/confetti/hop particles reduced 1.5x', () => {
+  it('Bug 10 (16:9 Viewport & Horizon Draw Distance Optimization): camera positioned at y=13.5, camZ-8.0 looking at camZ+3.0, lanes drawn up to +26 rows forward, and ambient/confetti/hop particles reduced 1.5x', () => {
     const sceneManagerSrc = fs.readFileSync(
       path.join(process.cwd(), 'src/view/sceneManager.ts'),
       'utf8'
@@ -315,12 +315,12 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
       'utf8'
     );
     assert.ok(
-      gameEngineSrc.includes('Math.max(centerRow + 38, Math.floor(this.cameraZ) + 38)'),
-      'gameEngine.ts ensureLanesAround must generate lanes up to +38 rows ahead'
+      gameEngineSrc.includes('Math.max(centerRow + 26, Math.floor(this.cameraZ) + 26)'),
+      'gameEngine.ts ensureLanesAround must generate lanes up to +26 rows ahead'
     );
     assert.ok(
-      gameEngineSrc.includes('Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38)'),
-      'gameEngine.ts getActiveLanes must include lanes up to +38 rows ahead'
+      gameEngineSrc.includes('Math.max(Math.floor(this.player.row) + 26, Math.floor(this.cameraZ) + 26)'),
+      'gameEngine.ts getActiveLanes must include lanes up to +26 rows ahead'
     );
 
     // Functional verification with GameEngine instance
@@ -328,8 +328,8 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
     const activeLanes = engine.getActiveLanes();
     const maxActiveIndex = Math.max(...activeLanes.map((l) => l.index));
     assert.ok(
-      maxActiveIndex >= 38,
-      `Active lanes must extend to at least row 38 on fresh start, got ${maxActiveIndex}`
+      maxActiveIndex >= 26,
+      `Active lanes must extend to at least row 26 on fresh start, got ${maxActiveIndex}`
     );
   });
 

@@ -76,8 +76,8 @@ export class GameEngine {
   }
 
   private ensureLanesAround(centerRow: number): void {
-    const minR = Math.min(centerRow - 8, Math.floor(this.cameraZ) - 26);
-    const maxR = Math.max(centerRow + 38, Math.floor(this.cameraZ) + 38);
+    const minR = Math.min(centerRow - 4, Math.floor(this.cameraZ) - 10);
+    const maxR = Math.max(centerRow + 26, Math.floor(this.cameraZ) + 26);
     const currentScore = this.scoreTracker.getScore();
     for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
@@ -164,8 +164,8 @@ export class GameEngine {
   getActiveLanes(): Lane[] {
     this.ensureLanesAround(Math.round(this.player.row));
     const list: Lane[] = [];
-    const minRow = Math.min(Math.floor(this.cameraZ) - 24, Math.floor(this.player.row) - 8);
-    const maxRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
+    const minRow = Math.min(Math.floor(this.cameraZ) - 10, Math.floor(this.player.row) - 4);
+    const maxRow = Math.max(Math.floor(this.player.row) + 26, Math.floor(this.cameraZ) + 26);
     for (let r = minRow; r <= maxRow; r++) {
       list.push(this.getLane(r));
     }
@@ -386,8 +386,8 @@ export class GameEngine {
     }
 
     const currentLane = this.getLane(Math.round(this.player.row));
-    const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
-    const maxSimRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
+    const minSimRow = Math.min(Math.floor(this.cameraZ) - 10, Math.floor(this.player.row) - 4);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 26, Math.floor(this.cameraZ) + 26);
 
     for (let r = minSimRow; r <= maxSimRow; r++) {
       const lane = this.getLane(r);
@@ -549,8 +549,8 @@ export class GameEngine {
   public stepAmbient(dt: number): void {
     if (dt <= 0) return;
 
-    const minSimRow = Math.min(Math.floor(this.cameraZ) - 26, Math.floor(this.player.row) - 8);
-    const maxSimRow = Math.max(Math.floor(this.player.row) + 38, Math.floor(this.cameraZ) + 38);
+    const minSimRow = Math.min(Math.floor(this.cameraZ) - 10, Math.floor(this.player.row) - 4);
+    const maxSimRow = Math.max(Math.floor(this.player.row) + 26, Math.floor(this.cameraZ) + 26);
 
     for (let r = minSimRow; r <= maxSimRow; r++) {
       const lane = this.getLane(r);

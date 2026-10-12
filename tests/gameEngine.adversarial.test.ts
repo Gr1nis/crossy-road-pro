@@ -178,6 +178,17 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
   it('Invariant 8 (Memory Leak Prevention & Sliding Window Lane Eviction): advancing 120+ rows evicts old rows from active lanes and bounds loaded lane memory', () => {
     const engine = new GameEngine(42);
 
+    // Initial check: active lanes envelope is ~36-38 lanes (Stream 4 optimized envelope)
+    const initialActive = engine.getActiveLanes();
+    assert.ok(
+      initialActive.length >= 35 && initialActive.length <= 40,
+      `Initial active lanes count should be ~36-38 lanes, got ${initialActive.length}`
+    );
+    const initialMinRow = Math.min(...initialActive.map((l) => l.index));
+    const initialMaxRow = Math.max(...initialActive.map((l) => l.index));
+    assert.equal(initialMinRow, -11, 'Initial min active row should be -11 (cameraZ - 10)');
+    assert.equal(initialMaxRow, 26, 'Initial max active row should be 26 (player.row + 26)');
+
     // Simulate advancing player and camera forward 125 rows
     for (let r = 1; r <= 125; r++) {
       const lane = engine.getLane(r);
@@ -193,7 +204,7 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
 
     const activeLanes = engine.getActiveLanes();
     assert.ok(activeLanes.length > 0, 'Active lanes should not be empty');
-    assert.ok(activeLanes.length <= 70, 'Active lanes window must remain bounded (<= 70)');
+    assert.ok(activeLanes.length <= 42, `Active lanes window must remain bounded (<= 42, got ${activeLanes.length})`);
 
     const hasOldLanes = activeLanes.some((lane) => lane.index < 10);
     assert.equal(hasOldLanes, false, 'Old lanes (index < 10) must be evicted from active lanes when camera > 45');
@@ -207,9 +218,14 @@ describe('GameEngine — Adversarial Physics, Log Riding & Collision Tests', () 
         : (internalLanes instanceof Map ? internalLanes.size : activeLanes.length);
 
     assert.ok(
-      loadedLanesCount <= 70,
-      `Loaded lanes count must not grow proportionally with traversed rows (expected <= 70, got ${loadedLanesCount})`
+      loadedLanesCount <= 65,
+      `Loaded lanes count must not grow proportionally with traversed rows (expected <= 65, got ${loadedLanesCount})`
     );
+
+    // Strict eviction threshold invariant: lanes behind cameraZ - 30 must be evicted
+    const evictionThreshold = Math.floor(engine.getCameraZ() - 30);
+    const hasBehindEviction = Array.from(internalLanes?.keys() ?? []).some((r) => r < evictionThreshold);
+    assert.equal(hasBehindEviction, false, 'No lanes behind cameraZ - 30 should remain in internal lanes Map');
   });
 
   it('Invariant 9 (Obstacle Blocking & Forward Streak Invariant): forward step into obstacle does not increment forwardStreak', () => {

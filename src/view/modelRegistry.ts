@@ -249,7 +249,10 @@ export function getModelCatalog(): ModelCatalogItem[] {
 export function getModelDiagnostics(group: THREE.Group): { meshCount: number; dims: string } {
   let meshCount = 0;
   group.traverse((c) => {
-    if ((c as THREE.Mesh).isMesh) meshCount++;
+    if ((c as THREE.Mesh).isMesh) {
+      const vx = (c.userData && typeof c.userData.voxelCount === 'number') ? c.userData.voxelCount : 1;
+      meshCount += vx;
+    }
   });
   const box = new THREE.Box3().setFromObject(group);
   const w = Math.max(0.01, box.max.x - box.min.x).toFixed(2);

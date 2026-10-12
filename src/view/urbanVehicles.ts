@@ -1,36 +1,7 @@
 import * as THREE from 'three';
 import { vehicleScreenRotationY } from '../core/collision.ts';
 import type { LogPlatform, Vehicle } from '../core/types.ts';
-
-const urbanGeoCache = new Map<string, THREE.BoxGeometry>();
-const urbanMatCache = new Map<string, THREE.Material>();
-
-function getUrbanGeo(w: number, h: number, d: number): THREE.BoxGeometry {
-  const key = `${w}_${h}_${d}`;
-  let geo = urbanGeoCache.get(key);
-  if (!geo) {
-    geo = new THREE.BoxGeometry(w, h, d);
-    urbanGeoCache.set(key, geo);
-  }
-  return geo;
-}
-
-function getUrbanMat(
-  color: number,
-  basic = false,
-  transparent = false,
-  opacity = 1.0
-): THREE.Material {
-  const key = `${color}_${basic ? 1 : 0}_${transparent ? 1 : 0}_${opacity}`;
-  let mat = urbanMatCache.get(key);
-  if (!mat) {
-    mat = basic
-      ? new THREE.MeshBasicMaterial({ color, transparent, opacity })
-      : new THREE.MeshLambertMaterial({ color, transparent, opacity });
-    urbanMatCache.set(key, mat);
-  }
-  return mat;
-}
+import { VoxelMeshBuilder } from './voxelMeshBuilder.ts';
 
 type UrbanVoxelSpec = [
   number, // w
@@ -43,21 +14,6 @@ type UrbanVoxelSpec = [
   boolean?, // basic material
   number?, // opacity
 ];
-
-function buildUrbanVoxels(group: THREE.Group, specs: UrbanVoxelSpec[]): void {
-  for (let i = 0; i < specs.length; i++) {
-    const s = specs[i];
-    const transparent = (s[8] ?? 1.0) < 1.0;
-    const mesh = new THREE.Mesh(
-      getUrbanGeo(s[0], s[1], s[2]),
-      getUrbanMat(s[6], !!s[7], transparent, s[8] ?? 1.0)
-    );
-    mesh.position.set(s[3], s[4], s[5]);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    group.add(mesh);
-  }
-}
 
 function buildTaxi(color: number = 0xfacc15): UrbanVoxelSpec[] {
   const taxiYellow = 0xfacc15;
@@ -727,50 +683,7 @@ function buildTrain(): UrbanVoxelSpec[] {
   ];
 }
 
-export function createUrbanVehicle(
-  vOrType: Vehicle | 'taxi' | 'scooter' | 'bus' | 'sweeper' | string,
-  speed?: number,
-  colorOverride?: number
-): THREE.Group {
-  const group = new THREE.Group();
-  let specs: UrbanVoxelSpec[];
-  let spd: number;
-
-  if (typeof vOrType === 'object') {
-    spd = vOrType.speed;
-    const col = vOrType.color;
-    if (vOrType.type === 'truck') {
-      specs = Math.abs(vOrType.id) % 2 === 0 ? buildBus(col) : buildSweeper(col);
-    } else {
-      specs = Math.abs(vOrType.id) % 2 === 0 ? buildTaxi(col) : buildScooter(col);
-    }
-  } else {
-    spd = speed ?? 1;
-    switch (vOrType) {
-      case 'taxi': specs = buildTaxi(colorOverride ?? 0xeab308); break;
-      case 'scooter': specs = buildScooter(colorOverride ?? 0x3b82f6); break;
-      case 'bus': specs = buildBus(colorOverride ?? 0x38bdf8); break;
-      case 'sweeper': specs = buildSweeper(colorOverride ?? 0xf97316); break;
-      case 'train': return createUrbanTrain(spd);
-      default: specs = buildTaxi(colorOverride ?? 0xeab308); break;
-    }
-  }
-
-  buildUrbanVoxels(group, specs);
-  group.rotation.y = vehicleScreenRotationY(spd);
-  return group;
-}
-
-export function createUrbanTrain(lengthOrSpeed: number = -1, speed?: number): THREE.Group {
-  const group = new THREE.Group();
-  buildUrbanVoxels(group, buildTrain());
-  const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
-  group.rotation.y = vehicleScreenRotationY(actualSpeed);
-  return group;
-}
-
-export function createUrbanPallet(log: LogPlatform): THREE.Group {
-  const group = new THREE.Group();
+function buildPallet(length: number): UrbanVoxelSpec[] {
   const timberColor = 0xd97706; // Light timber planks
   const darkWood = 0x78350f;    // Stringers, blocks, stamp
   const foamColor = 0xf8fafc;   // Water foam ripples
@@ -778,17 +691,17 @@ export function createUrbanPallet(log: LogPlatform): THREE.Group {
 
   const specs: UrbanVoxelSpec[] = [
     // Submerged buoyancy keel
-    [log.length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
+    [length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
     // White foam wake around floating pallet
-    [log.length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor, true, 0.85],
+    [length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor],
     // 3 Longitudinal bottom skids
-    [log.length * 0.94, 0.04, 0.12, 0, 0.01, -0.28, darkWood],
-    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0, darkWood],
-    [log.length * 0.94, 0.04, 0.12, 0, 0.01, 0.28, darkWood],
+    [length * 0.94, 0.04, 0.12, 0, 0.01, -0.28, darkWood],
+    [length * 0.94, 0.04, 0.12, 0, 0.01, 0, darkWood],
+    [length * 0.94, 0.04, 0.12, 0, 0.01, 0.28, darkWood],
   ];
 
   // 9 Support spacer blocks along pallet length
-  const blockXPositions = [-log.length * 0.42, 0, log.length * 0.42];
+  const blockXPositions = [-length * 0.42, 0, length * 0.42];
   for (const bx of blockXPositions) {
     specs.push([0.14, 0.06, 0.12, bx, 0.05, -0.28, darkWood]);
     specs.push([0.14, 0.06, 0.12, bx, 0.05, 0, darkWood]);
@@ -803,21 +716,98 @@ export function createUrbanPallet(log: LogPlatform): THREE.Group {
   // 5 Top longitudinal timber boards with realistic gaps (Ref: 20_euro_pallet_turnaround.jpg)
   const boardZ = [-0.29, -0.15, 0, 0.15, 0.29];
   for (const bz of boardZ) {
-    specs.push([log.length, 0.04, 0.11, 0, 0.14, bz, timberColor]);
+    specs.push([length, 0.04, 0.11, 0, 0.14, bz, timberColor]);
   }
 
   // Burned wood 'PALLET' stamp brand on front board
   specs.push([0.48, 0.042, 0.02, 0, 0.14, 0.35, darkWood]);
 
   // Discrete 1.0-spaced slot notches for hop magnetism
-  const slotCount = Math.floor(log.length);
+  const slotCount = Math.floor(length);
   for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
-    if (Math.abs(s) > 0.1 && Math.abs(s) < log.length / 2 - 0.2) {
+    if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
       specs.push([0.04, 0.045, 0.74, s, 0.14, 0, 0x92400e]);
     }
   }
 
-  buildUrbanVoxels(group, specs);
+  return specs;
+}
+
+export function createUrbanVehicle(
+  vOrType: Vehicle | 'taxi' | 'scooter' | 'bus' | 'sweeper' | string,
+  speed?: number,
+  colorOverride?: number
+): THREE.Group {
+  const group = new THREE.Group();
+  let type: string;
+  let spd: number;
+  let col: number;
+
+  if (typeof vOrType === 'object') {
+    spd = vOrType.speed;
+    col = vOrType.color;
+    if (vOrType.type === 'truck') {
+      type = Math.abs(vOrType.id) % 2 === 0 ? 'bus' : 'sweeper';
+    } else {
+      type = Math.abs(vOrType.id) % 2 === 0 ? 'taxi' : 'scooter';
+    }
+  } else {
+    spd = speed ?? 1;
+    type = vOrType;
+    col = colorOverride ?? 0;
+  }
+
+  if (type === 'train') {
+    return createUrbanTrain(spd);
+  }
+
+  const key = `veh_${type}_${col}`;
+  const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
+    let specs: UrbanVoxelSpec[];
+    switch (type) {
+      case 'scooter': specs = buildScooter(col); break;
+      case 'bus': specs = buildBus(col); break;
+      case 'sweeper': specs = buildSweeper(col); break;
+      case 'taxi':
+      default: specs = buildTaxi(col); break;
+    }
+    for (let i = 0; i < specs.length; i++) {
+      const s = specs[i];
+      builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
+    }
+  });
+
+  group.add(mesh);
+  group.rotation.y = vehicleScreenRotationY(spd);
+  return group;
+}
+
+export function createUrbanTrain(lengthOrSpeed: number = -1, speed?: number): THREE.Group {
+  const group = new THREE.Group();
+  const mesh = VoxelMeshBuilder.buildCachedMesh('train', (builder) => {
+    const specs = buildTrain();
+    for (let i = 0; i < specs.length; i++) {
+      const s = specs[i];
+      builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
+    }
+  });
+  group.add(mesh);
+  const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
+  group.rotation.y = vehicleScreenRotationY(actualSpeed);
+  return group;
+}
+
+export function createUrbanPallet(log: LogPlatform): THREE.Group {
+  const group = new THREE.Group();
+  const key = `pallet_${log.length.toFixed(2)}`;
+  const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
+    const specs = buildPallet(log.length);
+    for (let i = 0; i < specs.length; i++) {
+      const s = specs[i];
+      builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
+    }
+  });
+  group.add(mesh);
   return group;
 }
 
