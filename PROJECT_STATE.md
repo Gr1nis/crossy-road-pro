@@ -36,6 +36,7 @@
   - Система телеметрии `PerfMetricsTracker`, бенчмарк-ран с авто-хопом и экспорт отчетов `PerfReportModal`.
   - Интерактивный 3D-просмотрщик `viewer.html` / `model-viewer.html` с аудитом 26 моделей.
   - Мета-геймплей: Subway Surfers dock-меню, 7-дневный календарь наград `DailyRewardManager`, квесты `DailyQuestsManager`, флаг рекорда PB с салютом.
+  - **Воксельная стандартизация (Сетка 0.05 & 4 золотых правила)**: Спецификация `docs/VOXEL_GRID_SPECIFICATION.md`, эталонная Зимняя пекарня и Парижское кафе в `src/view/urbanBuildings.ts`.
   - Все **130 из 130 тестов GREEN**, `tsc --noEmit` — 0 ошибок, автономный бандл собран.
-- **Next Up**: Фаза 3 — Интеграция с Yandex Games SDK (Яндекс Игры), облачные сохранения и монетизация (Interstitial + Rewarded Ads).
+- **Next Up**: Стандартизация Книжного магазина (Townhouse C) по сетке 0.05, затем интеграция с Yandex Games SDK (Яндекс Игры).
 

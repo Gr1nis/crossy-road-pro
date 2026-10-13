@@ -13,7 +13,8 @@
 - Max file length: 300 lines. Split if exceeding.
 - Magic numbers → named constants in `WORLD_CONFIG` or module-level `const`.
 
-## Performance (Three.js)
+## Performance & 3D Modeling
+- **Voxel Grid Specification**: All 3D assets follow `docs/VOXEL_GRID_SPECIFICATION.md` (grid step 0.05, 4 golden rules: hollow shells, budgets: props 15–35, skins 60–120, vehicles 80–150, buildings 100–180, vertex colors, monolithic mesh).
 - **Always `dispose()`** geometry + material when removing meshes from scene (recursive `traverse`).
 - **Never allocate in render loop**: no `new THREE.Color/Vector3/Set` inside `sync()` or `animate()`. Pre-allocate as class fields.
 - **Prefer `InstancedMesh`** for repeated objects (trees, rocks, coins).

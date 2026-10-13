@@ -6290,26 +6290,185 @@ const createUrbanBush = (seedVariant        , biome                      )      
     : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
 
 // --- Module: src/view/urbanBuildings.ts ---
-const townhouseAVoxels              = [
-  // Foundation, Walls & Shopfront
-  [1.60, 0.12, 1.40, 0, 0.06, 0, 0x94a3b8], [1.50, 1.30, 1.30, 0, 0.77, 0, 0x2563eb],
-  [0.34, 0.90, 0.04, -0.42, 0.60, 0.66, 0x78350f], [0.26, 0.40, 0.05, -0.42, 0.72, 0.665, 0xfef08a],
-  [0.72, 0.70, 0.04, 0.26, 0.70, 0.66, 0xfef08a], [0.76, 0.08, 0.06, 0.26, 0.32, 0.67, 0x1e3a8a],
-  // Awning & Sign
-  [0.86, 0.14, 0.36, 0.26, 1.15, 0.80, 0xdc2626], [0.28, 0.15, 0.37, 0.26, 1.15, 0.80, 0xf8fafc],
-  [0.72, 0.24, 0.08, 0.26, 1.38, 0.68, 0x78350f], [0.54, 0.14, 0.09, 0.26, 1.38, 0.68, 0xfef08a],
-  [1.62, 0.12, 1.42, 0, 1.50, 0, 0xf8fafc], [1.50, 1.20, 1.30, 0, 2.16, 0, 0x3b82f6],
-  // 2nd Floor Windows & Planters
-  [0.32, 0.60, 0.05, -0.38, 2.16, 0.66, 0xfef08a], [0.36, 0.66, 0.03, -0.38, 2.16, 0.65, 0xf8fafc],
-  [0.32, 0.60, 0.05, 0.38, 2.16, 0.66, 0xfef08a], [0.36, 0.66, 0.03, 0.38, 2.16, 0.65, 0xf8fafc],
-  [0.38, 0.12, 0.14, -0.38, 1.80, 0.70, 0x854d0e], [0.32, 0.08, 0.10, -0.38, 1.88, 0.70, 0x16a34a],
-  [0.38, 0.12, 0.14, 0.38, 1.80, 0.70, 0x854d0e], [0.32, 0.08, 0.10, 0.38, 1.88, 0.70, 0x16a34a],
-  // Roof & Dormer
-  [1.64, 0.14, 1.44, 0, 2.82, 0, 0xf8fafc], [1.46, 0.85, 1.26, 0, 3.28, 0, 0xb45309],
-  [1.30, 0.20, 1.10, 0, 3.75, 0, 0x92400e], [0.40, 0.38, 0.36, 0, 3.32, 0.58, 0x3b82f6],
-  [0.26, 0.24, 0.05, 0, 3.32, 0.76, 0xfef08a], [0.44, 0.12, 0.38, 0, 3.55, 0.58, 0x92400e],
-  [0.22, 0.60, 0.22, -0.45, 3.85, -0.25, 0x64748b], [0.26, 0.10, 0.26, -0.45, 4.18, -0.25, 0x475569],
-];
+function populateCafeBuilder(b                  , isWinter         )       {
+  const cPlinth = 0x334155;
+  const cWall = 0x2563eb;
+  const cTrim = 0x1d4ed8;
+  const cWhite = 0xf8fafc;
+  const cDoor = 0x713f12;
+  const cGlass = 0xfef08a;
+  const cGold = 0xfacc15;
+  const cRed = 0xdc2626;
+  const cSign = 0x451a03;
+  const cGreen = 0x16a34a;
+  const cBerry = 0xef4444;
+  const cRoof = 0xb45309;
+  const cRidge = 0x92400e;
+  const cChimney = 0x64748b;
+  const cGarland = 0x166534;
+  const cSmoke = 0xe2e8f0;
+
+  // 1. Plinth (Цоколь) — Basalt dark slate, 1 voxel wider than walls
+  b.addBox(1.70, 0.10, 1.50, 0, 0.05, 0, cPlinth);
+  b.addBox(1.65, 0.10, 1.45, 0, 0.15, 0, cPlinth);
+
+  // 2. Commercial 1st floor — Ultramarine facade & white mid-cornice
+  b.addBox(1.60, 1.20, 1.40, 0, 0.80, 0, cWall);
+  b.addBox(1.70, 0.10, 1.50, 0, 1.45, 0, cWhite);
+
+  // Entrance door portal (bog oak with warm transom and brass doorknob)
+  b.addBox(0.45, 1.00, 0.05, -0.45, 0.70, 0.75, cTrim);
+  b.addBox(0.35, 0.90, 0.05, -0.45, 0.65, 0.75, cDoor);
+  b.addBox(0.25, 0.35, 0.05, -0.45, 0.85, 0.75, cGlass);
+  b.addBox(0.05, 0.05, 0.05, -0.30, 0.55, 0.80, cGold);
+  b.addBox(0.45, 0.05, 0.10, -0.45, 0.20, 0.75, cPlinth);
+
+  // Wide showcase window (warm interior light with white frames)
+  b.addBox(0.75, 0.85, 0.05, 0.30, 0.70, 0.75, cWhite);
+  b.addBox(0.65, 0.75, 0.05, 0.30, 0.70, 0.75, cGlass);
+  b.addBox(0.75, 0.05, 0.10, 0.30, 0.25, 0.75, cDoor);
+  b.addBox(0.05, 0.75, 0.05, 0.30, 0.70, 0.80, cWhite);
+  b.addBox(0.65, 0.05, 0.05, 0.30, 0.90, 0.80, cWhite);
+
+  // Striped awning (8 alternating red and white stripes, sloped)
+  for (let i = 0; i < 8; i++) {
+    const ax = -0.05 + i * 0.10;
+    const col = i % 2 === 0 ? cRed : cWhite;
+    b.addBox(0.10, 0.05, 0.15, ax, 1.25, 0.80, col);
+    b.addBox(0.10, 0.10, 0.15, ax, 1.15, 0.95, col);
+  }
+
+  // Front 'CAFE' sign above awning
+  b.addBox(0.65, 0.15, 0.05, 0.30, 1.35, 0.75, cSign);
+  b.addBox(0.70, 0.05, 0.05, 0.30, 1.45, 0.75, cDoor);
+  b.addBox(0.05, 0.10, 0.05, 0.15, 1.35, 0.80, cWhite); // C
+  b.addBox(0.05, 0.10, 0.05, 0.25, 1.35, 0.80, cWhite); // A
+  b.addBox(0.05, 0.10, 0.05, 0.35, 1.35, 0.80, cWhite); // F
+  b.addBox(0.05, 0.10, 0.05, 0.45, 1.35, 0.80, cWhite); // E
+
+  // Hanging cantilever sign with coffee cup
+  b.addBox(0.15, 0.05, 0.05, -0.85, 1.25, 0.40, cPlinth);
+  b.addBox(0.05, 0.25, 0.25, -0.95, 1.15, 0.40, cSign);
+  b.addBox(0.05, 0.20, 0.20, -0.95, 1.15, 0.40, cWhite);
+  b.addBox(0.05, 0.10, 0.10, -0.95, 1.10, 0.40, cDoor);
+  b.addBox(0.05, 0.05, 0.05, -0.95, 1.20, 0.40, cGlass);
+
+  // Sidewalk planters & cafe bench
+  for (const px of [-0.70, 0.70]) {
+    b.addBox(0.15, 0.15, 0.15, px, 0.25, 0.75, cRoof);
+    b.addBox(0.10, 0.20, 0.10, px, 0.40, 0.75, cGreen);
+  }
+  b.addBox(0.40, 0.05, 0.15, 0.30, 0.20, 0.80, cDoor);
+  b.addBox(0.05, 0.10, 0.10, 0.15, 0.10, 0.80, cDoor);
+  b.addBox(0.05, 0.10, 0.10, 0.45, 0.10, 0.80, cDoor);
+
+  // 3. Quoins (Рустовка на 4 углах)
+  const cornerXs = [-0.80, 0.80];
+  const cornerZs = [-0.70, 0.70];
+  const quoinYs = [0.30, 0.70, 1.10, 1.70, 2.10, 2.50];
+  for (let ci = 0; ci < 2; ci++) {
+    const cx = cornerXs[ci];
+    for (let cj = 0; cj < 2; cj++) {
+      const cz = cornerZs[cj];
+      for (let q = 0; q < quoinYs.length; q++) {
+        const isLong = q % 2 === 0;
+        const qw = isLong ? 0.15 : 0.10;
+        const qd = isLong ? 0.10 : 0.15;
+        b.addBox(qw, 0.10, qd, cx, quoinYs[q], cz, cWhite);
+      }
+    }
+  }
+
+  // 4. 2nd Floor Walls, Windows & Flower Boxes
+  b.addBox(1.60, 1.20, 1.40, 0, 2.10, 0, cWall);
+  b.addBox(1.70, 0.10, 1.50, 0, 2.75, 0, cWhite); // Upper cornice
+
+  for (const wx of [-0.35, 0.35]) {
+    b.addBox(0.35, 0.70, 0.05, wx, 2.15, 0.75, cWhite);
+    b.addBox(0.25, 0.60, 0.05, wx, 2.15, 0.75, cGlass);
+    b.addBox(0.40, 0.05, 0.10, wx, 1.75, 0.75, cWhite);
+    b.addBox(0.40, 0.05, 0.10, wx, 2.55, 0.75, cWhite);
+    b.addBox(0.35, 0.10, 0.10, wx, 1.65, 0.80, cDoor);
+    b.addBox(0.30, 0.05, 0.05, wx, 1.75, 0.80, cGreen);
+    b.addBox(0.05, 0.05, 0.05, wx - 0.10, 1.80, 0.80, cBerry);
+    b.addBox(0.05, 0.05, 0.05, wx + 0.10, 1.80, 0.80, cBerry);
+  }
+
+  // Side facade windows & downspout
+  b.addBox(0.05, 0.60, 0.30, -0.85, 2.15, 0, cWhite);
+  b.addBox(0.05, 0.50, 0.20, -0.85, 2.15, 0, cGlass);
+  b.addBox(0.10, 0.05, 0.35, -0.85, 1.80, 0, cWhite);
+  b.addBox(0.05, 0.60, 0.30, -0.85, 0.80, 0, cWhite);
+  b.addBox(0.05, 0.50, 0.20, -0.85, 0.80, 0, cGlass);
+  b.addBox(0.10, 0.05, 0.35, -0.85, 0.45, 0, cWhite);
+  b.addBox(0.05, 2.40, 0.05, -0.80, 1.40, 0.65, cChimney);
+
+  // 5. Mansard Roof, Dormer Windows & Chimney
+  b.addBox(1.55, 0.20, 1.35, 0, 2.90, 0, cRoof);
+  b.addBox(1.45, 0.20, 1.20, 0, 3.10, 0, cRoof);
+  b.addBox(1.35, 0.20, 1.05, 0, 3.30, 0, cRoof);
+  b.addBox(1.25, 0.20, 0.90, 0, 3.50, 0, cRoof);
+  b.addBox(1.15, 0.10, 0.80, 0, 3.65, 0, cRidge);
+
+  for (const lx of [-0.35, 0.35]) {
+    b.addBox(0.30, 0.25, 0.25, lx, 3.10, 0.55, cWall);
+    b.addBox(0.20, 0.20, 0.05, lx, 3.10, 0.70, cGlass);
+    b.addBox(0.25, 0.05, 0.05, lx, 2.95, 0.70, cWhite);
+    b.addBox(0.35, 0.10, 0.30, lx, 3.30, 0.55, cRoof);
+  }
+
+  // Brick chimney with cap
+  b.addBox(0.25, 0.60, 0.25, 0.45, 3.80, -0.25, cChimney);
+  b.addBox(0.30, 0.10, 0.30, 0.45, 4.15, -0.25, cPlinth);
+  b.addBox(0.15, 0.10, 0.15, 0.45, 4.25, -0.25, cTrim);
+
+  // 6. Winter Layer (Snow caps, garland, chimney smoke)
+  if (isWinter) {
+    b.addBox(1.20, 0.10, 0.85, 0, 3.75, 0, cWhite); // Roof snow
+    b.addBox(1.40, 0.05, 0.20, 0, 3.55, 0.40, cWhite); // Front mansard slope snow
+    b.addBox(1.40, 0.05, 0.20, 0, 3.55, -0.40, cWhite); // Back slope snow
+    for (const lx of [-0.35, 0.35]) {
+      b.addBox(0.35, 0.05, 0.30, lx, 3.40, 0.55, cWhite);
+    }
+    b.addBox(1.70, 0.05, 0.10, 0, 2.85, 0.70, cWhite);
+    b.addBox(0.10, 0.05, 1.50, -0.80, 2.85, 0, cWhite);
+    b.addBox(1.70, 0.05, 0.10, 0, 1.55, 0.70, cWhite);
+    b.addBox(0.10, 0.05, 1.50, -0.80, 1.55, 0, cWhite);
+
+    for (const wx of [-0.35, 0.35]) {
+      b.addBox(0.40, 0.05, 0.10, wx, 2.60, 0.75, cWhite);
+      b.addBox(0.35, 0.05, 0.10, wx, 1.80, 0.75, cWhite);
+    }
+    b.addBox(0.10, 0.05, 0.35, -0.85, 1.85, 0, cWhite);
+    b.addBox(0.85, 0.05, 0.20, 0.30, 1.30, 0.90, cWhite);
+    b.addBox(0.70, 0.05, 0.05, 0.30, 1.45, 0.75, cWhite);
+    b.addBox(0.05, 0.05, 0.25, -0.95, 1.30, 0.40, cWhite);
+
+    for (const px of [-0.70, 0.70]) {
+      b.addBox(0.15, 0.05, 0.15, px, 0.55, 0.75, cWhite);
+    }
+    b.addBox(0.40, 0.05, 0.15, 0.30, 0.25, 0.80, cWhite);
+    b.addBox(0.30, 0.05, 0.30, 0.45, 4.25, -0.25, cWhite);
+
+    // Chimney smoke puffs
+    b.addBox(0.10, 0.10, 0.10, 0.45, 4.40, -0.25, cSmoke);
+    b.addBox(0.10, 0.10, 0.10, 0.40, 4.55, -0.20, cSmoke);
+    b.addBox(0.10, 0.10, 0.10, 0.45, 4.70, -0.15, cSmoke);
+    b.addBox(0.05, 0.05, 0.05, 0.40, 4.80, -0.15, cSmoke);
+
+    // Festive garland with berries along cornice
+    for (const gx of [-0.50, 0.00, 0.50]) {
+      b.addBox(0.45, 0.05, 0.05, gx, 1.40, 0.75, cGarland);
+    }
+    for (const bx of [-0.65, -0.25, 0.25, 0.65]) {
+      b.addBox(0.05, 0.05, 0.05, bx, 1.40, 0.80, cBerry);
+    }
+    b.addBox(0.05, 0.05, 0.60, -0.85, 1.40, 0.20, cGarland);
+    for (const bz of [-0.10, 0.50]) {
+      b.addBox(0.05, 0.05, 0.05, -0.85, 1.40, bz, cBerry);
+    }
+  }
+}
 
 function populateBakeryBuilder(builder                  , isWinter         )       {
   const W = 1.60;
@@ -6468,6 +6627,8 @@ function populateBakeryBuilder(builder                  , isWinter         )    
   }
 }
 
+                                                                          
+
 const townhouseCVoxels              = [
   // Base & 1st Floor
   [1.56, 0.12, 1.40, 0, 0.06, 0, 0x854d0e],
@@ -6528,7 +6689,7 @@ function createTownhouseA(isWinter = false)              {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_a_winter' : 'townhouse_a';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
-    populateTownhouseBuilder(b, townhouseAVoxels, isWinter);
+    populateCafeBuilder(b, isWinter);
   });
   group.add(mesh);
   return group;
