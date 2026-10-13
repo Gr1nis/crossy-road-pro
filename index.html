@@ -9,15 +9,16 @@
   <title>Crossy Road 3D — Vibe-Pro Edition</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; touch-action: none; -webkit-touch-callout: none; }
-    #game-container { width: 100%; height: 100%; position: relative; touch-action: none; }
+    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0f1d; touch-action: none; -webkit-touch-callout: none; display: flex; align-items: center; justify-content: center; }
+    #game-container { aspect-ratio: 9 / 16; height: 100%; max-height: 100vh; max-width: calc(100vh * (9 / 16)); width: 100%; position: relative; overflow: hidden; box-shadow: 0 0 60px rgba(0, 0, 0, 0.75); touch-action: none; background: #87ceeb; }
+    #game-container > canvas { width: 100% !important; height: 100% !important; display: block; position: absolute; inset: 0; z-index: 1; }
 
     /* Global Visibility Utility */
     .hidden { display: none !important; }
     #in-game-hud.hidden, .hud.hidden { display: none !important; }
     
     /* Clean Minimal In-Game HUD: Coins, Distance & Pause button only */
-    .hud { position: fixed; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
+    .hud { position: absolute; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
     .hud.hidden { display: none !important; }
     .hud-stats { display: flex; gap: 14px; }
     .score-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.22); padding: 10px 22px; border-radius: 16px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
@@ -32,7 +33,7 @@
 
     /* Telemetry / Perf HUD */
     .perf-hud {
-      position: fixed;
+      position: absolute;
       top: max(16px, env(safe-area-inset-top));
       right: max(16px, env(safe-area-inset-right));
       width: 250px;
@@ -66,15 +67,15 @@
     .perf-breakdown { font-size: 9px; color: #a5b4fc; background: rgba(30, 41, 59, 0.5); padding: 4px 6px; border-radius: 6px; text-align: center; }
 
     /* Danger vignette at bottom when player crosses edge */
-    #warning-vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: linear-gradient(to top, rgba(239, 68, 68, 0.65) 0%, rgba(239, 68, 68, 0.2) 20%, transparent 45%); transition: opacity 0.15s ease-out; }
+    #warning-vignette { position: absolute; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: linear-gradient(to top, rgba(239, 68, 68, 0.65) 0%, rgba(239, 68, 68, 0.2) 20%, transparent 45%); transition: opacity 0.15s ease-out; }
 
-    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
+    .modal { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
     .modal.hidden { display: none !important; }
     #perf-report-modal { z-index: 2000; }
 
     /* Modern Subway Surfers-style Main Menu HUD */
     .main-menu-overlay {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background: transparent !important;
       backdrop-filter: none !important;
@@ -810,7 +811,7 @@
     .game-over-score-item:last-child .game-over-score-num { color: #facc15; }
 
     /* Toast Notifications */
-    #toast-container { position: fixed; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
+    #toast-container { position: absolute; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
     .toast-item { background: rgba(15, 23, 42, 0.94); border: 2px solid #f59e0b; border-radius: 16px; padding: 12px 16px; color: #f8fafc; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); display: flex; align-items: center; gap: 12px; animation: toastIn 0.28s ease-out; backdrop-filter: blur(10px); }
     .toast-icon { font-size: 26px; line-height: 1; }
     .toast-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -1007,9 +1008,9 @@
   </style>
 </head>
 <body>
-  <div id="game-container"></div>
-  <div id="warning-vignette"></div>
-  <div id="toast-container"></div>
+  <div id="game-container">
+    <div id="warning-vignette"></div>
+    <div id="toast-container"></div>
 
   <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
   <div id="in-game-hud" class="hud hidden">
@@ -1340,7 +1341,7 @@
   </div>
 
   <!-- Кнопка вызова DEV-панели -->
-  <button id="menu-dev-btn" class="hud-circle-btn" style="position: fixed; bottom: max(200px, calc(env(safe-area-inset-bottom) + 200px)); left: max(24px, env(safe-area-inset-left)); z-index: 100; font-size: 13px; width: auto; padding: 0 12px; height: 38px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; color: #38bdf8; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; pointer-events: auto;" title="Панель разработчика">🛠️ DEV</button>
+  <button id="menu-dev-btn" class="hud-circle-btn" style="position: absolute; bottom: max(200px, calc(env(safe-area-inset-bottom) + 200px)); left: max(24px, env(safe-area-inset-left)); z-index: 100; font-size: 13px; width: auto; padding: 0 12px; height: 38px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; color: #38bdf8; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; pointer-events: auto;" title="Панель разработчика">🛠️ DEV</button>
 
   <!-- Модальное окно Dev Sandbox (Тестирование и Вьюер) -->
   <div id="dev-modal" class="modal hidden">
@@ -1369,6 +1370,7 @@
       <button id="dev-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
     </div>
   </div>
+  </div>
 
   <script type="module">
 import * as THREE from 'https://unpkg.com/three@0.170.0/build/three.module.js';
@@ -1379,48 +1381,39 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;
-const MoveDirection = {
+}         ;const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;
-const DeathReason = {
+}         ;const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;
-const DEFAULT_SKIN_ID         = 'corgi';
-const ALL_SKINS                                                             = [
+}         ;const DEFAULT_SKIN_ID         = 'corgi';const ALL_SKINS                                                             = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
   { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
-];
-const Biome = {
+];const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
   DESERT: 'desert',
   NEON: 'neon',
-}         ;
-const BIOME_ORDER                           = [
+}         ;const BIOME_ORDER                           = [
   Biome.FOREST,
   Biome.WINTER,
   Biome.DESERT,
   Biome.NEON,
-];
-const BIOME_INTERVAL = 25;
-function getBiomeForScore(score        )            {
+];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
   const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
   const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
   return BIOME_ORDER[biomeIndex];
-}
-const WORLD_CONFIG = {
+}const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -1474,8 +1467,7 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}
-function findSupportingLog(playerX        , logs               )                     {
+}function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -1488,19 +1480,16 @@ function findSupportingLog(playerX        , logs               )                
 /**
  * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
  * relative to the center of the log, so the character cleanly magnets to a log section.
- */
-function snapToLogSlot(landingX        , log             )         {
+ */function snapToLogSlot(landingX        , log             )         {
   const rel = landingX - log.x;
   // Discrete 1.0-spaced slots centered on log
   const snappedRel = Math.round(rel);
   const maxRel = Math.max(0, (log.length - 1.0) / 2);
   const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
   return log.x + clampedRel;
-}
-function isOutOfBoundsX(playerX        )          {
+}function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}
-function quantizeLandX(x        )         {
+}function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -1508,15 +1497,11 @@ function quantizeLandX(x        )         {
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */
-function worldToScreenX(x        )         {
+ */function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
-}
-function vehicleScreenRotationY(speed        )         {
+}function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
-}
-const RECORD_FLAG_X = 3.8;
-function getRecordFlagPosition(
+}const RECORD_FLAG_X = 3.8;function getRecordFlagPosition(
   highScore        ,
   shoulderX         = RECORD_FLAG_X
 )                            {
@@ -1527,16 +1512,14 @@ function getRecordFlagPosition(
     x: shoulderX,
     row: Math.floor(highScore),
   };
-}
-const CAMERA_CONFIG = {
+}const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
   DESKTOP_VIEW_HEIGHT: 12.5,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
   FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
-}         ;
-function getCameraFrustumDimensions(aspect         = 9 / 16)   
+}         ;function getCameraFrustumDimensions(aspect         = 9 / 16)   
                      
                     
                  
@@ -1558,8 +1541,7 @@ function getCameraFrustumDimensions(aspect         = 9 / 16)
  * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
  * of the player character under the isometric orthographic camera.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
- */
-function getCameraFrustumNdcY(
+ */function getCameraFrustumNdcY(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -1582,8 +1564,7 @@ function getCameraFrustumNdcY(
 /**
  * Returns true when the player touches or crosses below the visible
  * bottom edge of the screen (NDC Y < -0.98).
- */
-function isPlayerBehindCameraFrustum(
+ */function isPlayerBehindCameraFrustum(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -1710,16 +1691,13 @@ const SkinRarity = {
   RARE: 'Rare',
   EPIC: 'Epic',
   LEGENDARY: 'Legendary',
-}         ;
-const GACHA_DUPLICATE_CASHBACK = 40;
-const SKIN_RARITY_MAP                                  = {
+}         ;const GACHA_DUPLICATE_CASHBACK = 40;const SKIN_RARITY_MAP                                  = {
   corgi: SkinRarity.COMMON,
   pigeon_pizza: SkinRarity.COMMON,
   box_cat: SkinRarity.RARE,
   raccoon_bandit: SkinRarity.EPIC,
   capybara_zen: SkinRarity.LEGENDARY,
-};
-const SKIN_RARITY_WEIGHTS                                  = {
+};const SKIN_RARITY_WEIGHTS                                  = {
   [SkinRarity.COMMON]: 50,
   [SkinRarity.RARE]: 30,
   [SkinRarity.EPIC]: 15,
@@ -1745,8 +1723,7 @@ function mulberry32(seed        )         {
 /**
  * GachaMachine handles skin rolls based on rarity weights, PRNG, and duplicates cashback.
  * Decoupled from storage, view, and game loop.
- */
-class GachaMachine {
+ */class GachaMachine {
   getSkinRarity(skinId        )                  {
     return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
   }
@@ -1816,8 +1793,7 @@ const ACHIEVEMENT_DEFINITIONS                                       = [
   { id: 'river_navigator', title: 'Речной волк', description: 'Совершите 10 прыжков по брёвнам', badge: '🪵', maxProgress: 10, difficulty: 'easy', rewardCoins: 25 },
   { id: 'speedy_crosser', title: 'Без оглядки', description: 'Сделайте 30 шагов вперед без движения назад', badge: '🏃', maxProgress: 30, difficulty: 'medium', rewardCoins: 50 },
   { id: 'leaderboard_champion', title: 'Король трассы', description: 'Займите 1-е место в таблице лидеров', badge: '👑', maxProgress: 1, difficulty: 'master', rewardCoins: 200 },
-];
-class AchievementTracker {
+];class AchievementTracker {
           unlocked = new Set               ();
           claimed = new Set               ();
           dates = new Map                       ();
@@ -2059,12 +2035,9 @@ function calculateCalendarDayDiff(dateStr1        , dateStr2        )         {
 // [DEV TESTING OVERRIDE: ТАЙМЕРЫ И ПРИВЯЗКА КО ВРЕМЕНИ ДЛЯ ЕЖЕДНЕВНЫХ БОНУСОВ]
 // Позволяет забирать бонусы подряд без ожидания полуночи (День 1..7 -> 1..7).
 // Для возврата продакшн-режима установите: DEV_DISABLE_DAILY_TIMERS = false;
-// ============================================================================
-let DEV_DISABLE_DAILY_TIMERS = true;
-function setDevDisableDailyTimers(disabled         )       {
+// ============================================================================let DEV_DISABLE_DAILY_TIMERS = true;function setDevDisableDailyTimers(disabled         )       {
   DEV_DISABLE_DAILY_TIMERS = disabled;
-}
-class DailyRewardManager {
+}class DailyRewardManager {
           currentStreak = 1;
           lastClaimTimestamp = 0;
           lastClaimDate = '';
@@ -2291,8 +2264,7 @@ class DailyRewardManager {
 }
 
 // --- Module: src/core/dailyQuests.ts ---
-const DAILY_SUPER_BONUS_COINS = 100;
-const DAILY_QUEST_DEFINITIONS                                      = [
+const DAILY_SUPER_BONUS_COINS = 100;const DAILY_QUEST_DEFINITIONS                                      = [
   { id: 'hop_distance', title: 'Прыжковый марафон', description: 'Сделайте 200 шагов суммарно', category: 'hops', target: 200, rewardCoins: 25, isSingleRun: false },
   { id: 'single_run_score', title: 'Рекордный забег', description: 'Наберите 40 очков за один забег', category: 'score', target: 40, rewardCoins: 40, isSingleRun: true },
   { id: 'coin_collector', title: 'Сборщик монет', description: 'Соберите 15 монет суммарно', category: 'coins', target: 15, rewardCoins: 25, isSingleRun: false },
@@ -2302,14 +2274,12 @@ const DAILY_QUEST_DEFINITIONS                                      = [
   { id: 'forward_streak', title: 'Только вперёд', description: 'Сделайте 25 шагов вперёд без отката', category: 'hops', target: 25, rewardCoins: 50, isSingleRun: true },
   { id: 'daily_runs', title: 'Ежедневные забеги', description: 'Сыграйте 5 забегов', category: 'score', target: 5, rewardCoins: 25, isSingleRun: false },
   { id: 'gacha_spin', title: 'Удачный спин', description: 'Совершите 1 прокрутку в автомате', category: 'gacha', target: 1, rewardCoins: 30, isSingleRun: false },
-];
-function getDailyDateKey(dateOrTimestamp                )         {
+];function getDailyDateKey(dateOrTimestamp                )         {
   const d = dateOrTimestamp instanceof Date ? dateOrTimestamp : new Date(dateOrTimestamp ?? Date.now());
   const m = String(d.getUTCMonth() + 1).padStart(2, '0');
   const day = String(d.getUTCDate()).padStart(2, '0');
   return `${d.getUTCFullYear()}-${m}-${day}`;
-}
-function getDailySeedFromDate(dateKey        )         {
+}function getDailySeedFromDate(dateKey        )         {
   let hash = 2166136261 ^ 37;
   for (let i = 0; i < dateKey.length; i++) {
     hash = Math.imul(hash ^ dateKey.charCodeAt(i), 16777619);
@@ -2327,8 +2297,7 @@ function dailyQuestCalendarDiff(d1        , d2        )         {
 
 function dailyQuestIsRecord(v         )                               {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
-}
-function selectDailyQuests(dateKey        )                       {
+}function selectDailyQuests(dateKey        )                       {
   let seed = getDailySeedFromDate(dateKey);
   const pool = [...DAILY_QUEST_DEFINITIONS];
   for (let i = pool.length - 1; i > 0; i--) {
@@ -2352,8 +2321,7 @@ function selectDailyQuests(dateKey        )                       {
     isCompleted: false,
     isClaimed: false,
   }));
-}
-class DailyQuestTracker {
+}class DailyQuestTracker {
           _lastActiveDateKey        ;
           _currentStreakDays        ;
           _allCompletedBonusClaimed         ;
@@ -2538,11 +2506,8 @@ class DailyQuestTracker {
 
 // --- Module: src/core/scoreTracker.ts ---
 // Re-exports for backward compatibility
-
 const HIGH_SCORE_KEY = 'crossy_road_pro_high_score';
-const PROFILE_KEY = 'crossy_road_pro_profile_v1';
-const MAX_LEADERBOARD_ENTRIES = 10;
-const DEFAULT_BOT_RIVALS                                                = [
+const PROFILE_KEY = 'crossy_road_pro_profile_v1';const MAX_LEADERBOARD_ENTRIES = 10;const DEFAULT_BOT_RIVALS                                                = [
   { playerName: 'CyberKaiser', score: 250, skinId: 'capybara_zen', date: '2026-09-20', isBot: true },
   { playerName: 'ArcticFlash', score: 210, skinId: 'raccoon_bandit', date: '2026-09-21', isBot: true },
   { playerName: 'NeonQuack', score: 175, skinId: 'box_cat', date: '2026-09-22', isBot: true },
@@ -2553,8 +2518,7 @@ const DEFAULT_BOT_RIVALS                                                = [
   { playerName: 'TurboCluck', score: 55, skinId: 'corgi', date: '2026-09-25', isBot: true },
   { playerName: 'TrainDodger', score: 35, skinId: 'box_cat', date: '2026-09-25', isBot: true },
   { playerName: 'RookieFeather', score: 18, skinId: 'pigeon_pizza', date: '2026-09-26', isBot: true },
-];
-class ScoreTracker {
+];class ScoreTracker {
           currentScore = 0;
           highScore = 0;
           bestRow = 0;
@@ -3070,8 +3034,7 @@ class ScoreTracker {
 
 // --- Module: src/core/laneGenerator.ts ---
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
-const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];
-class LaneGenerator {
+const OBSTACLE_KINDS                 = ['tree', 'rock', 'bush'];class LaneGenerator {
                    baseSeed        ;
 
   constructor(seed         = 42) {
@@ -3240,8 +3203,7 @@ class LaneGenerator {
 }
 
 // --- Module: src/core/gameEngine.ts ---
-const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;
-class GameEngine {
+const WRAP_LIMIT = WORLD_CONFIG.WRAP_LIMIT;class GameEngine {
           generator               ;
           lanes = new Map              ();
           scoreTracker              ;
@@ -3846,8 +3808,7 @@ class GameEngine {
 // 2. src/app/uiManager.ts -> раскомментировать боевые таймеры
 // 3. scripts/build.mjs -> убрать/скрыть кнопку #menu-dev-btn и модалку
 // 4. npm test && npm run build
-// ============================================================================
-class PlatformBridge                       {
+// ============================================================================class PlatformBridge                       {
           ysdk                      = null;
           isInitStarted          = false;
           isInitCompleted          = false;
@@ -4687,8 +4648,7 @@ const VOXEL_PALETTE = {
   concreteGrey: 0x64748b,
   goldCoin: 0xfacc15,
   rubyRed: 0xb91c1c,
-}         ;
-class VoxelPalette {
+}         ;class VoxelPalette {
           static          geoCache = new Map                           ();
           static          matCache = new Map                                   ();
           static          basicMatCache = new Map                                 ();
@@ -4766,21 +4726,18 @@ for (const [w, h, d] of voxelStandardSizes) {
 for (const key of Object.keys(VOXEL_PALETTE)                   ) {
   VoxelPalette.getMaterial(key, false);
 }
-VoxelPalette.getGhostMaterial();
-function createVoxelMaterial(
+VoxelPalette.getGhostMaterial();function createVoxelMaterial(
   colorKey                        ,
   isGhost = false
 )                            {
   return VoxelPalette.getMaterial(colorKey, isGhost);
-}
-function createVoxelBasicMaterial(
+}function createVoxelBasicMaterial(
   color        ,
   transparent = false,
   opacity = 1.0
 )                          {
   return VoxelPalette.getBasicMaterial(color, transparent, opacity);
-}
-function createVoxelMesh(
+}function createVoxelMesh(
   w        ,
   h        ,
   d        ,
@@ -4813,8 +4770,7 @@ function addCharVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}
-function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+}function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
   const group = new THREE.Group();
 
   if (skinId === 'corgi') {
@@ -5057,8 +5013,7 @@ function createUrbanCharacter(skinId         = 'corgi', isGhost = false)        
 /**
  * VoxelMeshBuilder — Compiles multi-cube voxel structures into a single
  * monolithic BufferGeometry mesh with vertex colors, drastically reducing Draw Calls.
- */
-class VoxelMeshBuilder {
+ */class VoxelMeshBuilder {
                    boxes                                                                  = [];
           static          geoCache = new Map                              ();
           static sharedLambertMaterial                                   = null;
@@ -5932,8 +5887,7 @@ function buildPallet(length        )                   {
   }
 
   return specs;
-}
-function createUrbanVehicle(
+}function createUrbanVehicle(
   vOrType                                                           ,
   speed         ,
   colorOverride         
@@ -5980,8 +5934,7 @@ function createUrbanVehicle(
   group.add(mesh);
   group.rotation.y = vehicleScreenRotationY(spd);
   return group;
-}
-function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+}function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
   const group = new THREE.Group();
   const mesh = VoxelMeshBuilder.buildCachedMesh('train', (builder) => {
     const specs = buildTrain();
@@ -5994,8 +5947,7 @@ function createUrbanTrain(lengthOrSpeed         = -1, speed         )           
   const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
   group.rotation.y = vehicleScreenRotationY(actualSpeed);
   return group;
-}
-function createUrbanPallet(log             )              {
+}function createUrbanPallet(log             )              {
   const group = new THREE.Group();
   const key = `pallet_${log.length.toFixed(2)}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
@@ -6010,8 +5962,7 @@ function createUrbanPallet(log             )              {
 }
 
 // --- Module: src/view/urbanEnvironment.ts ---
-/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */
-function createUrbanHydrant()              {
+/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */function createUrbanHydrant()              {
   const group = new THREE.Group();
   const redMat = createVoxelMaterial(0xef4444);
   const silverMat = createVoxelMaterial(0xcbd5e1);
@@ -6034,8 +5985,7 @@ function createUrbanHydrant()              {
   return group;
 }
 
-/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */
-function createUrbanTrashCan()              {
+/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */function createUrbanTrashCan()              {
   const group = new THREE.Group();
   const greenMat = createVoxelMaterial(0x15803d);
   const darkMat = createVoxelMaterial(0x1e293b);
@@ -6057,8 +6007,7 @@ function createUrbanTrashCan()              {
   return group;
 }
 
-/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */
-function createUrbanBench()              {
+/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */function createUrbanBench()              {
   const group = new THREE.Group();
   const woodMat = createVoxelMaterial(0x854d0e);
   const ironMat = createVoxelMaterial(0x1e293b);
@@ -6082,8 +6031,7 @@ function createUrbanBench()              {
   return group;
 }
 
-/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */
-function createUrbanLampPost()              {
+/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */function createUrbanLampPost()              {
   const group = new THREE.Group();
   const ironMat = createVoxelMaterial(0x0f172a);
   const glowMat = createVoxelBasicMaterial(0xfef08a);
@@ -6102,8 +6050,7 @@ function createUrbanLampPost()              {
   return group;
 }
 
-/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */
-function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
+/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
   const boxMat = createVoxelMaterial(0x78350f);
@@ -6133,8 +6080,7 @@ function createUrbanTreePlanter(seedVariant        , biome            = 'forest'
   return group;
 }
 
-/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */
-function createUrbanHedge(seedVariant        , biome            = 'forest')              {
+/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */function createUrbanHedge(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
   const hedgeColor =
@@ -6157,8 +6103,7 @@ function createUrbanHedge(seedVariant        , biome            = 'forest')     
   return group;
 }
 
-/** Obstacle Dispatcher */
-function createUrbanObstacle(
+/** Obstacle Dispatcher */function createUrbanObstacle(
   kind              ,
   seedVariant        ,
   biomeOrSnow                      = false
@@ -6180,16 +6125,14 @@ function createUrbanObstacle(
   return absSeed % 5 < 3
     ? createUrbanTreePlanter(absSeed, biome)
     : createUrbanLampPost();
-}
-function createUrbanCoin()              {
+}function createUrbanCoin()              {
   const group = new THREE.Group();
   const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
   const innerMat = createVoxelMaterial(0xef4444);
   group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
   group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
   return group;
-}
-function createUrbanRailwaySignal()                                                {
+}function createUrbanRailwaySignal()                                                {
   const group = new THREE.Group();
   const poleMat = createVoxelMaterial(0x1e293b);
   const lightMat = createVoxelBasicMaterial(0x334155);
@@ -6198,15 +6141,13 @@ function createUrbanRailwaySignal()                                             
   const lightMesh = createVoxelMesh(0.22, 0.16, 0.28, lightMat, 0, 1.22, 0, false, false);
   group.add(lightMesh);
   return { group, lightMesh };
-}
-function createUrbanRoadMarkings()              {
+}function createUrbanRoadMarkings()              {
   const group = new THREE.Group();
   const whiteLineMat = createVoxelBasicMaterial(0xf8fafc);
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(-9.5), 0.015, 0, false, false));
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(9.5), 0.015, 0, false, false));
   return group;
-}
-function createUrbanRoadBarrier(biome            = 'forest')              {
+}function createUrbanRoadBarrier(biome            = 'forest')              {
   const group = new THREE.Group();
   const postColor = biome === 'neon' ? 0x1e1b4b : biome === 'winter' ? 0x475569 : 0x64748b;
   const railColor = biome === 'neon' ? 0x06b6d4 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
@@ -6221,8 +6162,7 @@ function createUrbanRoadBarrier(biome            = 'forest')              {
   group.add(createVoxelMesh(0.14, 0.18, 0.96, railMat, 0, 0.28, 0));
   group.add(createVoxelMesh(0.15, 0.08, 0.18, reflectorMat, 0, 0.28, 0, false, false));
   return group;
-}
-function createUrbanRiverbankEdge(
+}function createUrbanRiverbankEdge(
   side                  ,
   biome            = 'forest'
 )              {
@@ -6241,8 +6181,7 @@ function createUrbanRiverbankEdge(
   group.add(createVoxelMesh(0.36, 0.22, 0.32, rockMat, bx, 0.07, 0.2));
   group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
   return group;
-}
-function createUrbanRecordFlag()              {
+}function createUrbanRecordFlag()              {
   const group = new THREE.Group();
   group.name = 'recordFlag';
 
@@ -6279,12 +6218,9 @@ function createUrbanRecordFlag()              {
 
   group.add(clothGroup);
   return group;
-}
-const createUrbanTree = (seedVariant        , biome                      )              =>
-  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
-const createUrbanRock = (seedVariant        , _biome            )              =>
-  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
-const createUrbanBush = (seedVariant        , biome                      )              =>
+}const createUrbanTree = (seedVariant        , biome                      )              =>
+  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);const createUrbanRock = (seedVariant        , _biome            )              =>
+  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();const createUrbanBush = (seedVariant        , biome                      )              =>
   Math.abs(seedVariant) % 2 === 0
     ? createUrbanBench()
     : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
@@ -7009,8 +6945,7 @@ function populateBooksBuilder(builder                  , isWinter         )     
   buildBooksRoof(builder, isWinter);
 }
 
-/** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */
-function createTownhouseA(isWinter = false)              {
+/** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */function createTownhouseA(isWinter = false)              {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_a_winter' : 'townhouse_a';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
@@ -7020,8 +6955,7 @@ function createTownhouseA(isWinter = false)              {
   return group;
 }
 
-/** Townhouse B: Red Brick Bakery (Ref: 12_townhouse_bakery_turnaround.jpg / 22_winter_brick_bakery_turnaround.jpg) */
-function createTownhouseB(isWinter = false)              {
+/** Townhouse B: Red Brick Bakery (Ref: 12_townhouse_bakery_turnaround.jpg / 22_winter_brick_bakery_turnaround.jpg) */function createTownhouseB(isWinter = false)              {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_b_winter' : 'townhouse_b';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
@@ -7031,8 +6965,7 @@ function createTownhouseB(isWinter = false)              {
   return group;
 }
 
-/** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */
-function createTownhouseC(isWinter = false)              {
+/** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */function createTownhouseC(isWinter = false)              {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_c_winter' : 'townhouse_c';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
@@ -7040,8 +6973,7 @@ function createTownhouseC(isWinter = false)              {
   });
   group.add(mesh);
   return group;
-}
-function createUrbanTownhouse(seed        , biome            = 'forest')              {
+}function createUrbanTownhouse(seed        , biome            = 'forest')              {
   const root = new THREE.Group();
   root.name = 'urbanTownhouse';
   const variant = Math.abs(seed) % 3;
@@ -7153,8 +7085,7 @@ const SKIN_DESCRIPTIONS                         = {
   box_cat: 'Рыжий котик в посылочной коробке со штампом "FRAGILE / DELIVERY", свесивший лапки через бортик.',
   raccoon_bandit: 'Городской енот-воришка в чёрной бандитской маске с кольчатым хвостом и холщовым мешком за спиной.',
   capybara_zen: 'Умиротворённая дзен-капибара в медитативной позе со спелым воксельным мандарином на голове.',
-};
-function getCharacterModelItems()                     {
+};function getCharacterModelItems()                     {
   return ALL_SKINS.map((skin) => ({
     id: skin.id,
     name: skin.name,
@@ -7163,8 +7094,7 @@ function getCharacterModelItems()                     {
     desc: SKIN_DESCRIPTIONS[skin.id] ?? `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
     create: (_biome            = 'forest', isGhost = false) => createUrbanCharacter(skin.id, isGhost),
   }));
-}
-function getVehicleModelItems()                     {
+}function getVehicleModelItems()                     {
   return [
     {
       id: 'taxi',
@@ -7215,8 +7145,7 @@ function getVehicleModelItems()                     {
       create: () => createUrbanPallet({ id: 1, x: 0, length: 2.4, speed: 1 }),
     },
   ];
-}
-function getPropModelItems()                     {
+}function getPropModelItems()                     {
   return [
     {
       id: 'hydrant',
@@ -7299,8 +7228,7 @@ function getPropModelItems()                     {
       create: (b            = 'forest') => createUrbanRiverbankEdge('left', b),
     },
   ];
-}
-function getNatureModelItems()                     {
+}function getNatureModelItems()                     {
   return [
     {
       id: 'tree_planter_0',
@@ -7327,8 +7255,7 @@ function getNatureModelItems()                     {
       create: (b            = 'forest') => createUrbanHedge(0, b),
     },
   ];
-}
-function getBuildingModelItems()                     {
+}function getBuildingModelItems()                     {
   return [
     {
       id: 'townhouse_cafe',
@@ -7355,8 +7282,7 @@ function getBuildingModelItems()                     {
       create: (b            = 'forest') => createTownhouseC(b === 'winter'),
     },
   ];
-}
-function getModelCatalog()                     {
+}function getModelCatalog()                     {
   return [
     ...getCharacterModelItems(),
     ...getVehicleModelItems(),
@@ -7364,8 +7290,7 @@ function getModelCatalog()                     {
     ...getNatureModelItems(),
     ...getBuildingModelItems(),
   ];
-}
-function getModelDiagnostics(group             )                                      {
+}function getModelDiagnostics(group             )                                      {
   let meshCount = 0;
   group.traverse((c) => {
     if ((c              ).isMesh) {
@@ -7378,8 +7303,7 @@ function getModelDiagnostics(group             )                                
   const h = Math.max(0.01, box.max.y - box.min.y).toFixed(2);
   const d = Math.max(0.01, box.max.z - box.min.z).toFixed(2);
   return { meshCount, dims: `${w} × ${h} × ${d}` };
-}
-function verifyModelRegistry()   
+}function verifyModelRegistry()   
                 
                                            
                    
@@ -7414,8 +7338,7 @@ function verifyModelRegistry()
 }
 
 // --- Module: src/view/squashStretch.ts ---
-const LANDING_BOUNCE_DURATION = 0.12;
-function calculateHopSquashStretch(hopProgress        )                                      {
+const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProgress        )                                      {
   const progress = Math.max(0, Math.min(1, hopProgress));
 
   if (progress < 0.2) {
@@ -7445,8 +7368,7 @@ function calculateHopSquashStretch(hopProgress        )                         
     scaleY,
     scaleXZ,
   };
-}
-function calculateLandingBounce(elapsedSeconds        )                                      {
+}function calculateLandingBounce(elapsedSeconds        )                                      {
   const t = Math.max(0, Math.min(LANDING_BOUNCE_DURATION, elapsedSeconds));
   // Damped spring: smooth squash from impact with bouncy return to 1.0
   const scaleY = 1.0 - 0.18 * Math.exp(-t * 18) * Math.cos(t * 32);
@@ -7455,8 +7377,7 @@ function calculateLandingBounce(elapsedSeconds        )                         
     scaleY,
     scaleXZ,
   };
-}
-function getDeathSquashScale(reason                           )                            {
+}function getDeathSquashScale(reason                           )                            {
   if (reason === DeathReason.CAR || reason === 'CAR') {
     return { scaleX: 1.65, scaleY: 0.1, scaleZ: 1.65 };
   }
@@ -7470,8 +7391,7 @@ function getDeathSquashScale(reason                           )                 
 /**
  * LaneGeometryPool — Pre-allocates and caches static lane geometries and materials.
  * Eliminates GPU VRAM memory leaks and GC spikes during lane generation & eviction.
- */
-class LaneGeometryPool {
+ */class LaneGeometryPool {
   // Pre-allocated static geometries (7 fixed ground and road furniture meshes)
          static          grassStripGeo = new THREE.BoxGeometry(80, 0.24, 1);
          static          roadStripGeo = new THREE.BoxGeometry(80, 0.16, 1);
@@ -7641,8 +7561,7 @@ const INSTANCED_COIN_BOXES                               = [
   { w: 0.18, h: 0.22, d: 0.15, x: 0, y: 0, z: 0, color: 0xef4444 },
 ];
 
-const INSTANCED_DECOR_Y_AXIS = new THREE.Vector3(0, 1, 0);
-class InstancedDecorManager {
+const INSTANCED_DECOR_Y_AXIS = new THREE.Vector3(0, 1, 0);class InstancedDecorManager {
                   group = new THREE.Group();
                   treeMesh                     ;
                   rockMesh                     ;
@@ -7865,9 +7784,9 @@ const BIOME_ATMOSPHERES
     dirIntensity: 0.95,
     particleColor: 0xc084fc,
   },
-};
-class SceneManager {
+};class SceneManager {
           static          puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                   container             ;
           scene             ;
           camera                          ;
           renderer                     ;
@@ -7929,12 +7848,15 @@ class SceneManager {
   }
 
   constructor(container             ) {
+    this.container = container;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb);
     this.fog = new THREE.FogExp2(0x87ceeb, 0.024);
     this.scene.fog = this.fog;
 
-    const aspect = window.innerWidth / window.innerHeight;
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    const aspect = width / height;
     const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
     this.currentViewHeight = viewHeight;
     this.currentHalfWidth = halfWidth;
@@ -7950,7 +7872,7 @@ class SceneManager {
     this.camera.lookAt(0, 0, 3.0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -8191,7 +8113,9 @@ class SceneManager {
   }
 
           onResize()       {
-    const aspect = window.innerWidth / window.innerHeight;
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    const aspect = width / height;
     const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
     this.currentViewHeight = viewHeight;
     this.currentHalfWidth = halfWidth;
@@ -8200,7 +8124,7 @@ class SceneManager {
     this.camera.top = top;
     this.camera.bottom = bottom;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
   }
 
           buildLaneGroup(lane      , hasNextRoad          = false)               {
@@ -8608,8 +8532,9 @@ class SceneManager {
     }
 
     // Sync viewport aspect to engine for matching NDC calculations
-    const aspect = window.innerWidth / window.innerHeight;
-    engine.setViewportAspect(aspect);
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    engine.setViewportAspect(width / height);
 
     // Mobile horizontal tracking: smoothly follow player.x with golden ratio clamp
     const targetCamX = Math.max(-2.5, Math.min(2.5, worldToScreenX(p.x) * 0.35));
@@ -8683,8 +8608,7 @@ class SceneManager {
 
 // --- Module: src/app/perfMetrics.ts ---
 const RING_BUFFER_CAPACITY = 120;
-const SPIKE_THRESHOLD_MS = 25.0; // Over 25ms means under 40 FPS
-class PerfMetricsTracker {
+const SPIKE_THRESHOLD_MS = 25.0; // Over 25ms means under 40 FPSclass PerfMetricsTracker {
                    history = new Float32Array(RING_BUFFER_CAPACITY);
           head = 0;
           count = 0;
@@ -8890,8 +8814,7 @@ class PerfMetricsTracker {
     const walked = Math.max(0, currentRow - this.benchStartRow);
     return Math.min(1, walked / targetRows);
   }
-}
-function formatPerfReportMarkdown(report                     )         {
+}function formatPerfReportMarkdown(report                     )         {
   const kTris = (report.peakTriangles / 1000).toFixed(1);
   return [
     '### 📊 Crossy Road Pro — Результаты стресс-теста производительности',
@@ -9324,8 +9247,7 @@ const UI_SKIN_RARITY                                                 = {
   box_cat: { label: 'Редкий', css: 'rarity-rare' },
   raccoon_bandit: { label: 'Эпический', css: 'rarity-epic' },
   capybara_zen: { label: 'Легендарный', css: 'rarity-legendary' },
-};
-class UIManager {
+};class UIManager {
   // HUD
                    hudEl                    ;
                    scoreEl                    ;
@@ -10671,8 +10593,7 @@ const DEATH_LABELS                         = {
   [DeathReason.WATER]: 'Вы упали в бурную реку!',
   [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
   [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
-};
-class GameLoop {
+};class GameLoop {
          isPlaying = false;
          isPaused = false;
          wasDead = false;

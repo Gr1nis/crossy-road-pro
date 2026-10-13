@@ -119,6 +119,7 @@ const BIOME_ATMOSPHERES: Record<
 
 export class SceneManager {
   private static readonly puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+  private readonly container: HTMLElement;
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
   private renderer: THREE.WebGLRenderer;
@@ -180,12 +181,15 @@ export class SceneManager {
   }
 
   constructor(container: HTMLElement) {
+    this.container = container;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb);
     this.fog = new THREE.FogExp2(0x87ceeb, 0.024);
     this.scene.fog = this.fog;
 
-    const aspect = window.innerWidth / window.innerHeight;
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    const aspect = width / height;
     const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
     this.currentViewHeight = viewHeight;
     this.currentHalfWidth = halfWidth;
@@ -201,7 +205,7 @@ export class SceneManager {
     this.camera.lookAt(0, 0, 3.0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -442,7 +446,9 @@ export class SceneManager {
   }
 
   private onResize(): void {
-    const aspect = window.innerWidth / window.innerHeight;
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    const aspect = width / height;
     const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
     this.currentViewHeight = viewHeight;
     this.currentHalfWidth = halfWidth;
@@ -451,7 +457,7 @@ export class SceneManager {
     this.camera.top = top;
     this.camera.bottom = bottom;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
   }
 
   private buildLaneGroup(lane: Lane, hasNextRoad: boolean = false): RenderedLane {
@@ -859,8 +865,9 @@ export class SceneManager {
     }
 
     // Sync viewport aspect to engine for matching NDC calculations
-    const aspect = window.innerWidth / window.innerHeight;
-    engine.setViewportAspect(aspect);
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    engine.setViewportAspect(width / height);
 
     // Mobile horizontal tracking: smoothly follow player.x with golden ratio clamp
     const targetCamX = Math.max(-2.5, Math.min(2.5, worldToScreenX(p.x) * 0.35));

@@ -89,15 +89,16 @@ const htmlContent = `<!DOCTYPE html>
   <title>Crossy Road 3D — Vibe-Pro Edition</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #87ceeb; touch-action: none; -webkit-touch-callout: none; }
-    #game-container { width: 100%; height: 100%; position: relative; touch-action: none; }
+    body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0f1d; touch-action: none; -webkit-touch-callout: none; display: flex; align-items: center; justify-content: center; }
+    #game-container { aspect-ratio: 9 / 16; height: 100%; max-height: 100vh; max-width: calc(100vh * (9 / 16)); width: 100%; position: relative; overflow: hidden; box-shadow: 0 0 60px rgba(0, 0, 0, 0.75); touch-action: none; background: #87ceeb; }
+    #game-container > canvas { width: 100% !important; height: 100% !important; display: block; position: absolute; inset: 0; z-index: 1; }
 
     /* Global Visibility Utility */
     .hidden { display: none !important; }
     #in-game-hud.hidden, .hud.hidden { display: none !important; }
     
     /* Clean Minimal In-Game HUD: Coins, Distance & Pause button only */
-    .hud { position: fixed; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
+    .hud { position: absolute; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 10; }
     .hud.hidden { display: none !important; }
     .hud-stats { display: flex; gap: 14px; }
     .score-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.22); padding: 10px 22px; border-radius: 16px; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
@@ -112,7 +113,7 @@ const htmlContent = `<!DOCTYPE html>
 
     /* Telemetry / Perf HUD */
     .perf-hud {
-      position: fixed;
+      position: absolute;
       top: max(16px, env(safe-area-inset-top));
       right: max(16px, env(safe-area-inset-right));
       width: 250px;
@@ -146,15 +147,15 @@ const htmlContent = `<!DOCTYPE html>
     .perf-breakdown { font-size: 9px; color: #a5b4fc; background: rgba(30, 41, 59, 0.5); padding: 4px 6px; border-radius: 6px; text-align: center; }
 
     /* Danger vignette at bottom when player crosses edge */
-    #warning-vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: linear-gradient(to top, rgba(239, 68, 68, 0.65) 0%, rgba(239, 68, 68, 0.2) 20%, transparent 45%); transition: opacity 0.15s ease-out; }
+    #warning-vignette { position: absolute; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: linear-gradient(to top, rgba(239, 68, 68, 0.65) 0%, rgba(239, 68, 68, 0.2) 20%, transparent 45%); transition: opacity 0.15s ease-out; }
 
-    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
+    .modal { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 30; }
     .modal.hidden { display: none !important; }
     #perf-report-modal { z-index: 2000; }
 
     /* Modern Subway Surfers-style Main Menu HUD */
     .main-menu-overlay {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background: transparent !important;
       backdrop-filter: none !important;
@@ -890,7 +891,7 @@ const htmlContent = `<!DOCTYPE html>
     .game-over-score-item:last-child .game-over-score-num { color: #facc15; }
 
     /* Toast Notifications */
-    #toast-container { position: fixed; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
+    #toast-container { position: absolute; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
     .toast-item { background: rgba(15, 23, 42, 0.94); border: 2px solid #f59e0b; border-radius: 16px; padding: 12px 16px; color: #f8fafc; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); display: flex; align-items: center; gap: 12px; animation: toastIn 0.28s ease-out; backdrop-filter: blur(10px); }
     .toast-icon { font-size: 26px; line-height: 1; }
     .toast-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -1087,9 +1088,9 @@ const htmlContent = `<!DOCTYPE html>
   </style>
 </head>
 <body>
-  <div id="game-container"></div>
-  <div id="warning-vignette"></div>
-  <div id="toast-container"></div>
+  <div id="game-container">
+    <div id="warning-vignette"></div>
+    <div id="toast-container"></div>
 
   <!-- Minimal In-Game HUD: Coins and Distance + Pause Button -->
   <div id="in-game-hud" class="hud hidden">
@@ -1420,7 +1421,7 @@ const htmlContent = `<!DOCTYPE html>
   </div>
 
   <!-- Кнопка вызова DEV-панели -->
-  <button id="menu-dev-btn" class="hud-circle-btn" style="position: fixed; bottom: max(200px, calc(env(safe-area-inset-bottom) + 200px)); left: max(24px, env(safe-area-inset-left)); z-index: 100; font-size: 13px; width: auto; padding: 0 12px; height: 38px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; color: #38bdf8; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; pointer-events: auto;" title="Панель разработчика">🛠️ DEV</button>
+  <button id="menu-dev-btn" class="hud-circle-btn" style="position: absolute; bottom: max(200px, calc(env(safe-area-inset-bottom) + 200px)); left: max(24px, env(safe-area-inset-left)); z-index: 100; font-size: 13px; width: auto; padding: 0 12px; height: 38px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; color: #38bdf8; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; pointer-events: auto;" title="Панель разработчика">🛠️ DEV</button>
 
   <!-- Модальное окно Dev Sandbox (Тестирование и Вьюер) -->
   <div id="dev-modal" class="modal hidden">
@@ -1448,6 +1449,7 @@ const htmlContent = `<!DOCTYPE html>
 
       <button id="dev-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
     </div>
+  </div>
   </div>
 
   <script type="module">
