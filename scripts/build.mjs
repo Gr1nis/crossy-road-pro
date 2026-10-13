@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as nodeModule from 'node:module';
 import ts from 'typescript';
+import { MENU_ICONS } from '../src/view/menuIconsBase64.ts';
 
 function stripTypes(source) {
   if (typeof nodeModule.stripTypeScriptTypes === 'function') {

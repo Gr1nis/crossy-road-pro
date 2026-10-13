@@ -155,6 +155,8 @@ export class SceneManager {
   private menuFactor: number = 1.0;
   private menuCoins: THREE.Group[] = [];
   private lastCameraZoom: number = 1.0;
+  private gameplayTop: number = 10.0;
+  private gameplayBottom: number = -5.0;
 
   private disposeHierarchy(obj: THREE.Object3D): void {
     obj.traverse((child) => {
@@ -197,6 +199,8 @@ export class SceneManager {
     const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
     this.currentViewHeight = viewHeight;
     this.currentHalfWidth = halfWidth;
+    this.gameplayTop = top;
+    this.gameplayBottom = bottom;
     this.camera = new THREE.OrthographicCamera(
       -halfWidth,
       halfWidth,
@@ -470,6 +474,8 @@ export class SceneManager {
     const { viewHeight, halfWidth, bottom, top } = getCameraFrustumDimensions(aspect);
     this.currentViewHeight = viewHeight;
     this.currentHalfWidth = halfWidth;
+    this.gameplayTop = top;
+    this.gameplayBottom = bottom;
     this.camera.left = -halfWidth;
     this.camera.right = halfWidth;
     this.camera.top = top;
@@ -922,9 +928,9 @@ export class SceneManager {
       this.shakeIntensity = 0;
     }
 
-    const lookAtX = this.currentCamX;
+    const lookAtX = this.menuFactor <= 0.001 ? this.currentCamX : THREE.MathUtils.lerp(this.currentCamX, 0, this.menuFactor);
     const lookAtY = this.menuFactor <= 0.001 ? 0 : THREE.MathUtils.lerp(0, 0.4, this.menuFactor);
-    const lookAtZ = this.menuFactor <= 0.001 ? camZ + 3.0 : THREE.MathUtils.lerp(camZ + 3.0, camZ + 0.5, this.menuFactor);
+    const lookAtZ = this.menuFactor <= 0.001 ? camZ + 3.0 : THREE.MathUtils.lerp(camZ + 3.0, 0.0, this.menuFactor);
 
     // Cinematic camera lerp between Gameplay and Menu views
     if (this.menuFactor <= 0.001) {
@@ -933,21 +939,31 @@ export class SceneManager {
     } else {
       const camPosX = THREE.MathUtils.lerp(
         -7.5 + this.currentCamX + shakeX,
-        -5.2 + this.currentCamX + shakeX,
+        -5.625 + this.currentCamX + shakeX,
         this.menuFactor
       );
-      const camPosY = THREE.MathUtils.lerp(13.5, 10.0, this.menuFactor);
+      const camPosY = THREE.MathUtils.lerp(13.5, 10.525, this.menuFactor);
       const camPosZ = THREE.MathUtils.lerp(
         camZ - 8.0 + shakeZ,
-        camZ - 5.5 + shakeZ,
+        -8.25 + shakeZ,
         this.menuFactor
       );
       this.camera.position.set(camPosX, camPosY, camPosZ);
       this.camera.lookAt(lookAtX, lookAtY, lookAtZ);
     }
 
-    const targetZoom = THREE.MathUtils.lerp(1.0, 1.35, this.menuFactor);
-    if (Math.abs(this.camera.zoom - targetZoom) > 0.001) {
+    const symmetricTop = this.currentViewHeight / 2;
+    const symmetricBottom = -this.currentViewHeight / 2;
+    const curTop = THREE.MathUtils.lerp(this.gameplayTop, symmetricTop, this.menuFactor);
+    const curBottom = THREE.MathUtils.lerp(this.gameplayBottom, symmetricBottom, this.menuFactor);
+    const targetZoom = THREE.MathUtils.lerp(1.0, 1.45, this.menuFactor);
+    if (
+      Math.abs(this.camera.top - curTop) > 0.001 ||
+      Math.abs(this.camera.bottom - curBottom) > 0.001 ||
+      Math.abs(this.camera.zoom - targetZoom) > 0.001
+    ) {
+      this.camera.top = curTop;
+      this.camera.bottom = curBottom;
       this.camera.zoom = targetZoom;
       this.lastCameraZoom = targetZoom;
       this.camera.updateProjectionMatrix();
