@@ -252,8 +252,28 @@ export class SceneManager {
     window.addEventListener('resize', () => this.onResize());
   }
 
-  setMenuMode(isMenu: boolean): void {
+  setMenuMode(isMenu: boolean, snap: boolean = false): void {
     this.isMenuMode = isMenu;
+    if (snap && this.camera) {
+      this.menuFactor = isMenu ? 1.0 : 0.0;
+      this.currentCamX = 0;
+      this.shakeIntensity = 0;
+      if (isMenu) {
+        this.camera.position.set(-5.625, 10.525, -8.25);
+        this.camera.lookAt(0, 0.4, 0.0);
+        this.camera.zoom = 1.45;
+        this.camera.top = this.currentViewHeight / 2;
+        this.camera.bottom = -this.currentViewHeight / 2;
+        this.camera.updateProjectionMatrix();
+      } else {
+        this.camera.position.set(-7.5, 13.5, -8.0);
+        this.camera.lookAt(0, 0, 3.0);
+        this.camera.zoom = 1.0;
+        this.camera.top = this.gameplayTop;
+        this.camera.bottom = this.gameplayBottom;
+        this.camera.updateProjectionMatrix();
+      }
+    }
   }
 
   triggerShake(intensity: number = 0.45): void {
@@ -1024,6 +1044,12 @@ export class SceneManager {
     for (let i = 0; i < this.menuCoins.length; i++) {
       const coin = this.menuCoins[i];
       coin.position.set(i === 0 ? -1.3 : 1.3, 0.45, 0);
+    }
+
+    if (this.playerMesh) {
+      this.playerMesh.scale.set(1, 1, 1);
+      this.playerMesh.rotation.set(0, 0, 0);
+      this.playerMesh.position.set(0, 0, 0);
     }
   }
 }

@@ -23,6 +23,7 @@ export class GameLoop {
   public isPlaying = false;
   public isPaused = false;
   public wasDead = false;
+  private isRunPrepared = true;
 
   private readonly engine: GameEngine;
   private readonly sceneManager: SceneManager;
@@ -88,7 +89,10 @@ export class GameLoop {
     this.updateDailyQuestsUI();
     this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
     this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
-    this.sceneManager.setMenuMode(true);
+    if (this.runStartHighScore > 0) {
+      this.sceneManager.setRecordFlag?.(this.runStartHighScore, RECORD_FLAG_X);
+    }
+    this.sceneManager.setMenuMode?.(true, true);
     this.setupDevGlobal();
   }
 
@@ -150,27 +154,42 @@ export class GameLoop {
     requestAnimationFrame(this.animate);
   }
 
+  public prepareRun(seed: number = Date.now()): void {
+    this.runStartHighScore = this.engine.getHighScore();
+    this.notifiedNewHighScoreThisRun = false;
+    this.sceneManager.clearAll?.();
+    if (this.runStartHighScore > 0) {
+      this.sceneManager.setRecordFlag?.(this.runStartHighScore, RECORD_FLAG_X);
+    }
+    this.engine.reset(seed);
+    this.lastCoins = this.engine.getCoins();
+    this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
+    this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
+    this.wasDead = false;
+    this.isRunPrepared = true;
+  }
+
   public startGame(): void {
     this.ui.closeMainMenu();
     this.ui.hideAllModals();
     this.ui.showHud();
     this.wasDead = false;
     this.isPaused = false;
-    this.runStartHighScore = this.engine.getHighScore();
-    this.notifiedNewHighScoreThisRun = false;
-    this.sceneManager.clearAll();
-    if (this.runStartHighScore > 0) {
-      this.sceneManager.setRecordFlag(this.runStartHighScore, RECORD_FLAG_X);
+    if (!this.isRunPrepared) {
+      this.prepareRun();
     }
-    this.engine.reset(Date.now());
-    this.lastCoins = this.engine.getCoins();
-    this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
-    this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
+    this.isRunPrepared = false;
     this.isPlaying = true;
-    this.sceneManager.setMenuMode(false);
+    this.sceneManager.setMenuMode?.(false);
     this.lastTime = performance.now();
     this.renderSkinsUI();
     this.syncBackgroundMusic();
+  }
+
+  public restartGame(): void {
+    this.prepareRun();
+    this.sceneManager.setMenuMode?.(false, true);
+    this.startGame();
   }
 
   public pauseGame(): void {
@@ -191,7 +210,8 @@ export class GameLoop {
   public openMainMenu(): void {
     this.isPlaying = false;
     this.isPaused = false;
-    this.sceneManager.setMenuMode(true);
+    this.prepareRun();
+    this.sceneManager.setMenuMode?.(true, true);
     this.ui.openMainMenu();
     this.updateMenuStats();
     this.updateDailyBonusUI();
@@ -478,6 +498,8 @@ export class GameLoop {
 
     if (this.isPlaying && p.isDead && !this.wasDead) {
       this.wasDead = true;
+      this.isPlaying = false;
+      this.isRunPrepared = false;
       const completed = this.engine.recordDailyQuestProgress({
         score: currentScore,
         coins: this.engine.getRunCoins(),
@@ -672,7 +694,7 @@ export class GameLoop {
       onPause: () => this.pauseGame(),
       onResume: () => this.resumeGame(),
       onToMenu: () => this.openMainMenu(),
-      onRestart: () => this.startGame(),
+      onRestart: () => this.restartGame(),
       onRollGacha: () => this.handleGachaRoll(),
       onSaveName: (name: string) => this.savePlayerName(name),
       onToggleSound: (enabled: boolean) => this.toggleSound(enabled),
