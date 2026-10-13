@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import type { BiomeType } from '../core/types.ts';
 import { VoxelMeshBuilder } from './voxelMeshBuilder.ts';
+import { buildBooksShopfront } from './townhouse/shopfront.ts';
+import { buildBooksUpperFloors } from './townhouse/upperFloors.ts';
+import { buildBooksRoof } from './townhouse/roof.ts';
 
 function populateCafeBuilder(b: VoxelMeshBuilder, isWinter: boolean): void {
   const cPlinth = 0x334155;
@@ -339,61 +342,10 @@ function populateBakeryBuilder(builder: VoxelMeshBuilder, isWinter: boolean): vo
   }
 }
 
-type BldgVoxel = [number, number, number, number, number, number, number];
-
-const townhouseCVoxels: BldgVoxel[] = [
-  // Base & 1st Floor
-  [1.56, 0.12, 1.40, 0, 0.06, 0, 0x854d0e],
-  [1.48, 1.30, 1.30, 0, 0.77, 0, 0x15803d],
-  // Door
-  [0.34, 0.90, 0.04, -0.40, 0.60, 0.66, 0x78350f],
-  [0.26, 0.36, 0.05, -0.40, 0.74, 0.665, 0xfef08a],
-  // Books Window with interior shelves
-  [0.74, 0.70, 0.04, 0.24, 0.70, 0.66, 0xfef08a],
-  [0.68, 0.20, 0.08, 0.24, 0.48, 0.67, 0x9333ea],   // Books display
-  // Emerald Awning
-  [0.84, 0.14, 0.36, 0.24, 1.15, 0.80, 0x166534],
-  [0.26, 0.15, 0.37, 0.24, 1.15, 0.80, 0x4ade80],
-  // Sign 'BOOKS'
-  [0.82, 0.26, 0.08, 0.18, 1.38, 0.68, 0x14532d],
-  [0.68, 0.16, 0.09, 0.18, 1.38, 0.68, 0xa3e635],
-  // Vertical blade sign 'BOOKS' on corner
-  [0.10, 0.55, 0.24, -0.74, 1.80, 0.45, 0x78350f],
-  [0.08, 0.45, 0.20, -0.74, 1.80, 0.45, 0xa3e635],
-  // Mid Cornice
-  [1.58, 0.12, 1.42, 0, 1.48, 0, 0xdcfce7],
-  // 2nd Floor (Olive Green)
-  [1.48, 1.20, 1.30, 0, 2.14, 0, 0x16a34a],
-  // 3 Upper Windows
-  [0.24, 0.58, 0.05, -0.40, 2.15, 0.66, 0xfef08a],
-  [0.28, 0.64, 0.03, -0.40, 2.15, 0.65, 0xdcfce7],
-  [0.24, 0.58, 0.05, 0, 2.15, 0.66, 0xfef08a],
-  [0.28, 0.64, 0.03, 0, 2.15, 0.65, 0xdcfce7],
-  [0.24, 0.58, 0.05, 0.40, 2.15, 0.66, 0xfef08a],
-  [0.28, 0.64, 0.03, 0.40, 2.15, 0.65, 0xdcfce7],
-  // Gable Roof (Terracotta Tile Pitch)
-  [1.54, 0.14, 1.44, 0, 2.78, 0, 0xdcfce7],
-  [1.44, 0.60, 1.32, 0, 3.12, 0, 0xc2410c],
-  [1.24, 0.40, 1.20, 0, 3.52, 0, 0x9a3412],
-  [0.96, 0.24, 1.08, 0, 3.78, 0, 0x7c2d12],
-  // Chimney with terracotta pots
-  [0.26, 0.68, 0.26, 0.40, 3.72, -0.22, 0x854d0e],
-  [0.10, 0.16, 0.10, 0.36, 4.12, -0.22, 0xc2410c],
-  [0.10, 0.16, 0.10, 0.44, 4.12, -0.22, 0xc2410c],
-];
-
-function populateTownhouseBuilder(
-  builder: VoxelMeshBuilder,
-  specs: BldgVoxel[],
-  isWinter: boolean
-): void {
-  for (let i = 0; i < specs.length; i++) {
-    const s = specs[i];
-    builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
-  }
-  if (isWinter) {
-    builder.addBox(1.48, 0.08, 1.28, 0, 3.82, 0, 0xf8fafc);
-  }
+function populateBooksBuilder(builder: VoxelMeshBuilder, isWinter: boolean): void {
+  buildBooksShopfront(builder, isWinter);
+  buildBooksUpperFloors(builder, isWinter);
+  buildBooksRoof(builder, isWinter);
 }
 
 /** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */
@@ -423,7 +375,7 @@ export function createTownhouseC(isWinter = false): THREE.Group {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_c_winter' : 'townhouse_c';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
-    populateTownhouseBuilder(b, townhouseCVoxels, isWinter);
+    populateBooksBuilder(b, isWinter);
   });
   group.add(mesh);
   return group;
