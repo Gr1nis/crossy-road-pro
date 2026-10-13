@@ -539,58 +539,65 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       gap: 5px;
       padding: 0;
-      transition: transform 0.12s ease;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: inherit;
     }
     .dock-btn:hover {
-      transform: translateY(-2px);
+      transform: scale(1.04);
     }
     .dock-btn:active {
-      transform: translateY(2px);
+      transform: translateY(2px) scale(0.96);
     }
     .dock-btn-inner {
       width: 64px;
       height: 64px;
-      border-radius: 20px;
+      border-radius: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      background: linear-gradient(180deg, #38d9a9 0%, #06b6d4 50%, #0891b2 100%);
-      border: 3.5px solid rgba(255, 255, 255, 0.95);
-      box-shadow: 0 8px 0 #0e7490, 0 14px 22px rgba(0, 0, 0, 0.3), inset 0 3px 3px rgba(255, 255, 255, 0.85);
+      background: linear-gradient(180deg, #2dd4bf 0%, #06b6d4 55%, #0891b2 100%);
+      border: 2px solid #a5f3fc;
+      box-shadow: 0 5px 0 #0e7490, 0 10px 18px rgba(0, 0, 0, 0.28), inset 0 2px 3px rgba(255, 255, 255, 0.85);
       transition: box-shadow 0.12s ease, transform 0.12s ease, filter 0.12s ease;
       overflow: hidden;
     }
     .dock-btn-inner::before {
       content: '';
       position: absolute;
-      top: 3px;
-      left: 6px;
-      right: 6px;
-      height: 35%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.05) 100%);
+      top: 2px;
+      left: 5px;
+      right: 5px;
+      height: 38%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.08) 100%);
       border-radius: 999px;
       pointer-events: none;
       z-index: 1;
     }
     .dock-btn-teal .dock-btn-inner {
-      background: linear-gradient(180deg, #38d9a9 0%, #06b6d4 50%, #0891b2 100%);
-      border: 3.5px solid rgba(255, 255, 255, 0.95);
-      box-shadow: 0 8px 0 #0e7490, 0 14px 22px rgba(0, 0, 0, 0.3), inset 0 3px 3px rgba(255, 255, 255, 0.85);
+      background: linear-gradient(180deg, #2dd4bf 0%, #06b6d4 55%, #0891b2 100%);
+      border: 2px solid #a5f3fc;
+      box-shadow: 0 5px 0 #0e7490, 0 10px 18px rgba(0, 0, 0, 0.28), inset 0 2px 3px rgba(255, 255, 255, 0.85);
     }
     .dock-btn:hover .dock-btn-inner {
-      filter: brightness(1.06);
+      filter: brightness(1.08);
     }
     .dock-btn:active .dock-btn-inner {
-      transform: translateY(4px);
-      box-shadow: 0 4px 0 #0e7490, 0 6px 12px rgba(0, 0, 0, 0.25);
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #0e7490, 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.6);
     }
-    .dock-btn-icon {
-      font-size: 32px;
-      line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    .dock-btn-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
       position: relative;
       z-index: 2;
+      pointer-events: none;
+      transition: transform 0.15s ease;
+    }
+    .dock-btn:hover .dock-btn-img {
+      transform: scale(1.06);
     }
     .dock-badge {
       position: absolute;
@@ -618,6 +625,7 @@ const htmlContent = `<!DOCTYPE html>
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.8);
       letter-spacing: 0.02em;
       white-space: nowrap;
+      pointer-events: none;
     }
 
     /* Giant 3D Green PLAY Button */
@@ -630,52 +638,83 @@ const htmlContent = `<!DOCTYPE html>
       width: 280px;
       height: 90px;
       border-radius: 34px;
-      background: linear-gradient(180deg, #86efac 0%, #4ade80 40%, #22c55e 70%, #16a34a 100%);
-      border: 4px solid rgba(255, 255, 255, 0.95);
-      box-shadow: 0 10px 0 #15803d, 0 20px 32px rgba(22, 163, 74, 0.4), inset 0 4px 3px rgba(255, 255, 255, 0.9);
+      background: linear-gradient(180deg, #4ade80 0%, #22c55e 55%, #16a34a 100%);
+      border: 3px solid #86efac;
+      box-shadow: 0 8px 0 #15803d, 0 12px 20px rgba(0, 0, 0, 0.3), inset 0 3px 3px rgba(255, 255, 255, 0.7);
       cursor: pointer;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease, filter 0.12s ease;
       margin: 0;
       padding: 0;
       z-index: 10;
+      font-family: inherit;
     }
     .hero-play-btn:hover {
-      filter: brightness(1.06);
-      transform: translateX(-50%) translateY(-2px);
-      box-shadow: 0 12px 0 #15803d, 0 24px 36px rgba(22, 163, 74, 0.45), inset 0 4px 3px rgba(255, 255, 255, 0.95);
+      filter: brightness(1.08);
+      transform: translateX(-50%) scale(1.04);
+      box-shadow: 0 10px 0 #15803d, 0 16px 26px rgba(22, 163, 74, 0.45), inset 0 3px 3px rgba(255, 255, 255, 0.85);
     }
     .hero-play-btn:active {
-      transform: translateX(-50%) translateY(6px);
-      box-shadow: 0 4px 0 #15803d, 0 8px 16px rgba(0, 0, 0, 0.3), inset 0 3px 2px rgba(255, 255, 255, 0.8);
+      transform: translateX(-50%) translateY(4px) scale(0.96);
+      box-shadow: 0 4px 0 #15803d, 0 6px 12px rgba(0, 0, 0, 0.25), inset 0 2px 2px rgba(255, 255, 255, 0.6);
     }
     .hero-play-sheen {
       position: absolute;
-      top: 3px;
-      left: 12px;
-      right: 12px;
-      height: 40%;
+      top: 4px;
+      left: 14px;
+      right: 14px;
+      height: 38%;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.08) 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.1) 100%);
       pointer-events: none;
+      z-index: 1;
+    }
+    .hero-play-sheen-diag {
+      position: absolute;
+      top: -60%;
+      left: -120%;
+      width: 60%;
+      height: 220%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        rgba(255, 255, 255, 100%
+      );
+      transform: skewX(-25deg);
+      animation: heroPlaySheenDiag 2.8s infinite ease-in-out;
+      pointer-events: none;
+      z-index: 2;
+    }
+    @keyframes heroPlaySheenDiag {
+      0% { left: -120%; }
+      35%, 100% { left: 220%; }
     }
     .hero-play-text {
       font-size: 38px;
       font-weight: 900;
-      letter-spacing: -0.01em;
+      letter-spacing: 0.02em;
       color: #ffffff;
       text-shadow: 0 3px 0 #15803d, 0 6px 14px rgba(0, 0, 0, 0.35);
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      gap: 12px;
       position: relative;
-      z-index: 2;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .hero-play-img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     }
     .hero-play-arrow {
-      font-size: 28px;
+      font-size: 26px;
       margin-left: 2px;
       text-shadow: 0 3px 0 #15803d, 0 6px 14px rgba(0, 0, 0, 0.35);
     }
@@ -1034,21 +1073,22 @@ const htmlContent = `<!DOCTYPE html>
       }
       .menu-top-left { gap: 6px; }
       .top-pill { padding: 5px 10px; border-width: 2px; }
-      .top-pill-icon { font-size: 22px; }
+      .top-pill-img-coin { width: 22px; height: 22px; }
       .top-pill-val { font-size: 16px; }
       .top-pill-score { padding: 5px 12px; gap: 6px; }
-      .top-pill-crown-box { width: 24px; height: 24px; font-size: 15px; }
+      .top-pill-crown-box { width: 24px; height: 24px; }
+      .top-pill-img-crown { width: 16px; height: 16px; }
       .top-pill-score-title { font-size: 9px; }
       .top-pill-score-line { font-size: 12px; }
       .top-settings-btn { width: 40px; height: 40px; border-radius: 14px; border-width: 2px; }
-      .top-settings-icon { font-size: 22px; }
+      .top-settings-img { width: 24px; height: 24px; }
       .menu-side-widgets {
         top: max(100px, calc(env(safe-area-inset-top) + 80px));
         left: max(16px, env(safe-area-inset-left));
         right: max(16px, env(safe-area-inset-right));
       }
-      .floating-widget-icon-box { width: 52px; height: 52px; border-radius: 16px; border-width: 2.5px; }
-      .floating-widget-icon { font-size: 28px; }
+      .floating-widget-icon-box { width: 52px; height: 52px; border-radius: 16px; border-width: 2px; }
+      .floating-widget-img { width: 36px; height: 36px; }
       .floating-widget-label { font-size: 11px; }
       .floating-widget-alert-badge { width: 22px; height: 22px; font-size: 12px; top: -5px; right: -5px; border-width: 2px; }
       .floating-widget-count-badge { min-width: 22px; height: 22px; font-size: 10px; padding: 0 5px; top: -5px; right: -5px; border-width: 2px; }
@@ -1078,15 +1118,16 @@ const htmlContent = `<!DOCTYPE html>
         width: 48px;
         height: 48px;
         border-radius: 16px;
-        border-width: 2.5px;
-        box-shadow: 0 5px 0 #0e7490, 0 10px 16px rgba(0, 0, 0, 0.25), inset 0 2px 2px rgba(255, 255, 255, 0.85);
+        border-width: 2px;
+        box-shadow: 0 4px 0 #0e7490, 0 8px 14px rgba(0, 0, 0, 0.25), inset 0 2px 2px rgba(255, 255, 255, 0.8);
       }
       .dock-btn:active .dock-btn-inner {
-        box-shadow: 0 2px 0 #0e7490, 0 4px 6px rgba(0, 0, 0, 0.25);
-        transform: translateY(3px);
+        box-shadow: 0 2px 0 #0e7490, 0 4px 6px rgba(0, 0, 0, 0.2);
+        transform: translateY(2px);
       }
-      .dock-btn-icon {
-        font-size: 24px;
+      .dock-btn-img {
+        width: 32px;
+        height: 32px;
       }
       .dock-btn-label {
         font-size: 11px;
@@ -1109,21 +1150,24 @@ const htmlContent = `<!DOCTYPE html>
         height: 74px;
         margin: 0;
         border-radius: 26px;
-        border-width: 3.5px;
+        border-width: 3px;
         box-shadow: 0 7px 0 #15803d, 0 14px 24px rgba(22, 163, 74, 0.4), inset 0 3px 2px rgba(255, 255, 255, 0.9);
       }
       .hero-play-btn:hover {
-        transform: translateY(-2px);
+        transform: scale(1.03);
         box-shadow: 0 9px 0 #15803d, 0 18px 28px rgba(22, 163, 74, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.9);
       }
       .hero-play-btn:active {
-        transform: translateY(4px);
+        transform: translateY(4px) scale(0.96);
         box-shadow: 0 3px 0 #15803d, 0 6px 12px rgba(22, 163, 74, 0.3), inset 0 2px 1px rgba(255, 255, 255, 0.7);
       }
       .hero-play-text {
         font-size: 28px;
-        gap: 6px;
+        gap: 8px;
         text-shadow: 0 2.5px 0 #15803d, 0 5px 10px rgba(0, 0, 0, 0.35);
+      }
+      .hero-play-img {
+        height: 36px;
       }
       .hero-play-arrow {
         font-size: 20px;
@@ -1168,14 +1212,14 @@ const htmlContent = `<!DOCTYPE html>
       <div class="menu-top-left">
         <!-- Монеты -->
         <div id="menu-coins-pill" class="top-pill top-pill-coins" title="Баланс монет">
-          <span class="top-pill-icon">🪙</span>
+          <span class="top-pill-icon"><img src="${MENU_ICONS.coin}" class="top-pill-img-coin" alt="Coins" /></span>
           <span id="menu-coins" class="top-pill-val">0</span>
           <button id="menu-coins-plus-btn" class="top-pill-plus" title="Пополнить / Магазин">+</button>
         </div>
 
         <!-- Рекорд -->
         <div class="top-pill top-pill-score" title="Ваш рекорд">
-          <div class="top-pill-crown-box">👑</div>
+          <div class="top-pill-crown-box"><img src="${MENU_ICONS.crown}" class="top-pill-img-crown" alt="Best" /></div>
           <div class="top-pill-score-text">
             <span class="top-pill-score-title">high score</span>
             <span class="top-pill-score-line">BEST: <strong id="menu-high-score">0</strong></span>
@@ -1186,7 +1230,7 @@ const htmlContent = `<!DOCTYPE html>
       <!-- Справа у самого края экрана: Кнопка Настройки -->
       <div class="menu-top-right">
         <button id="menu-settings-btn" class="top-settings-btn" title="Настройки">
-          <span class="top-settings-icon">⚙</span>
+          <span class="top-settings-icon"><img src="${MENU_ICONS.settings}" class="top-settings-img" alt="Settings" /></span>
         </button>
       </div>
     </div>
@@ -1197,7 +1241,7 @@ const htmlContent = `<!DOCTYPE html>
       <div class="floating-widget-left">
         <button id="menu-daily-btn" class="floating-widget-btn" title="Ежедневный бонус">
           <div class="floating-widget-icon-box gift-box">
-            <span class="floating-widget-icon">🎁</span>
+            <img src="${MENU_ICONS.daily_gift}" class="floating-widget-img" alt="Daily Gift" />
             <span id="menu-daily-badge" class="floating-widget-alert-badge pulse-badge">!</span>
           </div>
           <span class="floating-widget-label">Daily Gift</span>
@@ -1208,7 +1252,7 @@ const htmlContent = `<!DOCTYPE html>
       <div class="floating-widget-right">
         <button id="menu-daily-quests-btn" class="floating-widget-btn" title="Задания дня">
           <div class="floating-widget-icon-box quest-box">
-            <span class="floating-widget-icon">📋</span>
+            <img src="${MENU_ICONS.daily_quests}" class="floating-widget-img" alt="Quests" />
             <span id="menu-daily-quests-badge" class="floating-widget-count-badge hidden">0/3</span>
           </div>
           <span class="floating-widget-label">🎯 Задания дня</span>
@@ -1222,13 +1266,13 @@ const htmlContent = `<!DOCTYPE html>
       <div class="dock-col dock-col-left">
         <button id="menu-skins-btn" class="dock-btn dock-btn-teal" title="Скины">
           <div class="dock-btn-inner">
-            <span class="dock-btn-icon">🦊</span>
+            <img src="${MENU_ICONS.skins}" class="dock-btn-img" alt="Skins" />
           </div>
           <span class="dock-btn-label">Skins</span>
         </button>
         <button id="menu-gacha-btn" class="dock-btn dock-btn-teal" title="🎰 Автомат скинов">
           <div class="dock-btn-inner">
-            <span class="dock-btn-icon">🛒</span>
+            <img src="${MENU_ICONS.shop}" class="dock-btn-img" alt="Shop" />
           </div>
           <span class="dock-btn-label">Shop</span>
           <span style="display: none;">🎰 Автомат скинов</span>
@@ -1238,20 +1282,21 @@ const htmlContent = `<!DOCTYPE html>
       <!-- Центральная гигантская кнопка ИГРАТЬ (Hero PLAY Button) -->
       <button id="menu-play-btn" class="hero-play-btn" title="Начать игру">
         <div class="hero-play-sheen"></div>
-        <span class="hero-play-text">PLAY <span class="hero-play-arrow">▶</span></span>
+        <div class="hero-play-sheen-diag"></div>
+        <span class="hero-play-text"><img src="${MENU_ICONS.play}" class="hero-play-img" alt="" />PLAY <span class="hero-play-arrow">▶</span></span>
       </button>
 
       <!-- Правая колонка кнопок (Лидерборд и Достижения) -->
       <div class="dock-col dock-col-right">
         <button id="menu-leaderboard-btn" class="dock-btn dock-btn-teal" title="Таблица лидеров">
           <div class="dock-btn-inner">
-            <span class="dock-btn-icon">🏆</span>
+            <img src="${MENU_ICONS.leaderboard}" class="dock-btn-img" alt="Leaderboard" />
           </div>
           <span class="dock-btn-label">Leaderboard</span>
         </button>
         <button id="menu-achievements-btn" class="dock-btn dock-btn-teal" title="Достижения">
           <div class="dock-btn-inner">
-            <span class="dock-btn-icon">🎖</span>
+            <img src="${MENU_ICONS.achievements}" class="dock-btn-img" alt="Achievements" />
             <span id="menu-achievements-badge" class="dock-badge hidden">0/10</span>
           </div>
           <span class="dock-btn-label">Achievements</span>
