@@ -30,13 +30,20 @@
 8. **Performance Optimization Invariant**: Все 4 потока оптимизации (Geometry Pooling, Voxel Merging, Instanced Decor, Frustum Envelope & Lane Eviction) активны, удерживая 60 FPS на мобильных устройствах.
 
 ## 4. Текущий этап и Next Up
-- **Текущий этап**: **Комплексная оптимизация (4 потока), Телеметрия & Мета-системы — 130 / 130 GREEN**:
+- **Текущий этап**: **Комплексная оптимизация (4 потока), Телеметрия, Мета-системы & Редизайн Меню 9:16 — 130 / 130 GREEN**:
   - Реализованы пулы геометрий `laneGeometryPool.ts` и монолитный мердж вокселей `voxelMeshBuilder.ts`.
   - Инстансинг пропсов и монет через `InstancedDecorManager` (`InstancedMesh`).
   - Система телеметрии `PerfMetricsTracker`, бенчмарк-ран с авто-хопом и экспорт отчетов `PerfReportModal`.
   - Интерактивный 3D-просмотрщик `viewer.html` / `model-viewer.html` с аудитом 26 моделей.
-  - Мета-геймплей: Subway Surfers dock-меню, 7-дневный календарь наград `DailyRewardManager`, квесты `DailyQuestsManager`, флаг рекорда PB с салютом.
+  - Мета-геймплей: 7-дневный календарь наград `DailyRewardManager`, квесты `DailyQuestsManager`, флаг рекорда PB с салютом.
   - **Воксельная стандартизация (Сетка 0.05 & 4 золотых правила)**: Спецификация `docs/VOXEL_GRID_SPECIFICATION.md`, эталонная Зимняя пекарня и Парижское кафе в `src/view/urbanBuildings.ts`.
+  - **План редизайна меню и формата 9:16**: Сформирован `menu_redesign_plan.md` (контейнер 9:16 pillarbox под регламент Яндекс Игр, приближение камеры Three.js к герою, idle-анимация, левитирующие монеты, пак промптов NanoBanana).
   - Все **130 из 130 тестов GREEN**, `tsc --noEmit` — 0 ошибок, автономный бандл собран.
-- **Next Up**: Стандартизация Книжного магазина (Townhouse C) по сетке 0.05, затем интеграция с Yandex Games SDK (Яндекс Игры).
+- **Next Up**:
+  1. Реализация контейнера 9:16 и пересчет ресайза Three.js в `SceneManager`.
+  2. Режим камеры в меню с центрированием героя и парящими монетами.
+  3. Внедрение графических 3D-ассетов из NanoBanana и шрифта.
+  4. Стандартизация Книжной лавки (Townhouse C) по сетке 0.05.
+  5. Интеграция с Yandex Games SDK (`src/platform/ysdk.ts`).
+
 
