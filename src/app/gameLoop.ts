@@ -88,6 +88,7 @@ export class GameLoop {
     this.updateDailyQuestsUI();
     this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
     this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
+    this.sceneManager.setMenuMode(true);
     this.setupDevGlobal();
   }
 
@@ -166,6 +167,7 @@ export class GameLoop {
     this.lastLogsHopped = this.engine.getScoreTracker().getLogsHopped();
     this.lastTrainsSurvived = this.engine.getScoreTracker().getTrainsSurvived();
     this.isPlaying = true;
+    this.sceneManager.setMenuMode(false);
     this.lastTime = performance.now();
     this.renderSkinsUI();
     this.syncBackgroundMusic();
@@ -189,6 +191,7 @@ export class GameLoop {
   public openMainMenu(): void {
     this.isPlaying = false;
     this.isPaused = false;
+    this.sceneManager.setMenuMode(true);
     this.ui.openMainMenu();
     this.updateMenuStats();
     this.updateDailyBonusUI();

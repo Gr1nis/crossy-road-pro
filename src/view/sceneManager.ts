@@ -151,6 +151,10 @@ export class SceneManager {
   private lastSyncMs = 0;
   private lastRenderMs = 0;
   private decorManager: InstancedDecorManager;
+  private isMenuMode: boolean = true;
+  private menuFactor: number = 1.0;
+  private menuCoins: THREE.Group[] = [];
+  private lastCameraZoom: number = 1.0;
 
   private disposeHierarchy(obj: THREE.Object3D): void {
     obj.traverse((child) => {
@@ -227,11 +231,25 @@ export class SceneManager {
 
     this.playerMesh = MeshFactory.createCharacter('corgi');
     this.scene.add(this.playerMesh);
+
+    // Decorative spinning coins for 3D Main Menu
+    const coinLeft = MeshFactory.createCoin();
+    coinLeft.position.set(-1.3, 0.45, 0);
+    this.scene.add(coinLeft);
+    const coinRight = MeshFactory.createCoin();
+    coinRight.position.set(1.3, 0.45, 0);
+    this.scene.add(coinRight);
+    this.menuCoins = [coinLeft, coinRight];
+
     this.decorManager = new InstancedDecorManager();
     this.scene.add(this.decorManager.group);
     this.initAmbientParticles(21);
 
     window.addEventListener('resize', () => this.onResize());
+  }
+
+  setMenuMode(isMenu: boolean): void {
+    this.isMenuMode = isMenu;
   }
 
   triggerShake(intensity: number = 0.45): void {
@@ -677,6 +695,9 @@ export class SceneManager {
     this.activeIndices.clear();
     const nowSec = performance.now() * 0.004;
 
+    const targetFactor = this.isMenuMode ? 1.0 : 0.0;
+    this.menuFactor += (targetFactor - this.menuFactor) * Math.min(1.0, dt * 5.0);
+
     // Update log landing impact timers
     for (const [logId, impact] of this.logImpacts.entries()) {
       impact.age += dt;
@@ -848,8 +869,26 @@ export class SceneManager {
     } else if (this.landingBounceTimer > 0) {
       const { scaleY, scaleXZ } = calculateLandingBounce(this.landingBounceElapsed);
       this.playerMesh.scale.set(scaleXZ, scaleY, scaleXZ);
+    } else if (this.menuFactor > 0.02 && p.row === 0) {
+      const idleScaleY = 1.0 + 0.04 * Math.sin(nowSec * 3.5);
+      const idleScaleXZ = 1.0 - 0.02 * Math.sin(nowSec * 3.5);
+      this.playerMesh.scale.set(idleScaleXZ, idleScaleY, idleScaleXZ);
+      this.playerMesh.rotation.y = Math.sin(nowSec * 1.8) * 0.08 * this.menuFactor;
     } else {
       this.playerMesh.scale.set(1, 1, 1);
+    }
+
+    // Animate decorative 3D menu coins
+    for (let i = 0; i < this.menuCoins.length; i++) {
+      const coin = this.menuCoins[i];
+      if (this.menuFactor > 0.01) {
+        coin.visible = true;
+        coin.rotation.y = nowSec * 2.5;
+        coin.position.y = 0.45 + Math.sin(nowSec * 3.0 + i) * 0.08;
+        coin.scale.setScalar(this.menuFactor);
+      } else {
+        coin.visible = false;
+      }
     }
 
     const camZ = engine.getCameraZ();
@@ -883,10 +922,39 @@ export class SceneManager {
       this.shakeIntensity = 0;
     }
 
-    this.camera.position.set(-7.5 + this.currentCamX + shakeX, 13.5, camZ - 8.0 + shakeZ);
-    this.camera.lookAt(this.currentCamX, 0, camZ + 3.0);
+    const lookAtX = this.currentCamX;
+    const lookAtY = this.menuFactor <= 0.001 ? 0 : THREE.MathUtils.lerp(0, 0.4, this.menuFactor);
+    const lookAtZ = this.menuFactor <= 0.001 ? camZ + 3.0 : THREE.MathUtils.lerp(camZ + 3.0, camZ + 0.5, this.menuFactor);
+
+    // Cinematic camera lerp between Gameplay and Menu views
+    if (this.menuFactor <= 0.001) {
+      this.camera.position.set(-7.5 + this.currentCamX + shakeX, 13.5, camZ - 8.0 + shakeZ);
+      this.camera.lookAt(this.currentCamX, 0, camZ + 3.0);
+    } else {
+      const camPosX = THREE.MathUtils.lerp(
+        -7.5 + this.currentCamX + shakeX,
+        -5.2 + this.currentCamX + shakeX,
+        this.menuFactor
+      );
+      const camPosY = THREE.MathUtils.lerp(13.5, 10.0, this.menuFactor);
+      const camPosZ = THREE.MathUtils.lerp(
+        camZ - 8.0 + shakeZ,
+        camZ - 5.5 + shakeZ,
+        this.menuFactor
+      );
+      this.camera.position.set(camPosX, camPosY, camPosZ);
+      this.camera.lookAt(lookAtX, lookAtY, lookAtZ);
+    }
+
+    const targetZoom = THREE.MathUtils.lerp(1.0, 1.35, this.menuFactor);
+    if (Math.abs(this.camera.zoom - targetZoom) > 0.001) {
+      this.camera.zoom = targetZoom;
+      this.lastCameraZoom = targetZoom;
+      this.camera.updateProjectionMatrix();
+    }
+
     this.dirLight.position.set(-12 + this.currentCamX, 22, camZ - 6);
-    this.dirLight.target.position.set(this.currentCamX, 0, camZ + 3);
+    this.dirLight.target.position.set(lookAtX, 0, lookAtZ);
     const tRenderStart = performance.now();
     this.renderer.render(this.scene, this.camera);
     const tRenderEnd = performance.now();
@@ -936,5 +1004,10 @@ export class SceneManager {
     this.particles = [];
     this.landingBounceTimer = 0;
     this.landingBounceElapsed = 0;
+
+    for (let i = 0; i < this.menuCoins.length; i++) {
+      const coin = this.menuCoins[i];
+      coin.position.set(i === 0 ? -1.3 : 1.3, 0.45, 0);
+    }
   }
 }
