@@ -303,7 +303,8 @@ describe('DailyQuests — Comprehensive TDD Suite', () => {
     // Main Menu Button & Badge
     assert.ok(html.includes('id="menu-daily-quests-btn"'), 'Main menu must include #menu-daily-quests-btn');
     assert.ok(html.includes('id="menu-daily-quests-badge"'), 'Main menu button must include #menu-daily-quests-badge');
-    assert.ok(html.includes('🎯 Задания дня'), 'Button label must match 🎯 Задания дня');
+    assert.ok(html.includes('Quests'), 'Button label must match Quests');
+    assert.ok(html.includes('title="Задания дня"'), 'Button title must match Задания дня');
 
     // Modal & Cards
     assert.ok(html.includes('id="daily-quests-modal"'), 'Must contain #daily-quests-modal');

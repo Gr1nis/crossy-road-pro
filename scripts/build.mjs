@@ -165,6 +165,11 @@ const htmlContent = `<!DOCTYPE html>
     .main-menu-overlay {
       position: absolute;
       inset: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
       background: transparent !important;
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
@@ -326,21 +331,21 @@ const htmlContent = `<!DOCTYPE html>
     .top-pill-score-line {
       font-size: 14px;
       font-weight: 900;
-      color: #0f274a;
+      color: #fbbf24;
       line-height: 1.1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
     }
     .top-pill-score-line strong {
-      color: #d97706;
+      color: #fef08a;
       font-weight: 900;
-      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
     }
     .top-settings-btn {
       pointer-events: auto;
-      width: 48px;
-      height: 48px;
-      border-radius: 18px;
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
       background: rgba(255, 255, 255, 0.35);
       border: 2px solid rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(14px);
@@ -636,8 +641,8 @@ const htmlContent = `<!DOCTYPE html>
       transform: translateX(-50%);
       bottom: 0;
       width: 280px;
-      height: 90px;
-      border-radius: 34px;
+      height: 96px;
+      border-radius: 32px;
       background: linear-gradient(180deg, #4ade80 0%, #22c55e 55%, #16a34a 100%);
       border: 3px solid #86efac;
       box-shadow: 0 8px 0 #15803d, 0 12px 20px rgba(0, 0, 0, 0.3), inset 0 3px 3px rgba(255, 255, 255, 0.7);
@@ -647,7 +652,7 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       justify-content: center;
       transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease, filter 0.12s ease;
-      margin: 0;
+      margin: 0 0 24px 0;
       padding: 0;
       z-index: 10;
       font-family: inherit;
@@ -1080,7 +1085,7 @@ const htmlContent = `<!DOCTYPE html>
       .top-pill-img-crown { width: 16px; height: 16px; }
       .top-pill-score-title { font-size: 9px; }
       .top-pill-score-line { font-size: 12px; }
-      .top-settings-btn { width: 40px; height: 40px; border-radius: 14px; border-width: 2px; }
+      .top-settings-btn { width: 38px; height: 38px; border-radius: 13px; border-width: 2px; }
       .top-settings-img { width: 24px; height: 24px; }
       .menu-side-widgets {
         top: max(100px, calc(env(safe-area-inset-top) + 80px));
@@ -1147,9 +1152,9 @@ const htmlContent = `<!DOCTYPE html>
         width: auto;
         min-width: 130px;
         max-width: 220px;
-        height: 74px;
-        margin: 0;
-        border-radius: 26px;
+        height: 88px;
+        margin: 0 0 22px 0;
+        border-radius: 30px;
         border-width: 3px;
         box-shadow: 0 7px 0 #15803d, 0 14px 24px rgba(22, 163, 74, 0.4), inset 0 3px 2px rgba(255, 255, 255, 0.9);
       }
@@ -1162,7 +1167,7 @@ const htmlContent = `<!DOCTYPE html>
         box-shadow: 0 3px 0 #15803d, 0 6px 12px rgba(22, 163, 74, 0.3), inset 0 2px 1px rgba(255, 255, 255, 0.7);
       }
       .hero-play-text {
-        font-size: 28px;
+        font-size: 32px;
         gap: 8px;
         text-shadow: 0 2.5px 0 #15803d, 0 5px 10px rgba(0, 0, 0, 0.35);
       }
@@ -1255,7 +1260,7 @@ const htmlContent = `<!DOCTYPE html>
             <img src="${MENU_ICONS.daily_quests}" class="floating-widget-img" alt="Quests" />
             <span id="menu-daily-quests-badge" class="floating-widget-count-badge hidden">0/3</span>
           </div>
-          <span class="floating-widget-label">🎯 Задания дня</span>
+          <span class="floating-widget-label">Quests</span>
         </button>
       </div>
     </div>
@@ -1283,7 +1288,7 @@ const htmlContent = `<!DOCTYPE html>
       <button id="menu-play-btn" class="hero-play-btn" title="Начать игру">
         <div class="hero-play-sheen"></div>
         <div class="hero-play-sheen-diag"></div>
-        <span class="hero-play-text"><img src="${MENU_ICONS.play}" class="hero-play-img" alt="" />PLAY <span class="hero-play-arrow">▶</span></span>
+        <span class="hero-play-text">PLAY <span class="hero-play-arrow">▶</span></span>
       </button>
 
       <!-- Правая колонка кнопок (Лидерборд и Достижения) -->

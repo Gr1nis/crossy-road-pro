@@ -545,11 +545,10 @@ export class UIManager {
     const allCompleted = quests.length >= 3 && completedCount >= quests.length;
     const canClaimSuperBonus = allCompleted && !state.allCompletedBonusClaimed;
 
-    // 1. Badge in Main Menu: shows count of ready-to-claim rewards, hidden if none ready
-    const totalReadyToClaim = readyCount + (canClaimSuperBonus ? 1 : 0);
+    // 1. Badge in Main Menu: shows completed/total fraction when active quests exist
     if (this.menuDailyQuestsBadgeEl) {
-      if (totalReadyToClaim > 0) {
-        this.menuDailyQuestsBadgeEl.textContent = String(totalReadyToClaim);
+      if (quests.length > 0) {
+        this.menuDailyQuestsBadgeEl.textContent = `${completedCount}/${quests.length}`;
         this.menuDailyQuestsBadgeEl.classList.remove('hidden');
       } else {
         this.menuDailyQuestsBadgeEl.classList.add('hidden');

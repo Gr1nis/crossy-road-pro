@@ -52,3 +52,7 @@
 2. `src/app/uiManager.ts`: раскомментировать боевой обратный отсчёт до полуночи в `updateQuestsCountdown()` и показ таймера ожидания бонуса `dailyTimerBoxEl` в `renderDailyBonus()`.
 3. `scripts/build.mjs`: скрыть или убрать кнопку `#menu-dev-btn` и `#dev-modal` перед релизом.
 4. Выполнить сборку и тесты: `npm test && npm run build`.
+
+## Subagent Delegation & Game Critics
+- Любые согласованные в чате задачи реализации (UI, воксели, физика) автоматически запускаются через фоновых субагентов (`invoke_subagent`) без отдельного напоминания от пользователя.
+- Любые изменения визуала, 9:16 верстки и ассетов автоматически валидируются независимым сабагентом `game-critics` (Fidelity/Asset/Motion).

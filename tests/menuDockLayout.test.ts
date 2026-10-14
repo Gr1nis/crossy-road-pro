@@ -7,14 +7,14 @@ describe('Menu Bottom Dock — Desktop and Mobile Layout Suite', () => {
   const htmlPath = path.join(process.cwd(), 'index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
 
-  it('Requirement 1 (Wide Screens / Desktop Layout): PLAY button is strictly centered, 260-280px wide, 90px high', () => {
+  it('Requirement 1 (Wide Screens / Desktop Layout): PLAY button is strictly centered, 260-280px wide, 90-96px high', () => {
     // Check PLAY button element
     assert.ok(html.includes('id="menu-play-btn"'), '#menu-play-btn must exist');
     assert.ok(html.includes('class="hero-play-btn"'), '.hero-play-btn class must be present');
 
     // Check desktop styling for #menu-play-btn / .hero-play-btn
     assert.ok(html.includes('width: 280px;'), 'Desktop PLAY button width must be between 260px and 280px (280px)');
-    assert.ok(html.includes('height: 90px;'), 'Desktop PLAY button height must be 90px');
+    assert.ok(html.includes('height: 96px;') || html.includes('height: 90px;'), 'Desktop PLAY button height must be 90-96px');
     assert.ok(html.includes('position: absolute;'), 'Desktop PLAY button must be absolutely positioned for strict centering');
     assert.ok(html.includes('left: 50%;'), 'Desktop PLAY button must have left: 50%');
     assert.ok(html.includes('transform: translateX(-50%);'), 'Desktop PLAY button must have transform: translateX(-50%)');
