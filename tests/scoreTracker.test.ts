@@ -303,6 +303,34 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     assert.equal(repeatBonus.success, false);
     assert.equal(repeatBonus.coins, 0);
   });
+
+  it('Property 10 (Reset All Progress): clears highScore, wallet coins, unlocked skins, and persists cleanly', () => {
+    const storage = new MemoryStorage();
+    const tracker = new ScoreTracker(storage);
+    tracker.addCoins(500);
+    tracker.recordRun(150);
+    tracker.unlockSkin('box_cat');
+    tracker.selectSkin('box_cat');
+    assert.equal(tracker.getCoins(), 500);
+    assert.equal(tracker.getHighScore(), 150);
+    assert.ok(tracker.getUnlockedSkins().includes('box_cat'));
+
+    tracker.resetAllProgress();
+
+    assert.equal(tracker.getCoins(), 0);
+    assert.equal(tracker.getHighScore(), 0);
+    assert.deepEqual(tracker.getUnlockedSkins(), ['corgi']);
+    assert.equal(tracker.getSelectedSkin(), 'corgi');
+    assert.equal(tracker.getPlayerRuns().length, 0);
+
+    // Reload from storage to ensure reset was persisted
+    const reloaded = new ScoreTracker(storage);
+    assert.equal(reloaded.getCoins(), 0);
+    assert.equal(reloaded.getHighScore(), 0);
+    assert.deepEqual(reloaded.getUnlockedSkins(), ['corgi']);
+    assert.equal(reloaded.getSelectedSkin(), 'corgi');
+    assert.equal(reloaded.getPlayerRuns().length, 0);
+  });
 });
 
 

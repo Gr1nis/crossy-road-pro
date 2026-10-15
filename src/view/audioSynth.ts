@@ -5,8 +5,9 @@ interface WindowWithWebkitAudio extends Window {
 export class AudioSynth {
   private ctx: AudioContext | null = null;
   private soundEnabled: boolean = true;
+  private sfxVolume: number = 0.8;
   private musicEnabled: boolean = true;
-  private musicVolume: number = 0.22;
+  private musicVolume: number = 0.25;
   private isMusicPlaying: boolean = false;
   private musicTimerId: ReturnType<typeof setInterval> | null = null;
   private musicStep: number = 0;
@@ -25,6 +26,16 @@ export class AudioSynth {
       const savedMusic = localStorage.getItem('crossy_setting_music');
       if (savedMusic !== null) {
         this.musicEnabled = savedMusic !== 'false';
+      }
+      const savedSfxVol = localStorage.getItem('crossy_setting_sfx_vol');
+      if (savedSfxVol !== null) {
+        const val = parseFloat(savedSfxVol);
+        if (Number.isFinite(val)) this.sfxVolume = Math.max(0, Math.min(1, val));
+      }
+      const savedMusicVol = localStorage.getItem('crossy_setting_music_vol');
+      if (savedMusicVol !== null) {
+        const val = parseFloat(savedMusicVol);
+        if (Number.isFinite(val)) this.musicVolume = Math.max(0, Math.min(1, val));
       }
       this.setupUserGestureListener();
     }
@@ -57,7 +68,24 @@ export class AudioSynth {
       localStorage.setItem('crossy_setting_sound', String(enabled));
     }
     if (this.sfxGainNode && this.ctx) {
-      this.sfxGainNode.gain.setValueAtTime(enabled ? 1.0 : 0.0, this.ctx.currentTime);
+      const target = enabled ? this.sfxVolume : 0.0;
+      this.sfxGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
+    }
+  }
+
+  getSfxVolume(): number {
+    return this.sfxVolume;
+  }
+
+  setSfxVolume(volume: number): void {
+    const clamped = Math.max(0, Math.min(1, Number.isFinite(volume) ? volume : 0.8));
+    this.sfxVolume = clamped;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crossy_setting_sfx_vol', String(clamped));
+    }
+    if (this.sfxGainNode && this.ctx) {
+      const target = this.soundEnabled ? clamped : 0.0;
+      this.sfxGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
     }
   }
 
@@ -71,13 +99,31 @@ export class AudioSynth {
       localStorage.setItem('crossy_setting_music', String(enabled));
     }
     if (this.bgmGainNode && this.ctx) {
-      const target = enabled ? (this.isPaused ? this.musicVolume * 0.75 : this.musicVolume) : 0;
+      const base = this.isPaused ? this.musicVolume * 0.75 : this.musicVolume;
+      const target = enabled ? base : 0;
       this.bgmGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
     }
     if (enabled) {
       this.startMusic();
     } else {
       this.stopMusic();
+    }
+  }
+
+  getMusicVolume(): number {
+    return this.musicVolume;
+  }
+
+  setMusicVolume(volume: number): void {
+    const clamped = Math.max(0, Math.min(1, Number.isFinite(volume) ? volume : 0.25));
+    this.musicVolume = clamped;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crossy_setting_music_vol', String(clamped));
+    }
+    if (this.bgmGainNode && this.ctx) {
+      const base = this.isPaused ? clamped * 0.75 : clamped;
+      const target = this.musicEnabled ? base : 0;
+      this.bgmGainNode.gain.setValueAtTime(target, this.ctx.currentTime);
     }
   }
 
@@ -98,7 +144,7 @@ export class AudioSynth {
       this.masterGainNode.connect(this.ctx.destination);
 
       this.sfxGainNode = this.ctx.createGain();
-      this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? 1.0 : 0.0, this.ctx.currentTime);
+      this.sfxGainNode.gain.setValueAtTime(this.soundEnabled ? this.sfxVolume : 0.0, this.ctx.currentTime);
       this.sfxGainNode.connect(this.masterGainNode);
 
       this.bgmGainNode = this.ctx.createGain();

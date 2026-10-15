@@ -131,6 +131,9 @@ export class SceneManager {
   private renderedLanes = new Map<number, RenderedLane>();
   private activeIndices = new Set<number>();
   private shakeIntensity = 0;
+  private shadowsEnabled = true;
+  private renderQuality: 'high' | 'low' = 'high';
+  private screenShakeEnabled = true;
   private particles: Particle[] = [];
   private ambientParticles: AmbientParticle[] = [];
   private logImpacts = new Map<number, LogImpact>();
@@ -266,7 +269,32 @@ export class SceneManager {
     }
   }
 
+  setShadowsEnabled(enabled: boolean): void {
+    this.shadowsEnabled = enabled;
+    if (this.renderer) {
+      this.renderer.shadowMap.enabled = enabled;
+    }
+    if (this.dirLight) {
+      this.dirLight.castShadow = enabled;
+    }
+  }
+
+  setRenderQuality(quality: 'high' | 'low'): void {
+    this.renderQuality = quality;
+    if (this.renderer) {
+      const ratio = quality === 'high'
+        ? (typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1)
+        : 1;
+      this.renderer.setPixelRatio(ratio);
+    }
+  }
+
+  setScreenShakeEnabled(enabled: boolean): void {
+    this.screenShakeEnabled = enabled;
+  }
+
   triggerShake(intensity: number = 0.45): void {
+    if (!this.screenShakeEnabled) return;
     this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
   }
 
@@ -491,6 +519,10 @@ export class SceneManager {
     this.camera.top = top;
     this.camera.bottom = bottom;
     this.camera.updateProjectionMatrix();
+    const ratio = this.renderQuality === 'high'
+      ? (typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1)
+      : 1;
+    this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(width, height);
   }
 
@@ -917,7 +949,7 @@ export class SceneManager {
 
     let shakeX = 0;
     let shakeZ = 0;
-    if (this.shakeIntensity > 0.01) {
+    if (this.screenShakeEnabled && this.shakeIntensity > 0.01) {
       shakeX = (Math.random() - 0.5) * this.shakeIntensity;
       shakeZ = (Math.random() - 0.5) * this.shakeIntensity;
       this.shakeIntensity *= 0.85;

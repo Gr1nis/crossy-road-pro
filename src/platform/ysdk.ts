@@ -9,6 +9,8 @@
 // ============================================================================
 
 import type { AdProvider, RewardedAdCallbacks } from '../core/types.ts';
+import type { Language } from '../core/i18n.ts';
+import { resolveLanguage } from '../core/i18n.ts';
 
 export interface YsdkRewardedCallbacks {
   onOpen?: () => void;
@@ -22,8 +24,18 @@ export interface YsdkAdv {
   showFullscreenAdv?(options: { callbacks: { onClose?: (wasShown: boolean) => void; onError?: (err: unknown) => void } }): void;
 }
 
+export interface YsdkEnvironmentI18n {
+  lang?: string;
+  tld?: string;
+}
+
+export interface YsdkEnvironment {
+  i18n?: YsdkEnvironmentI18n;
+}
+
 export interface YsdkInstance {
   adv: YsdkAdv;
+  environment?: YsdkEnvironment;
   features?: {
     LoadingAPI?: {
       ready(): void;
@@ -94,6 +106,14 @@ export class PlatformBridge implements AdProvider {
 
   public setSimulationMode(enabled: boolean): void {
     this.simulationMode = enabled;
+  }
+
+  public getEnvironmentLanguage(): Language | null {
+    const raw = this.ysdk?.environment?.i18n?.lang;
+    if (typeof raw === 'string' && raw.trim().length > 0) {
+      return resolveLanguage(raw);
+    }
+    return null;
   }
 
   public showRewardedVideo(callbacks: RewardedAdCallbacks): void {

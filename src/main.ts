@@ -17,9 +17,9 @@ const platform = new PlatformBridge();
 const ui = new UIManager(platform);
 const gameLoop = new GameLoop(engine, sceneManager, audio, ui, platform);
 
-platform.init().catch((e: unknown) => console.warn(e));
+platform.init().then(() => gameLoop.syncPlatformLanguage()).catch((e: unknown) => console.warn(e));
 ui.bindActions(gameLoop.getUIActions());
-new InputManager(gameLoop.getInputCallbacks(), gameLoop.getModalStateProvider()).attach();
+new InputManager(gameLoop.getInputCallbacks(), gameLoop.getModalStateProvider(), gameLoop.getSettingsManager()).attach();
 
 ui.openMainMenu();
 gameLoop.updateMenuStats();

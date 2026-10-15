@@ -10,13 +10,21 @@ import { type InputCallbacks, type ModalStateProvider } from './inputManager.ts'
 import { PerfMonitor } from './perfMonitor.ts';
 import { PerfReportModal } from './perfReportModal.ts';
 import type { PerfBenchmarkReport } from './perfMetrics.ts';
+import {
+  SettingsManager,
+  type RenderQuality,
+  type AppLanguage,
+  type ControlsType,
+  type SwipeSensitivity,
+} from '../core/settingsManager.ts';
+import { type Language, resolveLanguage, t } from '../core/i18n.ts';
 
 const DEATH_LABELS: Record<string, string> = {
-  [DeathReason.CAR]: 'Вас сбил автомобиль на трассе!',
-  [DeathReason.TRAIN]: 'Вас снёс скоростной экспресс на переезде!',
-  [DeathReason.WATER]: 'Вы упали в бурную реку!',
-  [DeathReason.OUT_OF_BOUNDS]: 'Бревно унесло вас за край карты!',
-  [DeathReason.CAMERA_BEHIND]: 'Вы слишком долго стояли на месте!',
+  [DeathReason.CAR]: 'death_car',
+  [DeathReason.TRAIN]: 'death_train',
+  [DeathReason.WATER]: 'death_water',
+  [DeathReason.OUT_OF_BOUNDS]: 'death_bounds',
+  [DeathReason.CAMERA_BEHIND]: 'death_camera',
 };
 
 export class GameLoop {
@@ -30,6 +38,7 @@ export class GameLoop {
   private readonly audio: AudioSynth;
   private readonly ui: UIManager;
   private readonly platform: AdProvider;
+  private readonly settings: SettingsManager;
 
   private lastCoins: number;
   private runStartHighScore: number;
@@ -55,7 +64,8 @@ export class GameLoop {
     audio: AudioSynth,
     ui: UIManager,
     platform?: AdProvider,
-    perfMonitor?: PerfMonitor
+    perfMonitor?: PerfMonitor,
+    settingsManager?: SettingsManager
   ) {
     this.engine = engine;
     this.sceneManager = sceneManager;
@@ -66,9 +76,50 @@ export class GameLoop {
       isAdReady: () => false,
       showRewardedVideo: (cb) => cb.onError?.(new Error('No ad provider')),
     };
+    this.settings = settingsManager ?? new SettingsManager(this.engine.getStorage?.());
     this.animate = this.animate.bind(this);
     this.lastCoins = this.engine.getCoins();
     this.runStartHighScore = this.engine.getHighScore();
+
+    // Apply initial settings
+    if (!this.settings.hasStoredSettings()) {
+      const bridge = this.platform as { getEnvironmentLanguage?: () => Language | null };
+      const envLang = bridge.getEnvironmentLanguage ? bridge.getEnvironmentLanguage() : null;
+      const detected =
+        envLang ||
+        (typeof navigator !== 'undefined' ? resolveLanguage(navigator.language) : 'ru');
+      this.settings.setSetting('language', detected);
+    }
+
+    const initSettings = this.settings.getSettings();
+    this.ui.applyLanguage(initSettings.language);
+    this.audio.setSoundEnabled(initSettings.sfxEnabled);
+    this.audio.setSfxVolume(initSettings.sfxVolume);
+    this.audio.setMusicEnabled(initSettings.musicEnabled);
+    this.audio.setMusicVolume(initSettings.musicVolume);
+    this.sceneManager.setShadowsEnabled(initSettings.shadowsEnabled);
+    this.sceneManager.setRenderQuality(initSettings.renderQuality);
+    this.sceneManager.setScreenShakeEnabled(initSettings.screenShakeEnabled);
+
+    this.ui.initSettingsModal(this.settings, {
+      onSoundToggle: (enabled) => this.toggleSound(enabled),
+      onSfxVolumeChange: (vol) => this.setSfxVolume(vol),
+      onMusicToggle: (enabled) => this.toggleMusic(enabled),
+      onMusicVolumeChange: (vol) => this.setMusicVolume(vol),
+      onShadowsToggle: (enabled) => this.setShadowsEnabled(enabled),
+      onQualityChange: (quality) => this.setRenderQuality(quality),
+      onScreenShakeToggle: (enabled) => this.setScreenShakeEnabled(enabled),
+      onToggleFullscreen: () => this.toggleFullscreen(),
+      onHapticsToggle: (enabled) => this.settings.setSetting('hapticsEnabled', enabled),
+      onControlsTypeChange: (type) => this.settings.setSetting('controlsType', type),
+      onSwipeSensitivityChange: (sens) => this.settings.setSetting('swipeSensitivity', sens),
+      onLanguageChange: (lang) => {
+        this.settings.setSetting('language', lang);
+        this.ui.applyLanguage(lang);
+      },
+      onResetDefaults: () => this.handleResetSettings(),
+      onResetData: () => this.handleResetAllData(),
+    });
 
     for (const ach of this.engine.getScoreTracker().getAchievements()) {
       if (ach.unlocked) {
@@ -80,10 +131,6 @@ export class GameLoop {
     this.ui.setMusicToggle(this.audio.isMusicEnabled());
     const playerName = this.engine.getScoreTracker().getPlayerName() || 'Игрок';
     this.ui.setPlayerName(playerName);
-
-    for (const skin of ALL_SKINS) {
-      this.engine.unlockSkin(skin.id);
-    }
 
     this.updateDailyBonusUI();
     this.updateDailyQuestsUI();
@@ -110,6 +157,7 @@ export class GameLoop {
         stopBenchmark: () => void;
         openReport: () => void;
         openViewer: () => void;
+        unlockAllSkins?: () => void;
       };
     }
     (window as Window & CrossyDevGlobal).__CROSSY_DEV__ = {
@@ -142,6 +190,13 @@ export class GameLoop {
       stopBenchmark: () => this.finishBenchmark(),
       openReport: () => this.openPerfReport(),
       openViewer: () => window.open('model-viewer.html?v=' + Date.now(), '_blank'),
+      unlockAllSkins: () => {
+        for (const skin of ALL_SKINS) {
+          this.engine.unlockSkin(skin.id);
+        }
+        this.renderSkinsUI();
+        this.ui.showToast('🎨', 'Все скины открыты', 'Разблокированы все персонажи!');
+      },
     };
   }
 
@@ -272,16 +327,107 @@ export class GameLoop {
     this.ui.showToast('👤', 'Профиль обновлён', `Имя игрока сохранено: ${clean}`);
   }
 
+  public getSettingsManager(): SettingsManager {
+    return this.settings;
+  }
+
   public toggleSound(enabled: boolean): void {
+    this.settings.setSetting('sfxEnabled', enabled);
     this.audio.setSoundEnabled(enabled);
     this.ui.setSoundToggle(enabled);
     this.syncBackgroundMusic();
   }
 
   public toggleMusic(enabled: boolean): void {
+    this.settings.setSetting('musicEnabled', enabled);
     this.audio.setMusicEnabled(enabled);
     this.ui.setMusicToggle(enabled);
     this.syncBackgroundMusic();
+  }
+
+  public setSfxVolume(volume: number): void {
+    this.settings.setSetting('sfxVolume', volume);
+    this.audio.setSfxVolume(volume);
+  }
+
+  public setMusicVolume(volume: number): void {
+    this.settings.setSetting('musicVolume', volume);
+    this.audio.setMusicVolume(volume);
+  }
+
+  public setShadowsEnabled(enabled: boolean): void {
+    this.settings.setSetting('shadowsEnabled', enabled);
+    this.sceneManager.setShadowsEnabled(enabled);
+  }
+
+  public setRenderQuality(quality: RenderQuality): void {
+    this.settings.setSetting('renderQuality', quality);
+    this.sceneManager.setRenderQuality(quality);
+  }
+
+  public setScreenShakeEnabled(enabled: boolean): void {
+    this.settings.setSetting('screenShakeEnabled', enabled);
+    this.sceneManager.setScreenShakeEnabled(enabled);
+  }
+
+  public toggleFullscreen(): void {
+    if (typeof document === 'undefined') return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  }
+
+  private handleResetSettings(): void {
+    const s = this.settings.getSettings();
+    this.audio.setSoundEnabled(s.sfxEnabled);
+    this.audio.setSfxVolume(s.sfxVolume);
+    this.audio.setMusicEnabled(s.musicEnabled);
+    this.audio.setMusicVolume(s.musicVolume);
+    this.sceneManager.setShadowsEnabled(s.shadowsEnabled);
+    this.sceneManager.setRenderQuality(s.renderQuality);
+    this.sceneManager.setScreenShakeEnabled(s.screenShakeEnabled);
+    this.ui.setSoundToggle(s.sfxEnabled);
+    this.ui.setMusicToggle(s.musicEnabled);
+    this.ui.applyLanguage(s.language);
+    this.ui.showToast('⚙️', 'Настройки сброшены', 'Восстановлены значения по умолчанию');
+  }
+
+  public syncPlatformLanguage(): void {
+    if (!this.settings.hasStoredSettings()) {
+      const bridge = this.platform as { getEnvironmentLanguage?: () => Language | null };
+      const envLang = bridge.getEnvironmentLanguage ? bridge.getEnvironmentLanguage() : null;
+      if (envLang && envLang !== this.settings.getSetting('language')) {
+        this.settings.setSetting('language', envLang);
+        this.ui.applyLanguage(envLang);
+      }
+    }
+  }
+
+  private handleResetAllData(): void {
+    this.engine.resetAllProgress();
+    this.unlockedAchievements.clear();
+    this.lastCoins = 0;
+    this.runStartHighScore = 0;
+    this.sceneManager.removeRecordFlag?.();
+    this.updateMenuStats();
+    this.renderSkinsUI();
+    this.updateDailyBonusUI();
+    this.updateDailyQuestsUI();
+    this.ui.closeSettings();
+    this.ui.showToast('🗑️', 'Прогресс сброшен', 'Все монеты, открытые скины и рекорды удалены');
+  }
+
+  private triggerHaptics(pattern: number | number[]): void {
+    if (!this.settings.getSetting('hapticsEnabled')) return;
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      try {
+        navigator.vibrate(pattern);
+      } catch (_err: unknown) {
+        // Safe fallback on mobile browser restrictions
+      }
+    }
   }
 
   public handleCloseModal(): void {
@@ -353,9 +499,6 @@ export class GameLoop {
   }
 
   public renderSkinsUI(): void {
-    for (const skin of ALL_SKINS) {
-      this.engine.unlockSkin(skin.id);
-    }
     const unlocked = this.engine.getUnlockedSkins();
     const active = this.engine.getSelectedSkin();
     this.ui.renderSkins(unlocked, active, (skinId: string) => {
@@ -517,8 +660,10 @@ export class GameLoop {
         this.audio.playCrash();
         this.sceneManager.triggerShake(p.deathReason === DeathReason.TRAIN ? 0.9 : 0.45);
       }
+      const deathKey = DEATH_LABELS[p.deathReason] ?? 'death_generic';
+      const lang = this.settings.getSetting('language');
       this.ui.showGameOver(
-        DEATH_LABELS[p.deathReason] ?? 'Игра окончена',
+        t(deathKey, lang),
         currentScore,
         this.engine.getHighScore()
       );
@@ -562,9 +707,7 @@ export class GameLoop {
   private executeClaimDailyBonus(doubleMultiplier: boolean): void {
     const res = this.engine.claimDailyReward(doubleMultiplier);
     if (res.success) {
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate([25, 30, 25]);
-      }
+      this.triggerHaptics([25, 30, 25]);
       if (res.isDouble) {
         if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
           this.audio.playDailySuperBonusFanfare();
@@ -603,9 +746,7 @@ export class GameLoop {
   private executeClaimDailyQuest(questId: string, doubleMultiplier: boolean): void {
     const res = this.engine.claimDailyQuest(questId, doubleMultiplier);
     if (res.success) {
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate([25, 30, 25]);
-      }
+      this.triggerHaptics([25, 30, 25]);
       if (res.isDouble) {
         if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
           this.audio.playDailySuperBonusFanfare();
@@ -648,9 +789,7 @@ export class GameLoop {
   private executeClaimDailyQuestBonus(doubleMultiplier: boolean): void {
     const res = this.engine.claimDailyQuestBonus(doubleMultiplier);
     if (res.success) {
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate([25, 30, 25]);
-      }
+      this.triggerHaptics([25, 30, 25]);
       this.sceneManager.spawnRecordConfetti(0, 2.0, 100);
       if (typeof this.audio.playDailySuperBonusFanfare === 'function') {
         this.audio.playDailySuperBonusFanfare();

@@ -2,6 +2,9 @@ import { ALL_SKINS, type AdProvider } from '../core/types.ts';
 import type { Achievement, AchievementId } from '../core/achievements.ts';
 import type { DailyRewardDayView } from '../core/dailyReward.ts';
 import type { DailyQuestDayState } from '../core/dailyQuests.ts';
+import type { SettingsManager } from '../core/settingsManager.ts';
+import { type Language, t } from '../core/i18n.ts';
+import { SettingsModalController, type SettingsModalCallbacks } from './settingsModal.ts';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -58,6 +61,8 @@ export class UIManager {
   private readonly mainMenuModal: HTMLElement | null;
   private readonly pauseModal: HTMLElement | null;
   private readonly settingsModal: HTMLElement | null;
+  private settingsController: SettingsModalController | null = null;
+  private currentLanguage: Language = 'ru';
   private readonly gachaModal: HTMLElement | null;
   private readonly leaderboardModal: HTMLElement | null;
   private readonly achievementsModal: HTMLElement | null;
@@ -327,8 +332,13 @@ export class UIManager {
     this.pauseModal?.classList.add('hidden');
   }
 
+  initSettingsModal(settings: SettingsManager, callbacks: SettingsModalCallbacks): void {
+    this.settingsController = new SettingsModalController(settings, callbacks);
+  }
+
   openSettings(returnTo: 'menu' | 'pause' = 'menu'): void {
     this.settingsReturnTo = returnTo;
+    this.settingsController?.syncUI();
     this.settingsModal?.classList.remove('hidden');
   }
 
@@ -340,6 +350,44 @@ export class UIManager {
       this.mainMenuModal?.classList.remove('hidden');
     }
     return this.settingsReturnTo;
+  }
+
+  applyLanguage(lang: Language): void {
+    this.currentLanguage = lang;
+    if (typeof document === 'undefined') return;
+
+    const elements = document.querySelectorAll<HTMLElement>('[data-i18n]');
+    for (const el of elements) {
+      const key = el.dataset.i18n;
+      if (!key) continue;
+      const text = t(key, lang);
+      if (text) {
+        if (el.tagName === 'INPUT') {
+          (el as HTMLInputElement).placeholder = text;
+        } else {
+          el.textContent = text;
+        }
+      }
+    }
+
+    const titleElements = document.querySelectorAll<HTMLElement>('[data-i18n-title]');
+    for (const el of titleElements) {
+      const key = el.dataset.i18nTitle;
+      if (!key) continue;
+      const text = t(key, lang);
+      if (text) el.title = text;
+    }
+
+    const lbRank = document.querySelector<HTMLElement>('.lb-row.header .lb-col-rank');
+    if (lbRank) lbRank.textContent = t('leaderboard_rank', lang);
+    const lbPlayer = document.querySelector<HTMLElement>('.lb-row.header .lb-col-player');
+    if (lbPlayer) lbPlayer.textContent = t('leaderboard_player', lang);
+    const lbScore = document.querySelector<HTMLElement>('.lb-row.header .lb-col-score');
+    if (lbScore) lbScore.textContent = t('leaderboard_score', lang);
+  }
+
+  getLanguage(): Language {
+    return this.currentLanguage;
   }
 
   openGacha(): void {
@@ -467,7 +515,7 @@ export class UIManager {
     remainingMs: number
   ): void {
     if (this.dailyStreakTextEl) {
-      this.dailyStreakTextEl.textContent = `Серия: ${streak} ${streak === 1 ? 'день' : streak < 5 ? 'дня' : 'дней'}`;
+      this.dailyStreakTextEl.textContent = t('daily_streak', this.currentLanguage, [streak]);
     }
 
     if (this.dailyTimerBoxEl && this.dailyTimerValEl) {
@@ -571,7 +619,7 @@ export class UIManager {
 
     // 2. Day summary progress: "Выполнено X из 3" + progress bar
     if (this.questsSummaryTextEl) {
-      this.questsSummaryTextEl.textContent = `Выполнено ${completedCount} из ${quests.length || 3}`;
+      this.questsSummaryTextEl.textContent = t('quests_progress_summary', this.currentLanguage, [completedCount, quests.length || 3]);
     }
     if (this.questsSummaryBarEl) {
       const totalPercent = quests.length > 0 ? Math.round((completedCount / quests.length) * 100) : 0;

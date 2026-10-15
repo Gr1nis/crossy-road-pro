@@ -22,6 +22,8 @@ const moduleOrder = [
   'src/core/types.ts',
   'src/core/prng.ts',
   'src/core/collision.ts',
+  'src/core/i18n.ts',
+  'src/core/settingsManager.ts',
   'src/core/wallet.ts',
   'src/core/skinInventory.ts',
   'src/core/gachaMachine.ts',
@@ -51,6 +53,7 @@ const moduleOrder = [
   'src/app/perfMetrics.ts',
   'src/app/perfReportModal.ts',
   'src/app/perfMonitor.ts',
+  'src/app/settingsModal.ts',
   'src/app/uiManager.ts',
   'src/app/inputManager.ts',
   'src/app/gameLoop.ts',
@@ -658,6 +661,7 @@ const htmlContent = `<!DOCTYPE html>
     .menu-btn-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #fff; }
     .menu-btn-slate { background: linear-gradient(135deg, #475569, #334155); color: #f8fafc; }
     .menu-btn-secondary { background: #334155; color: #e2e8f0; }
+    .menu-btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
 
     .modal-card-gacha { max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; -webkit-overflow-scrolling: touch; }
     #gacha-modal h2 { font-size: clamp(18px, 4vw, 28px); color: #fbbf24; }
@@ -904,14 +908,183 @@ const htmlContent = `<!DOCTYPE html>
     @keyframes toastIn { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
 
     /* Settings Modal Styles & Range Slider Support */
-    .settings-group { background: #0f172a; border: 2px solid #334155; border-radius: 16px; padding: 16px 20px; margin: 20px 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
-    .settings-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 36px; }
-    .settings-label { font-size: 15px; font-weight: 700; color: #f8fafc; }
-    .settings-subtext { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-    .switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0; margin: 2px; }
+    .modal-card-settings {
+      max-width: 480px !important;
+      width: 94%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 22px !important;
+    }
+    .settings-modal-header { text-align: center; margin-bottom: 12px; }
+    .settings-subtitle { font-size: 13px; color: #94a3b8; margin-top: 2px; font-weight: 600; }
+    
+    /* Tabs Navigation */
+    .settings-tabs {
+      display: flex;
+      gap: 6px;
+      background: #090d16;
+      padding: 4px;
+      border-radius: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #1e293b;
+    }
+    .settings-tab-btn {
+      flex: 1;
+      padding: 9px 4px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #94a3b8;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .settings-tab-btn:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.05); }
+    .settings-tab-btn.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    .settings-tab-contents {
+      flex: 1;
+      overflow-y: auto;
+      max-height: calc(88vh - 180px);
+      padding-right: 2px;
+    }
+    .settings-tab-contents::-webkit-scrollbar { width: 5px; }
+    .settings-tab-contents::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    .settings-group {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      min-height: 36px;
+    }
+    .settings-row-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .settings-info { flex: 1; min-width: 0; }
+    .settings-label { font-size: 14px; font-weight: 800; color: #f8fafc; }
+    .settings-subtext { font-size: 11px; color: #94a3b8; margin-top: 2px; line-height: 1.3; }
+    .settings-divider { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 2px 0; }
+
+    /* Sliders and Badges */
+    .settings-slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 2px 0;
+    }
+    .settings-slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .settings-slider-label { font-size: 13px; font-weight: 700; color: #cbd5e1; }
+    .settings-badge {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      min-width: 44px;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Segmented Control Buttons */
+    .settings-segmented {
+      display: inline-flex;
+      background: #090d16;
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      gap: 3px;
+    }
+    .settings-segmented.full-width { display: flex; width: 100%; }
+    .settings-segment-btn {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .settings-segment-btn:hover { color: #f8fafc; }
+    .settings-segment-btn.active {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: 800;
+      box-shadow: 0 2px 6px rgba(56, 189, 248, 0.35);
+    }
+
+    .settings-action-btn {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      border-radius: 10px;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #f8fafc;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .settings-action-btn:hover { filter: brightness(1.2); border-color: #38bdf8; }
+    .settings-action-btn.danger {
+      border-color: rgba(239, 68, 68, 0.6);
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.12);
+    }
+    .settings-action-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fff;
+    }
+
+    .settings-version-tag {
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 800;
+      margin-top: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .switch { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0; margin: 2px; }
+    .switch::after { content: ""; position: absolute; inset: -9px -6px; z-index: 1; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .2s ease; border-radius: 28px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
-    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .2s ease; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .2s ease; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
     input:checked + .slider { background-color: #10b981; }
     input:checked + .slider:before { transform: translateX(22px); }
 
@@ -924,6 +1097,149 @@ const htmlContent = `<!DOCTYPE html>
     input[type=range]::-moz-range-thumb { height: 20px; width: 20px; border: none; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); cursor: pointer; transition: transform 0.15s ease, background-color 0.15s ease; box-sizing: border-box; }
     input[type=range]:active::-webkit-slider-thumb { transform: scale(1.1); background: #38bdf8; }
     input[type=range]:active::-moz-range-thumb { transform: scale(1.1); background: #38bdf8; }
+
+    /* Neon Accent Range Sliders */
+    input[type=range].settings-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 24px;
+      background: transparent;
+      margin: 2px 0;
+      padding: 0;
+      cursor: pointer;
+      display: block;
+      box-sizing: border-box;
+    }
+    input[type=range].settings-slider:focus { outline: none; }
+    input[type=range].settings-slider::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      border: 1px solid #334155;
+    }
+    input[type=range].settings-slider::-moz-range-track {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      border: 1px solid #334155;
+    }
+    input[type=range].settings-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+      border: 2px solid #ffffff;
+      cursor: pointer;
+      margin-top: -7px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      box-sizing: border-box;
+    }
+    input[type=range].settings-slider::-moz-range-thumb {
+      height: 20px;
+      width: 20px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      box-sizing: border-box;
+    }
+    input[type=range].settings-slider:active::-webkit-slider-thumb {
+      transform: scale(1.18);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 1);
+    }
+    input[type=range].settings-slider:active::-moz-range-thumb {
+      transform: scale(1.18);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 1);
+    }
+
+    /* Virtual On-Screen D-Pad */
+    .dpad-container {
+      position: absolute;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(3, 54px);
+      grid-template-rows: repeat(3, 54px);
+      gap: 8px;
+      justify-items: center;
+      align-items: center;
+      pointer-events: auto;
+      z-index: 15;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    .dpad-container.hidden { display: none !important; }
+    .dpad-btn {
+      width: 54px;
+      height: 54px;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(56, 189, 248, 0.55);
+      border-radius: 14px;
+      color: #38bdf8;
+      font-size: 22px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.2);
+      transition: transform 0.08s ease, background 0.08s ease, border-color 0.08s ease;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dpad-btn:active, .dpad-btn.pressed {
+      transform: scale(0.92);
+      background: rgba(56, 189, 248, 0.35);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.85);
+    }
+    .dpad-up { grid-column: 2; grid-row: 1; }
+    .dpad-left { grid-column: 1; grid-row: 2; }
+    .dpad-center {
+      grid-column: 2;
+      grid-row: 2;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px dashed rgba(56, 189, 248, 0.4);
+      pointer-events: none;
+    }
+    .dpad-right { grid-column: 3; grid-row: 2; }
+    .dpad-down { grid-column: 2; grid-row: 3; }
+
+    @media (max-height: 700px) {
+      .dpad-container {
+        bottom: max(10px, env(safe-area-inset-bottom));
+        grid-template-columns: repeat(3, 44px);
+        grid-template-rows: repeat(3, 44px);
+        gap: 6px;
+      }
+      .dpad-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+        border-radius: 12px;
+      }
+      .dpad-center {
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+      }
+    }
 
     /* Mobile Responsive Overrides */
     @media (max-width: 640px) {
@@ -963,7 +1279,7 @@ const htmlContent = `<!DOCTYPE html>
       .gacha-skin-badge { font-size: 24px; margin: 2px 0; }
       .gacha-skin-name { font-size: 11px; }
 
-      .settings-group { padding: 12px 14px; margin: 14px 0; gap: 10px; }
+      .settings-group { padding: 12px 14px; margin: 6px 0 10px; gap: 10px; }
       .settings-label { font-size: 14px; }
       .settings-subtext { font-size: 11px; }
 
@@ -1079,11 +1395,11 @@ const htmlContent = `<!DOCTYPE html>
   <div id="in-game-hud" class="hud hidden">
     <div class="hud-stats">
       <div class="score-card">
-        <div class="score-label">Пройденный путь</div>
+        <div class="score-label" data-i18n="hud_distance">Пройденный путь</div>
         <div id="score-value" class="score-number">0</div>
       </div>
       <div class="score-card">
-        <div class="score-label">Монеты 🪙</div>
+        <div class="score-label" data-i18n="hud_coins">Монеты 🪙</div>
         <div id="coins-value" class="score-number coins-number">0</div>
       </div>
     </div>
@@ -1091,6 +1407,15 @@ const htmlContent = `<!DOCTYPE html>
     <div class="hud-actions">
       <button id="pause-btn" class="hud-circle-btn" title="Пауза">⏸</button>
     </div>
+  </div>
+ 
+  <!-- Виртуальный D-Pad (On-Screen D-Pad) -->
+  <div id="on-screen-dpad" class="dpad-container hidden">
+    <button type="button" id="dpad-up" class="dpad-btn dpad-up" data-dir="forward" aria-label="Вверх">▲</button>
+    <button type="button" id="dpad-left" class="dpad-btn dpad-left" data-dir="left" aria-label="Влево">◄</button>
+    <div class="dpad-center" aria-hidden="true"></div>
+    <button type="button" id="dpad-right" class="dpad-btn dpad-right" data-dir="right" aria-label="Вправо">►</button>
+    <button type="button" id="dpad-down" class="dpad-btn dpad-down" data-dir="backward" aria-label="Вниз">▼</button>
   </div>
 
   <!-- Главное меню (Main Menu Modal) - Modern Casual Arcade HUD -->
@@ -1111,7 +1436,7 @@ const htmlContent = `<!DOCTYPE html>
         <div id="menu-score-pill" class="top-pill top-pill-score" title="Ваш рекорд">
           <img src="${MENU_ICONS.highscore_widget}" class="top-pill-bg-img" alt="Best" />
           <div class="top-pill-score-text">
-            <span class="top-pill-score-title">high score</span>
+            <span class="top-pill-score-title" data-i18n="menu_high_score">high score</span>
             <span class="top-pill-score-line">BEST: <strong id="menu-high-score">0</strong></span>
           </div>
         </div>
@@ -1134,7 +1459,7 @@ const htmlContent = `<!DOCTYPE html>
             <img src="${MENU_ICONS.daily_gift}" class="floating-widget-img" alt="Daily Gift" />
             <span id="menu-daily-badge" class="floating-widget-alert-badge pulse-badge">!</span>
           </div>
-          <span class="floating-widget-label">Daily Gift</span>
+          <span class="floating-widget-label" data-i18n="menu_daily_gift">Daily Gift</span>
         </button>
 
         <button id="menu-daily-quests-btn" class="floating-widget-btn" title="Задания дня">
@@ -1142,13 +1467,13 @@ const htmlContent = `<!DOCTYPE html>
             <img src="${MENU_ICONS.daily_quests}" class="floating-widget-img" alt="Quests" />
             <span id="menu-daily-quests-badge" class="floating-widget-count-badge hidden">0/3</span>
           </div>
-          <span class="floating-widget-label">Quests</span>
+          <span class="floating-widget-label" data-i18n="menu_quests">Quests</span>
         </button>
       </div>
     </div>
 
     <!-- Подсказка Нажмите для старта (Tap to Play Prompt) -->
-    <div class="tap-to-play-prompt">НАЖМИТЕ ДЛЯ СТАРТА</div>
+    <div class="tap-to-play-prompt" data-i18n="menu_tap_to_play">НАЖМИТЕ ДЛЯ СТАРТА</div>
 
     <!-- Нижняя навигационная панель (Bottom Hero Dock) -->
     <div class="menu-bottom-dock">
@@ -1158,13 +1483,13 @@ const htmlContent = `<!DOCTYPE html>
           <div class="dock-btn-inner">
             <img src="${MENU_ICONS.skins}" class="dock-btn-img" alt="Skins" />
           </div>
-          <span class="dock-btn-label">Skins</span>
+          <span class="dock-btn-label" data-i18n="menu_skins">Skins</span>
         </button>
         <button id="menu-gacha-btn" class="dock-btn dock-btn-teal" title="🎰 Автомат скинов">
           <div class="dock-btn-inner">
             <img src="${MENU_ICONS.shop}" class="dock-btn-img" alt="Shop" />
           </div>
-          <span class="dock-btn-label">Shop</span>
+          <span class="dock-btn-label" data-i18n="menu_shop">Shop</span>
           <span style="display: none;">🎰 Автомат скинов</span>
         </button>
       </div>
@@ -1175,14 +1500,14 @@ const htmlContent = `<!DOCTYPE html>
           <div class="dock-btn-inner">
             <img src="${MENU_ICONS.leaderboard}" class="dock-btn-img" alt="Leaderboard" />
           </div>
-          <span class="dock-btn-label">Leaderboard</span>
+          <span class="dock-btn-label" data-i18n="menu_leaderboard">Leaderboard</span>
         </button>
         <button id="menu-achievements-btn" class="dock-btn dock-btn-teal" title="Достижения">
           <div class="dock-btn-inner">
             <img src="${MENU_ICONS.achievements}" class="dock-btn-img" alt="Achievements" />
             <span id="menu-achievements-badge" class="dock-badge hidden">0/10</span>
           </div>
-          <span class="dock-btn-label">Achievements</span>
+          <span class="dock-btn-label" data-i18n="menu_achievements">Achievements</span>
         </button>
       </div>
     </div>
@@ -1191,58 +1516,240 @@ const htmlContent = `<!DOCTYPE html>
   <!-- Меню паузы (Pause Modal) -->
   <div id="pause-modal" class="modal hidden">
     <div class="modal-card">
-      <h2 style="color: #38bdf8;">⏸ ПАУЗА</h2>
-      <p>Игра приостановлена. Выберите действие:</p>
+      <h2 style="color: #38bdf8;" data-i18n="pause_title">⏸ ПАУЗА</h2>
+      <p data-i18n="pause_desc">Игра приостановлена. Выберите действие:</p>
 
       <div class="menu-btn-stack">
-        <button id="pause-resume-btn" class="menu-btn menu-btn-primary">▶ Продолжить</button>
-        <button id="pause-settings-btn" class="menu-btn menu-btn-slate">⚙ Настройки</button>
-        <button id="pause-menu-btn" class="menu-btn menu-btn-secondary">🏠 Главное меню</button>
+        <button id="pause-resume-btn" class="menu-btn menu-btn-primary" data-i18n="pause_resume_btn">▶ Продолжить</button>
+        <button id="pause-settings-btn" class="menu-btn menu-btn-slate" data-i18n="pause_settings_btn">⚙ Настройки</button>
+        <button id="pause-menu-btn" class="menu-btn menu-btn-secondary" data-i18n="pause_menu_btn">🏠 Главное меню</button>
       </div>
     </div>
   </div>
 
   <!-- Окно настроек (Settings Modal) -->
   <div id="settings-modal" class="modal hidden">
-    <div class="modal-card">
-      <h2 style="color: #94a3b8;">⚙ НАСТРОЙКИ</h2>
-      <p>Параметры звука, музыки и управления</p>
+    <div class="modal-card modal-card-settings">
+      <div class="settings-modal-header">
+        <h2 style="color: #38bdf8;" data-i18n="settings_title">⚙️ НАСТРОЙКИ</h2>
+        <p class="settings-subtitle" data-i18n="settings_subtitle">Персонализация звука, графики и геймплея</p>
+      </div>
 
-      <div class="settings-group">
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Звуковые эффекты</div>
-            <div class="settings-subtext">Синтезатор прыжков, монет, поездов и аварий</div>
+      <!-- Табы категорий -->
+      <div class="settings-tabs">
+        <button type="button" class="settings-tab-btn active" data-tab="sound" data-i18n="tab_sound">🔊 Звук</button>
+        <button type="button" class="settings-tab-btn" data-tab="graphics" data-i18n="tab_graphics">🎨 Графика</button>
+        <button type="button" class="settings-tab-btn" data-tab="controls" data-i18n="tab_controls">🎮 Управление</button>
+        <button type="button" class="settings-tab-btn" data-tab="game" data-i18n="tab_game">⚙️ Игра</button>
+      </div>
+
+      <div class="settings-tab-contents">
+        <!-- Вкладка: Звук -->
+        <div class="settings-tab-panel" data-tab="sound" id="settings-panel-sound">
+          <div class="settings-group">
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="sfx_label">Звуковые эффекты</div>
+                <div class="settings-subtext" data-i18n="sfx_subtext">Прыжки, монеты, поезда и аварии</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-sound-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="settings-slider-row">
+              <div class="settings-slider-header">
+                <span class="settings-slider-label" data-i18n="sfx_volume_label">Громкость звуков</span>
+                <span class="settings-badge" id="setting-sfx-volume-val">80%</span>
+              </div>
+              <input type="range" id="setting-sfx-volume" class="settings-slider" min="0" max="100" value="80" step="5" />
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="music_label">Фоновая музыка</div>
+                <div class="settings-subtext" data-i18n="music_subtext">Динамический ретро-саундтрек во время игры</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-music-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="settings-slider-row">
+              <div class="settings-slider-header">
+                <span class="settings-slider-label" data-i18n="music_volume_label">Громкость музыки</span>
+                <span class="settings-badge" id="setting-music-volume-val">25%</span>
+              </div>
+              <input type="range" id="setting-music-volume" class="settings-slider" min="0" max="100" value="25" step="5" />
+            </div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="setting-sound-toggle" checked>
-            <span class="slider"></span>
-          </label>
         </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Фоновая музыка</div>
-            <div class="settings-subtext">Динамический ретро-саундтрек во время игры</div>
+
+        <!-- Вкладка: Графика -->
+        <div class="settings-tab-panel hidden" data-tab="graphics" id="settings-panel-graphics">
+          <div class="settings-group">
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="shadows_label">Динамические тени</div>
+                <div class="settings-subtext" data-i18n="shadows_subtext">Мягкие тени от солнца и окружающих объектов</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-shadows-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="quality_label">Качество рендеринга</div>
+                <div class="settings-subtext" data-i18n="quality_subtext">Высокое (HiDPI / Retina) или низкое (1x)</div>
+              </div>
+              <div class="settings-segmented">
+                <button type="button" class="settings-segment-btn active" data-quality="high" data-i18n="quality_high">Высокое</button>
+                <button type="button" class="settings-segment-btn" data-quality="low" data-i18n="quality_low">Низкое</button>
+              </div>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="shake_label">Тряска камеры (Screen Shake)</div>
+                <div class="settings-subtext" data-i18n="shake_subtext">Эффект отдачи при ударах и проезде поезда</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-shake-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="fullscreen_label">Полноэкранный режим</div>
+                <div class="settings-subtext" data-i18n="fullscreen_subtext">Развернуть игру на полный экран</div>
+              </div>
+              <button type="button" id="setting-fullscreen-btn" class="settings-action-btn" data-i18n="fullscreen_btn">⛶ Экран</button>
+            </div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="setting-music-toggle" checked>
-            <span class="slider"></span>
-          </label>
+        </div>
+
+        <!-- Вкладка: Управление -->
+        <div class="settings-tab-panel hidden" data-tab="controls" id="settings-panel-controls">
+          <div class="settings-group">
+            <div class="settings-row-col">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="controls_label">Тип управления</div>
+                <div class="settings-subtext" data-i18n="controls_subtext">Выберите способ управления персонажем</div>
+              </div>
+              <div class="settings-segmented full-width">
+                <button type="button" class="settings-segment-btn active" data-controls="swipe" data-i18n="controls_swipe">👆 Свайпы</button>
+                <button type="button" class="settings-segment-btn" data-controls="dpad" data-i18n="controls_dpad">🕹️ D-Pad</button>
+                <button type="button" class="settings-segment-btn" data-controls="tap" data-i18n="controls_tap">🎯 Тапы</button>
+              </div>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row-col">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="sensitivity_label">Чувствительность свайпов</div>
+                <div class="settings-subtext" data-i18n="sensitivity_subtext">Дистанция жеста для срабатывания прыжка</div>
+              </div>
+              <div class="settings-segmented full-width">
+                <button type="button" class="settings-segment-btn" data-sensitivity="low" data-i18n="sens_low">Низкая</button>
+                <button type="button" class="settings-segment-btn active" data-sensitivity="normal" data-i18n="sens_normal">Нормальная</button>
+                <button type="button" class="settings-segment-btn" data-sensitivity="high" data-i18n="sens_high">Высокая</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Вкладка: Игра -->
+        <div class="settings-tab-panel hidden" data-tab="game" id="settings-panel-game">
+          <div class="settings-group">
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="haptics_label">Вибрация (Haptics)</div>
+                <div class="settings-subtext" data-i18n="haptics_subtext">Тактильный отклик при сборе бонусов и монет</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-haptics-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row-col">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="lang_label">Язык интерфейса</div>
+                <div class="settings-subtext" data-i18n="lang_subtext">Язык подсказок и меню</div>
+              </div>
+              <div class="settings-segmented full-width">
+                <button type="button" class="settings-segment-btn active" data-lang="ru">🇷🇺 Русский</button>
+                <button type="button" class="settings-segment-btn" data-lang="en">🇬🇧 English</button>
+                <button type="button" class="settings-segment-btn" data-lang="tr">🇹🇷 Türkçe</button>
+              </div>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" data-i18n="reset_settings_label">Сброс настроек</div>
+                <div class="settings-subtext" data-i18n="reset_settings_subtext">Вернуть все параметры к заводским значениям</div>
+              </div>
+              <button type="button" id="setting-reset-btn" class="settings-action-btn danger" data-i18n="reset_settings_btn">Сбросить</button>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-row">
+              <div class="settings-info">
+                <div class="settings-label" style="color: #f87171;" data-i18n="reset_data_label">Сброс прогресса</div>
+                <div class="settings-subtext" data-i18n="reset_data_subtext">Удалить все монеты, открытые скины и рекорды</div>
+              </div>
+              <button type="button" id="setting-reset-data-btn" class="settings-action-btn danger" data-i18n="reset_data_btn">Стереть всё</button>
+            </div>
+          </div>
+
+          <div class="settings-version-tag">Crossy Road Pro • v1.2.0 • Phase 2</div>
         </div>
       </div>
 
-      <button id="settings-close-btn" class="menu-btn menu-btn-primary">Готово</button>
+      <button id="settings-close-btn" class="menu-btn menu-btn-primary" style="margin-top: 12px;" data-i18n="settings_close_btn">Готово</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно подтверждения сброса прогресса -->
+  <div id="reset-confirm-modal" class="modal hidden" style="z-index: 250;">
+    <div class="modal-card" style="max-width: 360px; text-align: center; border: 2px solid rgba(239, 68, 68, 0.6); box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);">
+      <div style="font-size: 38px; margin-bottom: 8px;">⚠️</div>
+      <h2 style="color: #ef4444; font-size: 20px; margin-bottom: 8px;" data-i18n="reset_confirm_title">Сброс прогресса</h2>
+      <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;" data-i18n="reset_confirm_desc">
+        Вы уверены? Будут удалены все монеты, открытые скины и рекорды.
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" id="reset-confirm-cancel-btn" class="menu-btn menu-btn-slate" style="flex: 1;" data-i18n="reset_confirm_cancel">Отмена</button>
+        <button type="button" id="reset-confirm-ok-btn" class="menu-btn menu-btn-danger" style="flex: 1;" data-i18n="reset_confirm_ok">Да, сбросить всё</button>
+      </div>
     </div>
   </div>
 
   <!-- Модальное окно Автомата скинов -->
   <div id="gacha-modal" class="modal hidden">
     <div class="modal-card modal-card-gacha">
-      <h2 style="color: #fbbf24;">🎰 АВТОМАТ СКИНОВ</h2>
-      <p>Испытайте удачу и откройте новые воксельные скины!</p>
+      <h2 style="color: #fbbf24;" data-i18n="gacha_title">🎰 АВТОМАТ СКИНОВ</h2>
+      <p data-i18n="gacha_desc">Испытайте удачу и откройте новые воксельные скины!</p>
 
       <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; margin: 0 auto 16px; align-self: center;">
-        <span style="display: inline-flex; align-items: center; line-height: 1;">Ваш баланс:</span>
+        <span style="display: inline-flex; align-items: center; line-height: 1;" data-i18n="gacha_balance">Ваш баланс:</span>
         <strong id="gacha-modal-coins" style="display: inline-flex; align-items: center; line-height: 1; margin: 0;">0</strong>
         <span style="display: inline-flex; align-items: center; line-height: 1;">🪙</span>
       </div>
@@ -1251,7 +1758,7 @@ const htmlContent = `<!DOCTYPE html>
 
       <div class="menu-btn-stack">
         <button id="gacha-modal-roll-btn" class="menu-btn menu-btn-amber">100 🪙</button>
-        <button id="gacha-modal-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+        <button id="gacha-modal-close-btn" class="menu-btn menu-btn-secondary" data-i18n="modal_close">Закрыть</button>
       </div>
     </div>
   </div>
@@ -1260,12 +1767,12 @@ const htmlContent = `<!DOCTYPE html>
   <div id="leaderboard-modal" class="modal hidden">
     <div class="modal-card modal-card-leaderboard">
       <span class="placeholder-badge">LIVE ТОП ЗАБЕГОВ</span>
-      <h2 style="color: #c084fc;">🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
-      <p class="lb-desc">Введите своё имя и соревнуйтесь за первое место в рейтинге лучших забегов!</p>
+      <h2 style="color: #c084fc;" data-i18n="leaderboard_title">🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
+      <p class="lb-desc" data-i18n="leaderboard_desc">Введите своё имя и соревнуйтесь за первое место в рейтинге лучших забегов!</p>
 
       <div class="lb-name-form">
         <input type="text" id="leaderboard-name-input" class="lb-name-input" maxlength="18" placeholder="Ваше имя игрока..." value="Игрок" />
-        <button id="leaderboard-save-name-btn" class="lb-save-btn">Сохранить</button>
+        <button id="leaderboard-save-name-btn" class="lb-save-btn" data-i18n="leaderboard_save">Сохранить</button>
       </div>
 
       <div class="leaderboard-preview-box">
@@ -1278,19 +1785,19 @@ const htmlContent = `<!DOCTYPE html>
       </div>
       <span id="leaderboard-best-score" style="display: none;">0</span>
 
-      <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+      <button id="leaderboard-close-btn" class="menu-btn menu-btn-secondary" data-i18n="modal_close">Закрыть</button>
     </div>
   </div>
 
   <!-- Модальное окно Достижений (Achievements Modal) -->
   <div id="achievements-modal" class="modal hidden">
     <div class="modal-card modal-card-achievements">
-      <h2 style="color: #34d399;">🏅 ДОСТИЖЕНИЯ</h2>
-      <p class="ach-desc-main">Выполняйте испытания и открывайте новые награды!</p>
+      <h2 style="color: #34d399;" data-i18n="achievements_title">🏅 ДОСТИЖЕНИЯ</h2>
+      <p class="ach-desc-main" data-i18n="achievements_desc">Выполняйте испытания и открывайте новые награды!</p>
 
       <div class="ach-summary-card">
         <div class="ach-summary-header">
-          <span>ОБЩИЙ ПРОГРЕСС</span>
+          <span data-i18n="achievements_summary">ОБЩИЙ ПРОГРЕСС</span>
           <strong id="ach-summary-text">0 из 10 (0%)</strong>
         </div>
         <div class="ach-progress-bar-bg">
@@ -1300,15 +1807,15 @@ const htmlContent = `<!DOCTYPE html>
 
       <div id="achievements-list" class="achievements-list-box"></div>
 
-      <button id="achievements-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+      <button id="achievements-close-btn" class="menu-btn menu-btn-secondary" data-i18n="modal_close">Закрыть</button>
     </div>
   </div>
 
   <!-- Модальное окно Ежедневного бонуса (Daily Bonus Modal) -->
   <div id="daily-bonus-modal" class="modal hidden">
     <div class="modal-card modal-card-daily">
-      <h2 style="color: #fbbf24;">🎁 ЕЖЕДНЕВНЫЙ БОНУС</h2>
-      <p style="margin-bottom: 12px;">Заходите каждый день и собирайте ценные награды!</p>
+      <h2 style="color: #fbbf24;" data-i18n="daily_bonus_title">🎁 ЕЖЕДНЕВНЫЙ БОНУС</h2>
+      <p style="margin-bottom: 12px;" data-i18n="daily_bonus_desc">Заходите каждый день и собирайте ценные награды!</p>
 
       <div class="daily-streak-pill">
         🔥 <span id="daily-streak-text">Серия: 1 день</span>
@@ -1317,13 +1824,13 @@ const htmlContent = `<!DOCTYPE html>
       <div id="daily-bonus-grid" class="daily-grid"></div>
 
       <div id="daily-timer-box" class="daily-timer-box hidden">
-        Следующий бонус через: <strong id="daily-timer-val">00:00:00</strong>
+        <span data-i18n="daily_next_timer">Следующий бонус через:</span> <strong id="daily-timer-val">00:00:00</strong>
       </div>
 
       <div class="menu-btn-stack">
-        <button id="daily-claim-btn" class="menu-btn menu-btn-primary">Забрать награду</button>
-        <button id="daily-double-btn" class="menu-btn menu-btn-purple">🎬 Забрать x2 за рекламу</button>
-        <button id="daily-close-btn" class="menu-btn menu-btn-secondary">Закрыть</button>
+        <button id="daily-claim-btn" class="menu-btn menu-btn-primary" data-i18n="daily_claim_btn">Забрать награду</button>
+        <button id="daily-double-btn" class="menu-btn menu-btn-purple" data-i18n="daily_double_btn">🎬 Забрать x2 за рекламу</button>
+        <button id="daily-close-btn" class="menu-btn menu-btn-secondary" data-i18n="modal_close">Закрыть</button>
       </div>
     </div>
   </div>
@@ -1332,20 +1839,20 @@ const htmlContent = `<!DOCTYPE html>
   <div id="daily-quests-modal" class="modal hidden">
     <div class="modal-card modal-card-quests">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <h2 style="color: #fbbf24; margin: 0;">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+        <h2 style="color: #fbbf24; margin: 0;" data-i18n="quests_title">🎯 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
         <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 13px; margin: 0;">
           <strong id="quests-coins-val">0</strong> 🪙
         </div>
       </div>
-      <p style="margin-bottom: 12px;">Выполняйте испытания дня и получайте монеты!</p>
+      <p style="margin-bottom: 12px;" data-i18n="quests_desc">Выполняйте испытания дня и получайте монеты!</p>
 
       <div class="quest-timer-box">
-        До обновления: <span id="quests-timer-val">00:00:00</span>
+        <span data-i18n="quests_reset_timer">До обновления:</span> <span id="quests-timer-val">00:00:00</span>
       </div>
 
       <div class="quest-summary-card">
         <div class="quest-summary-header">
-          <span>ПРОГРЕСС ДНЯ</span>
+          <span data-i18n="quests_progress_header">ПРОГРЕСС ДНЯ</span>
           <strong id="quests-summary-text">Выполнено 0 из 3</strong>
         </div>
         <div class="quest-progress-bar-bg">
@@ -1359,7 +1866,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="quest-super-info">
           <div class="quest-super-icon">👑</div>
           <div class="quest-super-text">
-            <div class="quest-super-title">СУПЕР-ПРИЗ ДНЯ</div>
+            <div class="quest-super-title" data-i18n="quests_super_title">СУПЕР-ПРИЗ ДНЯ</div>
             <div class="quest-super-desc">Выполните все 3 задания: <strong style="color: #facc15;">+100 🪙</strong></div>
           </div>
         </div>
@@ -1369,30 +1876,30 @@ const htmlContent = `<!DOCTYPE html>
         </div>
       </div>
 
-      <button id="quests-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 14px;">Закрыть</button>
+      <button id="quests-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 14px;" data-i18n="modal_close">Закрыть</button>
     </div>
   </div>
 
   <!-- Экран Game Over -->
   <div id="game-over-modal" class="modal hidden">
     <div class="modal-card">
-      <h2>Игра окончена!</h2>
+      <h2 data-i18n="game_over_title">Игра окончена!</h2>
       <p id="death-reason">Вас сбил автомобиль!</p>
 
       <div class="game-over-score-card">
         <div class="game-over-score-item">
-          <span class="game-over-score-label">СЧЁТ</span>
+          <span class="game-over-score-label" data-i18n="game_over_score">СЧЁТ</span>
           <span id="game-over-score-val" class="game-over-score-num">0</span>
         </div>
         <div class="game-over-score-item">
-          <span class="game-over-score-label">РЕКОРД</span>
+          <span class="game-over-score-label" data-i18n="game_over_best">РЕКОРД</span>
           <span id="game-over-best-val" class="game-over-score-num">0</span>
         </div>
       </div>
 
       <div class="menu-btn-stack">
-        <button id="restart-btn" class="menu-btn menu-btn-primary">Играть снова</button>
-        <button id="to-menu-btn" class="menu-btn menu-btn-secondary">Главное меню</button>
+        <button id="restart-btn" class="menu-btn menu-btn-primary" data-i18n="game_over_restart">Играть снова</button>
+        <button id="to-menu-btn" class="menu-btn menu-btn-secondary" data-i18n="game_over_to_menu">Главное меню</button>
       </div>
     </div>
   </div>

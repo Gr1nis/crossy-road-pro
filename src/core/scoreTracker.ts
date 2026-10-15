@@ -131,6 +131,10 @@ export class ScoreTracker {
     this.evaluateAchievements();
   }
 
+  getStorage(): StorageAdapter | undefined {
+    return this.storage;
+  }
+
   private loadFromStorage(): void {
     if (!this.storage) return;
     try {
@@ -612,4 +616,19 @@ export class ScoreTracker {
     }
     return { success: false, coins: 0, isDouble: false };
   }
+
+  resetAllProgress(): void {
+    this.currentScore = 0;
+    this.highScore = 0;
+    this.bestRow = 0;
+    this.playerRuns = [];
+    this.wallet = new CoinWallet(0);
+    this.inventory = new SkinInventory(['corgi'], 'corgi');
+    this.gacha = new GachaMachine();
+    this.achievements = new AchievementTracker();
+    this.dailyReward = new DailyRewardManager();
+    this.dailyQuests = new DailyQuestTracker(getDailyDateKey());
+    this.saveToStorage();
+  }
 }
+

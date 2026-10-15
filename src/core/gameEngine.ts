@@ -58,6 +58,10 @@ export class GameEngine {
     this.ensureLanesAround(0);
   }
 
+  getStorage(): StorageAdapter | undefined {
+    return this.scoreTracker.getStorage();
+  }
+
   private createInitialPlayer(): PlayerState {
     return {
       row: 0,
@@ -250,6 +254,10 @@ export class GameEngine {
 
   getScoreTracker(): ScoreTracker {
     return this.scoreTracker;
+  }
+
+  resetAllProgress(): void {
+    this.scoreTracker.resetAllProgress();
   }
 
   claimAchievement(id: AchievementId): { success: boolean; rewardCoins: number } {
