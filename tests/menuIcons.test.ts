@@ -23,6 +23,7 @@ describe('Menu Icons & WebP Base64 Asset Suite', () => {
       'play',
       'playButton',
       'currency_widget',
+      'highscore_widget',
     ];
 
     for (const key of requiredKeys) {
@@ -62,6 +63,7 @@ describe('Menu Icons & WebP Base64 Asset Suite', () => {
       'crown.webp',
       'play.webp',
       'currency_widget.webp',
+      'highscore_widget.webp',
     ];
 
     for (const file of files) {

@@ -165,15 +165,13 @@ const htmlContent = `<!DOCTYPE html>
     .main-menu-overlay {
       position: absolute;
       inset: 0;
-      max-width: 480px;
-      margin: 0 auto;
-      left: 50%;
-      transform: translateX(-50%);
       width: 100%;
+      max-width: 100%;
       background: transparent !important;
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
-      pointer-events: none;
+      pointer-events: auto;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -193,8 +191,8 @@ const htmlContent = `<!DOCTYPE html>
       justify-content: space-between;
       align-items: center;
       box-sizing: border-box;
-      padding: 20px 32px;
-      padding-top: max(20px, env(safe-area-inset-top));
+      padding: 24px 32px;
+      padding-top: max(24px, env(safe-area-inset-top));
       padding-right: max(32px, env(safe-area-inset-right));
       padding-left: max(32px, env(safe-area-inset-left));
       pointer-events: none;
@@ -214,154 +212,137 @@ const htmlContent = `<!DOCTYPE html>
     }
     .top-pill {
       pointer-events: auto;
-      background: rgba(255, 255, 255, 0.35);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 2px solid rgba(255, 255, 255, 0.7);
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14), inset 0 2px 3px rgba(255, 255, 255, 0.9);
-      border-radius: 999px;
-      display: flex;
+      position: relative;
+      display: inline-flex;
       align-items: center;
-      padding: 6px 14px;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, box-shadow 0.15s ease;
+      justify-content: center;
+      width: 140px;
+      height: 76px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border-radius: 0;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.12s ease;
       font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      user-select: none;
     }
     .top-pill:hover {
-      transform: scale(1.04);
-      border-color: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18), inset 0 2px 3px rgba(255, 255, 255, 1);
+      transform: scale(1.05);
+      filter: brightness(1.08);
     }
     .top-pill:active {
       transform: translateY(2px) scale(0.96);
     }
+    .top-pill-bg-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+      display: block;
+    }
     .top-pill-coins {
-      gap: 8px;
       cursor: pointer;
     }
-    .top-pill-icon {
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .top-pill-img-coin {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
-      pointer-events: none;
-      transition: transform 0.15s ease;
-    }
-    .top-pill-coins:hover .top-pill-img-coin {
-      transform: rotate(15deg) scale(1.1);
-    }
-    .top-pill-val {
+    .top-pill-coins .top-pill-val {
+      position: absolute;
+      left: 31%;
+      right: 27%;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
       font-size: 19px;
       font-weight: 900;
       color: #0f274a;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
       letter-spacing: -0.01em;
+      pointer-events: none;
     }
     .top-pill-plus {
-      width: 24px;
-      height: 24px;
+      position: absolute;
+      right: 2%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 27%;
+      height: 60%;
       border-radius: 50%;
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #ea580c 100%);
-      border: 2px solid #ffffff;
-      color: #ffffff;
-      font-size: 16px;
-      font-weight: 900;
+      background: transparent;
+      border: none;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(217, 119, 6, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.85);
-      margin-left: 2px;
-      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.12s ease;
+      font-size: 0;
+      color: transparent;
       padding: 0;
       line-height: 1;
       font-family: inherit;
-    }
-    .top-pill-plus:hover {
-      transform: scale(1.15);
-      filter: brightness(1.1);
-    }
-    .top-pill-plus:active {
-      transform: scale(0.92);
+      pointer-events: auto;
     }
     .top-pill-score {
-      gap: 10px;
-      padding: 6px 18px;
-    }
-    .top-pill-crown-box {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%);
-      border: 2px solid #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(202, 138, 4, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.9);
-      flex-shrink: 0;
-    }
-    .top-pill-img-crown {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
-      pointer-events: none;
+      cursor: pointer;
     }
     .top-pill-score-text {
+      position: absolute;
+      left: 36%;
+      right: 6%;
+      top: 50%;
+      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      text-align: left;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+      gap: 1px;
     }
     .top-pill-score-title {
-      font-size: 11px;
-      text-transform: lowercase;
-      letter-spacing: 0.02em;
-      color: #ffffff;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #334155;
       font-weight: 900;
       line-height: 1.1;
-      text-shadow: 0 1px 3px rgba(15, 23, 42, 0.7), 0 0 2px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
     }
     .top-pill-score-line {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 900;
-      color: #fbbf24;
+      color: #0f274a;
       line-height: 1.1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
     }
     .top-pill-score-line strong {
-      color: #fef08a;
+      color: #d97706;
       font-weight: 900;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
     }
     .top-settings-btn {
       pointer-events: auto;
-      width: 42px;
-      height: 42px;
-      border-radius: 15px;
-      background: rgba(255, 255, 255, 0.35);
-      border: 2px solid rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14), inset 0 2px 3px rgba(255, 255, 255, 0.9);
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.12s ease;
       padding: 0;
     }
     .top-settings-btn:hover {
       transform: scale(1.06);
-      border-color: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18), inset 0 2px 3px rgba(255, 255, 255, 1);
+      filter: brightness(1.08);
     }
     .top-settings-btn:active {
       transform: translateY(2px) scale(0.96);
@@ -371,17 +352,15 @@ const htmlContent = `<!DOCTYPE html>
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
+      height: 100%;
     }
     .top-settings-img {
-      width: 32px;
-      height: 32px;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
       pointer-events: none;
-      transition: transform 0.3s ease;
-    }
-    .top-settings-btn:hover .top-settings-img {
-      transform: rotate(35deg);
     }
 
     /* Floating Side Badges */
@@ -389,11 +368,16 @@ const htmlContent = `<!DOCTYPE html>
       position: absolute;
       top: max(100px, calc(env(safe-area-inset-top) + 80px));
       left: max(32px, env(safe-area-inset-left));
-      right: max(32px, env(safe-area-inset-right));
       display: flex;
-      justify-content: space-between;
+      gap: 16px;
       pointer-events: none;
       z-index: 6;
+    }
+    .floating-widgets-left,
+    .floating-widget-left {
+      display: flex;
+      gap: 16px;
+      pointer-events: none;
     }
     .floating-widget-btn {
       pointer-events: auto;
@@ -417,42 +401,30 @@ const htmlContent = `<!DOCTYPE html>
     .floating-widget-icon-box {
       width: 64px;
       height: 64px;
-      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      background: rgba(255, 255, 255, 0.35);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 2px solid rgba(255, 255, 255, 0.65);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.9);
-      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      transition: transform 0.15s ease, filter 0.15s ease;
       overflow: visible;
-    }
-    .floating-widget-icon-box::before {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 6px;
-      right: 6px;
-      height: 38%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.06) 100%);
-      border-radius: 999px;
-      pointer-events: none;
-      z-index: 1;
     }
     .floating-widget-icon-box.gift-box,
     .floating-widget-icon-box.quest-box {
-      background: rgba(255, 255, 255, 0.35);
-      border: 2px solid rgba(255, 255, 255, 0.65);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
     }
     .floating-widget-img {
-      width: 44px;
-      height: 44px;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
       position: relative;
       z-index: 2;
       pointer-events: none;
@@ -556,46 +528,36 @@ const htmlContent = `<!DOCTYPE html>
     .dock-btn-inner {
       width: 64px;
       height: 64px;
-      border-radius: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      background: linear-gradient(180deg, #2dd4bf 0%, #06b6d4 55%, #0891b2 100%);
-      border: 2px solid #a5f3fc;
-      box-shadow: 0 5px 0 #0e7490, 0 10px 18px rgba(0, 0, 0, 0.28), inset 0 2px 3px rgba(255, 255, 255, 0.85);
-      transition: box-shadow 0.12s ease, transform 0.12s ease, filter 0.12s ease;
-      overflow: hidden;
-    }
-    .dock-btn-inner::before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 5px;
-      right: 5px;
-      height: 38%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.08) 100%);
-      border-radius: 999px;
-      pointer-events: none;
-      z-index: 1;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      transition: transform 0.12s ease, filter 0.12s ease;
+      overflow: visible;
     }
     .dock-btn-teal .dock-btn-inner {
-      background: linear-gradient(180deg, #2dd4bf 0%, #06b6d4 55%, #0891b2 100%);
-      border: 2px solid #a5f3fc;
-      box-shadow: 0 5px 0 #0e7490, 0 10px 18px rgba(0, 0, 0, 0.28), inset 0 2px 3px rgba(255, 255, 255, 0.85);
+      background: transparent;
+      border: none;
+      box-shadow: none;
     }
     .dock-btn:hover .dock-btn-inner {
-      filter: brightness(1.08);
+      transform: scale(1.06);
+      filter: brightness(1.1);
     }
     .dock-btn:active .dock-btn-inner {
-      transform: translateY(3px);
-      box-shadow: 0 2px 0 #0e7490, 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+      transform: translateY(3px) scale(0.96);
+      box-shadow: none;
     }
     .dock-btn-img {
-      width: 44px;
-      height: 44px;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
       position: relative;
       z-index: 2;
       pointer-events: none;
@@ -633,95 +595,45 @@ const htmlContent = `<!DOCTYPE html>
       pointer-events: none;
     }
 
-    /* Giant 3D Green PLAY Button */
-    .hero-play-btn {
-      pointer-events: auto;
+    /* Tap to Play Central Prompt */
+    .tap-to-play-prompt {
       position: absolute;
+      bottom: max(32px, calc(env(safe-area-inset-bottom) + 32px));
       left: 50%;
       transform: translateX(-50%);
-      bottom: 0;
-      width: 280px;
-      height: 96px;
-      border-radius: 32px;
-      background: linear-gradient(180deg, #4ade80 0%, #22c55e 55%, #16a34a 100%);
-      border: 3px solid #86efac;
-      box-shadow: 0 8px 0 #15803d, 0 12px 20px rgba(0, 0, 0, 0.3), inset 0 3px 3px rgba(255, 255, 255, 0.7);
-      cursor: pointer;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease, filter 0.12s ease;
-      margin: 0 0 24px 0;
-      padding: 0;
+      pointer-events: none;
       z-index: 10;
-      font-family: inherit;
-    }
-    .hero-play-btn:hover {
-      filter: brightness(1.08);
-      transform: translateX(-50%) scale(1.04);
-      box-shadow: 0 10px 0 #15803d, 0 16px 26px rgba(22, 163, 74, 0.45), inset 0 3px 3px rgba(255, 255, 255, 0.85);
-    }
-    .hero-play-btn:active {
-      transform: translateX(-50%) translateY(4px) scale(0.96);
-      box-shadow: 0 4px 0 #15803d, 0 6px 12px rgba(0, 0, 0, 0.25), inset 0 2px 2px rgba(255, 255, 255, 0.6);
-    }
-    .hero-play-sheen {
-      position: absolute;
-      top: 4px;
-      left: 14px;
-      right: 14px;
-      height: 38%;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.1) 100%);
-      pointer-events: none;
-      z-index: 1;
-    }
-    .hero-play-sheen-diag {
-      position: absolute;
-      top: -60%;
-      left: -120%;
-      width: 60%;
-      height: 220%;
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.5) 50%,
-        rgba(255, 255, 255, 100%
-      );
-      transform: skewX(-25deg);
-      animation: heroPlaySheenDiag 2.8s infinite ease-in-out;
-      pointer-events: none;
-      z-index: 2;
-    }
-    @keyframes heroPlaySheenDiag {
-      0% { left: -120%; }
-      35%, 100% { left: 220%; }
-    }
-    .hero-play-text {
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: 0.02em;
-      color: #ffffff;
-      text-shadow: 0 3px 0 #15803d, 0 6px 14px rgba(0, 0, 0, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      position: relative;
-      z-index: 3;
-      pointer-events: none;
+      padding: 10px 24px;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      color: #ffffff;
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+      animation: tapPromptPulse 2s ease-in-out infinite;
+      white-space: nowrap;
     }
-    .hero-play-img {
-      height: 44px;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    }
-    .hero-play-arrow {
-      font-size: 26px;
-      margin-left: 2px;
-      text-shadow: 0 3px 0 #15803d, 0 6px 14px rgba(0, 0, 0, 0.35);
+    @keyframes tapPromptPulse {
+      0%, 100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.88;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      }
+      50% {
+        transform: translateX(-50%) scale(1.05);
+        opacity: 1;
+        box-shadow: 0 8px 26px rgba(56, 189, 248, 0.45);
+        border-color: rgba(56, 189, 248, 0.65);
+      }
     }
 
     .modal-card { background: #1e293b; border: 2px solid #334155; border-radius: 24px; padding: 36px 40px; text-align: center; color: #f8fafc; max-width: 460px; width: 90%; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); position: relative; }
@@ -1077,23 +989,23 @@ const htmlContent = `<!DOCTYPE html>
         padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
       }
       .menu-top-left { gap: 6px; }
-      .top-pill { padding: 5px 10px; border-width: 2px; }
-      .top-pill-img-coin { width: 22px; height: 22px; }
-      .top-pill-val { font-size: 16px; }
-      .top-pill-score { padding: 5px 12px; gap: 6px; }
-      .top-pill-crown-box { width: 24px; height: 24px; }
-      .top-pill-img-crown { width: 16px; height: 16px; }
-      .top-pill-score-title { font-size: 9px; }
-      .top-pill-score-line { font-size: 12px; }
-      .top-settings-btn { width: 38px; height: 38px; border-radius: 13px; border-width: 2px; }
-      .top-settings-img { width: 24px; height: 24px; }
+      .top-pill { width: 106px; height: 58px; }
+      .top-pill-coins .top-pill-val { font-size: 15px; }
+      .top-pill-score-title { font-size: 8px; }
+      .top-pill-score-line { font-size: 11px; }
+      .top-settings-btn { width: 42px; height: 42px; background: transparent; border: none; box-shadow: none; backdrop-filter: none; }
+      .top-settings-img { width: 100%; height: 100%; }
       .menu-side-widgets {
         top: max(100px, calc(env(safe-area-inset-top) + 80px));
         left: max(16px, env(safe-area-inset-left));
-        right: max(16px, env(safe-area-inset-right));
+        gap: 10px;
       }
-      .floating-widget-icon-box { width: 52px; height: 52px; border-radius: 16px; border-width: 2px; }
-      .floating-widget-img { width: 36px; height: 36px; }
+      .floating-widgets-left,
+      .floating-widget-left {
+        gap: 10px;
+      }
+      .floating-widget-icon-box { width: 52px; height: 52px; background: transparent; border: none; box-shadow: none; }
+      .floating-widget-img { width: 100%; height: 100%; }
       .floating-widget-label { font-size: 11px; }
       .floating-widget-alert-badge { width: 22px; height: 22px; font-size: 12px; top: -5px; right: -5px; border-width: 2px; }
       .floating-widget-count-badge { min-width: 22px; height: 22px; font-size: 10px; padding: 0 5px; top: -5px; right: -5px; border-width: 2px; }
@@ -1122,17 +1034,17 @@ const htmlContent = `<!DOCTYPE html>
       .dock-btn-inner {
         width: 48px;
         height: 48px;
-        border-radius: 16px;
-        border-width: 2px;
-        box-shadow: 0 4px 0 #0e7490, 0 8px 14px rgba(0, 0, 0, 0.25), inset 0 2px 2px rgba(255, 255, 255, 0.8);
+        background: transparent;
+        border: none;
+        box-shadow: none;
       }
       .dock-btn:active .dock-btn-inner {
-        box-shadow: 0 2px 0 #0e7490, 0 4px 6px rgba(0, 0, 0, 0.2);
-        transform: translateY(2px);
+        box-shadow: none;
+        transform: translateY(2px) scale(0.96);
       }
       .dock-btn-img {
-        width: 32px;
-        height: 32px;
+        width: 100%;
+        height: 100%;
       }
       .dock-btn-label {
         font-size: 11px;
@@ -1145,38 +1057,11 @@ const htmlContent = `<!DOCTYPE html>
         min-width: 18px;
         height: 18px;
       }
-      .hero-play-btn {
-        position: static;
-        transform: none;
-        flex: 1;
-        width: auto;
-        min-width: 130px;
-        max-width: 220px;
-        height: 88px;
-        margin: 0 0 22px 0;
-        border-radius: 30px;
-        border-width: 3px;
-        box-shadow: 0 7px 0 #15803d, 0 14px 24px rgba(22, 163, 74, 0.4), inset 0 3px 2px rgba(255, 255, 255, 0.9);
-      }
-      .hero-play-btn:hover {
-        transform: scale(1.03);
-        box-shadow: 0 9px 0 #15803d, 0 18px 28px rgba(22, 163, 74, 0.45), inset 0 3px 2px rgba(255, 255, 255, 0.9);
-      }
-      .hero-play-btn:active {
-        transform: translateY(4px) scale(0.96);
-        box-shadow: 0 3px 0 #15803d, 0 6px 12px rgba(22, 163, 74, 0.3), inset 0 2px 1px rgba(255, 255, 255, 0.7);
-      }
-      .hero-play-text {
-        font-size: 32px;
-        gap: 8px;
-        text-shadow: 0 2.5px 0 #15803d, 0 5px 10px rgba(0, 0, 0, 0.35);
-      }
-      .hero-play-img {
-        height: 36px;
-      }
-      .hero-play-arrow {
-        font-size: 20px;
-        text-shadow: 0 2.5px 0 #15803d, 0 5px 10px rgba(0, 0, 0, 0.35);
+      .tap-to-play-prompt {
+        bottom: max(22px, calc(env(safe-area-inset-bottom) + 22px));
+        padding: 7px 16px;
+        font-size: 12px;
+        letter-spacing: 0.06em;
       }
       #menu-dev-btn {
         bottom: max(165px, calc(env(safe-area-inset-bottom) + 165px)) !important;
@@ -1217,14 +1102,14 @@ const htmlContent = `<!DOCTYPE html>
       <div class="menu-top-left">
         <!-- Монеты -->
         <div id="menu-coins-pill" class="top-pill top-pill-coins" title="Баланс монет">
-          <span class="top-pill-icon"><img src="${MENU_ICONS.coin}" class="top-pill-img-coin" alt="Coins" /></span>
+          <img src="${MENU_ICONS.currency_widget}" class="top-pill-bg-img" alt="Coins" />
           <span id="menu-coins" class="top-pill-val">0</span>
-          <button id="menu-coins-plus-btn" class="top-pill-plus" title="Пополнить / Магазин">+</button>
+          <button id="menu-coins-plus-btn" class="top-pill-plus" title="Пополнить / Магазин" aria-label="Пополнить">+</button>
         </div>
 
         <!-- Рекорд -->
-        <div class="top-pill top-pill-score" title="Ваш рекорд">
-          <div class="top-pill-crown-box"><img src="${MENU_ICONS.crown}" class="top-pill-img-crown" alt="Best" /></div>
+        <div id="menu-score-pill" class="top-pill top-pill-score" title="Ваш рекорд">
+          <img src="${MENU_ICONS.highscore_widget}" class="top-pill-bg-img" alt="Best" />
           <div class="top-pill-score-text">
             <span class="top-pill-score-title">high score</span>
             <span class="top-pill-score-line">BEST: <strong id="menu-high-score">0</strong></span>
@@ -1242,8 +1127,8 @@ const htmlContent = `<!DOCTYPE html>
 
     <!-- Боковые плавающие виджеты наград (Floating Side Widgets) -->
     <div class="menu-side-widgets">
-      <!-- Левый виджет: Ежедневный подарок -->
-      <div class="floating-widget-left">
+      <!-- Виджеты слева: Ежедневный подарок и Задания дня -->
+      <div class="floating-widgets-left floating-widget-left">
         <button id="menu-daily-btn" class="floating-widget-btn" title="Ежедневный бонус">
           <div class="floating-widget-icon-box gift-box">
             <img src="${MENU_ICONS.daily_gift}" class="floating-widget-img" alt="Daily Gift" />
@@ -1251,10 +1136,7 @@ const htmlContent = `<!DOCTYPE html>
           </div>
           <span class="floating-widget-label">Daily Gift</span>
         </button>
-      </div>
 
-      <!-- Правый виджет: Задания дня -->
-      <div class="floating-widget-right">
         <button id="menu-daily-quests-btn" class="floating-widget-btn" title="Задания дня">
           <div class="floating-widget-icon-box quest-box">
             <img src="${MENU_ICONS.daily_quests}" class="floating-widget-img" alt="Quests" />
@@ -1264,6 +1146,9 @@ const htmlContent = `<!DOCTYPE html>
         </button>
       </div>
     </div>
+
+    <!-- Подсказка Нажмите для старта (Tap to Play Prompt) -->
+    <div class="tap-to-play-prompt">НАЖМИТЕ ДЛЯ СТАРТА</div>
 
     <!-- Нижняя навигационная панель (Bottom Hero Dock) -->
     <div class="menu-bottom-dock">
@@ -1283,13 +1168,6 @@ const htmlContent = `<!DOCTYPE html>
           <span style="display: none;">🎰 Автомат скинов</span>
         </button>
       </div>
-
-      <!-- Центральная гигантская кнопка ИГРАТЬ (Hero PLAY Button) -->
-      <button id="menu-play-btn" class="hero-play-btn" title="Начать игру">
-        <div class="hero-play-sheen"></div>
-        <div class="hero-play-sheen-diag"></div>
-        <span class="hero-play-text">PLAY <span class="hero-play-arrow">▶</span></span>
-      </button>
 
       <!-- Правая колонка кнопок (Лидерборд и Достижения) -->
       <div class="dock-col dock-col-right">

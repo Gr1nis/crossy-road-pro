@@ -153,7 +153,6 @@ export class SceneManager {
   private decorManager: InstancedDecorManager;
   private isMenuMode: boolean = true;
   private menuFactor: number = 1.0;
-  private menuCoins: THREE.Group[] = [];
   private lastCameraZoom: number = 1.0;
   private gameplayTop: number = 10.0;
   private gameplayBottom: number = -5.0;
@@ -235,15 +234,6 @@ export class SceneManager {
 
     this.playerMesh = MeshFactory.createCharacter('corgi');
     this.scene.add(this.playerMesh);
-
-    // Decorative spinning coins for 3D Main Menu
-    const coinLeft = MeshFactory.createCoin();
-    coinLeft.position.set(-1.3, 0.45, 0);
-    this.scene.add(coinLeft);
-    const coinRight = MeshFactory.createCoin();
-    coinRight.position.set(1.3, 0.45, 0);
-    this.scene.add(coinRight);
-    this.menuCoins = [coinLeft, coinRight];
 
     this.decorManager = new InstancedDecorManager();
     this.scene.add(this.decorManager.group);
@@ -904,19 +894,6 @@ export class SceneManager {
       this.playerMesh.scale.set(1, 1, 1);
     }
 
-    // Animate decorative 3D menu coins
-    for (let i = 0; i < this.menuCoins.length; i++) {
-      const coin = this.menuCoins[i];
-      if (this.menuFactor > 0.01) {
-        coin.visible = true;
-        coin.rotation.y = nowSec * 2.5;
-        coin.position.y = 0.45 + Math.sin(nowSec * 3.0 + i) * 0.08;
-        coin.scale.setScalar(this.menuFactor);
-      } else {
-        coin.visible = false;
-      }
-    }
-
     const camZ = engine.getCameraZ();
     this.updateParticles(dt);
     this.updateAmbientParticles(dt, currentBiome, camZ, nowSec);
@@ -1040,11 +1017,6 @@ export class SceneManager {
     this.particles = [];
     this.landingBounceTimer = 0;
     this.landingBounceElapsed = 0;
-
-    for (let i = 0; i < this.menuCoins.length; i++) {
-      const coin = this.menuCoins[i];
-      coin.position.set(i === 0 ? -1.3 : 1.3, 0.45, 0);
-    }
 
     if (this.playerMesh) {
       this.playerMesh.scale.set(1, 1, 1);

@@ -205,39 +205,48 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;const MoveDirection = {
+}         ;
+const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;const DeathReason = {
+}         ;
+const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;const DEFAULT_SKIN_ID         = 'corgi';const ALL_SKINS                                                             = [
+}         ;
+const DEFAULT_SKIN_ID         = 'corgi';
+const ALL_SKINS                                                             = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
   { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
-];const Biome = {
+];
+const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
   DESERT: 'desert',
   NEON: 'neon',
-}         ;const BIOME_ORDER                           = [
+}         ;
+const BIOME_ORDER                           = [
   Biome.FOREST,
   Biome.WINTER,
   Biome.DESERT,
   Biome.NEON,
-];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
+];
+const BIOME_INTERVAL = 25;
+function getBiomeForScore(score        )            {
   const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
   const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
   return BIOME_ORDER[biomeIndex];
-}const WORLD_CONFIG = {
+}
+const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -267,7 +276,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}function findSupportingLog(playerX        , logs               )                     {
+}
+function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -280,16 +290,19 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
  * relative to the center of the log, so the character cleanly magnets to a log section.
- */function snapToLogSlot(landingX        , log             )         {
+ */
+function snapToLogSlot(landingX        , log             )         {
   const rel = landingX - log.x;
   // Discrete 1.0-spaced slots centered on log
   const snappedRel = Math.round(rel);
   const maxRel = Math.max(0, (log.length - 1.0) / 2);
   const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
   return log.x + clampedRel;
-}function isOutOfBoundsX(playerX        )          {
+}
+function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}function quantizeLandX(x        )         {
+}
+function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -297,11 +310,15 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */function worldToScreenX(x        )         {
+ */
+function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
-}function vehicleScreenRotationY(speed        )         {
+}
+function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
-}const RECORD_FLAG_X = 3.8;function getRecordFlagPosition(
+}
+const RECORD_FLAG_X = 3.8;
+function getRecordFlagPosition(
   highScore        ,
   shoulderX         = RECORD_FLAG_X
 )                            {
@@ -312,14 +329,16 @@ function checkVehicleCollision(playerX        , vehicles           )            
     x: shoulderX,
     row: Math.floor(highScore),
   };
-}const CAMERA_CONFIG = {
+}
+const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
   DESKTOP_VIEW_HEIGHT: 12.5,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
   FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
-}         ;function getCameraFrustumDimensions(aspect         = 9 / 16)   
+}         ;
+function getCameraFrustumDimensions(aspect         = 9 / 16)   
                      
                     
                  
@@ -341,7 +360,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
  * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
  * of the player character under the isometric orthographic camera.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
- */function getCameraFrustumNdcY(
+ */
+function getCameraFrustumNdcY(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -364,7 +384,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Returns true when the player touches or crosses below the visible
  * bottom edge of the screen (NDC Y < -0.98).
- */function isPlayerBehindCameraFrustum(
+ */
+function isPlayerBehindCameraFrustum(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -430,7 +451,8 @@ const VOXEL_PALETTE = {
   concreteGrey: 0x64748b,
   goldCoin: 0xfacc15,
   rubyRed: 0xb91c1c,
-}         ;class VoxelPalette {
+}         ;
+class VoxelPalette {
           static          geoCache = new Map                           ();
           static          matCache = new Map                                   ();
           static          basicMatCache = new Map                                 ();
@@ -508,18 +530,21 @@ for (const [w, h, d] of voxelStandardSizes) {
 for (const key of Object.keys(VOXEL_PALETTE)                   ) {
   VoxelPalette.getMaterial(key, false);
 }
-VoxelPalette.getGhostMaterial();function createVoxelMaterial(
+VoxelPalette.getGhostMaterial();
+function createVoxelMaterial(
   colorKey                        ,
   isGhost = false
 )                            {
   return VoxelPalette.getMaterial(colorKey, isGhost);
-}function createVoxelBasicMaterial(
+}
+function createVoxelBasicMaterial(
   color        ,
   transparent = false,
   opacity = 1.0
 )                          {
   return VoxelPalette.getBasicMaterial(color, transparent, opacity);
-}function createVoxelMesh(
+}
+function createVoxelMesh(
   w        ,
   h        ,
   d        ,
@@ -552,7 +577,8 @@ function addCharVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+}
+function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
   const group = new THREE.Group();
 
   if (skinId === 'corgi') {
@@ -795,7 +821,8 @@ function addCharVoxel(
 /**
  * VoxelMeshBuilder — Compiles multi-cube voxel structures into a single
  * monolithic BufferGeometry mesh with vertex colors, drastically reducing Draw Calls.
- */class VoxelMeshBuilder {
+ */
+class VoxelMeshBuilder {
                    boxes                                                                  = [];
           static          geoCache = new Map                              ();
           static sharedLambertMaterial                                   = null;
@@ -1669,7 +1696,8 @@ function buildPallet(length        )                   {
   }
 
   return specs;
-}function createUrbanVehicle(
+}
+function createUrbanVehicle(
   vOrType                                                           ,
   speed         ,
   colorOverride         
@@ -1716,7 +1744,8 @@ function buildPallet(length        )                   {
   group.add(mesh);
   group.rotation.y = vehicleScreenRotationY(spd);
   return group;
-}function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+}
+function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
   const group = new THREE.Group();
   const mesh = VoxelMeshBuilder.buildCachedMesh('train', (builder) => {
     const specs = buildTrain();
@@ -1729,7 +1758,8 @@ function buildPallet(length        )                   {
   const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
   group.rotation.y = vehicleScreenRotationY(actualSpeed);
   return group;
-}function createUrbanPallet(log             )              {
+}
+function createUrbanPallet(log             )              {
   const group = new THREE.Group();
   const key = `pallet_${log.length.toFixed(2)}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
@@ -1744,7 +1774,8 @@ function buildPallet(length        )                   {
 }
 
 // --- Module: src/view/urbanEnvironment.ts ---
-/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */function createUrbanHydrant()              {
+/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */
+function createUrbanHydrant()              {
   const group = new THREE.Group();
   const redMat = createVoxelMaterial(0xef4444);
   const silverMat = createVoxelMaterial(0xcbd5e1);
@@ -1767,7 +1798,8 @@ function buildPallet(length        )                   {
   return group;
 }
 
-/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */function createUrbanTrashCan()              {
+/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */
+function createUrbanTrashCan()              {
   const group = new THREE.Group();
   const greenMat = createVoxelMaterial(0x15803d);
   const darkMat = createVoxelMaterial(0x1e293b);
@@ -1789,7 +1821,8 @@ function buildPallet(length        )                   {
   return group;
 }
 
-/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */function createUrbanBench()              {
+/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */
+function createUrbanBench()              {
   const group = new THREE.Group();
   const woodMat = createVoxelMaterial(0x854d0e);
   const ironMat = createVoxelMaterial(0x1e293b);
@@ -1813,7 +1846,8 @@ function buildPallet(length        )                   {
   return group;
 }
 
-/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */function createUrbanLampPost()              {
+/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */
+function createUrbanLampPost()              {
   const group = new THREE.Group();
   const ironMat = createVoxelMaterial(0x0f172a);
   const glowMat = createVoxelBasicMaterial(0xfef08a);
@@ -1832,7 +1866,8 @@ function buildPallet(length        )                   {
   return group;
 }
 
-/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
+/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */
+function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
   const boxMat = createVoxelMaterial(0x78350f);
@@ -1862,7 +1897,8 @@ function buildPallet(length        )                   {
   return group;
 }
 
-/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */function createUrbanHedge(seedVariant        , biome            = 'forest')              {
+/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */
+function createUrbanHedge(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
   const hedgeColor =
@@ -1885,7 +1921,8 @@ function buildPallet(length        )                   {
   return group;
 }
 
-/** Obstacle Dispatcher */function createUrbanObstacle(
+/** Obstacle Dispatcher */
+function createUrbanObstacle(
   kind              ,
   seedVariant        ,
   biomeOrSnow                      = false
@@ -1907,14 +1944,16 @@ function buildPallet(length        )                   {
   return absSeed % 5 < 3
     ? createUrbanTreePlanter(absSeed, biome)
     : createUrbanLampPost();
-}function createUrbanCoin()              {
+}
+function createUrbanCoin()              {
   const group = new THREE.Group();
   const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
   const innerMat = createVoxelMaterial(0xef4444);
   group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
   group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
   return group;
-}function createUrbanRailwaySignal()                                                {
+}
+function createUrbanRailwaySignal()                                                {
   const group = new THREE.Group();
   const poleMat = createVoxelMaterial(0x1e293b);
   const lightMat = createVoxelBasicMaterial(0x334155);
@@ -1923,13 +1962,15 @@ function buildPallet(length        )                   {
   const lightMesh = createVoxelMesh(0.22, 0.16, 0.28, lightMat, 0, 1.22, 0, false, false);
   group.add(lightMesh);
   return { group, lightMesh };
-}function createUrbanRoadMarkings()              {
+}
+function createUrbanRoadMarkings()              {
   const group = new THREE.Group();
   const whiteLineMat = createVoxelBasicMaterial(0xf8fafc);
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(-9.5), 0.015, 0, false, false));
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(9.5), 0.015, 0, false, false));
   return group;
-}function createUrbanRoadBarrier(biome            = 'forest')              {
+}
+function createUrbanRoadBarrier(biome            = 'forest')              {
   const group = new THREE.Group();
   const postColor = biome === 'neon' ? 0x1e1b4b : biome === 'winter' ? 0x475569 : 0x64748b;
   const railColor = biome === 'neon' ? 0x06b6d4 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
@@ -1944,7 +1985,8 @@ function buildPallet(length        )                   {
   group.add(createVoxelMesh(0.14, 0.18, 0.96, railMat, 0, 0.28, 0));
   group.add(createVoxelMesh(0.15, 0.08, 0.18, reflectorMat, 0, 0.28, 0, false, false));
   return group;
-}function createUrbanRiverbankEdge(
+}
+function createUrbanRiverbankEdge(
   side                  ,
   biome            = 'forest'
 )              {
@@ -1963,7 +2005,8 @@ function buildPallet(length        )                   {
   group.add(createVoxelMesh(0.36, 0.22, 0.32, rockMat, bx, 0.07, 0.2));
   group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
   return group;
-}function createUrbanRecordFlag()              {
+}
+function createUrbanRecordFlag()              {
   const group = new THREE.Group();
   group.name = 'recordFlag';
 
@@ -2000,9 +2043,12 @@ function buildPallet(length        )                   {
 
   group.add(clothGroup);
   return group;
-}const createUrbanTree = (seedVariant        , biome                      )              =>
-  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);const createUrbanRock = (seedVariant        , _biome            )              =>
-  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();const createUrbanBush = (seedVariant        , biome                      )              =>
+}
+const createUrbanTree = (seedVariant        , biome                      )              =>
+  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
+const createUrbanRock = (seedVariant        , _biome            )              =>
+  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+const createUrbanBush = (seedVariant        , biome                      )              =>
   Math.abs(seedVariant) % 2 === 0
     ? createUrbanBench()
     : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
@@ -2012,7 +2058,8 @@ function buildPallet(length        )                   {
  * Books Shopfront Modeler for Townhouse C (Green Books Store).
  * Strictly complies with docs/VOXEL_GRID_SPECIFICATION.md (VOXEL_UNIT = 0.05).
  * All dimensions (w, h, d) and coordinates (x, y, z) are exact multiples of 0.05.
- */function buildBooksShopfront(b                  , isWinter         )       {
+ */
+function buildBooksShopfront(b                  , isWinter         )       {
   // Palettes (docs/VOXEL_GRID_SPECIFICATION.md §4)
   const cBasalt = 0x334155;    // Slate plinth, brackets, steps, metal
   const cEmerald = 0x15803d;   // Ground floor facade wall
@@ -2199,7 +2246,8 @@ function buildPallet(length        )                   {
 /**
  * Townhouse C (Books): Upper floors, quoins, cornices, windows, downspout and winter snow layer.
  * Strictly adheres to docs/VOXEL_GRID_SPECIFICATION.md (VOXEL_UNIT = 0.05).
- */function buildBooksUpperFloors(b                  , isWinter         )       {
+ */
+function buildBooksUpperFloors(b                  , isWinter         )       {
   // Color palette constants
   const cLimestone = 0xdcfce7; // Известняк (карнизы, рустовка, наличники, сандрики)
   const cWall = 0x15803d;      // Изумрудные стены книжного таунхауса
@@ -2299,7 +2347,8 @@ function buildPallet(length        )                   {
  * Books Roof & Chimney Modeler for Townhouse C (Green Books Store).
  * Strictly complies with docs/VOXEL_GRID_SPECIFICATION.md (VOXEL_UNIT = 0.05).
  * All dimensions (w, h, d) and coordinates (x, y, z) are exact multiples of 0.05.
- */function buildBooksRoof(b                  , isWinter         )       {
+ */
+function buildBooksRoof(b                  , isWinter         )       {
   // Palettes (docs/VOXEL_GRID_SPECIFICATION.md §4)
   const cTileLight = 0xc2410c;    // Терракотовая черепица (светлый ярус / оголовки)
   const cTileDark = 0x9a3412;     // Темная обожженная терракота
@@ -2724,7 +2773,8 @@ function populateBooksBuilder(builder                  , isWinter         )     
   buildBooksRoof(builder, isWinter);
 }
 
-/** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */function createTownhouseA(isWinter = false)              {
+/** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */
+function createTownhouseA(isWinter = false)              {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_a_winter' : 'townhouse_a';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
@@ -2734,7 +2784,8 @@ function populateBooksBuilder(builder                  , isWinter         )     
   return group;
 }
 
-/** Townhouse B: Red Brick Bakery (Ref: 12_townhouse_bakery_turnaround.jpg / 22_winter_brick_bakery_turnaround.jpg) */function createTownhouseB(isWinter = false)              {
+/** Townhouse B: Red Brick Bakery (Ref: 12_townhouse_bakery_turnaround.jpg / 22_winter_brick_bakery_turnaround.jpg) */
+function createTownhouseB(isWinter = false)              {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_b_winter' : 'townhouse_b';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
@@ -2744,7 +2795,8 @@ function populateBooksBuilder(builder                  , isWinter         )     
   return group;
 }
 
-/** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */function createTownhouseC(isWinter = false)              {
+/** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */
+function createTownhouseC(isWinter = false)              {
   const group = new THREE.Group();
   const key = isWinter ? 'townhouse_c_winter' : 'townhouse_c';
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
@@ -2752,7 +2804,8 @@ function populateBooksBuilder(builder                  , isWinter         )     
   });
   group.add(mesh);
   return group;
-}function createUrbanTownhouse(seed        , biome            = 'forest')              {
+}
+function createUrbanTownhouse(seed        , biome            = 'forest')              {
   const root = new THREE.Group();
   root.name = 'urbanTownhouse';
   const variant = Math.abs(seed) % 3;
@@ -2864,7 +2917,8 @@ const SKIN_DESCRIPTIONS                         = {
   box_cat: 'Рыжий котик в посылочной коробке со штампом "FRAGILE / DELIVERY", свесивший лапки через бортик.',
   raccoon_bandit: 'Городской енот-воришка в чёрной бандитской маске с кольчатым хвостом и холщовым мешком за спиной.',
   capybara_zen: 'Умиротворённая дзен-капибара в медитативной позе со спелым воксельным мандарином на голове.',
-};function getCharacterModelItems()                     {
+};
+function getCharacterModelItems()                     {
   return ALL_SKINS.map((skin) => ({
     id: skin.id,
     name: skin.name,
@@ -2873,7 +2927,8 @@ const SKIN_DESCRIPTIONS                         = {
     desc: SKIN_DESCRIPTIONS[skin.id] ?? `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
     create: (_biome            = 'forest', isGhost = false) => createUrbanCharacter(skin.id, isGhost),
   }));
-}function getVehicleModelItems()                     {
+}
+function getVehicleModelItems()                     {
   return [
     {
       id: 'taxi',
@@ -2924,7 +2979,8 @@ const SKIN_DESCRIPTIONS                         = {
       create: () => createUrbanPallet({ id: 1, x: 0, length: 2.4, speed: 1 }),
     },
   ];
-}function getPropModelItems()                     {
+}
+function getPropModelItems()                     {
   return [
     {
       id: 'hydrant',
@@ -3007,7 +3063,8 @@ const SKIN_DESCRIPTIONS                         = {
       create: (b            = 'forest') => createUrbanRiverbankEdge('left', b),
     },
   ];
-}function getNatureModelItems()                     {
+}
+function getNatureModelItems()                     {
   return [
     {
       id: 'tree_planter_0',
@@ -3034,7 +3091,8 @@ const SKIN_DESCRIPTIONS                         = {
       create: (b            = 'forest') => createUrbanHedge(0, b),
     },
   ];
-}function getBuildingModelItems()                     {
+}
+function getBuildingModelItems()                     {
   return [
     {
       id: 'townhouse_cafe',
@@ -3061,7 +3119,8 @@ const SKIN_DESCRIPTIONS                         = {
       create: (b            = 'forest') => createTownhouseC(b === 'winter'),
     },
   ];
-}function getModelCatalog()                     {
+}
+function getModelCatalog()                     {
   return [
     ...getCharacterModelItems(),
     ...getVehicleModelItems(),
@@ -3069,7 +3128,8 @@ const SKIN_DESCRIPTIONS                         = {
     ...getNatureModelItems(),
     ...getBuildingModelItems(),
   ];
-}function getModelDiagnostics(group             )                                      {
+}
+function getModelDiagnostics(group             )                                      {
   let meshCount = 0;
   group.traverse((c) => {
     if ((c              ).isMesh) {
@@ -3082,7 +3142,8 @@ const SKIN_DESCRIPTIONS                         = {
   const h = Math.max(0.01, box.max.y - box.min.y).toFixed(2);
   const d = Math.max(0.01, box.max.z - box.min.z).toFixed(2);
   return { meshCount, dims: `${w} × ${h} × ${d}` };
-}function verifyModelRegistry()   
+}
+function verifyModelRegistry()   
                 
                                            
                    

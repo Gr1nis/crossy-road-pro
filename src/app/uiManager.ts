@@ -265,6 +265,20 @@ export class UIManager {
     document.getElementById('menu-skins-btn')?.addEventListener('click', () => this.openGacha());
     document.getElementById('menu-coins-plus-btn')?.addEventListener('click', () => this.openGacha());
     document.getElementById('menu-coins-pill')?.addEventListener('click', () => this.openGacha());
+    const stopBubble = (e: Event) => e.stopPropagation();
+    this.menuDailyBtn?.addEventListener('click', stopBubble);
+    this.menuDailyQuestsBtn?.addEventListener('click', stopBubble);
+    this.menuDevBtn?.addEventListener('click', stopBubble);
+    this.menuAchievementsBtn?.addEventListener('click', stopBubble);
+    this.menuGachaBtn?.addEventListener('click', stopBubble);
+    this.menuLeaderboardBtn?.addEventListener('click', stopBubble);
+    this.menuSettingsBtn?.addEventListener('click', stopBubble);
+    document.getElementById('menu-skins-btn')?.addEventListener('click', stopBubble);
+    document.getElementById('menu-coins-plus-btn')?.addEventListener('click', stopBubble);
+    document.getElementById('menu-score-pill')?.addEventListener('click', stopBubble);
+    if (typeof document.querySelector === 'function') {
+      document.querySelector('.top-pill-score')?.addEventListener('click', stopBubble);
+    }
     this.pauseSettingsBtn?.addEventListener('click', () => {
       this.closePause();
       this.openSettings('pause');
@@ -829,6 +843,22 @@ export class UIManager {
   }
 
   bindActions(handlers: UIActions): void {
+    this.mainMenuModal?.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.closest('button') ||
+        target.closest('.top-pill') ||
+        target.closest('.floating-widget-btn') ||
+        target.closest('.dock-btn') ||
+        target.closest('#menu-dev-btn')
+      ) {
+        return;
+      }
+      this.closeMainMenu();
+      this.showHud();
+      handlers.onPlay();
+    });
+
     this.menuPlayBtn?.addEventListener('click', () => {
       this.closeMainMenu();
       this.showHud();
