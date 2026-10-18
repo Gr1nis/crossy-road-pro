@@ -3,102 +3,88 @@
 ## Цели и контекст перехода (macOS → PC / Windows)
 - **Проект**: Crossy Road Pro (HTML5 / Three.js / TypeScript / WebAudio).
 - **Платформа**: Переход с Mac (macOS) на ПК (Windows) для аккаунта `Gr1nis`.
-- **Ветка**: `master` (все текущие изменения проверены и запушены на `origin/master`).
+- **Ветка**: `master` (все изменения зафиксированы в локальном коммите `b404cc5`).
 - **Репозиторий**: `https://github.com/Gr1nis/crossy-road-pro`.
-- **Хэш коммита**: `3572b19` (`feat(ui): refine main menu matching fidelity reference`).
+- **Хэш коммита**: `b404cc5` (`feat(gacha): implement authentic PC Prize Machine horizontal reel roulette, separate skins collection & audio feedback`).
+
+---
+
+## 🚀 Инструкция по переходу на ПК (Windows)
+
+### Шаг 1. Отправка изменений с Mac в репозиторий GitHub
+На Mac локальный коммит `b404cc5` уже создан. Чтобы отправить его в удалённый репозиторий:
+```bash
+# В терминале на Mac выполните (потребуется ввести пароль от SSH-ключа id_ed25519):
+git push origin master
+```
+
+### Шаг 2. Развертывание и запуск на ПК (Windows)
+```bash
+# 1. Получить свежие изменения
+git pull origin master
+
+# 2. Установить зависимости (если ещё не установлены)
+npm install
+
+# 3. Проверить целостность и тесты
+npm test
+npx tsc --noEmit
+npm run build
+
+# 4. Локальный запуск
+npm run dev
+# Либо открыть автономный index.html или model-viewer.html прямо в браузере!
+```
 
 ---
 
 ## Статус готовности и Code Quality Gates
-- **Тесты**: 136 / 136 PASS (22 тестовых сьюта, Property-Based и Adversarial тесты на `node:test`).
+- **Тесты**: **154 / 154 PASS** (25 тестовых сьютов на `node:test` + `node:assert/strict`).
 - **Типизация**: `npx tsc --noEmit` — 0 ошибок.
 - **Сборка**: `node scripts/build.mjs` и `npm run build` — 100% успешно.
-- **Дистрибуция**: Zero-dependency автономный `index.html`, интерактивный просмотрщик `viewer.html` / `model-viewer.html`, `dist/bundle.js`.
+- **Дистрибуция**: Zero-dependency автономный `index.html` (~636 KB), `viewer.html` / `model-viewer.html` (3D Model Viewer), `dist/bundle.js`.
 
 ---
 
-## Текущий фокус задачи: Редизайн Главного Меню и Переход на Формат 9:16
+## Что было реализовано в текущей сессии [x]
 
-Пользователь поставил задачу привести главное меню в соответствие с визуальным референсом (стиль Subway Surfers / гиперказуальные мобильные хиты) и решить проблему размывания композиции на широких экранах ПК.
+### 1. Аутентичный ПК-автомат скинов (Prize Machine Reel Roulette)
+- **Горизонтальная рулетка по референсу CS:GO / Crossy Road Prize Machine**:
+  - 3D-заголовок `PRIZE MACHINE` с объёмными звездами, световыми бликами и праздничной лентой.
+  - Горизонтальная смотровая щель с золотым треугольным указателем `▼` по центру и вертикальной направляющей линией.
+  - Динамическая лента карточек рулетки (36 карточек) с реалистичным плавным замедлением по кубической кривой Безье (`ease-out`).
+  - Процедурные векторные иллюстрации скинов (`src/view/gachaCardArt.ts`) для всех 5 игровых персонажей (`corgi`, `pigeon_pizza`, `box_cat`, `raccoon_bandit`, `capybara_zen`) в каноничном воксельном стиле.
+- **Интерактивные эффекты победы и дубликатов**:
+  - Анимированное солнечное сияние (`Sunburst win flare VFX`) при выбивании скина.
+  - Реалистичный резиновый штамп `ДУБЛИКАТ` с оттиском и анимация вылетающих монеток `+40 🪙` в верхний кошелёк.
+  - Кнопка действия плавно переключается в зелёную `ВЫБРАТЬ И ИГРАТЬ` (`SELECT & PLAY`) с мгновенным стартом игры выбранным героем.
+- **Аудио-синтез (WebAudio)**:
+  - `playGachaTick(pitch)`: процедурные щелчки трещотки рулетки, адаптивно замедляющиеся вместе с лентой.
+  - `playCoinRefund()`: 4-тональный мажорный перезвон при начислении кэшбэка за дубликаты.
+  - Звуки разблокировки редких и эпических скинов.
 
-### Согласованное решение:
-1. **Строгий контейнер 9:16 для всей игры (Pillarbox на ПК)**:
-   - Вся игра (3D-холст Three.js + HUD + меню + модалки) ограничивается пропорциями **9:16**.
-   - На десктопе игра центрируется с аккуратными полями (pillarbox), что соответствует регламенту Яндекс Игр (свободные зоны по бокам зарезервированы под рекламу/баннеры).
-   - На мобилках контейнер занимает 100% экрана.
-   - Рендерер Three.js и ортографическая камера в `SceneManager` пересчитываются по `container.clientWidth / clientHeight`, фиксируя идеальное соотношение сторон `0.5625` без искажения геометрии.
-2. **Кинематографическая 3D-сцена меню (Three.js)**:
-   - В режиме меню камера приближается (`zoom: 1.35...1.45`) и разворачивается под диагональным углом прямо к дороге.
-   - Выбранный персонаж стоит в центре сцены на полосе `row = 0, x = 0`, плавно покачивается/дышит (`idle-анимация`).
-   - Рядом с героем на дороге левитируют и вращаются золотые 3D-монеты с мягкими тенями.
-   - При клике на `PLAY ▶` камера плавно отлетает (lerp ~0.4s) в боевую позицию забега.
-3. **Пак отдельных 3D-иконок через NanoBanana**:
-   - Вместо системных эмодзи и CSS-градиентов используются изолированные 3D-спрайты на белом фоне.
-   - Промпты для генерации согласованы и зафиксированы ниже.
-4. **Стеклянный UI и мультяшный шрифт**:
-   - Подключение округлого игрового шрифта (Lilita One / Fredoka) и стеклянных плашек (Frosted Glass).
+### 2. Отдельная модалка коллекции скинов (`#skins-modal`)
+- Кнопка «Скины» в главном меню теперь открывает удобную коллекцию для моментального выбора любого открытого персонажа.
+- Выбор персонажа синхронно обновляет 3D-модель в сцене главного меню (`SceneManager.updatePlayerSkin`).
 
-> Детальный план зафиксирован в артефакте: `menu_redesign_plan.md`.
+### 3. Модульное меню настроек (Settings Menu)
+- Полнофункциональное модальное окно настроек:
+  - Регуляторы громкости SFX и Music (ползунки от 0 до 100%).
+  - Тогглы: Вибрация/Screen Shake, Тени, Пост-эффекты, Экранный D-Pad.
+  - Локализация (i18n): мгновенное переключение RU / EN / TR.
+  - Сброс прогресса с защитой от случайного нажатия (модальное подтверждение).
+  - Персистентность в `SettingsManager` с защитой от битых данных хранилища.
 
----
-
-## Промпты для NanoBanana (Готовы к генерации)
-
-Стиль: **глянцевый изометрический 3D-стиль, мультяшный винил, мягкое студийное освещение, чистый белый фон**:
-
-1. **Главная кнопка PLAY**:
-   `3D mobile game UI asset, giant rounded rectangular green PLAY button with glossy jelly bevel, white bold 3D play triangle arrow, thick white border, casual mobile game style, isometric view, isolated on pure white background, vibrant lighting, no text`
-2. **Ежедневный подарок (Daily Gift)**:
-   `3D isometric red gift box with bright glossy yellow ribbon and big bow, cute casual game icon, clay style, toy aesthetic, isolated on pure white background, soft shadow`
-3. **Квесты (Quests)**:
-   `3D cartoon clipboard icon with checklist paper and green checkmarks, casual mobile game UI badge, glossy plastic, isolated on pure white background`
-4. **Скины (Skins)**:
-   `3D cute voxel red panda head portrait, chibi animal face badge, glossy cartoon game icon, vibrant orange fur, isolated on pure white background`
-5. **Магазин (Shop)**:
-   `3D cute turquoise shopping cart loaded with shiny golden coins, casual game icon, glossy finish, isolated on pure white background`
-6. **Лидерборд (Leaderboard)**:
-   `3D golden shiny trophy cup standing on a small white-blue podium pedestal, star emboss, casual mobile game achievement icon, isolated on pure white background`
-7. **Достижения (Achievements)**:
-   `3D round golden star medal with two hanging red silk ribbon tails, glossy mobile game award icon, isolated on pure white background`
-8. **Настройки (Settings)**:
-   `3D chunky cyan-blue metallic gear cog, smooth rounded edges, glossy casual game settings icon, isolated on pure white background`
-9. **Монетка и Корона (для верхней панели)**:
-   `3D shiny gold coin with embossed star, high gloss, casual game currency icon, isolated on pure white background`
-   `3D cute golden royal crown with tiny red jewels, casual mobile game high score badge, isolated on pure white background`
-
----
-
-## Что уже сделано в проекте [x]
-
-### 1. Оптимизация 60 FPS (Все 4 потока завершены)
-- **Stream 1**: Пул геометрий полос (`src/view/laneGeometryPool.ts`).
-- **Stream 2**: Монолитное слияние вокселей одинаковых материалов (`src/view/voxelMeshBuilder.ts`).
-- **Stream 3**: Инстансинг пропсов и монет через `InstancedDecorManager` (`THREE.InstancedMesh`).
-- **Stream 4**: Frustum Envelope и выгрузка полос позади камеры (`cameraZ - 30`).
-
-### 2. Бенчмарк-система и Телеметрия
-- `PerfMetricsTracker`: скользящий FPS, 1% Low, замер времени кадра и draw calls.
-- `PerfMonitor` (вызов по `F3` / `Alt+P`), режим бессмертия (God Mode), авто-хоп центрирование.
-- `PerfReportModal`: экспорт отчета с разбивкой таймингов и кнопкой копирования в Markdown.
-
-### 3. Интерактивный 3D Model Viewer
-- Реестр моделей `src/view/modelRegistry.ts` (26 проверенных моделей).
-- Доступен по `viewer.html` и `model-viewer.html` с автоматическим аудитом при сборке.
-
-### 4. Мета-геймплей
-- 7-дневный календарь наград `DailyRewardManager` с заморозкой/восстановлением серии через Rewarded Ads.
-- Ежедневные квесты `DailyQuestsManager` с процедурным аудио и летающими монетами.
-- 3D воксельный флаг рекорда PB с салютом и конфетти при побитии лучшего счёта.
-
-### 5. Стандартизация воксельной сетки 0.05
-- Спецификация `docs/VOXEL_GRID_SPECIFICATION.md` (шаг 0.05, 4 золотых правила: полые оболочки, бюджеты, vertex colors, монолитная склейка).
-- Эталонная Зимняя пекарня (`Townhouse B`, `src/view/urbanBuildings.ts`).
-- Парижское кафе (`Townhouse A`, `src/view/urbanBuildings.ts`).
+### 4. Редизайн ПК-лейаута Главного Меню (Crossy Road PC Aesthetic)
+- Полноэкранный кинематографичный 3D-вид на широких дисплеях (16:9 / 21:9).
+- Клик/тап в любую точку экрана запускает забег (Tap-to-Play).
+- Слева: объёмные 3D-виджеты монет и рекорда.
+- Справа снизу: круглые стеклянные кнопки-пилюли дока (Gacha, Квесты, Ежедневные подарки, Лидерборд, Настройки).
 
 ---
 
 ## ⚠️ ОБЯЗАТЕЛЬНОЕ НАПОМИНАНИЕ: ТЕСТОВЫЙ РЕЖИМ (DEV MODE)
-В коде сейчас активирован тестовый режим для мгновенной проверки всех 7 дней наград без ожидания полуночи.
+В коде сейчас активирован тестовый режим для мгновенной проверки всех 7 дней наград и тестирования механик.
 
 ### Чек-лист отключения DEV Mode перед релизом в продакшн:
 1. **`src/core/dailyReward.ts` (строка 68)**:
@@ -114,66 +100,25 @@
 
 ---
 
-## Инструкция по развертыванию на ПК (Windows)
+## 📋 Очередь задач к реализации на ПК (Next Up)
 
-1. **Клонирование / обновление репозитория**:
-   ```bash
-   git pull origin master
-   ```
-2. **Установка зависимостей (если ещё не установлены)**:
-   ```bash
-   npm install
-   ```
-3. **Запуск проверок**:
-   ```bash
-   npm test
-   npx tsc --noEmit
-   npm run build
-   ```
-4. **Локальный запуск**:
-   - Через Vite: `npm run dev`
-   - Или открыть автономный `index.html` / `model-viewer.html` прямо в браузере.
-
----
-
-## Следующие шаги (Next Steps на ПК / Mac)
-
-### Выполненные этапы [x]:
-1. **Этап 1 (Контейнер 16:9 на ПК и портрет 9:16 на мобилках) [x]**
-2. **Этап 2 (3D Сцена Главного Меню: lerp камеры, idle персонажа, парящие монеты) [x]**
-3. **Этап 3 (Интеграция ассетов NanoBanana: 10 WebP 3D-иконок в Base64 < 85 KB) [x]**
-4. **Этап 4 (Стеклянный UI, желейные кнопки и шрифты Fredoka/Lilita One) [x]**
-5. **Этап 5 (Фиделити-доводка UI по референсу из аудита Game Critics) [x]**:
-   - Ограничение меню `max-width: 480px` по центру экрана 16:9 на десктопе.
-   - Очистка кнопки PLAY от лишней растровой иконки (только чистый 3D-шрифт и стрелка `▶`).
-   - Увеличение высоты PLAY до 88px (мобилки) / 96px (ПК) и нижний срез вровень с кнопками Shop и Achievements.
-   - Золотисто-янтарный цвет строки рекорда `BEST: 12,480` (`#fbbf24` / `#fef08a`).
-   - Лаконичный бейдж квестов `Quests` с прогрессом `${completed}/${total}` (`0/3`, `3/5`).
-   - Калибровка шестерёнки настроек 42px / 38px.
-
----
-
-### Очередь задач к реализации [ ]:
-
-1. **Спринт 1: Motion & Game Feel [ ] (ПЕРВООЧЕРЕДНОЙ)**:
-   - [ ] **Сглаживание скачка прыжка**: в `src/view/squashStretch.ts:14-29` устранить 1-кадровый скачок $\Delta scaleY = +34\%$ на стыке фаз $t = 0.2$ (гладкая $C^0$ синусоида).
-   - [ ] **Частота idle-дыхания героя**: в `src/view/sceneManager.ts:722, 898-903` снизить множитель фазы с 3.5 до 1.2 (~45 bpm вместо 134 bpm).
-   - [ ] **Зум камеры меню**: скорректировать с 1.45x до эталонных 1.35x (`sceneManager.ts:264, 979`).
-   - [ ] **Вращение и левитация монет**: успокоить множители в `sceneManager.ts:912-913` (вращение 42 rpm, парение 0.89 Гц).
+1. **Спринт: Motion & Game Feel**:
+   - [ ] **Сглаживание прыжка**: в `src/view/squashStretch.ts` устранить 1-кадровый скачок $\Delta scaleY = +34\%$ на стыке фаз $t = 0.2$ (гладкая $C^0$ синусоида).
+   - [ ] **Частота idle-дыхания героя**: в `src/view/sceneManager.ts` снизить множитель фазы с 3.5 до 1.2 (~45 bpm вместо 134 bpm).
+   - [ ] **Вращение и левитация монет**: успокоить множители в `sceneManager.ts` (вращение 42 rpm, парение 0.89 Гц).
    - [ ] **Частицы толчка**: добавить спавн 2 легких частиц пыли в момент отрыва ног от земли при прыжке.
    - [ ] **Экспоненциальное затухание шейка**: перевести `shakeIntensity` на `Math.exp(-dt * 10.0)`.
 
-2. **Спринт 2: Voxel Grid & Performance [ ]**:
-   - [ ] **Защита кеша VoxelPalette**: нейтрализовать `dispose = () => {}` для геометрий и материалов в `src/view/voxelPalette.ts`, чтобы `disposeHierarchy` при сходе полос не сбрасывала видеопамять разметки и светофоров.
+2. **Спринт: Voxel Grid & Performance**:
+   - [ ] **Защита кеша VoxelPalette**: нейтрализовать `dispose = () => {}` для общих геометрий и материалов в `src/view/voxelPalette.ts`, чтобы `disposeHierarchy` при сходе полос не сбрасывала видеопамять разметки и светофоров.
    - [ ] **Слияние меша персонажа**: перевести сборку скинов в `src/view/urbanCharacters.ts` на `VoxelMeshBuilder.buildCachedMesh` (сокращение 60+ Draw Calls).
-   - [ ] **Квантование Пекарни (Townhouse B)**: переписать `populateBakeryBuilder` в `src/view/urbanBuildings.ts` строго по сетке 0.05 по модульному канону `src/view/townhouse/` (устранить 954 неквантованных числа и вписаться в 180 вокселей).
-   - [ ] **Устранение дробных сдвигов**: убрать `scale(0.95)` и дробный $Z = -0.1325$ в `urbanBuildings.ts:394`.
+   - [ ] **Квантование Пекарни (Townhouse B)**: переписать `populateBakeryBuilder` в `src/view/urbanBuildings.ts` строго по сетке 0.05 по модульному канону `src/view/townhouse/` (устранить неквантованные числа и вписаться в бюджет 180 вокселей).
 
-3. **Спринт 3: Интеграция с Yandex Games SDK (`src/platform/ysdk.ts`) [ ]**:
+3. **Спринт: Интеграция с Yandex Games SDK (`src/platform/ysdk.ts`)**:
    - [ ] Облачные сохранения прогресса игрока `ysdk.getPlayer().setData()`.
-   - [ ] Отправка очков в лидерборд Яндекс Игр.
+   - [ ] Отправка рекорда в официальный лидерборд Яндекс Игр.
    - [ ] Боевые вызовы рекламы: Rewarded (воскрешение + восстановление серии бонуса) и Interstitial (раз в 3-4 поражения).
 
 4. **Правило тестирования и деплоя**:
-   - После КАЖДОГО спринта запускать `npm test && npx tsc --noEmit && node scripts/build.mjs`.
-   - Немедленно коммитить и пушить в `origin/master`, так как пользователь тестирует на GitHub Pages.
+   - После КАЖДОГО спринта запускать `npm test && npx tsc --noEmit && npm run build`.
+   - Коммитить и пушить в `origin/master`, так как деплой в GitHub Pages автоматический.
