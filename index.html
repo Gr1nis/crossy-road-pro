@@ -579,12 +579,350 @@
     .menu-btn-secondary { background: #334155; color: #e2e8f0; }
     .menu-btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
 
-    .modal-card-gacha { max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; -webkit-overflow-scrolling: touch; }
-    #gacha-modal h2 { font-size: clamp(18px, 4vw, 28px); color: #fbbf24; }
-    .modal-card-gacha .menu-stat-pill.gold { display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; flex-direction: row; align-self: center; margin: 0 auto 16px; font-size: 15px; line-height: 1; }
-    .modal-card-gacha .menu-stat-pill.gold strong { font-size: 22px; line-height: 1; display: inline-flex; align-items: center; margin: 0; color: #facc15; }
-    .modal-card-gacha .menu-stat-pill.gold span { display: inline-flex; align-items: center; line-height: 1; }
-    .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+    /* ===== НОВЫЙ ДИЗАЙН ГАЧА-АВТОМАТА (ПК 16:9 ПО РЕФЕРЕНСУ) ===== */
+    .modal-card-gacha-pc {
+      background: linear-gradient(180deg, rgba(20, 32, 54, 0.96) 0%, rgba(13, 20, 36, 0.98) 100%);
+      border: 2px solid rgba(251, 191, 36, 0.55);
+      border-radius: 28px;
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.25), 0 25px 60px rgba(0, 0, 0, 0.75);
+      max-width: 840px;
+      width: 92%;
+      padding: 20px 28px 26px;
+      position: relative;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+    .gacha-top-bar {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 20;
+    }
+    .gacha-coin-pill {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid #f59e0b;
+      border-radius: 999px;
+      padding: 5px 14px 5px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+    }
+    .gacha-coin-val { font-size: 19px; font-weight: 900; color: #facc15; }
+    .gacha-coin-label { font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 0.05em; }
+    .gacha-coin-icon { font-size: 16px; margin-left: 2px; }
+    .gacha-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      border: 2px solid #fca5a5;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 12px rgba(239, 68, 68, 0.4);
+      transition: transform 0.15s ease, filter 0.15s;
+    }
+    .gacha-close-btn:hover { transform: scale(1.1); filter: brightness(1.15); }
+
+    .gacha-header-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .gacha-stars-left, .gacha-stars-right {
+      display: flex;
+      gap: 6px;
+      font-size: 24px;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    }
+    .star-purple { color: #c084fc; text-shadow: 0 0 10px rgba(192, 132, 252, 0.8); }
+    .star-cyan { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
+    .gacha-title-box { text-align: center; position: relative; }
+    .gacha-3d-title {
+      margin: 0;
+      font-size: 34px;
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      color: #fde047;
+      text-shadow:
+        0 1px 0 #ca8a04,
+        0 2px 0 #a16207,
+        0 3px 0 #854d0e,
+        0 4px 0 #713f12,
+        0 6px 12px rgba(0, 0, 0, 0.6);
+      -webkit-text-stroke: 1px #78350f;
+    }
+    .gacha-ribbon {
+      width: 140px;
+      height: 10px;
+      background: linear-gradient(90deg, transparent, #dc2626 20%, #ef4444 50%, #dc2626 80%, transparent);
+      margin: 4px auto 0;
+      border-radius: 999px;
+      filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.5));
+    }
+
+    .gacha-viewport {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #090e1c;
+      border: 2px solid #1e293b;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.7);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    }
+    .gacha-pointer {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 26px;
+      color: #facc15;
+      z-index: 15;
+      filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+      line-height: 1;
+      pointer-events: none;
+      animation: pointerGlow 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes pointerGlow {
+      0% { filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.7)); }
+      100% { filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1)); }
+    }
+    .gacha-guide-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(250, 204, 21, 0.6) 0%, rgba(250, 204, 21, 0.05) 100%);
+      transform: translateX(-50%);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .gacha-reel-track {
+      position: absolute;
+      top: 14px;
+      left: 0;
+      display: flex;
+      gap: 14px;
+      will-change: transform;
+      padding: 0 40px;
+    }
+    .gacha-roulette-card {
+      flex: 0 0 150px;
+      width: 150px;
+      height: 190px;
+      background: #111c33;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 8px 8px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s;
+      position: relative;
+    }
+    .gacha-roulette-card.winning-card {
+      border-color: #fbbf24;
+      box-shadow: 0 0 25px rgba(251, 191, 36, 0.8), inset 0 0 15px rgba(251, 191, 36, 0.3);
+      transform: scale(1.06);
+      z-index: 12;
+      background: #192747;
+    }
+    .gacha-card-name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #f1f5f9;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 90%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gacha-card-character {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4px 0;
+    }
+    .gacha-card-character svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+    }
+    .gacha-card-rarity {
+      width: 92%;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      padding: 3px 0;
+      border-radius: 8px;
+      text-transform: uppercase;
+    }
+
+    .gacha-win-fx {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px;
+      height: 220px;
+      pointer-events: none;
+      z-index: 11;
+    }
+    .gacha-sunburst {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(250, 204, 21, 0.45) 0%, rgba(250, 204, 21, 0.1) 45%, transparent 70%);
+      animation: sunburstRotate 8s linear infinite;
+    }
+    @keyframes sunburstRotate {
+      0% { transform: rotate(0deg) scale(0.9); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      100% { transform: rotate(360deg) scale(0.9); }
+    }
+
+    .gacha-duplicate-stamp {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-8deg);
+      background: rgba(220, 38, 38, 0.92);
+      border: 3px dashed #fecaca;
+      border-radius: 12px;
+      padding: 8px 18px;
+      text-align: center;
+      z-index: 25;
+      color: #fff;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.7);
+      animation: stampPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .gacha-stamp-sub { font-size: 12px; color: #fde047; margin-top: 2px; }
+    @keyframes stampPop {
+      0% { transform: translate(-50%, -50%) rotate(-25deg) scale(2.2); opacity: 0; }
+      100% { transform: translate(-50%, -50%) rotate(-8deg) scale(1); opacity: 1; }
+    }
+
+    .gacha-cashback-flyer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 22px;
+      font-weight: 900;
+      color: #facc15;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      z-index: 30;
+      pointer-events: none;
+    }
+    .gacha-cashback-flyer.fly-anim {
+      animation: flyerMove 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    @keyframes flyerMove {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      60% { transform: translate(140px, -110px) scale(1.3); opacity: 1; }
+      100% { transform: translate(260px, -150px) scale(0.6); opacity: 0; }
+    }
+
+    .gacha-action-bar { display: flex; justify-content: center; width: 100%; }
+    .gacha-spin-btn {
+      background: linear-gradient(180deg, #facc15 0%, #f59e0b 45%, #d97706 100%);
+      border: 3px solid #fde68a;
+      border-radius: 22px;
+      padding: 14px 48px;
+      cursor: pointer;
+      min-width: 260px;
+      box-shadow:
+        0 2px 0 #b45309,
+        0 4px 0 #92400e,
+        0 6px 0 #78350f,
+        0 8px 0 #451a03,
+        0 14px 25px rgba(0, 0, 0, 0.6);
+      transition: transform 0.1s ease, filter 0.15s, box-shadow 0.1s;
+      outline: none;
+    }
+    .gacha-spin-btn:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-2px); }
+    .gacha-spin-btn:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow:
+        0 1px 0 #b45309,
+        0 2px 0 #78350f,
+        0 6px 14px rgba(0, 0, 0, 0.5);
+    }
+    .gacha-spin-btn:disabled { opacity: 0.65; cursor: not-allowed; filter: grayscale(0.2); }
+    .gacha-spin-btn.shake-error { animation: shakeBtn 0.4s ease-in-out; }
+    @keyframes shakeBtn {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .gacha-spin-content { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .gacha-spin-main {
+      font-size: 26px;
+      font-weight: 900;
+      color: #451a03;
+      letter-spacing: 0.05em;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    .gacha-spin-price {
+      font-size: 14px;
+      font-weight: 900;
+      color: #78350f;
+      background: rgba(255, 255, 255, 0.35);
+      padding: 2px 14px;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
+    }
+
+    .gacha-spin-btn.select-character-btn {
+      background: linear-gradient(180deg, #34d399 0%, #10b981 45%, #059669 100%);
+      border-color: #a7f3d0;
+      box-shadow:
+        0 2px 0 #047857,
+        0 4px 0 #065f46,
+        0 6px 0 #064e3b,
+        0 8px 0 #022c22,
+        0 14px 28px rgba(16, 185, 129, 0.45);
+      animation: pulseWinBtn 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes pulseWinBtn {
+      0% { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
+      100% { filter: drop-shadow(0 0 24px rgba(16, 185, 129, 0.95)) brightness(1.08); }
+    }
+    .gacha-spin-btn.select-character-btn .gacha-spin-main { color: #022c22; font-size: 20px; }
+    .gacha-spin-btn.select-character-btn .gacha-spin-price { color: #064e3b; background: rgba(255, 255, 255, 0.4); }
     .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
     .gacha-skin-card.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 14px rgba(56, 189, 248, 0.3); }
@@ -1658,24 +1996,81 @@
     </div>
   </div>
 
-  <!-- Модальное окно Автомата скинов -->
-  <div id="gacha-modal" class="modal hidden">
-    <div class="modal-card modal-card-gacha">
-      <h2 style="color: #fbbf24;" data-i18n="gacha_title">🎰 АВТОМАТ СКИНОВ</h2>
-      <p data-i18n="gacha_desc">Испытайте удачу и откройте новые воксельные скины!</p>
-
-      <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; margin: 0 auto 16px; align-self: center;">
-        <span style="display: inline-flex; align-items: center; line-height: 1;" data-i18n="gacha_balance">Ваш баланс:</span>
-        <strong id="gacha-modal-coins" style="display: inline-flex; align-items: center; line-height: 1; margin: 0;">0</strong>
-        <span style="display: inline-flex; align-items: center; line-height: 1;">🪙</span>
+  <!-- Модальное окно Автомата скинов (ПК рулетка по референсу) -->
+  <div id="gacha-modal" class="modal hidden" style="z-index: 120;">
+    <div class="modal-card modal-card-gacha-pc">
+      <!-- Верхний бар с балансом и кнопкой закрытия -->
+      <div class="gacha-top-bar">
+        <div class="gacha-coin-pill" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle;">
+          <span class="gacha-coin-val" id="gacha-modal-coins">0</span>
+          <span class="gacha-coin-label">COINS</span>
+          <span class="gacha-coin-icon">🪙</span>
+        </div>
+        <button type="button" id="gacha-modal-close-btn" class="gacha-close-btn" aria-label="Закрыть">✕</button>
       </div>
 
-      <div id="gacha-modal-skin-list" class="gacha-modal-grid"></div>
-
-      <div class="menu-btn-stack">
-        <button id="gacha-modal-roll-btn" class="menu-btn menu-btn-amber">100 🪙</button>
-        <button id="gacha-modal-close-btn" class="menu-btn menu-btn-secondary" data-i18n="modal_close">Закрыть</button>
+      <!-- 3D Заголовок PRIZE MACHINE со звёздами и лентой -->
+      <div class="gacha-header-wrap">
+        <span style="display:none;" data-i18n="gacha_title">🎰 АВТОМАТ СКИНОВ</span>
+        <div class="gacha-stars-left">
+          <span class="gacha-star star-purple">★</span>
+          <span class="gacha-star star-cyan">★</span>
+        </div>
+        <div class="gacha-title-box">
+          <h1 class="gacha-3d-title">PRIZE<br>MACHINE</h1>
+          <div class="gacha-ribbon"></div>
+        </div>
+        <div class="gacha-stars-right">
+          <span class="gacha-star star-cyan">★</span>
+          <span class="gacha-star star-purple">★</span>
+        </div>
       </div>
+
+      <!-- Смотровое окно горизонтальной рулетки -->
+      <div id="gacha-viewport" class="gacha-viewport">
+        <!-- Золотой указатель по центру -->
+        <div class="gacha-pointer">▼</div>
+
+        <!-- Центральная направляющая линия -->
+        <div class="gacha-guide-line"></div>
+
+        <!-- Контейнер карточек рулетки -->
+        <div id="gacha-modal-skin-list" class="gacha-reel-track"></div>
+
+        <!-- Оверлей сияния при победе -->
+        <div id="gacha-win-fx" class="gacha-win-fx hidden">
+          <div class="gacha-sunburst"></div>
+        </div>
+
+        <!-- Штамп дубликата -->
+        <div id="gacha-duplicate-stamp" class="gacha-duplicate-stamp hidden">
+          <span>♻ ДУБЛИКАТ</span>
+          <div class="gacha-stamp-sub">+40 🪙 КЭШБЭК</div>
+        </div>
+
+        <!-- Анимация вылетающих монеток кэшбэка -->
+        <div id="gacha-cashback-flyer" class="gacha-cashback-flyer hidden">+40 🪙</div>
+      </div>
+
+      <!-- Нижняя зона: большая кнопка SPIN -->
+      <div class="gacha-action-bar">
+        <button type="button" id="gacha-modal-roll-btn" class="gacha-spin-btn">
+          <div class="gacha-spin-content">
+            <span class="gacha-spin-main">SPIN</span>
+            <span class="gacha-spin-price">100 🪙</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно Коллекции скинов -->
+  <div id="skins-modal" class="modal hidden" style="z-index: 110;">
+    <div class="modal-card" style="max-width: 520px;">
+      <h2 style="color: #38bdf8;" data-i18n="skins_title">👤 КОЛЛЕКЦИЯ СКИНОВ</h2>
+      <p style="margin-bottom: 16px;" data-i18n="skins_desc">Выберите персонажа для следующего забега:</p>
+      <div id="skins-modal-list" class="gacha-modal-grid"></div>
+      <button type="button" id="skins-modal-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 16px;" data-i18n="modal_close">Закрыть</button>
     </div>
   </div>
 
@@ -5470,6 +5865,48 @@ class AudioSynth {
     }
   }
 
+  playGachaTick(pitch         = 1.0)       {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    const freq = Math.max(220, Math.min(2200, 680 * pitch));
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.024);
+    gain.gain.setValueAtTime(0.09 * this.sfxVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.024);
+    osc.connect(gain);
+    gain.connect(this.sfxGainNode ?? ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.025);
+  }
+
+  playCoinRefund()       {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const freqs = [1200, 1500, 1800, 2200];
+    freqs.forEach((freq, idx) => {
+      const t = now + idx * 0.055;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.12 * this.sfxVolume, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.17);
+    });
+  }
+
   playGachaRoll()       {
     if (!this.soundEnabled) return;
     const ctx = this.ensureContext();
@@ -8812,6 +9249,158 @@ class InstancedDecorManager {
   }
 }
 
+// --- Module: src/view/gachaCardArt.ts ---
+function hexShade(hex        , factor        )         {
+  const c = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, Math.floor(((c >> 16) & 255) * factor));
+  const g = Math.min(255, Math.floor(((c >> 8) & 255) * factor));
+  const b = Math.min(255, Math.floor((c & 255) * factor));
+  return '#' + (16777216 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+function isoBox(
+  x        ,
+  y        ,
+  z        ,
+  w        ,
+  h        ,
+  d        ,
+  color        
+)         {
+  const topCol = hexShade(color, 1.18);
+  const leftCol = hexShade(color, 0.92);
+  const rightCol = hexShade(color, 0.75);
+  const sx = 60 + (x - z) * 7.5;
+  const sy = 66 + (x + z) * 3.8 - y * 7.5;
+  const pTop = `${sx.toFixed(1)},${sy.toFixed(1)} ${(sx + w * 7.5).toFixed(1)},${(sy + w * 3.8).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8).toFixed(1)} ${(sx - d * 7.5).toFixed(1)},${(sy + d * 3.8).toFixed(1)}`;
+  const pLeft = `${(sx - d * 7.5).toFixed(1)},${(sy + d * 3.8).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8 + h * 7.5).toFixed(1)} ${(sx - d * 7.5).toFixed(1)},${(sy + d * 3.8 + h * 7.5).toFixed(1)}`;
+  const pRight = `${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8).toFixed(1)} ${(sx + w * 7.5).toFixed(1)},${(sy + w * 3.8).toFixed(1)} ${(sx + w * 7.5).toFixed(1)},${(sy + w * 3.8 + h * 7.5).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8 + h * 7.5).toFixed(1)}`;
+  return `<polygon points="${pTop}" fill="${topCol}"/><polygon points="${pLeft}" fill="${leftCol}"/><polygon points="${pRight}" fill="${rightCol}"/>`;
+}
+
+function buildCorgiSvg()         {
+  const b           = [];
+  b.push(isoBox(-0.6, 2.2, -2.5, 1.2, 1.2, 1.0, '#ea580c'));
+  b.push(isoBox(-1.5, 0.0, -1.8, 0.9, 1.2, 0.9, '#ffffff'));
+  b.push(isoBox(0.6, 0.0, -1.8, 0.9, 1.2, 0.9, '#ffffff'));
+  b.push(isoBox(-1.8, 0.8, -2.0, 3.6, 2.6, 4.4, '#ea580c'));
+  b.push(isoBox(-1.3, 0.8, 1.5, 2.6, 2.2, 1.0, '#ffffff'));
+  b.push(isoBox(-1.5, 0.0, 1.5, 0.9, 1.2, 0.9, '#ffffff'));
+  b.push(isoBox(0.6, 0.0, 1.5, 0.9, 1.2, 0.9, '#ffffff'));
+  b.push(isoBox(-1.6, 3.2, 1.2, 3.2, 0.4, 1.6, '#dc2626'));
+  b.push(isoBox(-0.3, 2.9, 2.8, 0.6, 0.5, 0.2, '#facc15'));
+  b.push(isoBox(-1.7, 3.4, 0.8, 3.4, 2.8, 3.0, '#ea580c'));
+  b.push(isoBox(-1.0, 3.2, 2.8, 2.0, 1.6, 1.6, '#ffffff'));
+  b.push(isoBox(-0.4, 4.2, 3.8, 0.8, 0.6, 0.5, '#0f172a'));
+  b.push(isoBox(-0.1, 3.2, 3.7, 0.5, 0.4, 0.6, '#f472b6'));
+  b.push(isoBox(-0.5, 4.4, 2.2, 1.0, 2.0, 1.6, '#ffffff'));
+  b.push(isoBox(-1.2, 4.6, 2.6, 0.5, 0.6, 0.4, '#0f172a'));
+  b.push(isoBox(0.7, 4.6, 2.6, 0.5, 0.6, 0.4, '#0f172a'));
+  b.push(isoBox(-1.6, 6.0, 1.4, 1.0, 1.8, 0.8, '#ea580c'));
+  b.push(isoBox(-1.4, 6.2, 1.8, 0.6, 1.4, 0.4, '#f472b6'));
+  b.push(isoBox(0.6, 6.0, 1.4, 1.0, 1.8, 0.8, '#ea580c'));
+  b.push(isoBox(0.8, 6.2, 1.8, 0.6, 1.4, 0.4, '#f472b6'));
+  return wrapSvg(b.join(''), 36, 12);
+}
+
+function buildBoxCatSvg()         {
+  const b           = [];
+  b.push(isoBox(-2.5, 0.2, -2.5, 5.0, 3.6, 5.0, '#b45309'));
+  b.push(isoBox(-2.2, 3.6, -2.2, 4.4, 0.2, 4.4, '#451a03'));
+  b.push(isoBox(-2.8, 3.6, -0.8, 0.6, 1.4, 3.2, '#d97706'));
+  b.push(isoBox(2.2, 3.6, -0.8, 0.6, 1.4, 3.2, '#d97706'));
+  b.push(isoBox(-0.8, 3.6, 2.2, 3.2, 1.4, 0.6, '#d97706'));
+  b.push(isoBox(-1.6, 3.6, 0.2, 3.2, 2.8, 3.0, '#64748b'));
+  b.push(isoBox(-1.0, 3.4, 2.2, 2.0, 1.4, 1.2, '#f8fafc'));
+  b.push(isoBox(-0.3, 4.2, 3.0, 0.6, 0.4, 0.4, '#f472b6'));
+  b.push(isoBox(-1.2, 4.8, 2.4, 0.5, 0.6, 0.4, '#10b981'));
+  b.push(isoBox(0.7, 4.8, 2.4, 0.5, 0.6, 0.4, '#10b981'));
+  b.push(isoBox(-1.6, 6.2, 1.0, 0.9, 1.4, 0.8, '#64748b'));
+  b.push(isoBox(-1.4, 6.4, 1.4, 0.5, 1.0, 0.4, '#f472b6'));
+  b.push(isoBox(0.7, 6.2, 1.0, 0.9, 1.4, 0.8, '#64748b'));
+  b.push(isoBox(0.9, 6.4, 1.4, 0.5, 1.0, 0.4, '#f472b6'));
+  b.push(isoBox(-1.6, 3.4, 2.4, 0.9, 0.7, 0.8, '#ffffff'));
+  b.push(isoBox(0.7, 3.4, 2.4, 0.9, 0.7, 0.8, '#ffffff'));
+  return wrapSvg(b.join(''), 40, 13);
+}
+
+function buildPigeonSvg()         {
+  const b           = [];
+  b.push(isoBox(-1.0, 0.0, 0.0, 0.6, 1.0, 0.6, '#f97316'));
+  b.push(isoBox(0.4, 0.0, 0.0, 0.6, 1.0, 0.6, '#f97316'));
+  b.push(isoBox(-1.7, 0.8, -2.0, 3.4, 3.2, 4.0, '#64748b'));
+  b.push(isoBox(-1.9, 1.4, -1.2, 0.5, 2.0, 2.8, '#475569'));
+  b.push(isoBox(1.4, 1.4, -1.2, 0.5, 2.0, 2.8, '#475569'));
+  b.push(isoBox(-0.6, 1.6, -3.2, 1.2, 0.6, 1.6, '#334155'));
+  b.push(isoBox(-1.3, 3.8, 0.6, 2.6, 1.0, 2.4, '#a855f7'));
+  b.push(isoBox(-1.2, 4.6, 0.8, 2.4, 2.2, 2.4, '#64748b'));
+  b.push(isoBox(-1.0, 5.2, 2.4, 0.4, 0.5, 0.4, '#0f172a'));
+  b.push(isoBox(0.6, 5.2, 2.4, 0.4, 0.5, 0.4, '#0f172a'));
+  b.push(isoBox(-0.4, 4.6, 2.8, 0.8, 0.8, 1.2, '#facc15'));
+  b.push(isoBox(-1.6, 3.6, 2.8, 3.2, 0.3, 2.6, '#fde047'));
+  b.push(isoBox(-1.6, 3.6, 2.4, 3.2, 0.4, 0.5, '#b45309'));
+  b.push(isoBox(-0.8, 3.9, 3.4, 0.6, 0.1, 0.6, '#ef4444'));
+  b.push(isoBox(0.4, 3.9, 3.8, 0.6, 0.1, 0.6, '#ef4444'));
+  return wrapSvg(b.join(''), 36, 12);
+}
+
+function buildRaccoonSvg()         {
+  const b           = [];
+  b.push(isoBox(-0.7, 1.4, -4.2, 1.4, 1.4, 1.4, '#1e293b'));
+  b.push(isoBox(-0.6, 1.6, -3.0, 1.2, 1.2, 1.4, '#94a3b8'));
+  b.push(isoBox(-1.4, 0.0, -1.6, 0.8, 1.0, 0.8, '#1e293b'));
+  b.push(isoBox(0.6, 0.0, -1.6, 0.8, 1.0, 0.8, '#1e293b'));
+  b.push(isoBox(-1.7, 0.6, -2.0, 3.4, 2.8, 4.2, '#475569'));
+  b.push(isoBox(-1.4, 0.0, 1.4, 0.8, 1.0, 0.8, '#1e293b'));
+  b.push(isoBox(0.6, 0.0, 1.4, 0.8, 1.0, 0.8, '#1e293b'));
+  b.push(isoBox(-1.7, 3.2, 0.8, 3.4, 2.8, 2.8, '#475569'));
+  b.push(isoBox(-1.8, 3.8, 2.4, 3.6, 1.2, 1.0, '#0f172a'));
+  b.push(isoBox(-1.1, 5.0, 2.4, 0.8, 0.4, 0.6, '#ffffff'));
+  b.push(isoBox(0.3, 5.0, 2.4, 0.8, 0.4, 0.6, '#ffffff'));
+  b.push(isoBox(-1.1, 4.0, 2.8, 0.4, 0.6, 0.4, '#f8fafc'));
+  b.push(isoBox(0.7, 4.0, 2.8, 0.4, 0.6, 0.4, '#f8fafc'));
+  b.push(isoBox(-1.0, 3.2, 2.8, 2.0, 1.0, 1.4, '#ffffff'));
+  b.push(isoBox(-0.3, 3.8, 3.8, 0.6, 0.5, 0.4, '#020617'));
+  b.push(isoBox(-1.6, 5.8, 1.2, 0.9, 1.2, 0.8, '#334155'));
+  b.push(isoBox(-1.4, 6.0, 1.4, 0.5, 0.8, 0.4, '#ffffff'));
+  b.push(isoBox(0.7, 5.8, 1.2, 0.9, 1.2, 0.8, '#334155'));
+  b.push(isoBox(0.9, 6.0, 1.4, 0.5, 0.8, 0.4, '#ffffff'));
+  return wrapSvg(b.join(''), 38, 12);
+}
+
+function buildCapybaraSvg()         {
+  const b           = [];
+  b.push(isoBox(-1.8, 0.0, -2.0, 1.0, 1.0, 1.0, '#78350f'));
+  b.push(isoBox(0.8, 0.0, -2.0, 1.0, 1.0, 1.0, '#78350f'));
+  b.push(isoBox(-2.2, 0.6, -2.6, 4.4, 3.4, 5.2, '#b45309'));
+  b.push(isoBox(-1.8, 0.0, 1.6, 1.0, 1.0, 1.0, '#78350f'));
+  b.push(isoBox(0.8, 0.0, 1.6, 1.0, 1.0, 1.0, '#78350f'));
+  b.push(isoBox(-1.8, 3.0, 0.8, 3.6, 2.8, 3.6, '#b45309'));
+  b.push(isoBox(-1.5, 2.8, 3.4, 3.0, 2.2, 1.6, '#78350f'));
+  b.push(isoBox(-1.3, 4.4, 3.2, 0.6, 0.3, 0.4, '#451a03'));
+  b.push(isoBox(0.7, 4.4, 3.2, 0.6, 0.3, 0.4, '#451a03'));
+  b.push(isoBox(-1.8, 5.2, 1.2, 0.6, 0.8, 0.6, '#78350f'));
+  b.push(isoBox(1.2, 5.2, 1.2, 0.6, 0.8, 0.6, '#78350f'));
+  b.push(isoBox(-0.8, 5.8, 1.8, 1.6, 1.4, 1.6, '#f97316'));
+  b.push(isoBox(-0.2, 7.2, 2.0, 0.5, 0.4, 0.5, '#22c55e'));
+  return wrapSvg(b.join(''), 42, 13);
+}
+
+function wrapSvg(shapes        , shadowRx        , shadowRy        )         {
+  return `<svg viewBox="0 0 120 110" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="94" rx="${shadowRx}" ry="${shadowRy}" fill="rgba(0,0,0,0.35)"/>${shapes}</svg>`;
+}
+
+const GACHA_CARD_SVG_MAP                         = {
+  corgi: buildCorgiSvg(),
+  box_cat: buildBoxCatSvg(),
+  pigeon_pizza: buildPigeonSvg(),
+  raccoon_bandit: buildRaccoonSvg(),
+  capybara_zen: buildCapybaraSvg(),
+};
+function getGachaCardSvg(skinId        )         {
+  return GACHA_CARD_SVG_MAP[skinId] ?? GACHA_CARD_SVG_MAP.corgi;
+}
+
 // --- Module: src/view/sceneManager.ts ---
 const BIOME_ATMOSPHERES         
             
@@ -9459,6 +10048,15 @@ class SceneManager {
       decorTrees,
       decorRocks,
     };
+  }
+
+  updatePlayerSkin(skinId        )       {
+    if (skinId !== this.currentSkin) {
+      this.currentSkin = skinId;
+      this.scene.remove(this.playerMesh);
+      this.playerMesh = MeshFactory.createCharacter(skinId);
+      this.scene.add(this.playerMesh);
+    }
   }
 
   sync(engine            , dt         = 0.016)       {
@@ -10682,6 +11280,359 @@ class SettingsModalController {
   }
 }
 
+// --- Module: src/app/gachaMachineModal.ts ---
+const CARD_NAMES_UPPER                         = {
+  corgi: 'CORGI',
+  pigeon_pizza: 'PIZZA PIGEON',
+  box_cat: 'BOX CAT',
+  raccoon_bandit: 'RACCOON',
+  capybara_zen: 'CAPYBARA',
+};
+
+const RARITY_CSS_MAP                                                          = {
+  Common: { label: 'COMMON', css: 'rarity-common' },
+  Rare: { label: 'RARE', css: 'rarity-rare' },
+  Epic: { label: 'EPIC', css: 'rarity-epic' },
+  Legendary: { label: 'LEGENDARY', css: 'rarity-legendary' },
+};
+class GachaMachineModal {
+                   modal                    ;
+                   coinsEl                    ;
+                   closeBtn                    ;
+                   rollBtn                    ;
+                   trackEl                    ;
+                   viewportEl                    ;
+                   winFxEl                    ;
+                   dupStampEl                    ;
+                   cashbackFlyerEl                    ;
+                   callbacks                     ;
+
+          isSpinning = false;
+          pendingWonSkinId                = null;
+          reelInitialized = false;
+          animFrameId                = null;
+
+  constructor(callbacks                     ) {
+    this.callbacks = callbacks;
+    this.modal = document.getElementById('gacha-modal');
+    this.coinsEl = document.getElementById('gacha-modal-coins');
+    this.closeBtn = document.getElementById('gacha-modal-close-btn');
+    this.rollBtn = document.getElementById('gacha-modal-roll-btn');
+    this.trackEl = document.getElementById('gacha-modal-skin-list');
+    this.viewportEl = document.getElementById('gacha-viewport');
+    this.winFxEl = document.getElementById('gacha-win-fx');
+    this.dupStampEl = document.getElementById('gacha-duplicate-stamp');
+    this.cashbackFlyerEl = document.getElementById('gacha-cashback-flyer');
+
+    this.bindEvents();
+  }
+
+          bindEvents()       {
+    this.closeBtn?.addEventListener('click', () => {
+      this.close();
+      this.callbacks.onClose();
+    });
+
+    this.rollBtn?.addEventListener('click', () => {
+      if (this.isSpinning) return;
+      if (this.pendingWonSkinId) {
+        const chosen = this.pendingWonSkinId;
+        this.pendingWonSkinId = null;
+        this.callbacks.onSelectAndPlay(chosen);
+      } else {
+        this.callbacks.onRoll();
+      }
+    });
+  }
+
+         open(currentSkinId         = 'corgi')       {
+    this.modal?.classList.remove('hidden');
+    if (!this.reelInitialized || !this.trackEl?.children.length) {
+      this.initReel(currentSkinId);
+    }
+  }
+
+         close()       {
+    if (this.animFrameId !== null) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
+    this.isSpinning = false;
+    this.pendingWonSkinId = null;
+    this.clearWinEffects();
+    this.resetButton();
+    this.modal?.classList.add('hidden');
+  }
+
+         isOpen()          {
+    return Boolean(this.modal && !this.modal.classList.contains('hidden'));
+  }
+
+         updateCoins(coins        )       {
+    if (this.coinsEl) {
+      this.coinsEl.textContent = String(coins);
+    }
+  }
+
+         shakeRollButton()       {
+    if (!this.rollBtn) return;
+    this.rollBtn.classList.remove('shake-error');
+    // Force reflow
+    void this.rollBtn.offsetWidth;
+    this.rollBtn.classList.add('shake-error');
+    setTimeout(() => {
+      this.rollBtn?.classList.remove('shake-error');
+    }, 450);
+  }
+
+         resetButton()       {
+    if (!this.rollBtn) return;
+    this.rollBtn.removeAttribute('disabled');
+    this.rollBtn.classList.remove('select-character-btn');
+    this.rollBtn.innerHTML = `
+      <div class="gacha-spin-content">
+        <span class="gacha-spin-main">SPIN</span>
+        <span class="gacha-spin-price">100 🪙</span>
+      </div>
+    `;
+  }
+
+         clearWinEffects()       {
+    this.winFxEl?.classList.add('hidden');
+    this.dupStampEl?.classList.add('hidden');
+    this.cashbackFlyerEl?.classList.add('hidden');
+    if (this.trackEl) {
+      const prevWinning = this.trackEl.querySelectorAll('.winning-card');
+      prevWinning.forEach((c) => c.classList.remove('winning-card'));
+    }
+    const prevConfetti = this.viewportEl?.querySelectorAll('.gacha-confetti-piece');
+    prevConfetti?.forEach((c) => c.remove());
+  }
+
+         initReel(centerSkinId         = 'corgi')       {
+    if (!this.trackEl) return;
+    this.clearWinEffects();
+    this.resetButton();
+
+    const initialCards           = [
+      'corgi', 'pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen',
+      'corgi', 'pigeon_pizza', (centerSkinId          ) || 'corgi', 'box_cat', 'raccoon_bandit',
+      'capybara_zen', 'corgi', 'pigeon_pizza', 'box_cat', 'capybara_zen'
+    ];
+
+    this.trackEl.innerHTML = '';
+    initialCards.forEach((id, idx) => {
+      this.trackEl?.appendChild(this.createCardElement(id, idx));
+    });
+
+    const viewportW = this.viewportEl?.clientWidth || 780;
+    const cardPitch = 164;
+    const centerIdx = 7;
+    const startX = viewportW / 2 - (centerIdx * cardPitch + 75);
+    this.trackEl.style.transform = `translateX(${startX}px)`;
+    this.reelInitialized = true;
+  }
+
+         startRoulette(
+    result                                                                                ,
+    onFinished             
+  )       {
+    if (this.isSpinning || !this.trackEl) return;
+    this.isSpinning = true;
+    this.pendingWonSkinId = null;
+    this.clearWinEffects();
+
+    if (this.rollBtn) {
+      this.rollBtn.setAttribute('disabled', 'true');
+      this.rollBtn.classList.remove('select-character-btn');
+      this.rollBtn.innerHTML = `
+        <div class="gacha-spin-content">
+          <span class="gacha-spin-main">КРУТИТСЯ...</span>
+          <span class="gacha-spin-price">🎰</span>
+        </div>
+      `;
+    }
+
+    const winningSkin         = (result.skinId          ) || 'corgi';
+    const totalCards = 36;
+    const targetIndex = 30;
+    const allSkinIds           = ['corgi', 'pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen'];
+
+    const reelSkins           = [];
+    for (let i = 0; i < totalCards; i++) {
+      if (i === targetIndex) {
+        reelSkins.push(winningSkin);
+      } else {
+        const randSkin = allSkinIds[Math.floor(Math.random() * allSkinIds.length)];
+        reelSkins.push(randSkin);
+      }
+    }
+
+    this.trackEl.innerHTML = '';
+    reelSkins.forEach((id, idx) => {
+      this.trackEl?.appendChild(this.createCardElement(id, idx));
+    });
+
+    const viewportW = this.viewportEl?.clientWidth || 780;
+    const cardPitch = 164;
+    const startX = 0;
+    const organicDrift = (Math.random() - 0.5) * 32;
+    const targetX = viewportW / 2 - (targetIndex * cardPitch + 75) + organicDrift;
+
+    this.trackEl.style.transform = `translateX(${startX}px)`;
+
+    const startTime = performance.now();
+    const duration = 3800;
+    let lastTickedCard = -1;
+
+    const animate = (now        ) => {
+      const elapsed = now - startTime;
+      const tau = Math.min(1.0, elapsed / duration);
+      // Quartic ease out: fast initial spin, smooth gradual deceleration
+      const progress = 1.0 - Math.pow(1.0 - tau, 4);
+      const currentX = startX + (targetX - startX) * progress;
+
+      if (this.trackEl) {
+        this.trackEl.style.transform = `translateX(${currentX}px)`;
+      }
+
+      // Check which card is under center marker
+      const centerPos = viewportW / 2 - currentX;
+      const currentIdx = Math.floor(centerPos / cardPitch);
+      if (currentIdx !== lastTickedCard && currentIdx >= 0 && currentIdx <= totalCards) {
+        lastTickedCard = currentIdx;
+        const pitch = 0.8 + 0.6 * (1.0 - progress);
+        this.callbacks.onTick(pitch);
+      }
+
+      if (tau < 1.0) {
+        this.animFrameId = requestAnimationFrame(animate);
+      } else {
+        this.animFrameId = null;
+        this.isSpinning = false;
+        if (this.trackEl) {
+          this.trackEl.style.transform = `translateX(${targetX}px)`;
+        }
+        this.handleSpinComplete(result, targetIndex);
+        onFinished?.();
+      }
+    };
+
+    this.animFrameId = requestAnimationFrame(animate);
+  }
+
+          handleSpinComplete(
+    result                                                                                ,
+    targetIndex        
+  )       {
+    const winningCardEl = this.trackEl?.querySelector(`[data-index="${targetIndex}"]`)                      ;
+    if (winningCardEl) {
+      winningCardEl.classList.add('winning-card');
+    }
+
+    this.winFxEl?.classList.remove('hidden');
+
+    if (!result.isDuplicate && result.skinId) {
+      this.pendingWonSkinId = result.skinId;
+      this.spawnConfetti();
+
+      if (this.rollBtn) {
+        this.rollBtn.removeAttribute('disabled');
+        this.rollBtn.classList.add('select-character-btn');
+        this.rollBtn.innerHTML = `
+          <div class="gacha-spin-content">
+            <span class="gacha-spin-main">ВЫБРАТЬ ПЕРСОНАЖА</span>
+            <span class="gacha-spin-price">ИГРАТЬ СРАЗУ ▶</span>
+          </div>
+        `;
+      }
+    } else {
+      this.pendingWonSkinId = null;
+      this.dupStampEl?.classList.remove('hidden');
+      this.triggerCashbackFlyer();
+
+      if (this.rollBtn) {
+        this.rollBtn.removeAttribute('disabled');
+        this.rollBtn.classList.remove('select-character-btn');
+        this.rollBtn.innerHTML = `
+          <div class="gacha-spin-content">
+            <span class="gacha-spin-main">КРУТИТЬ ЕЩЁ</span>
+            <span class="gacha-spin-price">100 🪙</span>
+          </div>
+        `;
+      }
+    }
+  }
+
+          triggerCashbackFlyer()       {
+    if (!this.cashbackFlyerEl) return;
+    this.cashbackFlyerEl.classList.remove('hidden');
+    this.cashbackFlyerEl.classList.remove('fly-anim');
+    void this.cashbackFlyerEl.offsetWidth;
+    this.cashbackFlyerEl.classList.add('fly-anim');
+    setTimeout(() => {
+      this.cashbackFlyerEl?.classList.add('hidden');
+      this.cashbackFlyerEl?.classList.remove('fly-anim');
+    }, 1200);
+  }
+
+          spawnConfetti()       {
+    if (!this.viewportEl) return;
+    const colors = ['#fbbf24', '#f59e0b', '#38bdf8', '#c084fc', '#4ade80', '#f43f5e', '#ffffff'];
+    const count = 38;
+
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'gacha-confetti-piece';
+      const color = colors[i % colors.length];
+      const isSquare = i % 3 === 0;
+      const w = isSquare ? 8 : 10;
+      const h = isSquare ? 8 : 14;
+
+      const angle = (Math.random() * Math.PI) - (Math.PI / 2);
+      const dist = 70 + Math.random() * 160;
+      const dx = Math.cos(angle) * dist * 1.5;
+      const dy = -Math.abs(Math.sin(angle)) * dist - 30;
+      const rot = (Math.random() - 0.5) * 720;
+
+      piece.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: ${w}px;
+        height: ${h}px;
+        background: ${color};
+        border-radius: 2px;
+        pointer-events: none;
+        z-index: 22;
+        --dx: ${dx.toFixed(1)}px;
+        --dy: ${dy.toFixed(1)}px;
+        --rot: ${rot.toFixed(1)}deg;
+      `;
+      this.viewportEl.appendChild(piece);
+    }
+  }
+
+          createCardElement(skinId        , index        )              {
+    const card = document.createElement('div');
+    card.className = 'gacha-roulette-card';
+    card.setAttribute('data-index', String(index));
+    card.setAttribute('data-skin-id', skinId);
+
+    const rarityVal = SKIN_RARITY_MAP[skinId] ?? 'Common';
+    const rarityInfo = RARITY_CSS_MAP[rarityVal] ?? RARITY_CSS_MAP.Common;
+    const nameUpper = CARD_NAMES_UPPER[skinId] ?? skinId.toUpperCase();
+    const svgArt = getGachaCardSvg(skinId);
+
+    card.innerHTML = `
+      <div class="gacha-card-name">${nameUpper}</div>
+      <div class="gacha-card-character">${svgArt}</div>
+      <div class="gacha-card-rarity ${rarityInfo.css}">${rarityInfo.label}</div>
+    `;
+    return card;
+  }
+}
+
 // --- Module: src/app/uiManager.ts ---
 const UI_SKIN_RARITY                                                 = {
   corgi: { label: 'Обычный', css: 'rarity-common' },
@@ -10732,6 +11683,11 @@ class UIManager {
                    gachaModalCloseBtn                    ;
                    gachaModalCoinsEl                    ;
                    gachaModalSkinListEl                    ;
+                   skinsModal                    ;
+                   skinsModalCloseBtn                    ;
+                   skinsModalListEl                    ;
+          gachaController                           = null;
+          uiActions                   = null;
 
                    leaderboardCloseBtn                    ;
                    leaderboardBestScoreEl                    ;
@@ -10838,6 +11794,18 @@ class UIManager {
     this.gachaModalCoinsEl = document.getElementById('gacha-modal-coins');
     this.gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list');
 
+    this.skinsModal = document.getElementById('skins-modal');
+    this.skinsModalCloseBtn = document.getElementById('skins-modal-close-btn');
+    this.skinsModalListEl = document.getElementById('skins-modal-list');
+    this.skinsModalCloseBtn?.addEventListener('click', () => this.closeSkins());
+
+    this.gachaController = new GachaMachineModal({
+      onRoll: () => this.uiActions?.onRollGacha(),
+      onSelectAndPlay: (skinId) => this.uiActions?.onSelectAndPlay?.(skinId),
+      onTick: (pitch) => this.uiActions?.onGachaTick?.(pitch),
+      onClose: () => {},
+    });
+
     this.leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
     this.leaderboardBestScoreEl = document.getElementById('leaderboard-best-score');
     this.leaderboardNameInput = document.getElementById('leaderboard-name-input')                           ;
@@ -10909,7 +11877,7 @@ class UIManager {
     this.menuLeaderboardBtn?.addEventListener('click', () => this.openLeaderboard());
     this.leaderboardCloseBtn?.addEventListener('click', () => this.closeLeaderboard());
     this.menuSettingsBtn?.addEventListener('click', () => this.openSettings('menu'));
-    document.getElementById('menu-skins-btn')?.addEventListener('click', () => this.openGacha());
+    document.getElementById('menu-skins-btn')?.addEventListener('click', () => this.openSkins());
     document.getElementById('menu-coins-plus-btn')?.addEventListener('click', () => this.openGacha());
     document.getElementById('menu-coins-pill')?.addEventListener('click', () => this.openGacha());
     const stopBubble = (e       ) => e.stopPropagation();
@@ -11032,12 +12000,35 @@ class UIManager {
     return this.currentLanguage;
   }
 
-  openGacha()       {
-    this.gachaModal?.classList.remove('hidden');
+  openGacha(currentSkinId         )       {
+    this.gachaController?.open(currentSkinId);
   }
 
   closeGacha()       {
-    this.gachaModal?.classList.add('hidden');
+    this.gachaController?.close();
+  }
+
+  openSkins()       {
+    this.skinsModal?.classList.remove('hidden');
+  }
+
+  closeSkins()       {
+    this.skinsModal?.classList.add('hidden');
+  }
+
+  isSkinsOpen()          {
+    return Boolean(this.skinsModal && !this.skinsModal.classList.contains('hidden'));
+  }
+
+  startGachaRoulette(
+    result                                                                                ,
+    onFinished             
+  )       {
+    this.gachaController?.startRoulette(result, onFinished);
+  }
+
+  shakeGachaRollButton()       {
+    this.gachaController?.shakeRollButton();
   }
 
   openLeaderboard()       {
@@ -11419,7 +12410,7 @@ class UIManager {
   }
 
   isGachaOpen()          {
-    return Boolean(this.gachaModal && !this.gachaModal.classList.contains('hidden'));
+    return Boolean(this.gachaController ? this.gachaController.isOpen() : (this.gachaModal && !this.gachaModal.classList.contains('hidden')));
   }
 
   isLeaderboardOpen()          {
@@ -11490,6 +12481,7 @@ class UIManager {
     if (this.leaderboardBestScoreEl) this.leaderboardBestScoreEl.textContent = String(highScore);
     if (this.gachaModalCoinsEl) this.gachaModalCoinsEl.textContent = String(coins);
     if (this.questsCoinsValEl) this.questsCoinsValEl.textContent = String(coins);
+    this.gachaController?.updateCoins(coins);
   }
 
   renderLeaderboard(entries                    )       {
@@ -11511,8 +12503,9 @@ class UIManager {
   }
 
   renderSkins(unlocked          , selected        , onSelectSkin                      )       {
-    if (!this.gachaModalSkinListEl) return;
-    this.gachaModalSkinListEl.innerHTML = '';
+    const container = this.skinsModalListEl ?? this.gachaModalSkinListEl;
+    if (!container) return;
+    container.innerHTML = '';
 
     ALL_SKINS.forEach((skin) => {
       const isUnlocked = unlocked.includes(skin.id);
@@ -11526,13 +12519,17 @@ class UIManager {
         <div class="gacha-skin-tag">${selected === skin.id ? 'ВЫБРАН' : isUnlocked ? 'ДОСТУПЕН' : 'ЗАКРЫТ'}</div>
       `;
       if (isUnlocked) {
-        card.addEventListener('click', () => onSelectSkin(skin.id));
+        card.addEventListener('click', () => {
+          onSelectSkin(skin.id);
+          this.closeSkins();
+        });
       }
-      this.gachaModalSkinListEl?.appendChild(card);
+      container.appendChild(card);
     });
   }
 
   bindActions(handlers           )       {
+    this.uiActions = handlers;
     this.mainMenuModal?.addEventListener('click', (e) => {
       const target = e.target               ;
       if (
@@ -11559,7 +12556,6 @@ class UIManager {
     this.pauseMenuBtn?.addEventListener('click', handlers.onToMenu);
     this.toMenuBtn?.addEventListener('click', handlers.onToMenu);
     this.restartBtn?.addEventListener('click', handlers.onRestart);
-    this.gachaModalRollBtn?.addEventListener('click', handlers.onRollGacha);
     this.menuDailyBtn?.addEventListener('click', () => {
       handlers.onOpenDaily?.();
     });
@@ -12367,33 +13363,61 @@ class GameLoop {
   }
 
          handleGachaRoll()       {
+    if (this.engine.getCoins() < WORLD_CONFIG.GACHA_COST) {
+      this.ui.shakeGachaRollButton?.();
+      const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${this.engine.getCoins()} 🪙)`;
+      this.ui.updateGachaStatus(msg);
+      this.ui.showToast('🪙', 'Недостаточно монет!', `Для запуска автомата нужно ${WORLD_CONFIG.GACHA_COST} монет`);
+      return;
+    }
+
     const res = this.engine.rollGacha();
     if (res.success && res.skinId) {
-      const completed = this.engine.recordDailyQuestProgress({ gacha: 1 });
-      this.notifyQuestsCompleted(completed);
       this.audio.playGachaRoll();
-      const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
-      this.audio.playGachaUnlock(isRare);
-      const meta = ALL_SKINS.find((s) => s.id === res.skinId);
-      const rarity = UI_SKIN_RARITY[res.skinId] ?? { label: 'Эпический', css: 'rarity-epic' };
-      if (res.isDuplicate) {
-        const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
-        this.ui.updateGachaStatus(msg);
-        this.ui.showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
-      } else {
-        const msg = `🎉 Выбит скин (${rarity.label}): ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
-        this.ui.updateGachaStatus(msg);
-        this.ui.showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
-      }
-      this.unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
-      if (this.engine.getUnlockedSkins().length >= ALL_SKINS.length) {
-        this.unlockAchievement('gacha_all', '👑', 'Полная коллекция', 'Собраны все воксельные скины!');
-      }
-      this.lastCoins = this.engine.getCoins();
-      this.renderSkinsUI();
+      this.updateMenuStats();
+
+      this.ui.startGachaRoulette(res, () => {
+        const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
+        const meta = ALL_SKINS.find((s) => s.id === res.skinId);
+        const rarity = UI_SKIN_RARITY[res.skinId ] ?? { label: 'Эпический', css: 'rarity-epic' };
+
+        if (res.isDuplicate) {
+          this.audio.playCoinRefund();
+          const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
+          this.ui.updateGachaStatus(msg);
+          this.ui.showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
+          this.updateMenuStats();
+        } else {
+          this.audio.playGachaUnlock(isRare);
+          const msg = `🎉 Выбит скин (${rarity.label}): ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+          this.ui.updateGachaStatus(msg);
+          this.ui.showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
+          this.unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
+        }
+
+        const completed = this.engine.recordDailyQuestProgress({ gacha: 1 });
+        this.notifyQuestsCompleted(completed);
+
+        if (this.engine.getUnlockedSkins().length >= ALL_SKINS.length) {
+          this.unlockAchievement('gacha_all', '👑', 'Полная коллекция', 'Собраны все воксельные скины!');
+        }
+        this.lastCoins = this.engine.getCoins();
+        this.renderSkinsUI();
+      });
     } else {
       const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${this.engine.getCoins()} 🪙)`;
       this.ui.updateGachaStatus(msg);
+      this.ui.shakeGachaRollButton?.();
+    }
+  }
+
+         handleSelectAndPlay(skinId        )       {
+    if (this.engine.selectSkin(skinId          )) {
+      this.sceneManager.updatePlayerSkin(skinId          );
+      this.audio.playSkinVoice(skinId);
+      this.ui.closeGacha();
+      this.renderSkinsUI();
+      this.startGame();
     }
   }
 
@@ -12517,6 +13541,8 @@ class GameLoop {
       this.ui.closeDailyQuests();
     } else if (this.ui.isAchievementsOpen()) {
       this.ui.closeAchievements();
+    } else if (this.ui.isSkinsOpen()) {
+      this.ui.closeSkins();
     } else if (this.ui.isGachaOpen()) {
       this.ui.closeGacha();
     } else if (this.ui.isLeaderboardOpen()) {
@@ -12913,6 +13939,8 @@ class GameLoop {
       onToMenu: () => this.openMainMenu(),
       onRestart: () => this.restartGame(),
       onRollGacha: () => this.handleGachaRoll(),
+      onSelectAndPlay: (skinId        ) => this.handleSelectAndPlay(skinId),
+      onGachaTick: (pitch        ) => this.audio.playGachaTick(pitch),
       onSaveName: (name        ) => this.savePlayerName(name),
       onToggleSound: (enabled         ) => this.toggleSound(enabled),
       onToggleMusic: (enabled         ) => this.toggleMusic(enabled),
@@ -13046,6 +14074,7 @@ class GameLoop {
       isPauseOpen: () => this.ui.isPauseOpen(),
       isMainMenuOpen: () => this.ui.isMainMenuOpen(),
       isGachaOpen: () => this.ui.isGachaOpen(),
+      isSkinsOpen: () => this.ui.isSkinsOpen(),
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),
       isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),

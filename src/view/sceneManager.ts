@@ -711,6 +711,15 @@ export class SceneManager {
     };
   }
 
+  updatePlayerSkin(skinId: SkinId): void {
+    if (skinId !== this.currentSkin) {
+      this.currentSkin = skinId;
+      this.scene.remove(this.playerMesh);
+      this.playerMesh = MeshFactory.createCharacter(skinId);
+      this.scene.add(this.playerMesh);
+    }
+  }
+
   sync(engine: GameEngine, dt: number = 0.016): void {
     const tSyncStart = performance.now();
     const selectedSkin = engine.getSelectedSkin();

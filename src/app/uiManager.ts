@@ -5,6 +5,7 @@ import type { DailyQuestDayState } from '../core/dailyQuests.ts';
 import type { SettingsManager } from '../core/settingsManager.ts';
 import { type Language, t } from '../core/i18n.ts';
 import { SettingsModalController, type SettingsModalCallbacks } from './settingsModal.ts';
+import { GachaMachineModal } from './gachaMachineModal.ts';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -21,6 +22,8 @@ export interface UIActions {
   onToMenu: () => void;
   onRestart: () => void;
   onRollGacha: () => void;
+  onSelectAndPlay?: (skinId: string) => void;
+  onGachaTick?: (pitch: number) => void;
   onSaveName: (name: string) => void;
   onToggleSound: (enabled: boolean) => void;
   onToggleMusic: (enabled: boolean) => void;
@@ -90,6 +93,11 @@ export class UIManager {
   private readonly gachaModalCloseBtn: HTMLElement | null;
   private readonly gachaModalCoinsEl: HTMLElement | null;
   private readonly gachaModalSkinListEl: HTMLElement | null;
+  private readonly skinsModal: HTMLElement | null;
+  private readonly skinsModalCloseBtn: HTMLElement | null;
+  private readonly skinsModalListEl: HTMLElement | null;
+  private gachaController: GachaMachineModal | null = null;
+  private uiActions: UIActions | null = null;
 
   private readonly leaderboardCloseBtn: HTMLElement | null;
   private readonly leaderboardBestScoreEl: HTMLElement | null;
@@ -196,6 +204,18 @@ export class UIManager {
     this.gachaModalCoinsEl = document.getElementById('gacha-modal-coins');
     this.gachaModalSkinListEl = document.getElementById('gacha-modal-skin-list');
 
+    this.skinsModal = document.getElementById('skins-modal');
+    this.skinsModalCloseBtn = document.getElementById('skins-modal-close-btn');
+    this.skinsModalListEl = document.getElementById('skins-modal-list');
+    this.skinsModalCloseBtn?.addEventListener('click', () => this.closeSkins());
+
+    this.gachaController = new GachaMachineModal({
+      onRoll: () => this.uiActions?.onRollGacha(),
+      onSelectAndPlay: (skinId) => this.uiActions?.onSelectAndPlay?.(skinId),
+      onTick: (pitch) => this.uiActions?.onGachaTick?.(pitch),
+      onClose: () => {},
+    });
+
     this.leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
     this.leaderboardBestScoreEl = document.getElementById('leaderboard-best-score');
     this.leaderboardNameInput = document.getElementById('leaderboard-name-input') as HTMLInputElement | null;
@@ -267,7 +287,7 @@ export class UIManager {
     this.menuLeaderboardBtn?.addEventListener('click', () => this.openLeaderboard());
     this.leaderboardCloseBtn?.addEventListener('click', () => this.closeLeaderboard());
     this.menuSettingsBtn?.addEventListener('click', () => this.openSettings('menu'));
-    document.getElementById('menu-skins-btn')?.addEventListener('click', () => this.openGacha());
+    document.getElementById('menu-skins-btn')?.addEventListener('click', () => this.openSkins());
     document.getElementById('menu-coins-plus-btn')?.addEventListener('click', () => this.openGacha());
     document.getElementById('menu-coins-pill')?.addEventListener('click', () => this.openGacha());
     const stopBubble = (e: Event) => e.stopPropagation();
@@ -390,12 +410,35 @@ export class UIManager {
     return this.currentLanguage;
   }
 
-  openGacha(): void {
-    this.gachaModal?.classList.remove('hidden');
+  openGacha(currentSkinId?: string): void {
+    this.gachaController?.open(currentSkinId);
   }
 
   closeGacha(): void {
-    this.gachaModal?.classList.add('hidden');
+    this.gachaController?.close();
+  }
+
+  openSkins(): void {
+    this.skinsModal?.classList.remove('hidden');
+  }
+
+  closeSkins(): void {
+    this.skinsModal?.classList.add('hidden');
+  }
+
+  isSkinsOpen(): boolean {
+    return Boolean(this.skinsModal && !this.skinsModal.classList.contains('hidden'));
+  }
+
+  startGachaRoulette(
+    result: { skinId?: string; rarity?: string; isDuplicate?: boolean; cashback?: number },
+    onFinished?: () => void
+  ): void {
+    this.gachaController?.startRoulette(result, onFinished);
+  }
+
+  shakeGachaRollButton(): void {
+    this.gachaController?.shakeRollButton();
   }
 
   openLeaderboard(): void {
@@ -777,7 +820,7 @@ export class UIManager {
   }
 
   isGachaOpen(): boolean {
-    return Boolean(this.gachaModal && !this.gachaModal.classList.contains('hidden'));
+    return Boolean(this.gachaController ? this.gachaController.isOpen() : (this.gachaModal && !this.gachaModal.classList.contains('hidden')));
   }
 
   isLeaderboardOpen(): boolean {
@@ -848,6 +891,7 @@ export class UIManager {
     if (this.leaderboardBestScoreEl) this.leaderboardBestScoreEl.textContent = String(highScore);
     if (this.gachaModalCoinsEl) this.gachaModalCoinsEl.textContent = String(coins);
     if (this.questsCoinsValEl) this.questsCoinsValEl.textContent = String(coins);
+    this.gachaController?.updateCoins(coins);
   }
 
   renderLeaderboard(entries: LeaderboardEntry[]): void {
@@ -869,8 +913,9 @@ export class UIManager {
   }
 
   renderSkins(unlocked: string[], selected: string, onSelectSkin: (id: string) => void): void {
-    if (!this.gachaModalSkinListEl) return;
-    this.gachaModalSkinListEl.innerHTML = '';
+    const container = this.skinsModalListEl ?? this.gachaModalSkinListEl;
+    if (!container) return;
+    container.innerHTML = '';
 
     ALL_SKINS.forEach((skin) => {
       const isUnlocked = unlocked.includes(skin.id);
@@ -884,13 +929,17 @@ export class UIManager {
         <div class="gacha-skin-tag">${selected === skin.id ? 'ВЫБРАН' : isUnlocked ? 'ДОСТУПЕН' : 'ЗАКРЫТ'}</div>
       `;
       if (isUnlocked) {
-        card.addEventListener('click', () => onSelectSkin(skin.id));
+        card.addEventListener('click', () => {
+          onSelectSkin(skin.id);
+          this.closeSkins();
+        });
       }
-      this.gachaModalSkinListEl?.appendChild(card);
+      container.appendChild(card);
     });
   }
 
   bindActions(handlers: UIActions): void {
+    this.uiActions = handlers;
     this.mainMenuModal?.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       if (
@@ -917,7 +966,6 @@ export class UIManager {
     this.pauseMenuBtn?.addEventListener('click', handlers.onToMenu);
     this.toMenuBtn?.addEventListener('click', handlers.onToMenu);
     this.restartBtn?.addEventListener('click', handlers.onRestart);
-    this.gachaModalRollBtn?.addEventListener('click', handlers.onRollGacha);
     this.menuDailyBtn?.addEventListener('click', () => {
       handlers.onOpenDaily?.();
     });

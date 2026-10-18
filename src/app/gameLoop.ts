@@ -289,33 +289,61 @@ export class GameLoop {
   }
 
   public handleGachaRoll(): void {
+    if (this.engine.getCoins() < WORLD_CONFIG.GACHA_COST) {
+      this.ui.shakeGachaRollButton?.();
+      const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${this.engine.getCoins()} 🪙)`;
+      this.ui.updateGachaStatus(msg);
+      this.ui.showToast('🪙', 'Недостаточно монет!', `Для запуска автомата нужно ${WORLD_CONFIG.GACHA_COST} монет`);
+      return;
+    }
+
     const res = this.engine.rollGacha();
     if (res.success && res.skinId) {
-      const completed = this.engine.recordDailyQuestProgress({ gacha: 1 });
-      this.notifyQuestsCompleted(completed);
       this.audio.playGachaRoll();
-      const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
-      this.audio.playGachaUnlock(isRare);
-      const meta = ALL_SKINS.find((s) => s.id === res.skinId);
-      const rarity = UI_SKIN_RARITY[res.skinId] ?? { label: 'Эпический', css: 'rarity-epic' };
-      if (res.isDuplicate) {
-        const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
-        this.ui.updateGachaStatus(msg);
-        this.ui.showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
-      } else {
-        const msg = `🎉 Выбит скин (${rarity.label}): ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
-        this.ui.updateGachaStatus(msg);
-        this.ui.showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
-      }
-      this.unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
-      if (this.engine.getUnlockedSkins().length >= ALL_SKINS.length) {
-        this.unlockAchievement('gacha_all', '👑', 'Полная коллекция', 'Собраны все воксельные скины!');
-      }
-      this.lastCoins = this.engine.getCoins();
-      this.renderSkinsUI();
+      this.updateMenuStats();
+
+      this.ui.startGachaRoulette(res, () => {
+        const isRare = res.rarity === 'Legendary' || res.rarity === 'Epic';
+        const meta = ALL_SKINS.find((s) => s.id === res.skinId);
+        const rarity = UI_SKIN_RARITY[res.skinId!] ?? { label: 'Эпический', css: 'rarity-epic' };
+
+        if (res.isDuplicate) {
+          this.audio.playCoinRefund();
+          const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
+          this.ui.updateGachaStatus(msg);
+          this.ui.showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
+          this.updateMenuStats();
+        } else {
+          this.audio.playGachaUnlock(isRare);
+          const msg = `🎉 Выбит скин (${rarity.label}): ${meta?.badge ?? ''} ${meta?.name ?? res.skinId}!`;
+          this.ui.updateGachaStatus(msg);
+          this.ui.showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
+          this.unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
+        }
+
+        const completed = this.engine.recordDailyQuestProgress({ gacha: 1 });
+        this.notifyQuestsCompleted(completed);
+
+        if (this.engine.getUnlockedSkins().length >= ALL_SKINS.length) {
+          this.unlockAchievement('gacha_all', '👑', 'Полная коллекция', 'Собраны все воксельные скины!');
+        }
+        this.lastCoins = this.engine.getCoins();
+        this.renderSkinsUI();
+      });
     } else {
       const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${this.engine.getCoins()} 🪙)`;
       this.ui.updateGachaStatus(msg);
+      this.ui.shakeGachaRollButton?.();
+    }
+  }
+
+  public handleSelectAndPlay(skinId: string): void {
+    if (this.engine.selectSkin(skinId as SkinId)) {
+      this.sceneManager.updatePlayerSkin(skinId as SkinId);
+      this.audio.playSkinVoice(skinId);
+      this.ui.closeGacha();
+      this.renderSkinsUI();
+      this.startGame();
     }
   }
 
@@ -439,6 +467,8 @@ export class GameLoop {
       this.ui.closeDailyQuests();
     } else if (this.ui.isAchievementsOpen()) {
       this.ui.closeAchievements();
+    } else if (this.ui.isSkinsOpen()) {
+      this.ui.closeSkins();
     } else if (this.ui.isGachaOpen()) {
       this.ui.closeGacha();
     } else if (this.ui.isLeaderboardOpen()) {
@@ -835,6 +865,8 @@ export class GameLoop {
       onToMenu: () => this.openMainMenu(),
       onRestart: () => this.restartGame(),
       onRollGacha: () => this.handleGachaRoll(),
+      onSelectAndPlay: (skinId: string) => this.handleSelectAndPlay(skinId),
+      onGachaTick: (pitch: number) => this.audio.playGachaTick(pitch),
       onSaveName: (name: string) => this.savePlayerName(name),
       onToggleSound: (enabled: boolean) => this.toggleSound(enabled),
       onToggleMusic: (enabled: boolean) => this.toggleMusic(enabled),
@@ -968,6 +1000,7 @@ export class GameLoop {
       isPauseOpen: () => this.ui.isPauseOpen(),
       isMainMenuOpen: () => this.ui.isMainMenuOpen(),
       isGachaOpen: () => this.ui.isGachaOpen(),
+      isSkinsOpen: () => this.ui.isSkinsOpen(),
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),
       isDailyBonusOpen: () => this.ui.isDailyBonusOpen(),

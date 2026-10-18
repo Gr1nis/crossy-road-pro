@@ -24,6 +24,7 @@ export interface ModalStateProvider {
   isPauseOpen: () => boolean;
   isMainMenuOpen: () => boolean;
   isGachaOpen: () => boolean;
+  isSkinsOpen?: () => boolean;
   isLeaderboardOpen: () => boolean;
   isAchievementsOpen?: () => boolean;
   isDailyBonusOpen?: () => boolean;

@@ -584,6 +584,48 @@ export class AudioSynth {
     }
   }
 
+  playGachaTick(pitch: number = 1.0): void {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    const freq = Math.max(220, Math.min(2200, 680 * pitch));
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.024);
+    gain.gain.setValueAtTime(0.09 * this.sfxVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.024);
+    osc.connect(gain);
+    gain.connect(this.sfxGainNode ?? ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.025);
+  }
+
+  playCoinRefund(): void {
+    if (!this.soundEnabled) return;
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const freqs = [1200, 1500, 1800, 2200];
+    freqs.forEach((freq, idx) => {
+      const t = now + idx * 0.055;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.12 * this.sfxVolume, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.17);
+    });
+  }
+
   playGachaRoll(): void {
     if (!this.soundEnabled) return;
     const ctx = this.ensureContext();

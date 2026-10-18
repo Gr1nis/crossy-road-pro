@@ -49,11 +49,13 @@ const moduleOrder = [
   'src/view/squashStretch.ts',
   'src/view/laneGeometryPool.ts',
   'src/view/instancedDecorManager.ts',
+  'src/view/gachaCardArt.ts',
   'src/view/sceneManager.ts',
   'src/app/perfMetrics.ts',
   'src/app/perfReportModal.ts',
   'src/app/perfMonitor.ts',
   'src/app/settingsModal.ts',
+  'src/app/gachaMachineModal.ts',
   'src/app/uiManager.ts',
   'src/app/inputManager.ts',
   'src/app/gameLoop.ts',
@@ -663,12 +665,350 @@ const htmlContent = `<!DOCTYPE html>
     .menu-btn-secondary { background: #334155; color: #e2e8f0; }
     .menu-btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
 
-    .modal-card-gacha { max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; -webkit-overflow-scrolling: touch; }
-    #gacha-modal h2 { font-size: clamp(18px, 4vw, 28px); color: #fbbf24; }
-    .modal-card-gacha .menu-stat-pill.gold { display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; flex-direction: row; align-self: center; margin: 0 auto 16px; font-size: 15px; line-height: 1; }
-    .modal-card-gacha .menu-stat-pill.gold strong { font-size: 22px; line-height: 1; display: inline-flex; align-items: center; margin: 0; color: #facc15; }
-    .modal-card-gacha .menu-stat-pill.gold span { display: inline-flex; align-items: center; line-height: 1; }
-    .gacha-modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+    /* ===== НОВЫЙ ДИЗАЙН ГАЧА-АВТОМАТА (ПК 16:9 ПО РЕФЕРЕНСУ) ===== */
+    .modal-card-gacha-pc {
+      background: linear-gradient(180deg, rgba(20, 32, 54, 0.96) 0%, rgba(13, 20, 36, 0.98) 100%);
+      border: 2px solid rgba(251, 191, 36, 0.55);
+      border-radius: 28px;
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.25), 0 25px 60px rgba(0, 0, 0, 0.75);
+      max-width: 840px;
+      width: 92%;
+      padding: 20px 28px 26px;
+      position: relative;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+    .gacha-top-bar {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 20;
+    }
+    .gacha-coin-pill {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid #f59e0b;
+      border-radius: 999px;
+      padding: 5px 14px 5px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+    }
+    .gacha-coin-val { font-size: 19px; font-weight: 900; color: #facc15; }
+    .gacha-coin-label { font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 0.05em; }
+    .gacha-coin-icon { font-size: 16px; margin-left: 2px; }
+    .gacha-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      border: 2px solid #fca5a5;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 12px rgba(239, 68, 68, 0.4);
+      transition: transform 0.15s ease, filter 0.15s;
+    }
+    .gacha-close-btn:hover { transform: scale(1.1); filter: brightness(1.15); }
+
+    .gacha-header-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .gacha-stars-left, .gacha-stars-right {
+      display: flex;
+      gap: 6px;
+      font-size: 24px;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    }
+    .star-purple { color: #c084fc; text-shadow: 0 0 10px rgba(192, 132, 252, 0.8); }
+    .star-cyan { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
+    .gacha-title-box { text-align: center; position: relative; }
+    .gacha-3d-title {
+      margin: 0;
+      font-size: 34px;
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      color: #fde047;
+      text-shadow:
+        0 1px 0 #ca8a04,
+        0 2px 0 #a16207,
+        0 3px 0 #854d0e,
+        0 4px 0 #713f12,
+        0 6px 12px rgba(0, 0, 0, 0.6);
+      -webkit-text-stroke: 1px #78350f;
+    }
+    .gacha-ribbon {
+      width: 140px;
+      height: 10px;
+      background: linear-gradient(90deg, transparent, #dc2626 20%, #ef4444 50%, #dc2626 80%, transparent);
+      margin: 4px auto 0;
+      border-radius: 999px;
+      filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.5));
+    }
+
+    .gacha-viewport {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #090e1c;
+      border: 2px solid #1e293b;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.7);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    }
+    .gacha-pointer {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 26px;
+      color: #facc15;
+      z-index: 15;
+      filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+      line-height: 1;
+      pointer-events: none;
+      animation: pointerGlow 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes pointerGlow {
+      0% { filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.7)); }
+      100% { filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1)); }
+    }
+    .gacha-guide-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(250, 204, 21, 0.6) 0%, rgba(250, 204, 21, 0.05) 100%);
+      transform: translateX(-50%);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .gacha-reel-track {
+      position: absolute;
+      top: 14px;
+      left: 0;
+      display: flex;
+      gap: 14px;
+      will-change: transform;
+      padding: 0 40px;
+    }
+    .gacha-roulette-card {
+      flex: 0 0 150px;
+      width: 150px;
+      height: 190px;
+      background: #111c33;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 8px 8px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s;
+      position: relative;
+    }
+    .gacha-roulette-card.winning-card {
+      border-color: #fbbf24;
+      box-shadow: 0 0 25px rgba(251, 191, 36, 0.8), inset 0 0 15px rgba(251, 191, 36, 0.3);
+      transform: scale(1.06);
+      z-index: 12;
+      background: #192747;
+    }
+    .gacha-card-name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #f1f5f9;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 90%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gacha-card-character {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4px 0;
+    }
+    .gacha-card-character svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+    }
+    .gacha-card-rarity {
+      width: 92%;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      padding: 3px 0;
+      border-radius: 8px;
+      text-transform: uppercase;
+    }
+
+    .gacha-win-fx {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px;
+      height: 220px;
+      pointer-events: none;
+      z-index: 11;
+    }
+    .gacha-sunburst {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(250, 204, 21, 0.45) 0%, rgba(250, 204, 21, 0.1) 45%, transparent 70%);
+      animation: sunburstRotate 8s linear infinite;
+    }
+    @keyframes sunburstRotate {
+      0% { transform: rotate(0deg) scale(0.9); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      100% { transform: rotate(360deg) scale(0.9); }
+    }
+
+    .gacha-duplicate-stamp {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-8deg);
+      background: rgba(220, 38, 38, 0.92);
+      border: 3px dashed #fecaca;
+      border-radius: 12px;
+      padding: 8px 18px;
+      text-align: center;
+      z-index: 25;
+      color: #fff;
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.7);
+      animation: stampPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .gacha-stamp-sub { font-size: 12px; color: #fde047; margin-top: 2px; }
+    @keyframes stampPop {
+      0% { transform: translate(-50%, -50%) rotate(-25deg) scale(2.2); opacity: 0; }
+      100% { transform: translate(-50%, -50%) rotate(-8deg) scale(1); opacity: 1; }
+    }
+
+    .gacha-cashback-flyer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 22px;
+      font-weight: 900;
+      color: #facc15;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      z-index: 30;
+      pointer-events: none;
+    }
+    .gacha-cashback-flyer.fly-anim {
+      animation: flyerMove 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    @keyframes flyerMove {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      60% { transform: translate(140px, -110px) scale(1.3); opacity: 1; }
+      100% { transform: translate(260px, -150px) scale(0.6); opacity: 0; }
+    }
+
+    .gacha-action-bar { display: flex; justify-content: center; width: 100%; }
+    .gacha-spin-btn {
+      background: linear-gradient(180deg, #facc15 0%, #f59e0b 45%, #d97706 100%);
+      border: 3px solid #fde68a;
+      border-radius: 22px;
+      padding: 14px 48px;
+      cursor: pointer;
+      min-width: 260px;
+      box-shadow:
+        0 2px 0 #b45309,
+        0 4px 0 #92400e,
+        0 6px 0 #78350f,
+        0 8px 0 #451a03,
+        0 14px 25px rgba(0, 0, 0, 0.6);
+      transition: transform 0.1s ease, filter 0.15s, box-shadow 0.1s;
+      outline: none;
+    }
+    .gacha-spin-btn:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-2px); }
+    .gacha-spin-btn:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow:
+        0 1px 0 #b45309,
+        0 2px 0 #78350f,
+        0 6px 14px rgba(0, 0, 0, 0.5);
+    }
+    .gacha-spin-btn:disabled { opacity: 0.65; cursor: not-allowed; filter: grayscale(0.2); }
+    .gacha-spin-btn.shake-error { animation: shakeBtn 0.4s ease-in-out; }
+    @keyframes shakeBtn {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .gacha-spin-content { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .gacha-spin-main {
+      font-size: 26px;
+      font-weight: 900;
+      color: #451a03;
+      letter-spacing: 0.05em;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    .gacha-spin-price {
+      font-size: 14px;
+      font-weight: 900;
+      color: #78350f;
+      background: rgba(255, 255, 255, 0.35);
+      padding: 2px 14px;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
+    }
+
+    .gacha-spin-btn.select-character-btn {
+      background: linear-gradient(180deg, #34d399 0%, #10b981 45%, #059669 100%);
+      border-color: #a7f3d0;
+      box-shadow:
+        0 2px 0 #047857,
+        0 4px 0 #065f46,
+        0 6px 0 #064e3b,
+        0 8px 0 #022c22,
+        0 14px 28px rgba(16, 185, 129, 0.45);
+      animation: pulseWinBtn 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes pulseWinBtn {
+      0% { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
+      100% { filter: drop-shadow(0 0 24px rgba(16, 185, 129, 0.95)) brightness(1.08); }
+    }
+    .gacha-spin-btn.select-character-btn .gacha-spin-main { color: #022c22; font-size: 20px; }
+    .gacha-spin-btn.select-character-btn .gacha-spin-price { color: #064e3b; background: rgba(255, 255, 255, 0.4); }
     .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
     .gacha-skin-card.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 14px rgba(56, 189, 248, 0.3); }
@@ -1742,24 +2082,81 @@ const htmlContent = `<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- Модальное окно Автомата скинов -->
-  <div id="gacha-modal" class="modal hidden">
-    <div class="modal-card modal-card-gacha">
-      <h2 style="color: #fbbf24;" data-i18n="gacha_title">🎰 АВТОМАТ СКИНОВ</h2>
-      <p data-i18n="gacha_desc">Испытайте удачу и откройте новые воксельные скины!</p>
-
-      <div class="menu-stat-pill gold" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; margin: 0 auto 16px; align-self: center;">
-        <span style="display: inline-flex; align-items: center; line-height: 1;" data-i18n="gacha_balance">Ваш баланс:</span>
-        <strong id="gacha-modal-coins" style="display: inline-flex; align-items: center; line-height: 1; margin: 0;">0</strong>
-        <span style="display: inline-flex; align-items: center; line-height: 1;">🪙</span>
+  <!-- Модальное окно Автомата скинов (ПК рулетка по референсу) -->
+  <div id="gacha-modal" class="modal hidden" style="z-index: 120;">
+    <div class="modal-card modal-card-gacha-pc">
+      <!-- Верхний бар с балансом и кнопкой закрытия -->
+      <div class="gacha-top-bar">
+        <div class="gacha-coin-pill" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle;">
+          <span class="gacha-coin-val" id="gacha-modal-coins">0</span>
+          <span class="gacha-coin-label">COINS</span>
+          <span class="gacha-coin-icon">🪙</span>
+        </div>
+        <button type="button" id="gacha-modal-close-btn" class="gacha-close-btn" aria-label="Закрыть">✕</button>
       </div>
 
-      <div id="gacha-modal-skin-list" class="gacha-modal-grid"></div>
-
-      <div class="menu-btn-stack">
-        <button id="gacha-modal-roll-btn" class="menu-btn menu-btn-amber">100 🪙</button>
-        <button id="gacha-modal-close-btn" class="menu-btn menu-btn-secondary" data-i18n="modal_close">Закрыть</button>
+      <!-- 3D Заголовок PRIZE MACHINE со звёздами и лентой -->
+      <div class="gacha-header-wrap">
+        <span style="display:none;" data-i18n="gacha_title">🎰 АВТОМАТ СКИНОВ</span>
+        <div class="gacha-stars-left">
+          <span class="gacha-star star-purple">★</span>
+          <span class="gacha-star star-cyan">★</span>
+        </div>
+        <div class="gacha-title-box">
+          <h1 class="gacha-3d-title">PRIZE<br>MACHINE</h1>
+          <div class="gacha-ribbon"></div>
+        </div>
+        <div class="gacha-stars-right">
+          <span class="gacha-star star-cyan">★</span>
+          <span class="gacha-star star-purple">★</span>
+        </div>
       </div>
+
+      <!-- Смотровое окно горизонтальной рулетки -->
+      <div id="gacha-viewport" class="gacha-viewport">
+        <!-- Золотой указатель по центру -->
+        <div class="gacha-pointer">▼</div>
+
+        <!-- Центральная направляющая линия -->
+        <div class="gacha-guide-line"></div>
+
+        <!-- Контейнер карточек рулетки -->
+        <div id="gacha-modal-skin-list" class="gacha-reel-track"></div>
+
+        <!-- Оверлей сияния при победе -->
+        <div id="gacha-win-fx" class="gacha-win-fx hidden">
+          <div class="gacha-sunburst"></div>
+        </div>
+
+        <!-- Штамп дубликата -->
+        <div id="gacha-duplicate-stamp" class="gacha-duplicate-stamp hidden">
+          <span>♻ ДУБЛИКАТ</span>
+          <div class="gacha-stamp-sub">+40 🪙 КЭШБЭК</div>
+        </div>
+
+        <!-- Анимация вылетающих монеток кэшбэка -->
+        <div id="gacha-cashback-flyer" class="gacha-cashback-flyer hidden">+40 🪙</div>
+      </div>
+
+      <!-- Нижняя зона: большая кнопка SPIN -->
+      <div class="gacha-action-bar">
+        <button type="button" id="gacha-modal-roll-btn" class="gacha-spin-btn">
+          <div class="gacha-spin-content">
+            <span class="gacha-spin-main">SPIN</span>
+            <span class="gacha-spin-price">100 🪙</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно Коллекции скинов -->
+  <div id="skins-modal" class="modal hidden" style="z-index: 110;">
+    <div class="modal-card" style="max-width: 520px;">
+      <h2 style="color: #38bdf8;" data-i18n="skins_title">👤 КОЛЛЕКЦИЯ СКИНОВ</h2>
+      <p style="margin-bottom: 16px;" data-i18n="skins_desc">Выберите персонажа для следующего забега:</p>
+      <div id="skins-modal-list" class="gacha-modal-grid"></div>
+      <button type="button" id="skins-modal-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 16px;" data-i18n="modal_close">Закрыть</button>
     </div>
   </div>
 
