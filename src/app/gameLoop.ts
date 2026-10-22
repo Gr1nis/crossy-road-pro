@@ -141,6 +141,16 @@ export class GameLoop {
     }
     this.sceneManager.setMenuMode?.(true, true);
     this.setupDevGlobal();
+    if (typeof document !== 'undefined') {
+      document.getElementById('menu-skins-btn')?.addEventListener('click', () => {
+        this.handleOpenSkins();
+      });
+    }
+  }
+
+  public handleOpenSkins(): void {
+    const override = this.engine.getBiomeOverride?.() ?? null;
+    this.ui.openSkins(this.engine.getCoins(), this.engine.getUnlockedSkins(), this.engine.getSelectedSkin(), override ?? 'auto');
   }
 
   private setupDevGlobal(): void {
@@ -289,6 +299,7 @@ export class GameLoop {
   }
 
   public handleGachaRoll(): void {
+    if (this.ui.isGachaSpinning()) return;
     if (this.engine.getCoins() < WORLD_CONFIG.GACHA_COST) {
       this.ui.shakeGachaRollButton?.();
       const msg = `Нужно ${WORLD_CONFIG.GACHA_COST} 🪙 (сейчас: ${this.engine.getCoins()} 🪙)`;
@@ -308,10 +319,12 @@ export class GameLoop {
         const rarity = UI_SKIN_RARITY[res.skinId!] ?? { label: 'Эпический', css: 'rarity-epic' };
 
         if (res.isDuplicate) {
+          const cashbackAmount = res.cashback ?? 40;
+          this.engine.claimDuplicateCashback(cashbackAmount);
           this.audio.playCoinRefund();
-          const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${res.cashback ?? 40} 🪙`;
+          const msg = `♻ Дубликат ${meta?.badge ?? ''} ${meta?.name}! Кэшбэк +${cashbackAmount} 🪙`;
           this.ui.updateGachaStatus(msg);
-          this.ui.showToast('🪙', 'Кэшбэк за дубликат!', `+${res.cashback ?? 40} монет возвращено на баланс`);
+          this.ui.showToast('🪙', 'Кэшбэк за дубликат!', `+${cashbackAmount} монет возвращено на баланс`);
           this.updateMenuStats();
         } else {
           this.audio.playGachaUnlock(isRare);
@@ -319,6 +332,10 @@ export class GameLoop {
           this.ui.updateGachaStatus(msg);
           this.ui.showToast(meta?.badge ?? '🎰', `Новый скин (${rarity.label})!`, `Открыт ${meta?.name ?? res.skinId}`);
           this.unlockAchievement('gacha_first', '🎰', 'Испытатель удачи', 'Выбит первый скин в Гача-автомате!');
+          if (res.skinId) {
+            this.engine.selectSkin(res.skinId as SkinId);
+            this.sceneManager.updatePlayerSkin(res.skinId as SkinId);
+          }
         }
 
         const completed = this.engine.recordDailyQuestProgress({ gacha: 1 });
@@ -459,7 +476,9 @@ export class GameLoop {
   }
 
   public handleCloseModal(): void {
-    if (this.ui.isSettingsOpen()) {
+    if (this.ui.isGachaOpen()) {
+      this.ui.closeGacha();
+    } else if (this.ui.isSettingsOpen()) {
       this.ui.closeSettings();
     } else if (this.ui.isDailyBonusOpen()) {
       this.ui.closeDailyBonus();
@@ -469,8 +488,6 @@ export class GameLoop {
       this.ui.closeAchievements();
     } else if (this.ui.isSkinsOpen()) {
       this.ui.closeSkins();
-    } else if (this.ui.isGachaOpen()) {
-      this.ui.closeGacha();
     } else if (this.ui.isLeaderboardOpen()) {
       this.ui.closeLeaderboard();
     } else if (this.ui.isDevModalOpen()) {
@@ -533,6 +550,7 @@ export class GameLoop {
     const active = this.engine.getSelectedSkin();
     this.ui.renderSkins(unlocked, active, (skinId: string) => {
       if (this.engine.selectSkin(skinId as SkinId)) {
+        this.sceneManager.updatePlayerSkin(skinId as SkinId);
         this.audio.playSkinVoice(skinId);
         this.renderSkinsUI();
       }
@@ -867,6 +885,18 @@ export class GameLoop {
       onRollGacha: () => this.handleGachaRoll(),
       onSelectAndPlay: (skinId: string) => this.handleSelectAndPlay(skinId),
       onGachaTick: (pitch: number) => this.audio.playGachaTick(pitch),
+      onGetUnlockedSkins: () => this.engine.getUnlockedSkins(),
+      onOpenSkins: () => this.handleOpenSkins(),
+      onSelectWorld: (worldId: string) => {
+        if (worldId === 'auto') {
+          this.engine.setBiomeOverride(null);
+        } else {
+          this.engine.setBiomeOverride(worldId as BiomeType);
+        }
+        this.audio.playSkinVoice?.(this.engine.getSelectedSkin());
+        this.ui.showToast('🌍', 'Мир выбран', worldId === 'auto' ? 'Динамический цикл (смена каждые 25 очков)' : `Выбран биом: ${worldId}`);
+        this.renderSkinsUI();
+      },
       onSaveName: (name: string) => this.savePlayerName(name),
       onToggleSound: (enabled: boolean) => this.toggleSound(enabled),
       onToggleMusic: (enabled: boolean) => this.toggleMusic(enabled),
@@ -1000,6 +1030,7 @@ export class GameLoop {
       isPauseOpen: () => this.ui.isPauseOpen(),
       isMainMenuOpen: () => this.ui.isMainMenuOpen(),
       isGachaOpen: () => this.ui.isGachaOpen(),
+      isGachaSpinning: () => this.ui.isGachaSpinning(),
       isSkinsOpen: () => this.ui.isSkinsOpen(),
       isLeaderboardOpen: () => this.ui.isLeaderboardOpen(),
       isAchievementsOpen: () => this.ui.isAchievementsOpen(),

@@ -95,7 +95,7 @@ describe('Arcade Pro Update — Railway, Coins, Rocks/Bushes, Gacha Skins, Combo
     assert.equal((reloadedEngine as any).getCoins(), initialCoins + 1, 'Coins must persist across page reloads');
   });
 
-  it('Feature 4 (Gacha Machine & 3 Unlockable Skins + Persistence): rolls 3 unique skins without duplicates and saves selected skin', () => {
+  it('Feature 4 (Gacha Machine & Skins Persistence + Cashback): rolls gacha from full pool with duplicates cashback and saves selected skin', () => {
     const storage = new MemoryStorage();
     const engine = new GameEngine(555, storage) as any;
 
@@ -106,26 +106,24 @@ describe('Arcade Pro Update — Railway, Coins, Rocks/Bushes, Gacha Skins, Combo
     const failRoll = engine.rollGacha();
     assert.equal(failRoll.success, false, 'Gacha roll must fail when player has insufficient coins');
 
-    // Grant 300 coins (3 rolls x 100 coins) and unlock all 3 gacha skins
+    // Grant 300 coins (3 rolls x 100 coins)
     engine.addCoins(300);
-    const unlockedSet = new Set<string>();
     for (let i = 0; i < 3; i++) {
       const res = engine.rollGacha();
       assert.equal(res.success, true, `Roll ${i + 1} should succeed`);
-      unlockedSet.add(res.skinId);
+      if (res.isDuplicate) {
+        assert.equal(res.cashback, 40, 'Duplicate rolls must grant 40 coins cashback');
+      }
     }
 
-    assert.equal(unlockedSet.size, 3, '3 rolls must unlock 3 distinct new skins without duplicates');
-    assert.equal(engine.getUnlockedSkins().length, 4, 'Player should now have corgi + 3 gacha skins');
-
-    // Select one of the new skins and verify persistence on reload
-    const chosenSkin = Array.from(unlockedSet)[0];
-    engine.selectSkin(chosenSkin);
-    assert.equal(engine.getSelectedSkin(), chosenSkin);
+    // Unlock skin and verify persistence on reload
+    engine.unlockSkin('box_cat');
+    engine.selectSkin('box_cat');
+    assert.equal(engine.getSelectedSkin(), 'box_cat');
 
     const reloaded = new GameEngine(111, storage) as any;
-    assert.equal(reloaded.getUnlockedSkins().length, 4, 'All 4 unlocked skins must persist in LocalStorage');
-    assert.equal(reloaded.getSelectedSkin(), chosenSkin, 'Selected skin must persist in LocalStorage');
+    assert.ok(reloaded.getUnlockedSkins().includes('box_cat'), 'Unlocked skin must persist in LocalStorage');
+    assert.equal(reloaded.getSelectedSkin(), 'box_cat', 'Selected skin must persist in LocalStorage');
   });
 
   it('Feature 5 (Rhythm Combo & Desktop-Only HTML without Mobile Controls): rapid hops increase combo multiplier and index.html has no mobile pad', () => {

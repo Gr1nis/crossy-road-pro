@@ -1,6 +1,13 @@
 import { ALL_SKINS, type SkinId } from '../core/types.ts';
-import { SKIN_RARITY_MAP, type SkinRarityValue } from '../core/gachaMachine.ts';
-import { getGachaCardSvg } from '../view/gachaCardArt.ts';
+import { MENU_ICONS } from '../view/menuIconsBase64.ts';
+import { GACHA_ICONS } from '../view/gachaIconsBase64.ts';
+import {
+  createGachaCardElement,
+  revealGachaWinningCard,
+  spawnGachaConfetti,
+  preloadGachaCardThumbnails,
+} from '../view/gachaCardArt.ts';
+import { GachaRouletteAnim } from './gachaRouletteAnim.ts';
 
 export interface GachaModalCallbacks {
   onRoll: () => void;
@@ -9,20 +16,11 @@ export interface GachaModalCallbacks {
   onClose: () => void;
 }
 
-const CARD_NAMES_UPPER: Record<string, string> = {
-  corgi: 'CORGI',
-  pigeon_pizza: 'PIZZA PIGEON',
-  box_cat: 'BOX CAT',
-  raccoon_bandit: 'RACCOON',
-  capybara_zen: 'CAPYBARA',
-};
-
-const RARITY_CSS_MAP: Record<SkinRarityValue, { label: string; css: string }> = {
-  Common: { label: 'COMMON', css: 'rarity-common' },
-  Rare: { label: 'RARE', css: 'rarity-rare' },
-  Epic: { label: 'EPIC', css: 'rarity-epic' },
-  Legendary: { label: 'LEGENDARY', css: 'rarity-legendary' },
-};
+export function getGachaMachineCoinUrl(): string {
+  return typeof MENU_ICONS !== 'undefined' && MENU_ICONS?.coin
+    ? MENU_ICONS.coin
+    : (typeof GACHA_ICONS !== 'undefined' && GACHA_ICONS?.coin ? GACHA_ICONS.coin : '');
+}
 
 export class GachaMachineModal {
   private readonly modal: HTMLElement | null;
@@ -35,131 +33,177 @@ export class GachaMachineModal {
   private readonly dupStampEl: HTMLElement | null;
   private readonly cashbackFlyerEl: HTMLElement | null;
   private readonly callbacks: GachaModalCallbacks;
+  private readonly anim: GachaRouletteAnim;
 
   private isSpinning = false;
+  private hasSpinResult = false;
   private pendingWonSkinId: string | null = null;
-  private reelInitialized = false;
-  private animFrameId: number | null = null;
+  private unlockedSkins: SkinId[] = ['corgi'];
+  private currentResult: { skinId?: string; rarity?: string; isDuplicate?: boolean; cashback?: number } | null = null;
+  private currentOnFinished?: () => void;
 
   constructor(callbacks: GachaModalCallbacks) {
     this.callbacks = callbacks;
-    this.modal = document.getElementById('gacha-modal');
-    this.coinsEl = document.getElementById('gacha-modal-coins');
-    this.closeBtn = document.getElementById('gacha-modal-close-btn');
-    this.rollBtn = document.getElementById('gacha-modal-roll-btn');
-    this.trackEl = document.getElementById('gacha-modal-skin-list');
-    this.viewportEl = document.getElementById('gacha-viewport');
-    this.winFxEl = document.getElementById('gacha-win-fx');
-    this.dupStampEl = document.getElementById('gacha-duplicate-stamp');
-    this.cashbackFlyerEl = document.getElementById('gacha-cashback-flyer');
+    const get = (id: string) => document.getElementById(id);
+    this.modal = get('gacha-modal');
+    this.coinsEl = get('gacha-modal-coins');
+    this.closeBtn = get('gacha-modal-close-btn');
+    this.rollBtn = get('gacha-modal-roll-btn');
+    this.trackEl = get('gacha-modal-skin-list');
+    this.viewportEl = get('gacha-viewport');
+    this.winFxEl = get('gacha-win-fx');
+    this.dupStampEl = get('gacha-duplicate-stamp');
+    this.cashbackFlyerEl = get('gacha-cashback-flyer');
+
+    this.anim = new GachaRouletteAnim(this.trackEl, this.viewportEl, {
+      onTick: (pitch) => this.callbacks.onTick(pitch),
+      onSpinFinished: (targetIndex) => {
+        try {
+          this.handleSpinComplete(this.currentResult || {}, targetIndex);
+        } finally {
+          this.isSpinning = false;
+          this.pendingWonSkinId = null;
+          this.currentResult = null;
+          try {
+            this.currentOnFinished?.();
+          } catch (cbErr: unknown) {
+            console.warn('[GachaMachineModal] onFinished error:', cbErr);
+          }
+        }
+      },
+    });
 
     this.bindEvents();
   }
 
   private bindEvents(): void {
-    this.closeBtn?.addEventListener('click', () => {
-      this.close();
-      this.callbacks.onClose();
-    });
-
+    const handleClose = (e?: Event) => {
+      e?.preventDefault();
+      try { this.close(); } finally {
+        try { this.callbacks.onClose(); } catch (cbErr: unknown) {
+          console.warn('[GachaMachineModal] onClose error:', cbErr);
+        }
+      }
+    };
+    this.closeBtn?.addEventListener('click', handleClose);
+    this.closeBtn?.addEventListener('touchend', handleClose);
     this.rollBtn?.addEventListener('click', () => {
       if (this.isSpinning) return;
-      if (this.pendingWonSkinId) {
-        const chosen = this.pendingWonSkinId;
-        this.pendingWonSkinId = null;
-        this.callbacks.onSelectAndPlay(chosen);
-      } else {
-        this.callbacks.onRoll();
-      }
+      this.callbacks.onRoll();
     });
   }
 
-  public open(currentSkinId: string = 'corgi'): void {
+  public getLockedSkins(): SkinId[] {
+    const set = new Set(this.unlockedSkins);
+    return ALL_SKINS.map((s) => s.id).filter((id) => !set.has(id));
+  }
+
+  public isAllUnlocked(): boolean { return this.getLockedSkins().length === 0; }
+  public isSpinningActive(): boolean { return this.isSpinning; }
+  public isOpen(): boolean { return Boolean(this.modal && !this.modal.classList.contains('hidden')); }
+  public hasPendingSelection(): boolean { return Boolean(this.pendingWonSkinId); }
+  public updateCoins(coins: number): void { if (this.coinsEl) this.coinsEl.textContent = String(coins); }
+  public stopAmbientConveyor(): void { this.anim.stopAmbient(); }
+
+  public open(currentSkinId: string = 'corgi', unlockedSkins?: string[]): void {
+    if (unlockedSkins && Array.isArray(unlockedSkins)) {
+      this.unlockedSkins = (unlockedSkins as SkinId[]).length > 0 ? (unlockedSkins as SkinId[]) : ['corgi'];
+    }
+    preloadGachaCardThumbnails();
     this.modal?.classList.remove('hidden');
-    if (!this.reelInitialized || !this.trackEl?.children.length) {
-      this.initReel(currentSkinId);
+    this.refreshReelState(currentSkinId);
+  }
+
+  public setUnlockedSkins(unlocked: string[]): void {
+    this.unlockedSkins = (unlocked as SkinId[]) || ['corgi'];
+    if (this.isOpen() && !this.isSpinning && !this.hasSpinResult && !this.pendingWonSkinId) {
+      this.refreshReelState();
     }
   }
 
   public close(): void {
-    if (this.animFrameId !== null) {
-      cancelAnimationFrame(this.animFrameId);
-      this.animFrameId = null;
-    }
-    this.isSpinning = false;
-    this.pendingWonSkinId = null;
-    this.clearWinEffects();
-    this.resetButton();
-    this.modal?.classList.add('hidden');
-  }
-
-  public isOpen(): boolean {
-    return Boolean(this.modal && !this.modal.classList.contains('hidden'));
-  }
-
-  public updateCoins(coins: number): void {
-    if (this.coinsEl) {
-      this.coinsEl.textContent = String(coins);
+    try {
+      this.anim.stopAll();
+      this.isSpinning = false;
+      this.hasSpinResult = false;
+      this.pendingWonSkinId = null;
+      this.currentResult = null;
+      this.clearWinEffects();
+      this.resetButton();
+    } catch (err: unknown) {
+      console.warn('[GachaMachineModal] Error closing modal:', err);
+    } finally {
+      this.modal?.classList.add('hidden');
     }
   }
 
   public shakeRollButton(): void {
     if (!this.rollBtn) return;
     this.rollBtn.classList.remove('shake-error');
-    // Force reflow
     void this.rollBtn.offsetWidth;
     this.rollBtn.classList.add('shake-error');
-    setTimeout(() => {
-      this.rollBtn?.classList.remove('shake-error');
-    }, 450);
+    setTimeout(() => this.rollBtn?.classList.remove('shake-error'), 450);
+  }
+
+  public updateRollButtonPrice(priceText: string): void {
+    if (!this.rollBtn) return;
+    const priceEl = this.rollBtn.querySelector('.gacha-spin-price');
+    if (priceEl) {
+      const cleanText = priceText.replace(/🪙/g, '').trim();
+      const coinUrl = getGachaMachineCoinUrl();
+      priceEl.innerHTML = `${cleanText} <img src="${coinUrl}" class="gacha-btn-coin-img" alt="🪙">`;
+    }
   }
 
   public resetButton(): void {
     if (!this.rollBtn) return;
+    const coinUrl = getGachaMachineCoinUrl();
     this.rollBtn.removeAttribute('disabled');
-    this.rollBtn.classList.remove('select-character-btn');
+    this.rollBtn.classList.remove('select-character-btn', 'all-collected-btn');
     this.rollBtn.innerHTML = `
       <div class="gacha-spin-content">
         <span class="gacha-spin-main">SPIN</span>
-        <span class="gacha-spin-price">100 🪙</span>
-      </div>
-    `;
+        <span class="gacha-spin-price">100 <img src="${coinUrl}" class="gacha-btn-coin-img" alt="🪙"></span>
+      </div>`;
   }
 
   public clearWinEffects(): void {
-    this.winFxEl?.classList.add('hidden');
-    this.dupStampEl?.classList.add('hidden');
-    this.cashbackFlyerEl?.classList.add('hidden');
-    if (this.trackEl) {
-      const prevWinning = this.trackEl.querySelectorAll('.winning-card');
-      prevWinning.forEach((c) => c.classList.remove('winning-card'));
-    }
-    const prevConfetti = this.viewportEl?.querySelectorAll('.gacha-confetti-piece');
-    prevConfetti?.forEach((c) => c.remove());
+    [this.winFxEl, this.dupStampEl, this.cashbackFlyerEl].forEach((el) => el?.classList.add('hidden'));
+    this.trackEl?.querySelectorAll('.winning-card').forEach((c) => c.classList.remove('winning-card'));
+    this.viewportEl?.querySelectorAll('.gacha-confetti-piece').forEach((c) => c.remove());
   }
 
-  public initReel(centerSkinId: string = 'corgi'): void {
-    if (!this.trackEl) return;
+  public refreshReelState(centerSkinId?: string): void {
+    this.anim.stopAll();
+    this.isSpinning = false;
+    this.hasSpinResult = false;
+    this.pendingWonSkinId = null;
+    this.currentResult = null;
     this.clearWinEffects();
     this.resetButton();
+    this.initReel(centerSkinId);
+    this.startAmbientConveyor();
+  }
 
-    const initialCards: SkinId[] = [
-      'corgi', 'pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen',
-      'corgi', 'pigeon_pizza', (centerSkinId as SkinId) || 'corgi', 'box_cat', 'raccoon_bandit',
-      'capybara_zen', 'corgi', 'pigeon_pizza', 'box_cat', 'capybara_zen'
-    ];
-
+  public initReel(_centerSkinId?: string): void {
+    if (!this.trackEl) return;
+    this.clearWinEffects();
+    const allSkins = ALL_SKINS.map((s) => s.id);
+    const block: SkinId[] = [...allSkins, ...allSkins];
+    const reelSkins = [...block, ...block, ...block];
+    this.anim.setRepeatWidth(block.length * 164);
+    this.anim.resetAmbientOffset();
     this.trackEl.innerHTML = '';
-    initialCards.forEach((id, idx) => {
-      this.trackEl?.appendChild(this.createCardElement(id, idx));
+    reelSkins.forEach((id, idx) => {
+      const isSilhouette = !this.unlockedSkins.includes(id);
+      this.trackEl?.appendChild(createGachaCardElement(id, idx, isSilhouette));
     });
+    this.anim.setPosition(0);
+  }
 
-    const viewportW = this.viewportEl?.clientWidth || 780;
-    const cardPitch = 164;
-    const centerIdx = 7;
-    const startX = viewportW / 2 - (centerIdx * cardPitch + 75);
-    this.trackEl.style.transform = `translateX(${startX}px)`;
-    this.reelInitialized = true;
+  public startAmbientConveyor(): void {
+    if (this.isSpinning || this.pendingWonSkinId !== null) return;
+    this.anim.startAmbient();
   }
 
   public startRoulette(
@@ -168,196 +212,86 @@ export class GachaMachineModal {
   ): void {
     if (this.isSpinning || !this.trackEl) return;
     this.isSpinning = true;
+    this.hasSpinResult = false;
     this.pendingWonSkinId = null;
+    this.currentResult = result;
+    this.currentOnFinished = onFinished;
     this.clearWinEffects();
-
     if (this.rollBtn) {
       this.rollBtn.setAttribute('disabled', 'true');
       this.rollBtn.classList.remove('select-character-btn');
-      this.rollBtn.innerHTML = `
-        <div class="gacha-spin-content">
-          <span class="gacha-spin-main">КРУТИТСЯ...</span>
-          <span class="gacha-spin-price">🎰</span>
-        </div>
-      `;
+      this.rollBtn.innerHTML = `<div class="gacha-spin-content"><span class="gacha-spin-main">КРУТИТСЯ...</span></div>`;
     }
 
     const winningSkin: SkinId = (result.skinId as SkinId) || 'corgi';
     const totalCards = 36;
     const targetIndex = 30;
-    const allSkinIds: SkinId[] = ['corgi', 'pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen'];
-
-    const reelSkins: SkinId[] = [];
-    for (let i = 0; i < totalCards; i++) {
-      if (i === targetIndex) {
-        reelSkins.push(winningSkin);
-      } else {
-        const randSkin = allSkinIds[Math.floor(Math.random() * allSkinIds.length)];
-        reelSkins.push(randSkin);
-      }
-    }
+    const allSkins = ALL_SKINS.map((s) => s.id);
+    const reelSkins: SkinId[] = Array.from({ length: totalCards }, (_, i) =>
+      i === targetIndex ? winningSkin : allSkins[Math.floor(Math.random() * allSkins.length)]
+    );
 
     this.trackEl.innerHTML = '';
     reelSkins.forEach((id, idx) => {
-      this.trackEl?.appendChild(this.createCardElement(id, idx));
+      const isSilhouette = idx === targetIndex ? !result.isDuplicate : !this.unlockedSkins.includes(id);
+      this.trackEl?.appendChild(createGachaCardElement(id, idx, isSilhouette));
     });
-
-    const viewportW = this.viewportEl?.clientWidth || 780;
-    const cardPitch = 164;
-    const startX = 0;
-    const organicDrift = (Math.random() - 0.5) * 32;
-    const targetX = viewportW / 2 - (targetIndex * cardPitch + 75) + organicDrift;
-
-    this.trackEl.style.transform = `translateX(${startX}px)`;
-
-    const startTime = performance.now();
-    const duration = 3800;
-    let lastTickedCard = -1;
-
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
-      const tau = Math.min(1.0, elapsed / duration);
-      // Quartic ease out: fast initial spin, smooth gradual deceleration
-      const progress = 1.0 - Math.pow(1.0 - tau, 4);
-      const currentX = startX + (targetX - startX) * progress;
-
-      if (this.trackEl) {
-        this.trackEl.style.transform = `translateX(${currentX}px)`;
-      }
-
-      // Check which card is under center marker
-      const centerPos = viewportW / 2 - currentX;
-      const currentIdx = Math.floor(centerPos / cardPitch);
-      if (currentIdx !== lastTickedCard && currentIdx >= 0 && currentIdx <= totalCards) {
-        lastTickedCard = currentIdx;
-        const pitch = 0.8 + 0.6 * (1.0 - progress);
-        this.callbacks.onTick(pitch);
-      }
-
-      if (tau < 1.0) {
-        this.animFrameId = requestAnimationFrame(animate);
-      } else {
-        this.animFrameId = null;
-        this.isSpinning = false;
-        if (this.trackEl) {
-          this.trackEl.style.transform = `translateX(${targetX}px)`;
-        }
-        this.handleSpinComplete(result, targetIndex);
-        onFinished?.();
-      }
-    };
-
-    this.animFrameId = requestAnimationFrame(animate);
+    this.anim.startSpin(targetIndex, totalCards);
   }
 
   private handleSpinComplete(
     result: { skinId?: string; rarity?: string; isDuplicate?: boolean; cashback?: number },
     targetIndex: number
   ): void {
-    const winningCardEl = this.trackEl?.querySelector(`[data-index="${targetIndex}"]`) as HTMLElement | null;
-    if (winningCardEl) {
-      winningCardEl.classList.add('winning-card');
-    }
+    const coinUrl = getGachaMachineCoinUrl();
+    try {
+      const winningCardEl = this.trackEl?.querySelector(`[data-index="${targetIndex}"]`) as HTMLElement | null;
 
-    this.winFxEl?.classList.remove('hidden');
-
-    if (!result.isDuplicate && result.skinId) {
-      this.pendingWonSkinId = result.skinId;
-      this.spawnConfetti();
-
+      if (!result.isDuplicate && result.skinId) {
+        if (winningCardEl) revealGachaWinningCard(winningCardEl, result.skinId);
+        this.winFxEl?.classList.remove('hidden');
+        if (this.viewportEl) spawnGachaConfetti(this.viewportEl);
+        const wonId = result.skinId as SkinId;
+        if (!this.unlockedSkins.includes(wonId)) this.unlockedSkins.push(wonId);
+      } else {
+        if (winningCardEl) winningCardEl.classList.add('winning-card');
+        if (this.dupStampEl) {
+          const sub = this.dupStampEl.querySelector('.gacha-stamp-sub');
+          if (sub) sub.textContent = `+${result.cashback ?? 40} 🪙 КЭШБЭК`;
+          this.dupStampEl.classList.remove('hidden');
+          void this.dupStampEl.offsetWidth;
+        }
+        if (this.cashbackFlyerEl) this.cashbackFlyerEl.textContent = `+${result.cashback ?? 40} 🪙`;
+        this.triggerCashbackFlyer();
+      }
+    } catch (err: unknown) {
+      console.warn('[GachaMachineModal] Error rendering spin rewards:', err);
+    } finally {
+      this.isSpinning = false;
+      this.hasSpinResult = true;
+      this.pendingWonSkinId = null;
+      this.currentResult = null;
       if (this.rollBtn) {
         this.rollBtn.removeAttribute('disabled');
+        this.rollBtn.classList.remove('all-collected-btn');
         this.rollBtn.classList.add('select-character-btn');
         this.rollBtn.innerHTML = `
           <div class="gacha-spin-content">
-            <span class="gacha-spin-main">ВЫБРАТЬ ПЕРСОНАЖА</span>
-            <span class="gacha-spin-price">ИГРАТЬ СРАЗУ ▶</span>
-          </div>
-        `;
-      }
-    } else {
-      this.pendingWonSkinId = null;
-      this.dupStampEl?.classList.remove('hidden');
-      this.triggerCashbackFlyer();
-
-      if (this.rollBtn) {
-        this.rollBtn.removeAttribute('disabled');
-        this.rollBtn.classList.remove('select-character-btn');
-        this.rollBtn.innerHTML = `
-          <div class="gacha-spin-content">
             <span class="gacha-spin-main">КРУТИТЬ ЕЩЁ</span>
-            <span class="gacha-spin-price">100 🪙</span>
-          </div>
-        `;
+            <span class="gacha-spin-price">100 <img src="${coinUrl}" class="gacha-btn-coin-img" alt="🪙"></span>
+          </div>`;
       }
     }
   }
 
   private triggerCashbackFlyer(): void {
     if (!this.cashbackFlyerEl) return;
-    this.cashbackFlyerEl.classList.remove('hidden');
-    this.cashbackFlyerEl.classList.remove('fly-anim');
+    this.cashbackFlyerEl.classList.remove('hidden', 'fly-anim');
     void this.cashbackFlyerEl.offsetWidth;
     this.cashbackFlyerEl.classList.add('fly-anim');
     setTimeout(() => {
       this.cashbackFlyerEl?.classList.add('hidden');
       this.cashbackFlyerEl?.classList.remove('fly-anim');
     }, 1200);
-  }
-
-  private spawnConfetti(): void {
-    if (!this.viewportEl) return;
-    const colors = ['#fbbf24', '#f59e0b', '#38bdf8', '#c084fc', '#4ade80', '#f43f5e', '#ffffff'];
-    const count = 38;
-
-    for (let i = 0; i < count; i++) {
-      const piece = document.createElement('div');
-      piece.className = 'gacha-confetti-piece';
-      const color = colors[i % colors.length];
-      const isSquare = i % 3 === 0;
-      const w = isSquare ? 8 : 10;
-      const h = isSquare ? 8 : 14;
-
-      const angle = (Math.random() * Math.PI) - (Math.PI / 2);
-      const dist = 70 + Math.random() * 160;
-      const dx = Math.cos(angle) * dist * 1.5;
-      const dy = -Math.abs(Math.sin(angle)) * dist - 30;
-      const rot = (Math.random() - 0.5) * 720;
-
-      piece.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: ${w}px;
-        height: ${h}px;
-        background: ${color};
-        border-radius: 2px;
-        pointer-events: none;
-        z-index: 22;
-        --dx: ${dx.toFixed(1)}px;
-        --dy: ${dy.toFixed(1)}px;
-        --rot: ${rot.toFixed(1)}deg;
-      `;
-      this.viewportEl.appendChild(piece);
-    }
-  }
-
-  private createCardElement(skinId: SkinId, index: number): HTMLElement {
-    const card = document.createElement('div');
-    card.className = 'gacha-roulette-card';
-    card.setAttribute('data-index', String(index));
-    card.setAttribute('data-skin-id', skinId);
-
-    const rarityVal = SKIN_RARITY_MAP[skinId] ?? 'Common';
-    const rarityInfo = RARITY_CSS_MAP[rarityVal] ?? RARITY_CSS_MAP.Common;
-    const nameUpper = CARD_NAMES_UPPER[skinId] ?? skinId.toUpperCase();
-    const svgArt = getGachaCardSvg(skinId);
-
-    card.innerHTML = `
-      <div class="gacha-card-name">${nameUpper}</div>
-      <div class="gacha-card-character">${svgArt}</div>
-      <div class="gacha-card-rarity ${rarityInfo.css}">${rarityInfo.label}</div>
-    `;
-    return card;
   }
 }

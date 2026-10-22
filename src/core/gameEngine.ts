@@ -9,6 +9,7 @@ import {
 } from './collision.ts';
 import { LaneGenerator } from './laneGenerator.ts';
 import { ScoreTracker } from './scoreTracker.ts';
+import { GACHA_DUPLICATE_CASHBACK } from './gachaMachine.ts';
 import type { AchievementId } from './achievements.ts';
 import type {
   DailyQuestTracker,
@@ -113,8 +114,22 @@ export class GameEngine {
     return this.biomeOverride ?? getBiomeForScore(this.getScore());
   }
 
+  getBiomeOverride(): BiomeType | null {
+    return this.biomeOverride;
+  }
+
   setBiomeOverride(biome: BiomeType | null): void {
     this.biomeOverride = biome;
+    if (biome) {
+      for (const cachedLane of this.lanes.values()) {
+        cachedLane.biome = biome;
+      }
+    } else {
+      const currentScore = this.scoreTracker.getScore();
+      for (const [r, cachedLane] of this.lanes.entries()) {
+        cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
+      }
+    }
   }
 
   getCurrentBiome(): BiomeType {
@@ -264,9 +279,17 @@ export class GameEngine {
     return this.scoreTracker.claimAchievement(id);
   }
 
+  isAllSkinsUnlocked(): boolean {
+    return this.scoreTracker.isAllSkinsUnlocked();
+  }
+
   rollGacha() {
     this.gachaNonce += 1;
     return this.scoreTracker.rollGacha(this.gachaNonce);
+  }
+
+  claimDuplicateCashback(amount: number = GACHA_DUPLICATE_CASHBACK): number {
+    return this.scoreTracker.claimDuplicateCashback(amount);
   }
 
   canClaimDailyReward(now?: number): boolean {

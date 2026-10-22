@@ -6,6 +6,7 @@ import type { SettingsManager } from '../core/settingsManager.ts';
 import { type Language, t } from '../core/i18n.ts';
 import { SettingsModalController, type SettingsModalCallbacks } from './settingsModal.ts';
 import { GachaMachineModal } from './gachaMachineModal.ts';
+import { SkinsCollectionModal, SKINS_RARITY_MAP } from './skinsCollectionModal.ts';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -24,6 +25,9 @@ export interface UIActions {
   onRollGacha: () => void;
   onSelectAndPlay?: (skinId: string) => void;
   onGachaTick?: (pitch: number) => void;
+  onGetUnlockedSkins?: () => string[];
+  onOpenSkins?: () => void;
+  onSelectWorld?: (worldId: string) => void;
   onSaveName: (name: string) => void;
   onToggleSound: (enabled: boolean) => void;
   onToggleMusic: (enabled: boolean) => void;
@@ -43,13 +47,7 @@ export interface UIActions {
   onDevOpenReport?: () => void;
 }
 
-export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = {
-  corgi: { label: 'Обычный', css: 'rarity-common' },
-  pigeon_pizza: { label: 'Обычный', css: 'rarity-common' },
-  box_cat: { label: 'Редкий', css: 'rarity-rare' },
-  raccoon_bandit: { label: 'Эпический', css: 'rarity-epic' },
-  capybara_zen: { label: 'Легендарный', css: 'rarity-legendary' },
-};
+export const UI_SKIN_RARITY: Record<string, { label: string; css: string }> = SKINS_RARITY_MAP;
 
 export class UIManager {
   // HUD
@@ -97,6 +95,10 @@ export class UIManager {
   private readonly skinsModalCloseBtn: HTMLElement | null;
   private readonly skinsModalListEl: HTMLElement | null;
   private gachaController: GachaMachineModal | null = null;
+  private skinsController: SkinsCollectionModal | null = null;
+  private lastUnlockedSkins: string[] = ['corgi'];
+  private lastSelectedSkin: string = 'corgi';
+  private skinsSelectSkinCallback?: (id: string) => void;
   private uiActions: UIActions | null = null;
 
   private readonly leaderboardCloseBtn: HTMLElement | null;
@@ -209,6 +211,20 @@ export class UIManager {
     this.skinsModalListEl = document.getElementById('skins-modal-list');
     this.skinsModalCloseBtn?.addEventListener('click', () => this.closeSkins());
 
+    this.skinsController = new SkinsCollectionModal({
+      onSelectSkin: (skinId) => {
+        this.skinsSelectSkinCallback?.(skinId);
+      },
+      onSelectWorld: (worldId) => {
+        this.uiActions?.onSelectWorld?.(worldId);
+      },
+      onOpenGacha: () => {
+        this.closeSkins();
+        this.openGacha(this.lastSelectedSkin, this.lastUnlockedSkins);
+      },
+      onClose: () => {},
+    });
+
     this.gachaController = new GachaMachineModal({
       onRoll: () => this.uiActions?.onRollGacha(),
       onSelectAndPlay: (skinId) => this.uiActions?.onSelectAndPlay?.(skinId),
@@ -283,11 +299,15 @@ export class UIManager {
     this.menuAchievementsBtn?.addEventListener('click', () => this.openAchievements());
     this.achievementsCloseBtn?.addEventListener('click', () => this.closeAchievements());
     this.menuGachaBtn?.addEventListener('click', () => this.openGacha());
-    this.gachaModalCloseBtn?.addEventListener('click', () => this.closeGacha());
+    const onGachaClose = (e?: Event) => {
+      e?.preventDefault();
+      this.closeGacha();
+    };
+    this.gachaModalCloseBtn?.addEventListener('click', onGachaClose);
+    this.gachaModalCloseBtn?.addEventListener('touchend', onGachaClose);
     this.menuLeaderboardBtn?.addEventListener('click', () => this.openLeaderboard());
     this.leaderboardCloseBtn?.addEventListener('click', () => this.closeLeaderboard());
     this.menuSettingsBtn?.addEventListener('click', () => this.openSettings('menu'));
-    document.getElementById('menu-skins-btn')?.addEventListener('click', () => this.openSkins());
     document.getElementById('menu-coins-plus-btn')?.addEventListener('click', () => this.openGacha());
     document.getElementById('menu-coins-pill')?.addEventListener('click', () => this.openGacha());
     const stopBubble = (e: Event) => e.stopPropagation();
@@ -410,24 +430,44 @@ export class UIManager {
     return this.currentLanguage;
   }
 
-  openGacha(currentSkinId?: string): void {
-    this.gachaController?.open(currentSkinId);
+  openGacha(currentSkinId?: string, unlockedSkins?: string[]): void {
+    const unlocked = unlockedSkins ?? this.uiActions?.onGetUnlockedSkins?.() ?? this.lastUnlockedSkins;
+    this.gachaController?.open(currentSkinId, unlocked);
   }
 
   closeGacha(): void {
-    this.gachaController?.close();
+    try {
+      this.gachaController?.close();
+    } finally {
+      this.gachaModal?.classList.add('hidden');
+    }
   }
 
-  openSkins(): void {
+  isGachaSpinning(): boolean {
+    return Boolean(this.gachaController?.isSpinningActive());
+  }
+
+  openSkins(coins?: number, unlocked?: string[], selected?: string, currentBiome?: string | null): void {
+    const finalCoins = coins ?? (this.lastCoins >= 0 ? this.lastCoins : 0);
+    const finalUnlocked = unlocked ?? this.lastUnlockedSkins;
+    const finalSelected = selected ?? this.lastSelectedSkin;
+    this.skinsController?.open(finalCoins, finalUnlocked, finalSelected, currentBiome);
     this.skinsModal?.classList.remove('hidden');
   }
 
   closeSkins(): void {
+    this.skinsController?.close();
     this.skinsModal?.classList.add('hidden');
   }
 
   isSkinsOpen(): boolean {
-    return Boolean(this.skinsModal && !this.skinsModal.classList.contains('hidden'));
+    return Boolean(
+      this.skinsController ? this.skinsController.isOpen() : this.skinsModal && !this.skinsModal.classList.contains('hidden')
+    );
+  }
+
+  getSkinsController(): SkinsCollectionModal | null {
+    return this.skinsController;
   }
 
   startGachaRoulette(
@@ -858,6 +898,8 @@ export class UIManager {
     if (this.questsCoinsValEl) {
       this.questsCoinsValEl.textContent = String(coins);
     }
+    this.gachaController?.updateCoins(coins);
+    this.skinsController?.updateCoins(coins);
   }
 
   setWarningVignette(graceRatio: number): void {
@@ -892,6 +934,7 @@ export class UIManager {
     if (this.gachaModalCoinsEl) this.gachaModalCoinsEl.textContent = String(coins);
     if (this.questsCoinsValEl) this.questsCoinsValEl.textContent = String(coins);
     this.gachaController?.updateCoins(coins);
+    this.skinsController?.updateCoins(coins);
   }
 
   renderLeaderboard(entries: LeaderboardEntry[]): void {
@@ -913,6 +956,16 @@ export class UIManager {
   }
 
   renderSkins(unlocked: string[], selected: string, onSelectSkin: (id: string) => void): void {
+    this.lastUnlockedSkins = [...unlocked];
+    this.lastSelectedSkin = selected;
+    this.skinsSelectSkinCallback = onSelectSkin;
+    this.gachaController?.setUnlockedSkins(unlocked);
+
+    if (this.skinsController) {
+      this.skinsController.renderCards(unlocked, selected);
+      return;
+    }
+
     const container = this.skinsModalListEl ?? this.gachaModalSkinListEl;
     if (!container) return;
     container.innerHTML = '';
@@ -1050,8 +1103,13 @@ export class UIManager {
   }
 
   setGachaRollButtonText(text: string): void {
-    if (this.gachaModalRollBtn) {
-      this.gachaModalRollBtn.textContent = text;
+    if (this.gachaController) {
+      this.gachaController.updateRollButtonPrice(text);
+    } else if (this.gachaModalRollBtn) {
+      const priceEl = this.gachaModalRollBtn.querySelector('.gacha-spin-price');
+      if (priceEl) {
+        priceEl.textContent = text;
+      }
     }
   }
 

@@ -1,151 +1,263 @@
-function hexShade(hex: string, factor: number): string {
-  const c = parseInt(hex.slice(1), 16);
+import * as THREE from 'three';
+import { type SkinId } from '../core/types.ts';
+import { SKIN_RARITY_MAP, type SkinRarityValue } from '../core/gachaMachine.ts';
+import { createUrbanCharacter } from './urbanCharacters.ts';
+import { GACHA_CHARACTER_SKIN_BASE64 } from './gachaSkinsBase64.ts';
+
+export const CARD_NAMES_UPPER: Record<string, string> = {
+  corgi: 'CORGI',
+  pigeon_pizza: 'PIZZA PIGEON',
+  box_cat: 'BOX CAT',
+  raccoon_bandit: 'RACCOON',
+  capybara_zen: 'CAPYBARA',
+};
+
+export const RARITY_CSS_MAP: Record<SkinRarityValue, { label: string; css: string }> = {
+  Common: { label: 'COMMON', css: 'rarity-common' },
+  Rare: { label: 'RARE', css: 'rarity-rare' },
+  Epic: { label: 'EPIC', css: 'rarity-epic' },
+  Legendary: { label: 'LEGENDARY', css: 'rarity-legendary' },
+};
+
+export const RARITY_GLOW_MAP: Record<SkinRarityValue, string> = {
+  Common: '#94a3b8',
+  Rare: '#38bdf8',
+  Epic: '#c084fc',
+  Legendary: '#fbbf24',
+};
+
+export const GACHA_CARD_THUMB_CACHE = new Map<string, string>();
+for (const [id, url] of Object.entries(GACHA_CHARACTER_SKIN_BASE64)) {
+  GACHA_CARD_THUMB_CACHE.set(id, url);
+}
+
+function shadeHex(hexStr: string, factor: number): string {
+  const c = parseInt(hexStr, 16);
   const r = Math.min(255, Math.floor(((c >> 16) & 255) * factor));
   const g = Math.min(255, Math.floor(((c >> 8) & 255) * factor));
   const b = Math.min(255, Math.floor((c & 255) * factor));
   return '#' + (16777216 + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-function isoBox(
-  x: number,
-  y: number,
-  z: number,
-  w: number,
-  h: number,
-  d: number,
-  color: string
-): string {
-  const topCol = hexShade(color, 1.18);
-  const leftCol = hexShade(color, 0.92);
-  const rightCol = hexShade(color, 0.75);
-  const sx = 60 + (x - z) * 7.5;
-  const sy = 66 + (x + z) * 3.8 - y * 7.5;
-  const pTop = `${sx.toFixed(1)},${sy.toFixed(1)} ${(sx + w * 7.5).toFixed(1)},${(sy + w * 3.8).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8).toFixed(1)} ${(sx - d * 7.5).toFixed(1)},${(sy + d * 3.8).toFixed(1)}`;
-  const pLeft = `${(sx - d * 7.5).toFixed(1)},${(sy + d * 3.8).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8 + h * 7.5).toFixed(1)} ${(sx - d * 7.5).toFixed(1)},${(sy + d * 3.8 + h * 7.5).toFixed(1)}`;
-  const pRight = `${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8).toFixed(1)} ${(sx + w * 7.5).toFixed(1)},${(sy + w * 3.8).toFixed(1)} ${(sx + w * 7.5).toFixed(1)},${(sy + w * 3.8 + h * 7.5).toFixed(1)} ${(sx + (w - d) * 7.5).toFixed(1)},${(sy + (w + d) * 3.8 + h * 7.5).toFixed(1)}`;
-  return `<polygon points="${pTop}" fill="${topCol}"/><polygon points="${pLeft}" fill="${leftCol}"/><polygon points="${pRight}" fill="${rightCol}"/>`;
+function renderVoxelIsometricSvg(skinId: string): string {
+  try {
+    const group = createUrbanCharacter(skinId);
+    const cos30 = Math.cos(Math.PI / 6);
+    const sin30 = Math.sin(Math.PI / 6);
+
+    let minPx = Infinity;
+    let maxPx = -Infinity;
+    let minPy = Infinity;
+    let maxPy = -Infinity;
+
+    for (const child of group.children) {
+      const m = child as THREE.Mesh;
+      const geom = m.geometry as THREE.BoxGeometry;
+      const p = geom.parameters;
+      const x = m.position.x;
+      const y = m.position.y;
+      const z = m.position.z;
+      const w = p.width;
+      const h = p.height;
+      const d = p.depth;
+      const x0 = x - w / 2;
+      const x1 = x + w / 2;
+      const y0 = y - h / 2;
+      const y1 = y + h / 2;
+      const z0 = z - d / 2;
+      const z1 = z + d / 2;
+      for (const vx of [x0, x1]) {
+        for (const vy of [y0, y1]) {
+          for (const vz of [z0, z1]) {
+            const px = (vx - vz) * cos30;
+            const py = (vx + vz) * sin30 - vy;
+            if (px < minPx) minPx = px;
+            if (px > maxPx) maxPx = px;
+            if (py < minPy) minPy = py;
+            if (py > maxPy) maxPy = py;
+          }
+        }
+      }
+    }
+
+    const spanX = maxPx - minPx;
+    const spanY = maxPy - minPy;
+    const centerPx = (minPx + maxPx) / 2;
+    const centerPy = (minPy + maxPy) / 2;
+    const targetSize = 120;
+    const scale = Math.min(targetSize / spanX, targetSize / spanY);
+    const cx = 80;
+    const cy = 82;
+
+    const projX = (vx: number, vz: number): string =>
+      (cx + ((vx - vz) * cos30 - centerPx) * scale).toFixed(2);
+    const projY = (vx: number, vy: number, vz: number): string =>
+      (cy + ((vx + vz) * sin30 - vy - centerPy) * scale).toFixed(2);
+
+    interface FacePolygon {
+      depth: number;
+      points: string;
+      fill: string;
+    }
+
+    const faces: FacePolygon[] = [];
+    for (const child of group.children) {
+      const m = child as THREE.Mesh;
+      const geom = m.geometry as THREE.BoxGeometry;
+      const p = geom.parameters;
+      const mat = m.material as THREE.MeshLambertMaterial;
+      const colorHex = mat.color.getHexString();
+      const x = m.position.x;
+      const y = m.position.y;
+      const z = m.position.z;
+      const w = p.width;
+      const h = p.height;
+      const d = p.depth;
+      const x0 = x - w / 2;
+      const x1 = x + w / 2;
+      const y0 = y - h / 2;
+      const y1 = y + h / 2;
+      const z0 = z - d / 2;
+      const z1 = z + d / 2;
+
+      const topCol = shadeHex(colorHex, 1.20);
+      const frontCol = shadeHex(colorHex, 1.02);
+      const rightCol = shadeHex(colorHex, 0.82);
+
+      // Top face (+Y)
+      faces.push({
+        depth: x + y + h / 2 + z,
+        points: `${projX(x0, z0)},${projY(x0, y1, z0)} ${projX(x1, z0)},${projY(x1, y1, z0)} ${projX(x1, z1)},${projY(x1, y1, z1)} ${projX(x0, z1)},${projY(x0, y1, z1)}`,
+        fill: topCol,
+      });
+
+      // Right face (+X)
+      faces.push({
+        depth: x + w / 2 + y + z,
+        points: `${projX(x1, z0)},${projY(x1, y1, z0)} ${projX(x1, z1)},${projY(x1, y1, z1)} ${projX(x1, z1)},${projY(x1, y0, z1)} ${projX(x1, z0)},${projY(x1, y0, z0)}`,
+        fill: rightCol,
+      });
+
+      // Front face (+Z)
+      faces.push({
+        depth: x + y + z + d / 2,
+        points: `${projX(x0, z1)},${projY(x0, y1, z1)} ${projX(x1, z1)},${projY(x1, y1, z1)} ${projX(x1, z1)},${projY(x1, y0, z1)} ${projX(x0, z1)},${projY(x0, y0, z1)}`,
+        fill: frontCol,
+      });
+    }
+
+    faces.sort((a, b) => a.depth - b.depth);
+    const polygons = faces.map(
+      (f) => `<polygon points="${f.points}" fill="${f.fill}" stroke="${f.fill}" stroke-width="0.5" stroke-linejoin="round"/>`
+    );
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">${polygons.join('')}</svg>`;
+  } catch {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" fill="%231e293b"/></svg>';
+  }
 }
 
-function buildCorgiSvg(): string {
-  const b: string[] = [];
-  b.push(isoBox(-0.6, 2.2, -2.5, 1.2, 1.2, 1.0, '#ea580c'));
-  b.push(isoBox(-1.5, 0.0, -1.8, 0.9, 1.2, 0.9, '#ffffff'));
-  b.push(isoBox(0.6, 0.0, -1.8, 0.9, 1.2, 0.9, '#ffffff'));
-  b.push(isoBox(-1.8, 0.8, -2.0, 3.6, 2.6, 4.4, '#ea580c'));
-  b.push(isoBox(-1.3, 0.8, 1.5, 2.6, 2.2, 1.0, '#ffffff'));
-  b.push(isoBox(-1.5, 0.0, 1.5, 0.9, 1.2, 0.9, '#ffffff'));
-  b.push(isoBox(0.6, 0.0, 1.5, 0.9, 1.2, 0.9, '#ffffff'));
-  b.push(isoBox(-1.6, 3.2, 1.2, 3.2, 0.4, 1.6, '#dc2626'));
-  b.push(isoBox(-0.3, 2.9, 2.8, 0.6, 0.5, 0.2, '#facc15'));
-  b.push(isoBox(-1.7, 3.4, 0.8, 3.4, 2.8, 3.0, '#ea580c'));
-  b.push(isoBox(-1.0, 3.2, 2.8, 2.0, 1.6, 1.6, '#ffffff'));
-  b.push(isoBox(-0.4, 4.2, 3.8, 0.8, 0.6, 0.5, '#0f172a'));
-  b.push(isoBox(-0.1, 3.2, 3.7, 0.5, 0.4, 0.6, '#f472b6'));
-  b.push(isoBox(-0.5, 4.4, 2.2, 1.0, 2.0, 1.6, '#ffffff'));
-  b.push(isoBox(-1.2, 4.6, 2.6, 0.5, 0.6, 0.4, '#0f172a'));
-  b.push(isoBox(0.7, 4.6, 2.6, 0.5, 0.6, 0.4, '#0f172a'));
-  b.push(isoBox(-1.6, 6.0, 1.4, 1.0, 1.8, 0.8, '#ea580c'));
-  b.push(isoBox(-1.4, 6.2, 1.8, 0.6, 1.4, 0.4, '#f472b6'));
-  b.push(isoBox(0.6, 6.0, 1.4, 1.0, 1.8, 0.8, '#ea580c'));
-  b.push(isoBox(0.8, 6.2, 1.8, 0.6, 1.4, 0.4, '#f472b6'));
-  return wrapSvg(b.join(''), 36, 12);
+export function createFallbackVoxelDataUrl(skinId: string): string {
+  const svg = renderVoxelIsometricSvg(skinId);
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-function buildBoxCatSvg(): string {
-  const b: string[] = [];
-  b.push(isoBox(-2.5, 0.2, -2.5, 5.0, 3.6, 5.0, '#b45309'));
-  b.push(isoBox(-2.2, 3.6, -2.2, 4.4, 0.2, 4.4, '#451a03'));
-  b.push(isoBox(-2.8, 3.6, -0.8, 0.6, 1.4, 3.2, '#d97706'));
-  b.push(isoBox(2.2, 3.6, -0.8, 0.6, 1.4, 3.2, '#d97706'));
-  b.push(isoBox(-0.8, 3.6, 2.2, 3.2, 1.4, 0.6, '#d97706'));
-  b.push(isoBox(-1.6, 3.6, 0.2, 3.2, 2.8, 3.0, '#64748b'));
-  b.push(isoBox(-1.0, 3.4, 2.2, 2.0, 1.4, 1.2, '#f8fafc'));
-  b.push(isoBox(-0.3, 4.2, 3.0, 0.6, 0.4, 0.4, '#f472b6'));
-  b.push(isoBox(-1.2, 4.8, 2.4, 0.5, 0.6, 0.4, '#10b981'));
-  b.push(isoBox(0.7, 4.8, 2.4, 0.5, 0.6, 0.4, '#10b981'));
-  b.push(isoBox(-1.6, 6.2, 1.0, 0.9, 1.4, 0.8, '#64748b'));
-  b.push(isoBox(-1.4, 6.4, 1.4, 0.5, 1.0, 0.4, '#f472b6'));
-  b.push(isoBox(0.7, 6.2, 1.0, 0.9, 1.4, 0.8, '#64748b'));
-  b.push(isoBox(0.9, 6.4, 1.4, 0.5, 1.0, 0.4, '#f472b6'));
-  b.push(isoBox(-1.6, 3.4, 2.4, 0.9, 0.7, 0.8, '#ffffff'));
-  b.push(isoBox(0.7, 3.4, 2.4, 0.9, 0.7, 0.8, '#ffffff'));
-  return wrapSvg(b.join(''), 40, 13);
+export function preloadGachaCardThumbnails(): void {
+  const skins: SkinId[] = ['corgi', 'pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen'];
+  for (const id of skins) {
+    if (!GACHA_CARD_THUMB_CACHE.has(id)) {
+      const b64 = GACHA_CHARACTER_SKIN_BASE64[id];
+      GACHA_CARD_THUMB_CACHE.set(id, b64 || createFallbackVoxelDataUrl(id));
+    }
+  }
 }
 
-function buildPigeonSvg(): string {
-  const b: string[] = [];
-  b.push(isoBox(-1.0, 0.0, 0.0, 0.6, 1.0, 0.6, '#f97316'));
-  b.push(isoBox(0.4, 0.0, 0.0, 0.6, 1.0, 0.6, '#f97316'));
-  b.push(isoBox(-1.7, 0.8, -2.0, 3.4, 3.2, 4.0, '#64748b'));
-  b.push(isoBox(-1.9, 1.4, -1.2, 0.5, 2.0, 2.8, '#475569'));
-  b.push(isoBox(1.4, 1.4, -1.2, 0.5, 2.0, 2.8, '#475569'));
-  b.push(isoBox(-0.6, 1.6, -3.2, 1.2, 0.6, 1.6, '#334155'));
-  b.push(isoBox(-1.3, 3.8, 0.6, 2.6, 1.0, 2.4, '#a855f7'));
-  b.push(isoBox(-1.2, 4.6, 0.8, 2.4, 2.2, 2.4, '#64748b'));
-  b.push(isoBox(-1.0, 5.2, 2.4, 0.4, 0.5, 0.4, '#0f172a'));
-  b.push(isoBox(0.6, 5.2, 2.4, 0.4, 0.5, 0.4, '#0f172a'));
-  b.push(isoBox(-0.4, 4.6, 2.8, 0.8, 0.8, 1.2, '#facc15'));
-  b.push(isoBox(-1.6, 3.6, 2.8, 3.2, 0.3, 2.6, '#fde047'));
-  b.push(isoBox(-1.6, 3.6, 2.4, 3.2, 0.4, 0.5, '#b45309'));
-  b.push(isoBox(-0.8, 3.9, 3.4, 0.6, 0.1, 0.6, '#ef4444'));
-  b.push(isoBox(0.4, 3.9, 3.8, 0.6, 0.1, 0.6, '#ef4444'));
-  return wrapSvg(b.join(''), 36, 12);
+export function getGachaCardThumbUrl(skinId: string): string {
+  if (GACHA_CHARACTER_SKIN_BASE64[skinId]) {
+    return GACHA_CHARACTER_SKIN_BASE64[skinId];
+  }
+  let cached = GACHA_CARD_THUMB_CACHE.get(skinId);
+  if (!cached) {
+    preloadGachaCardThumbnails();
+    cached = GACHA_CARD_THUMB_CACHE.get(skinId);
+  }
+  return cached ?? createFallbackVoxelDataUrl(skinId);
 }
-
-function buildRaccoonSvg(): string {
-  const b: string[] = [];
-  b.push(isoBox(-0.7, 1.4, -4.2, 1.4, 1.4, 1.4, '#1e293b'));
-  b.push(isoBox(-0.6, 1.6, -3.0, 1.2, 1.2, 1.4, '#94a3b8'));
-  b.push(isoBox(-1.4, 0.0, -1.6, 0.8, 1.0, 0.8, '#1e293b'));
-  b.push(isoBox(0.6, 0.0, -1.6, 0.8, 1.0, 0.8, '#1e293b'));
-  b.push(isoBox(-1.7, 0.6, -2.0, 3.4, 2.8, 4.2, '#475569'));
-  b.push(isoBox(-1.4, 0.0, 1.4, 0.8, 1.0, 0.8, '#1e293b'));
-  b.push(isoBox(0.6, 0.0, 1.4, 0.8, 1.0, 0.8, '#1e293b'));
-  b.push(isoBox(-1.7, 3.2, 0.8, 3.4, 2.8, 2.8, '#475569'));
-  b.push(isoBox(-1.8, 3.8, 2.4, 3.6, 1.2, 1.0, '#0f172a'));
-  b.push(isoBox(-1.1, 5.0, 2.4, 0.8, 0.4, 0.6, '#ffffff'));
-  b.push(isoBox(0.3, 5.0, 2.4, 0.8, 0.4, 0.6, '#ffffff'));
-  b.push(isoBox(-1.1, 4.0, 2.8, 0.4, 0.6, 0.4, '#f8fafc'));
-  b.push(isoBox(0.7, 4.0, 2.8, 0.4, 0.6, 0.4, '#f8fafc'));
-  b.push(isoBox(-1.0, 3.2, 2.8, 2.0, 1.0, 1.4, '#ffffff'));
-  b.push(isoBox(-0.3, 3.8, 3.8, 0.6, 0.5, 0.4, '#020617'));
-  b.push(isoBox(-1.6, 5.8, 1.2, 0.9, 1.2, 0.8, '#334155'));
-  b.push(isoBox(-1.4, 6.0, 1.4, 0.5, 0.8, 0.4, '#ffffff'));
-  b.push(isoBox(0.7, 5.8, 1.2, 0.9, 1.2, 0.8, '#334155'));
-  b.push(isoBox(0.9, 6.0, 1.4, 0.5, 0.8, 0.4, '#ffffff'));
-  return wrapSvg(b.join(''), 38, 12);
-}
-
-function buildCapybaraSvg(): string {
-  const b: string[] = [];
-  b.push(isoBox(-1.8, 0.0, -2.0, 1.0, 1.0, 1.0, '#78350f'));
-  b.push(isoBox(0.8, 0.0, -2.0, 1.0, 1.0, 1.0, '#78350f'));
-  b.push(isoBox(-2.2, 0.6, -2.6, 4.4, 3.4, 5.2, '#b45309'));
-  b.push(isoBox(-1.8, 0.0, 1.6, 1.0, 1.0, 1.0, '#78350f'));
-  b.push(isoBox(0.8, 0.0, 1.6, 1.0, 1.0, 1.0, '#78350f'));
-  b.push(isoBox(-1.8, 3.0, 0.8, 3.6, 2.8, 3.6, '#b45309'));
-  b.push(isoBox(-1.5, 2.8, 3.4, 3.0, 2.2, 1.6, '#78350f'));
-  b.push(isoBox(-1.3, 4.4, 3.2, 0.6, 0.3, 0.4, '#451a03'));
-  b.push(isoBox(0.7, 4.4, 3.2, 0.6, 0.3, 0.4, '#451a03'));
-  b.push(isoBox(-1.8, 5.2, 1.2, 0.6, 0.8, 0.6, '#78350f'));
-  b.push(isoBox(1.2, 5.2, 1.2, 0.6, 0.8, 0.6, '#78350f'));
-  b.push(isoBox(-0.8, 5.8, 1.8, 1.6, 1.4, 1.6, '#f97316'));
-  b.push(isoBox(-0.2, 7.2, 2.0, 0.5, 0.4, 0.5, '#22c55e'));
-  return wrapSvg(b.join(''), 42, 13);
-}
-
-function wrapSvg(shapes: string, shadowRx: number, shadowRy: number): string {
-  return `<svg viewBox="0 0 120 110" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="94" rx="${shadowRx}" ry="${shadowRy}" fill="rgba(0,0,0,0.35)"/>${shapes}</svg>`;
-}
-
-const GACHA_CARD_SVG_MAP: Record<string, string> = {
-  corgi: buildCorgiSvg(),
-  box_cat: buildBoxCatSvg(),
-  pigeon_pizza: buildPigeonSvg(),
-  raccoon_bandit: buildRaccoonSvg(),
-  capybara_zen: buildCapybaraSvg(),
-};
 
 export function getGachaCardSvg(skinId: string): string {
-  return GACHA_CARD_SVG_MAP[skinId] ?? GACHA_CARD_SVG_MAP.corgi;
+  const thumbUrl = getGachaCardThumbUrl(skinId);
+  return `<img src="${thumbUrl}" class="gacha-card-char-img" alt="${skinId}">`;
+}
+
+export function createGachaCardElement(skinId: SkinId, index: number, isSilhouette = true): HTMLElement {
+  const card = document.createElement('div');
+  card.className = 'gacha-roulette-card';
+  card.setAttribute('data-index', String(index));
+  card.setAttribute('data-skin-id', skinId);
+
+  const rarityVal = SKIN_RARITY_MAP[skinId] ?? 'Common';
+  const rarityInfo = RARITY_CSS_MAP[rarityVal] ?? RARITY_CSS_MAP.Common;
+  const nameUpper = CARD_NAMES_UPPER[skinId] ?? skinId.toUpperCase();
+  const thumbUrl = getGachaCardThumbUrl(skinId);
+
+  card.classList.add(`glow-${rarityVal.toLowerCase()}`);
+  card.style.setProperty('--rarity-glow', RARITY_GLOW_MAP[rarityVal]);
+
+  const displayedName = isSilhouette ? `??? ${rarityInfo.label}` : nameUpper;
+  const silhouetteClass = isSilhouette ? 'card-silhouette' : '';
+
+  card.innerHTML = `
+    <div class="gacha-card-name" data-real-name="${nameUpper}">${displayedName}</div>
+    <div class="gacha-card-character ${silhouetteClass}">
+      <img src="${thumbUrl}" class="gacha-card-char-img" alt="${skinId}">
+    </div>
+    <div class="gacha-card-rarity ${rarityInfo.css}">${rarityInfo.label}</div>
+  `;
+  return card;
+}
+
+export function revealGachaWinningCard(cardEl: HTMLElement, skinId: string): void {
+  cardEl.classList.add('winning-card');
+  const charEl = cardEl.querySelector('.gacha-card-character');
+  if (charEl) {
+    charEl.classList.remove('card-silhouette');
+    charEl.classList.add('reveal-pop');
+  }
+  const nameEl = cardEl.querySelector('.gacha-card-name');
+  if (nameEl) {
+    const realName = nameEl.getAttribute('data-real-name') || CARD_NAMES_UPPER[skinId] || skinId.toUpperCase();
+    nameEl.textContent = realName;
+    nameEl.classList.add('name-revealed');
+  }
+}
+
+export function spawnGachaConfetti(container: HTMLElement): void {
+  const colors = ['#fbbf24', '#f59e0b', '#38bdf8', '#c084fc', '#4ade80', '#f43f5e', '#ffffff'];
+  for (let i = 0; i < 38; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'gacha-confetti-piece';
+    const isSquare = i % 3 === 0;
+    const angle = Math.random() * Math.PI - Math.PI / 2;
+    const dist = 70 + Math.random() * 160;
+    const dx = Math.cos(angle) * dist * 1.5;
+    const dy = -Math.abs(Math.sin(angle)) * dist - 30;
+    const rot = (Math.random() - 0.5) * 720;
+
+    piece.style.cssText = `
+      position: absolute; top: 50%; left: 50%;
+      width: ${isSquare ? 8 : 10}px; height: ${isSquare ? 8 : 14}px;
+      background: ${colors[i % colors.length]}; border-radius: 2px;
+      pointer-events: none; z-index: 22;
+      --dx: ${dx.toFixed(1)}px; --dy: ${dy.toFixed(1)}px; --rot: ${rot.toFixed(1)}deg;
+    `;
+    container.appendChild(piece);
+  }
+}
+
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => preloadGachaCardThumbnails());
+  } else {
+    preloadGachaCardThumbnails();
+  }
 }

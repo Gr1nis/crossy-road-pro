@@ -4,6 +4,7 @@ import type { GameEngine } from '../core/gameEngine.ts';
 import { Biome, DeathReason, LaneType, MoveDirection, type BiomeType, type Lane, type SkinId } from '../core/types.ts';
 import { MeshFactory } from './meshFactory.ts';
 import { LaneGeometryPool } from './laneGeometryPool.ts';
+import { VoxelPalette } from './voxelPalette.ts';
 import { InstancedDecorManager } from './instancedDecorManager.ts';
 import {
   calculateHopSquashStretch,
@@ -167,19 +168,26 @@ export class SceneManager {
         if (
           mesh.geometry &&
           mesh.geometry !== SceneManager.puffGeo &&
-          !LaneGeometryPool.isSharedGeometry(mesh.geometry)
+          !LaneGeometryPool.isSharedGeometry(mesh.geometry) &&
+          !VoxelPalette.isSharedGeometry(mesh.geometry)
         ) {
           mesh.geometry.dispose();
         }
         if (mesh.material) {
           if (Array.isArray(mesh.material)) {
             for (const mat of mesh.material) {
-              if (!LaneGeometryPool.isSharedMaterial(mat)) {
+              if (
+                !LaneGeometryPool.isSharedMaterial(mat) &&
+                !VoxelPalette.isSharedMaterial(mat)
+              ) {
                 mat.dispose();
               }
             }
           } else {
-            if (!LaneGeometryPool.isSharedMaterial(mesh.material)) {
+            if (
+              !LaneGeometryPool.isSharedMaterial(mesh.material) &&
+              !VoxelPalette.isSharedMaterial(mesh.material)
+            ) {
               mesh.material.dispose();
             }
           }
@@ -1066,3 +1074,4 @@ export class SceneManager {
     }
   }
 }
+

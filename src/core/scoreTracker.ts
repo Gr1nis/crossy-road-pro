@@ -378,15 +378,16 @@ export class ScoreTracker {
     return success;
   }
 
+  getLockedSkins(): SkinId[] {
+    return ALL_SKINS.map((s) => s.id).filter((id) => !this.inventory.isUnlocked(id));
+  }
+
+  isAllSkinsUnlocked(): boolean {
+    return this.getLockedSkins().length === 0;
+  }
+
   rollGacha(randomIndex: number = 0, forceSkinId?: SkinId): GachaRollResult {
-    let forced = forceSkinId;
-    if (!forced && Number.isInteger(randomIndex) && randomIndex > 0) {
-      const locked = ALL_SKINS.map((s) => s.id).filter((id) => !this.inventory.isUnlocked(id));
-      if (locked.length > 0) {
-        forced = locked[(Math.floor(randomIndex) - 1) % locked.length];
-      }
-    }
-    const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forced);
+    const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forceSkinId);
     if (result.success) {
       this.achievements.recordGachaRoll();
       if (!result.isDuplicate && result.skinId) {
@@ -396,6 +397,15 @@ export class ScoreTracker {
       this.saveToStorage();
     }
     return result;
+  }
+
+  claimDuplicateCashback(amount: number = GACHA_DUPLICATE_CASHBACK): number {
+    const credited = this.gacha.applyCashback(this.wallet, amount);
+    if (credited > 0) {
+      this.evaluateAchievements();
+      this.saveToStorage();
+    }
+    return credited;
   }
 
   getPlayerName(): string {

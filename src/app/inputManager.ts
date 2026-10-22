@@ -24,6 +24,7 @@ export interface ModalStateProvider {
   isPauseOpen: () => boolean;
   isMainMenuOpen: () => boolean;
   isGachaOpen: () => boolean;
+  isGachaSpinning?: () => boolean;
   isSkinsOpen?: () => boolean;
   isLeaderboardOpen: () => boolean;
   isAchievementsOpen?: () => boolean;
@@ -113,6 +114,7 @@ export class InputManager {
     return (
       this.modalState.isSettingsOpen() ||
       this.modalState.isLeaderboardOpen() ||
+      Boolean(this.modalState.isSkinsOpen?.()) ||
       Boolean(this.modalState.isAchievementsOpen?.()) ||
       Boolean(this.modalState.isDailyBonusOpen?.()) ||
       Boolean(this.modalState.isDailyQuestsOpen?.()) ||
@@ -231,8 +233,15 @@ export class InputManager {
     }
 
     if (this.modalState.isGachaOpen()) {
-      if (e.code === 'Escape') { e.preventDefault(); this.callbacks.onCloseModal(); }
-      else if (e.code === 'KeyG' || e.code === 'Enter') { e.preventDefault(); this.callbacks.onGachaRoll(); }
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        this.callbacks.onCloseModal();
+      } else if (e.code === 'KeyG' || e.code === 'Enter' || e.code === 'Space') {
+        e.preventDefault();
+        if (!this.modalState.isGachaSpinning?.()) {
+          this.callbacks.onGachaRoll();
+        }
+      }
       return;
     }
 

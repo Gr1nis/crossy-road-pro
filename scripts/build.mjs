@@ -3,6 +3,8 @@ import path from 'node:path';
 import * as nodeModule from 'node:module';
 import ts from 'typescript';
 import { MENU_ICONS } from '../src/view/menuIconsBase64.ts';
+import { GACHA_ICONS } from '../src/view/gachaIconsBase64.ts';
+import { SKINS_MENU_ICONS } from '../src/view/skinsIconsBase64.ts';
 
 function stripTypes(source) {
   if (typeof nodeModule.stripTypeScriptTypes === 'function') {
@@ -49,13 +51,20 @@ const moduleOrder = [
   'src/view/squashStretch.ts',
   'src/view/laneGeometryPool.ts',
   'src/view/instancedDecorManager.ts',
+  'src/view/menuIconsBase64.ts',
+  'src/view/gachaIconsBase64.ts',
+  'src/view/skinsIconsBase64.ts',
+  'src/view/gachaSkinsBase64.ts',
   'src/view/gachaCardArt.ts',
   'src/view/sceneManager.ts',
   'src/app/perfMetrics.ts',
   'src/app/perfReportModal.ts',
   'src/app/perfMonitor.ts',
   'src/app/settingsModal.ts',
+  'src/app/gachaRouletteAnim.ts',
   'src/app/gachaMachineModal.ts',
+  'src/app/worldsCollectionModal.ts',
+  'src/app/skinsCollectionModal.ts',
   'src/app/uiManager.ts',
   'src/app/inputManager.ts',
   'src/app/gameLoop.ts',
@@ -667,131 +676,205 @@ const htmlContent = `<!DOCTYPE html>
 
     /* ===== НОВЫЙ ДИЗАЙН ГАЧА-АВТОМАТА (ПК 16:9 ПО РЕФЕРЕНСУ) ===== */
     .modal-card-gacha-pc {
-      background: linear-gradient(180deg, rgba(20, 32, 54, 0.96) 0%, rgba(13, 20, 36, 0.98) 100%);
-      border: 2px solid rgba(251, 191, 36, 0.55);
-      border-radius: 28px;
-      box-shadow: 0 0 35px rgba(245, 158, 11, 0.25), 0 25px 60px rgba(0, 0, 0, 0.75);
+      background: linear-gradient(180deg, rgba(20, 31, 53, 0.95) 0%, rgba(13, 20, 36, 0.98) 100%);
+      border: 3px solid #f59e0b;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow:
+        0 0 35px rgba(245, 158, 11, 0.45),
+        inset 0 0 20px rgba(245, 158, 11, 0.2),
+        0 25px 60px rgba(0, 0, 0, 0.85);
       max-width: 840px;
       width: 92%;
-      padding: 20px 28px 26px;
+      padding: 28px 28px 24px;
       position: relative;
       color: #f8fafc;
       display: flex;
       flex-direction: column;
       align-items: center;
       user-select: none;
+      overflow: visible;
     }
-    .gacha-top-bar {
+    .modal-card-gacha-pc::before {
+      content: '';
       position: absolute;
-      top: 18px;
-      right: 22px;
+      inset: 0;
+      border-radius: 27px;
+      background: radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Верхний левый блок: плашка баланса монет на одном уровне с кнопкой закрытия */
+    .gacha-top-left-group, .gacha-coin-capsule-wrap {
+      position: absolute;
+      top: 16px;
+      left: 24px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      z-index: 20;
+      height: 44px;
+      z-index: 25;
     }
-    .gacha-coin-pill {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1.5px solid #f59e0b;
-      border-radius: 999px;
-      padding: 5px 14px 5px 16px;
+
+    /* Верхний правый блок: кнопка закрытия и подсказка ESC */
+    .gacha-top-right-group, .gacha-top-bar {
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      height: 44px;
+      z-index: 25;
+    }
+    .gacha-close-box {
       display: flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
     }
-    .gacha-coin-val { font-size: 19px; font-weight: 900; color: #facc15; }
-    .gacha-coin-label { font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 0.05em; }
-    .gacha-coin-icon { font-size: 16px; margin-left: 2px; }
-    .gacha-close-btn {
-      width: 36px;
-      height: 36px;
+    .gacha-close-btn-3d {
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      border: 2px solid #fca5a5;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 900;
+      background: transparent;
+      border: none;
+      padding: 0;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 12px rgba(239, 68, 68, 0.4);
-      transition: transform 0.15s ease, filter 0.15s;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
+      outline: none;
     }
-    .gacha-close-btn:hover { transform: scale(1.1); filter: brightness(1.15); }
+    .gacha-close-btn-3d:hover {
+      transform: scale(1.12);
+      filter: brightness(1.12) drop-shadow(0 6px 14px rgba(239, 68, 68, 0.5));
+    }
+    .gacha-close-btn-3d:active {
+      transform: scale(0.92);
+    }
+    .gacha-close-btn-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .gacha-esc-hint {
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+      background: rgba(15, 23, 42, 0.75);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    .gacha-coin-capsule {
+      background: linear-gradient(180deg, rgba(20, 31, 53, 0.95) 0%, rgba(13, 20, 36, 0.98) 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 999px;
+      padding: 5px 14px 5px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+    }
+    .gacha-coin-capsule .gacha-coin-val {
+      font-size: 19px;
+      font-weight: 900;
+      color: #facc15;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
+    .gacha-coin-capsule .gacha-coin-label {
+      font-size: 11px;
+      font-weight: 900;
+      color: #fde68a;
+      letter-spacing: 0.06em;
+    }
+    .gacha-coin-capsule .gacha-coin-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gacha-coin-icon-img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+    /* Legacy aliases for backward compatibility */
+    .gacha-coin-pill { display: none; }
+    .gacha-close-btn { display: none; }
 
+    /* 3D Заголовок PRIZE MACHINE (середина на верхней золотой границе) */
     .gacha-header-wrap {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      margin-top: 4px;
-      margin-bottom: 12px;
+      margin-top: -72px;
+      margin-bottom: 14px;
       position: relative;
+      z-index: 15;
+      pointer-events: none;
     }
-    .gacha-stars-left, .gacha-stars-right {
-      display: flex;
-      gap: 6px;
-      font-size: 24px;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
-    }
-    .star-purple { color: #c084fc; text-shadow: 0 0 10px rgba(192, 132, 252, 0.8); }
-    .star-cyan { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
-    .gacha-title-box { text-align: center; position: relative; }
-    .gacha-3d-title {
-      margin: 0;
-      font-size: 34px;
-      line-height: 0.95;
-      font-weight: 900;
-      letter-spacing: 0.03em;
-      color: #fde047;
-      text-shadow:
-        0 1px 0 #ca8a04,
-        0 2px 0 #a16207,
-        0 3px 0 #854d0e,
-        0 4px 0 #713f12,
-        0 6px 12px rgba(0, 0, 0, 0.6);
-      -webkit-text-stroke: 1px #78350f;
-    }
-    .gacha-ribbon {
-      width: 140px;
-      height: 10px;
-      background: linear-gradient(90deg, transparent, #dc2626 20%, #ef4444 50%, #dc2626 80%, transparent);
-      margin: 4px auto 0;
-      border-radius: 999px;
-      filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.5));
+    .gacha-3d-title-img {
+      height: 98px;
+      max-width: 460px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.55));
     }
 
+    /* Шасси барабана (глубокая темная ниша с фаской) */
     .gacha-viewport {
       position: relative;
       width: 100%;
       height: 220px;
-      background: #090e1c;
-      border: 2px solid #1e293b;
-      border-radius: 20px;
+      background: radial-gradient(ellipse at 50% 50%, #0d162a 0%, #060912 100%);
+      border: 3px solid #1e293b;
+      border-top-color: #334155;
+      border-bottom-color: #0b1120;
+      border-radius: 22px;
       overflow: hidden;
-      margin-bottom: 22px;
-      box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.7);
+      margin-bottom: 20px;
+      box-shadow:
+        inset 0 8px 24px rgba(0, 0, 0, 0.85),
+        inset 0 0 12px rgba(0, 0, 0, 0.9),
+        0 4px 12px rgba(0, 0, 0, 0.5);
       -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
       mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+      z-index: 5;
     }
     .gacha-pointer {
       position: absolute;
-      top: -2px;
+      top: -6px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 26px;
-      color: #facc15;
-      z-index: 15;
-      filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.9)) drop-shadow(0 4px 6px rgba(0,0,0,0.8));
-      line-height: 1;
+      width: 44px;
+      height: 48px;
+      z-index: 20;
       pointer-events: none;
-      animation: pointerGlow 1.4s ease-in-out infinite alternate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pointerFloat 1.4s ease-in-out infinite alternate;
     }
-    @keyframes pointerGlow {
-      0% { filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.7)); }
-      100% { filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1)); }
+    .gacha-pointer-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.95)) drop-shadow(0 6px 8px rgba(0, 0, 0, 0.8));
+    }
+    @keyframes pointerFloat {
+      0% { transform: translateX(-50%) translateY(0); filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.8)); }
+      100% { transform: translateX(-50%) translateY(4px); filter: drop-shadow(0 0 18px rgba(250, 204, 21, 1)); }
     }
     .gacha-guide-line {
       position: absolute;
@@ -830,12 +913,79 @@ const htmlContent = `<!DOCTYPE html>
       transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s;
       position: relative;
     }
+    .gacha-roulette-card.glow-common {
+      border-color: #64748b;
+      box-shadow: 0 0 12px rgba(148, 163, 184, 0.35), inset 0 0 8px rgba(148, 163, 184, 0.12);
+    }
+    .gacha-roulette-card.glow-rare {
+      border-color: #0284c7;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.45), inset 0 0 10px rgba(56, 189, 248, 0.18);
+    }
+    .gacha-roulette-card.glow-epic {
+      border-color: #9333ea;
+      box-shadow: 0 0 16px rgba(192, 132, 252, 0.55), inset 0 0 12px rgba(192, 132, 252, 0.22);
+    }
+    .gacha-roulette-card.glow-legendary {
+      border-color: #f59e0b;
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.65), inset 0 0 14px rgba(251, 191, 36, 0.25);
+    }
     .gacha-roulette-card.winning-card {
       border-color: #fbbf24;
       box-shadow: 0 0 25px rgba(251, 191, 36, 0.8), inset 0 0 15px rgba(251, 191, 36, 0.3);
       transform: scale(1.06);
       z-index: 12;
       background: #192747;
+    }
+    .card-silhouette {
+      opacity: 0.95;
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .card-silhouette .gacha-card-char-img,
+    .card-silhouette svg {
+      filter: brightness(0) drop-shadow(0 0 10px var(--rarity-glow, rgba(255, 255, 255, 0.7)));
+    }
+    .gacha-card-character.reveal-pop {
+      animation: cardRevealPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes cardRevealPop {
+      0% { transform: scale(0.85); filter: brightness(2.2) drop-shadow(0 0 22px #fbbf24); }
+      50% { transform: scale(1.18); filter: brightness(1.3) drop-shadow(0 0 26px #fbbf24); }
+      100% { transform: scale(1.0); filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55)); }
+    }
+    .gacha-card-name.name-revealed {
+      animation: nameShine 0.5s ease-out forwards;
+      color: #fde047;
+      border-color: rgba(250, 204, 21, 0.5);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
+    }
+    @keyframes nameShine {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1.0); opacity: 1; }
+    }
+    .gacha-all-unlocked-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 100%;
+      color: #fbbf24;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-shadow: 0 2px 10px rgba(251, 191, 36, 0.6);
+      z-index: 15;
+    }
+    .gacha-all-unlocked-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.04em;
+    }
+    .gacha-spin-btn.all-collected-btn {
+      filter: grayscale(0.5) brightness(0.85);
+      cursor: not-allowed;
     }
     .gacha-card-name {
       font-size: 11px;
@@ -858,11 +1008,19 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       justify-content: center;
       margin: 4px 0;
+      position: relative;
     }
+    .gacha-card-char-img,
     .gacha-card-character svg {
       width: 100%;
       height: 100%;
+      object-fit: contain;
+      background: transparent;
       filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+      transition: filter 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
     }
     .gacha-card-rarity {
       width: 92%;
@@ -900,25 +1058,34 @@ const htmlContent = `<!DOCTYPE html>
 
     .gacha-duplicate-stamp {
       position: absolute;
-      top: 25%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(-8deg);
-      background: rgba(220, 38, 38, 0.92);
-      border: 3px dashed #fecaca;
-      border-radius: 12px;
-      padding: 8px 18px;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+      border: 3.5px dashed #fecaca;
+      border-radius: 16px;
+      padding: 10px 24px;
       text-align: center;
-      z-index: 25;
-      color: #fff;
+      z-index: 45;
+      color: #ffffff;
       font-weight: 900;
-      font-size: 18px;
-      letter-spacing: 0.05em;
-      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.7);
-      animation: stampPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      box-shadow: 0 8px 30px rgba(220, 38, 38, 0.85), inset 0 2px 6px rgba(255, 255, 255, 0.35);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+      animation: stampPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-    .gacha-stamp-sub { font-size: 12px; color: #fde047; margin-top: 2px; }
+    .gacha-stamp-sub {
+      font-size: 14px;
+      font-weight: 900;
+      color: #facc15;
+      margin-top: 4px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+      letter-spacing: 0.04em;
+    }
     @keyframes stampPop {
-      0% { transform: translate(-50%, -50%) rotate(-25deg) scale(2.2); opacity: 0; }
+      0% { transform: translate(-50%, -50%) rotate(-25deg) scale(2.4); opacity: 0; }
       100% { transform: translate(-50%, -50%) rotate(-8deg) scale(1); opacity: 1; }
     }
 
@@ -926,11 +1093,11 @@ const htmlContent = `<!DOCTYPE html>
       position: absolute;
       top: 50%;
       left: 50%;
-      font-size: 22px;
+      font-size: 26px;
       font-weight: 900;
       color: #facc15;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-      z-index: 30;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85), 0 0 14px rgba(250, 204, 21, 0.6);
+      z-index: 50;
       pointer-events: none;
     }
     .gacha-cashback-flyer.fly-anim {
@@ -938,77 +1105,141 @@ const htmlContent = `<!DOCTYPE html>
     }
     @keyframes flyerMove {
       0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      60% { transform: translate(140px, -110px) scale(1.3); opacity: 1; }
-      100% { transform: translate(260px, -150px) scale(0.6); opacity: 0; }
+      50% { transform: translate(120px, -90px) scale(1.35); opacity: 1; }
+      100% { transform: translate(250px, -150px) scale(0.6); opacity: 0; }
     }
 
-    .gacha-action-bar { display: flex; justify-content: center; width: 100%; }
+    .gacha-confetti-piece {
+      animation: confettiExplode 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+    @keyframes confettiExplode {
+      0% { transform: translate(-50%, -50%) translate(0, 0) rotate(0deg); opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+    }
+
+    /* Нижняя зона: 3D кнопка SPIN */
+    .gacha-action-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      z-index: 10;
+    }
     .gacha-spin-btn {
-      background: linear-gradient(180deg, #facc15 0%, #f59e0b 45%, #d97706 100%);
-      border: 3px solid #fde68a;
-      border-radius: 22px;
-      padding: 14px 48px;
+      position: relative;
+      width: 270px;
+      height: 128px;
+      background: url('${GACHA_ICONS.spin}') center center / contain no-repeat;
+      border: none;
+      border-radius: 28px;
+      padding: 0;
       cursor: pointer;
-      min-width: 260px;
-      box-shadow:
-        0 2px 0 #b45309,
-        0 4px 0 #92400e,
-        0 6px 0 #78350f,
-        0 8px 0 #451a03,
-        0 14px 25px rgba(0, 0, 0, 0.6);
-      transition: transform 0.1s ease, filter 0.15s, box-shadow 0.1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.65));
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.12s ease;
       outline: none;
+      box-sizing: border-box;
     }
-    .gacha-spin-btn:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-2px); }
+    .gacha-spin-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      filter: brightness(1.08) drop-shadow(0 12px 28px rgba(245, 158, 11, 0.55));
+    }
     .gacha-spin-btn:active:not(:disabled) {
-      transform: translateY(4px);
-      box-shadow:
-        0 1px 0 #b45309,
-        0 2px 0 #78350f,
-        0 6px 14px rgba(0, 0, 0, 0.5);
+      transform: scale(0.97) translateY(2px);
+      filter: brightness(0.98);
     }
-    .gacha-spin-btn:disabled { opacity: 0.65; cursor: not-allowed; filter: grayscale(0.2); }
-    .gacha-spin-btn.shake-error { animation: shakeBtn 0.4s ease-in-out; }
+    .gacha-spin-btn:disabled {
+      opacity: 0.85;
+      cursor: not-allowed;
+      filter: grayscale(0.25) brightness(0.9);
+    }
+    .gacha-spin-btn.shake-error {
+      animation: shakeBtn 0.4s ease-in-out;
+    }
     @keyframes shakeBtn {
       0%, 100% { transform: translateX(0); }
       20%, 60% { transform: translateX(-8px); }
       40%, 80% { transform: translateX(8px); }
     }
-    .gacha-spin-content { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .gacha-spin-content {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      right: 14px;
+      height: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      pointer-events: none;
+      z-index: 2;
+    }
     .gacha-spin-main {
-      font-size: 26px;
+      font-family: 'Lilita One', 'Fredoka', system-ui, sans-serif;
+      font-size: 24px;
       font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.06em;
       color: #451a03;
-      letter-spacing: 0.05em;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 3px rgba(0, 0, 0, 0.35);
     }
     .gacha-spin-price {
-      font-size: 14px;
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 16px;
       font-weight: 900;
-      color: #78350f;
-      background: rgba(255, 255, 255, 0.35);
-      padding: 2px 14px;
-      border-radius: 999px;
-      letter-spacing: 0.02em;
+      line-height: 1.1;
+      color: #451a03;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 3px rgba(0, 0, 0, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .gacha-btn-coin-img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      vertical-align: middle;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
     }
 
     .gacha-spin-btn.select-character-btn {
-      background: linear-gradient(180deg, #34d399 0%, #10b981 45%, #059669 100%);
-      border-color: #a7f3d0;
-      box-shadow:
-        0 2px 0 #047857,
-        0 4px 0 #065f46,
-        0 6px 0 #064e3b,
-        0 8px 0 #022c22,
-        0 14px 28px rgba(16, 185, 129, 0.45);
+      filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.8)) brightness(1.05);
       animation: pulseWinBtn 1.2s ease-in-out infinite alternate;
     }
     @keyframes pulseWinBtn {
-      0% { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
-      100% { filter: drop-shadow(0 0 24px rgba(16, 185, 129, 0.95)) brightness(1.08); }
+      0% { filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.6)); }
+      100% { filter: drop-shadow(0 0 26px rgba(245, 158, 11, 0.95)) brightness(1.08); }
     }
-    .gacha-spin-btn.select-character-btn .gacha-spin-main { color: #022c22; font-size: 20px; }
-    .gacha-spin-btn.select-character-btn .gacha-spin-price { color: #064e3b; background: rgba(255, 255, 255, 0.4); }
+    .gacha-spin-btn.select-character-btn .gacha-spin-main {
+      color: #451a03;
+      font-size: 22px;
+    }
+    .gacha-spin-btn.select-character-btn .gacha-spin-price {
+      color: #451a03;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 3px rgba(0, 0, 0, 0.25);
+    }
+    .gacha-space-hint {
+      margin-top: 10px;
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #facc15;
+      text-shadow: 0 0 12px rgba(250, 204, 21, 0.75), 0 2px 4px rgba(0, 0, 0, 0.8);
+      animation: spaceHintGlow 1.6s ease-in-out infinite alternate;
+    }
+    @keyframes spaceHintGlow {
+      0% { opacity: 0.75; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1.02); text-shadow: 0 0 18px rgba(250, 204, 21, 1), 0 2px 6px rgba(0, 0, 0, 0.9); }
+    }
     .gacha-skin-card { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.15s ease; position: relative; overflow: hidden; }
     .gacha-skin-card:hover:not(.locked) { border-color: #38bdf8; transform: translateY(-2px); }
     .gacha-skin-card.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.12); box-shadow: 0 0 14px rgba(56, 189, 248, 0.3); }
@@ -1022,6 +1253,459 @@ const htmlContent = `<!DOCTYPE html>
     .rarity-rare { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
     .rarity-epic { background: rgba(192, 132, 252, 0.22); color: #c084fc; border: 1px solid #9333ea; box-shadow: 0 0 8px rgba(168, 85, 247, 0.3); }
     .rarity-legendary { background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.3)); color: #fbbf24; border: 1px solid #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+
+    /* ========================================================================== */
+    /* SKINS COLLECTION MODAL (PC / Mobile Glassmorphism by Reference)            */
+    /* ========================================================================== */
+
+    .modal-card-skins-pc {
+      background: linear-gradient(180deg, rgba(20, 31, 53, 0.95) 0%, rgba(13, 20, 36, 0.98) 100%);
+      border: 3px solid #f59e0b;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow:
+        0 0 35px rgba(245, 158, 11, 0.45),
+        inset 0 0 20px rgba(245, 158, 11, 0.2),
+        0 25px 60px rgba(0, 0, 0, 0.85);
+      max-width: 860px;
+      width: 92%;
+      padding: 32px 24px 24px;
+      position: relative;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      overflow: visible;
+    }
+    .modal-card-skins-pc::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 27px;
+      background: radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Верхний левый блок: плашка баланса монет */
+    .skins-top-left-group, .skins-coin-capsule-wrap {
+      position: absolute;
+      top: 16px;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      height: 44px;
+      z-index: 25;
+    }
+
+    /* Верхний правый блок: кнопка закрытия и подсказка ESC */
+    .skins-top-right-group, .skins-top-bar {
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      height: 44px;
+      z-index: 25;
+    }
+    .skins-close-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .skins-close-btn-3d {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
+      outline: none;
+    }
+    .skins-close-btn-3d:hover {
+      transform: scale(1.12);
+      filter: brightness(1.12) drop-shadow(0 6px 14px rgba(239, 68, 68, 0.5));
+    }
+    .skins-close-btn-3d:active {
+      transform: scale(0.92);
+    }
+    .skins-close-btn-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .skins-esc-hint {
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+      background: rgba(15, 23, 42, 0.75);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    .skins-coin-capsule {
+      background: linear-gradient(180deg, rgba(20, 31, 53, 0.95) 0%, rgba(13, 20, 36, 0.98) 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 999px;
+      padding: 5px 14px 5px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+    }
+    .skins-coin-capsule .skins-coin-val {
+      font-size: 19px;
+      font-weight: 900;
+      color: #facc15;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
+    .skins-coin-capsule .skins-coin-label {
+      font-size: 11px;
+      font-weight: 900;
+      color: #fde68a;
+      letter-spacing: 0.06em;
+    }
+    .skins-coin-capsule .skins-coin-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .skins-coin-icon-img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    /* 3D Заголовок SKINS (середина на верхней золотой границе) */
+    .skins-header-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -72px;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 15;
+      pointer-events: none;
+    }
+    .skins-3d-title-img {
+      height: 98px;
+      max-width: 440px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.55));
+    }
+
+    /* Сетка карточек персонажей */
+    .skins-cards-grid {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      width: 100%;
+      margin-top: 24px;
+      flex-wrap: wrap;
+      z-index: 5;
+      position: relative;
+    }
+
+    /* Карточка персонажа */
+    .skin-card {
+      --rarity-color: #94a3b8;
+      --rarity-glow: rgba(148, 163, 184, 0.4);
+      width: 146px;
+      min-height: 236px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 2px solid var(--rarity-color);
+      border-radius: 18px;
+      padding: 10px 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        0 0 16px var(--rarity-glow),
+        inset 0 1px 2px rgba(255, 255, 255, 0.08);
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+      cursor: pointer;
+      user-select: none;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .skin-card:hover:not(.locked) {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.5),
+        0 0 24px var(--rarity-glow),
+        inset 0 1px 4px rgba(255, 255, 255, 0.15);
+    }
+    .skin-card.active {
+      border-color: #4ade80;
+      box-shadow:
+        0 0 25px rgba(74, 222, 128, 0.55),
+        inset 0 0 14px rgba(74, 222, 128, 0.25),
+        0 8px 24px rgba(0, 0, 0, 0.6);
+      transform: translateY(-2px);
+    }
+    .skin-card.locked {
+      opacity: 0.88;
+      cursor: pointer;
+    }
+    .skin-card.locked:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.5),
+        0 0 18px var(--rarity-glow);
+    }
+
+    /* Рамки и свечение по редкостям */
+    .skin-card.rarity-common {
+      --rarity-color: #94a3b8;
+      --rarity-glow: rgba(148, 163, 184, 0.4);
+    }
+    .skin-card.rarity-rare {
+      --rarity-color: #38bdf8;
+      --rarity-glow: rgba(56, 189, 248, 0.45);
+    }
+    .skin-card.rarity-epic {
+      --rarity-color: #c084fc;
+      --rarity-glow: rgba(192, 132, 252, 0.5);
+    }
+    .skin-card.rarity-legendary {
+      --rarity-color: #fbbf24;
+      --rarity-glow: rgba(251, 191, 36, 0.55);
+    }
+
+    /* Плашка редкости внутри карточки */
+    .skin-card-rarity {
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--rarity-color);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      margin-bottom: 2px;
+      z-index: 2;
+    }
+
+    /* Превью персонажа */
+    .skin-card-preview {
+      width: 110px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin: 2px 0 6px;
+    }
+    .skin-card-char-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.65));
+      transition: filter 0.2s ease, transform 0.2s ease;
+      pointer-events: none;
+    }
+
+    /* Силуэт закрытого скина с неоновым контуром редкости */
+    .skin-card.locked .skin-card-char-img,
+    .skin-card.skin-card-silhouette .skin-card-char-img {
+      filter: brightness(0) drop-shadow(0 0 10px var(--rarity-glow));
+    }
+
+    /* Имя персонажа */
+    .skin-card-name {
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      z-index: 2;
+    }
+    .skin-card.locked .skin-card-name {
+      color: #94a3b8;
+    }
+
+    /* 3D Кнопки действия в карточке */
+    .skin-card-btn {
+      width: 110px;
+      height: 42px;
+      border: none;
+      background: transparent;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0 4px 6px; /* смещение контента вверх */
+      margin: 0 auto;
+      outline: none;
+      border-radius: 12px;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
+      transition: transform 0.12s ease, filter 0.12s ease;
+      user-select: none;
+      z-index: 3;
+    }
+    .skin-card-btn:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+    }
+    .skin-card-btn:active {
+      transform: scale(0.96);
+    }
+    .skin-card-btn.btn-active {
+      background-image: url('${SKINS_MENU_ICONS.btnGreen}');
+    }
+    .skin-card-btn.btn-select {
+      background-image: url('${SKINS_MENU_ICONS.btnGold}');
+    }
+    .skin-card-btn.btn-locked {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1.5px solid rgba(245, 158, 11, 0.5);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .skin-card-btn-text {
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      pointer-events: none;
+      transform: translateY(-3px);
+    }
+    .skin-card-btn.btn-active .skin-card-btn-text {
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(20, 83, 45, 0.9), 0 0 3px rgba(0, 0, 0, 0.9);
+    }
+    .skin-card-btn.btn-select .skin-card-btn-text {
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(120, 53, 15, 0.9), 0 0 3px rgba(0, 0, 0, 0.9);
+    }
+    .skin-card-btn.btn-locked .skin-card-btn-text {
+      color: #fde68a;
+      font-size: 11px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+    .skin-card-btn-lock-img {
+      width: 15px;
+      height: 15px;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+      vertical-align: middle;
+    }
+
+    /* Вкладки разделов меню: Персонажи / Миры */
+    .skins-tabs-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 6px 0 14px;
+      z-index: 10;
+    }
+    .skins-tab-btn {
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.75);
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      border-radius: 20px;
+      padding: 6px 18px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      user-select: none;
+      outline: none;
+    }
+    .skins-tab-btn:hover {
+      color: #f8fafc;
+      border-color: rgba(245, 158, 11, 0.6);
+      transform: translateY(-1px);
+    }
+    .skins-tab-btn.active {
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+      border-color: #fbbf24;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);
+    }
+    .skins-tab-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .skins-tab-content.hidden {
+      display: none !important;
+    }
+
+    /* Навигационная подсказка для ПК */
+    .skins-nav-hint {
+      margin-top: 18px;
+      font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #facc15;
+      text-shadow: 0 0 12px rgba(250, 204, 21, 0.75), 0 2px 4px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      z-index: 5;
+      position: relative;
+    }
+    .skins-key-badge {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(250, 204, 21, 0.4);
+      color: #fef08a;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
 
     /* Daily Bonus Modal & 7-Day Grid */
     #daily-bonus-modal { z-index: 50; }
@@ -1240,7 +1924,7 @@ const htmlContent = `<!DOCTYPE html>
     .game-over-score-item:last-child .game-over-score-num { color: #facc15; }
 
     /* Toast Notifications */
-    #toast-container { position: absolute; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 60; pointer-events: none; max-width: 340px; }
+    #toast-container { position: absolute; top: 88px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; max-width: 340px; }
     .toast-item { background: rgba(15, 23, 42, 0.94); border: 2px solid #f59e0b; border-radius: 16px; padding: 12px 16px; color: #f8fafc; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); display: flex; align-items: center; gap: 12px; animation: toastIn 0.28s ease-out; backdrop-filter: blur(10px); }
     .toast-icon { font-size: 26px; line-height: 1; }
     .toast-title { font-size: 13px; font-weight: 900; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -1613,11 +2297,99 @@ const htmlContent = `<!DOCTYPE html>
       .lb-col-player { text-align: left !important; font-size: 13px; display: flex; align-items: center; gap: 4px; }
       .lb-col-score { font-size: 12px; font-weight: 800; color: #38bdf8; }
 
-      .modal-card-gacha { max-height: 90vh !important; padding: 16px 14px !important; }
+      .modal-card-gacha, .modal-card-gacha-pc { max-height: 94vh !important; padding: 22px 14px 18px !important; border-radius: 22px !important; }
+      .gacha-header-wrap { margin-top: -52px !important; margin-bottom: 8px !important; }
+      .gacha-3d-title-img { height: 68px !important; max-width: 310px !important; }
+      .gacha-top-left-group, .gacha-coin-capsule-wrap { top: 10px; left: 12px; height: 36px; }
+      .gacha-top-right-group, .gacha-top-bar { top: 10px; right: 12px; height: 36px; gap: 8px; }
+      .gacha-close-btn-3d { width: 36px; height: 36px; }
+      .gacha-esc-hint { display: none; }
+      .gacha-coin-capsule { padding: 3px 10px; }
+      .gacha-coin-capsule .gacha-coin-val { font-size: 16px; }
+      .gacha-coin-capsule .gacha-coin-label { font-size: 10px; }
+      .gacha-coin-icon-img { width: 18px; height: 18px; }
+      .gacha-viewport { height: 185px; margin-bottom: 14px; }
+      .gacha-spin-btn { width: 230px !important; height: 110px !important; }
+      .gacha-spin-content { top: 8px !important; height: 60px !important; gap: 2px !important; }
+      .gacha-spin-main { font-size: 20px !important; }
+      .gacha-spin-price { font-size: 14px !important; padding: 0 !important; }
+      .gacha-btn-coin-img { width: 15px !important; height: 15px !important; }
+      .gacha-space-hint { font-size: 11px; margin-top: 6px; }
       .gacha-modal-grid { gap: 6px; margin: 8px 0; }
       .gacha-skin-card { padding: 8px 6px; }
       .gacha-skin-badge { font-size: 24px; margin: 2px 0; }
       .gacha-skin-name { font-size: 11px; }
+
+      /* Skins Menu Mobile Overrides (9:16 Portrait) */
+      .modal-card-skins, .modal-card-skins-pc {
+        max-height: 94vh !important;
+        padding: 22px 14px 18px !important;
+        border-radius: 22px !important;
+        width: 95% !important;
+      }
+      .skins-header-wrap {
+        margin-top: -52px !important;
+        margin-bottom: 6px !important;
+      }
+      .skins-3d-title-img {
+        height: 68px !important;
+        max-width: 290px !important;
+      }
+      .skins-top-left-group, .skins-coin-capsule-wrap {
+        top: 10px;
+        left: 12px;
+        height: 36px;
+      }
+      .skins-top-right-group, .skins-top-bar {
+        top: 10px;
+        right: 12px;
+        height: 36px;
+        gap: 8px;
+      }
+      .skins-close-btn-3d {
+        width: 36px;
+        height: 36px;
+      }
+      .skins-esc-hint {
+        display: none;
+      }
+      .skins-coin-capsule {
+        padding: 3px 10px;
+      }
+      .skins-coin-capsule .skins-coin-val {
+        font-size: 16px;
+      }
+      .skins-coin-capsule .skins-coin-label {
+        font-size: 10px;
+      }
+      .skins-coin-icon-img {
+        width: 18px;
+        height: 18px;
+      }
+      .skins-cards-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        justify-content: flex-start;
+        gap: 10px;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        margin-top: 14px;
+      }
+      .skin-card {
+        flex: 0 0 136px;
+        min-height: 220px;
+        scroll-snap-align: center;
+      }
+      .skin-card-preview {
+        width: 95px;
+        height: 95px;
+      }
+      .skins-nav-hint {
+        display: none;
+      }
 
       .settings-group { padding: 12px 14px; margin: 6px 0 10px; gap: 10px; }
       .settings-label { font-size: 14px; }
@@ -2085,37 +2857,37 @@ const htmlContent = `<!DOCTYPE html>
   <!-- Модальное окно Автомата скинов (ПК рулетка по референсу) -->
   <div id="gacha-modal" class="modal hidden" style="z-index: 120;">
     <div class="modal-card modal-card-gacha-pc">
-      <!-- Верхний бар с балансом и кнопкой закрытия -->
-      <div class="gacha-top-bar">
-        <div class="gacha-coin-pill" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle;">
+      <!-- Верхний левый блок: плашка баланса монет -->
+      <div class="gacha-top-left-group gacha-coin-capsule-wrap">
+        <div class="gacha-coin-capsule" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle;" title="Баланс монет">
           <span class="gacha-coin-val" id="gacha-modal-coins">0</span>
           <span class="gacha-coin-label">COINS</span>
-          <span class="gacha-coin-icon">🪙</span>
+          <span class="gacha-coin-icon"><img src="${MENU_ICONS.coin}" class="gacha-coin-icon-img" alt="🪙" /></span>
         </div>
-        <button type="button" id="gacha-modal-close-btn" class="gacha-close-btn" aria-label="Закрыть">✕</button>
       </div>
 
-      <!-- 3D Заголовок PRIZE MACHINE со звёздами и лентой -->
+      <!-- Верхний правый блок: кнопка закрытия [ESC] -->
+      <div class="gacha-top-right-group gacha-top-bar">
+        <div class="gacha-close-box">
+          <button type="button" id="gacha-modal-close-btn" class="gacha-close-btn-3d" aria-label="Закрыть" title="Закрыть [ESC]">
+            <img src="${GACHA_ICONS.close}" class="gacha-close-btn-img" alt="✕" />
+          </button>
+          <span class="gacha-esc-hint">[ESC]</span>
+        </div>
+      </div>
+
+      <!-- 3D Заголовок PRIZE MACHINE -->
       <div class="gacha-header-wrap">
         <span style="display:none;" data-i18n="gacha_title">🎰 АВТОМАТ СКИНОВ</span>
-        <div class="gacha-stars-left">
-          <span class="gacha-star star-purple">★</span>
-          <span class="gacha-star star-cyan">★</span>
-        </div>
-        <div class="gacha-title-box">
-          <h1 class="gacha-3d-title">PRIZE<br>MACHINE</h1>
-          <div class="gacha-ribbon"></div>
-        </div>
-        <div class="gacha-stars-right">
-          <span class="gacha-star star-cyan">★</span>
-          <span class="gacha-star star-purple">★</span>
-        </div>
+        <img src="${GACHA_ICONS.title}" class="gacha-3d-title-img" alt="PRIZE MACHINE" />
       </div>
 
-      <!-- Смотровое окно горизонтальной рулетки -->
+      <!-- Смотровое окно горизонтальной рулетки (шасси барабана) -->
       <div id="gacha-viewport" class="gacha-viewport">
-        <!-- Золотой указатель по центру -->
-        <div class="gacha-pointer">▼</div>
+        <!-- 3D Стрелка-указатель по центру -->
+        <div class="gacha-pointer">
+          <img src="${GACHA_ICONS.pointer}" class="gacha-pointer-img" alt="Pointer" />
+        </div>
 
         <!-- Центральная направляющая линия -->
         <div class="gacha-guide-line"></div>
@@ -2138,25 +2910,72 @@ const htmlContent = `<!DOCTYPE html>
         <div id="gacha-cashback-flyer" class="gacha-cashback-flyer hidden">+40 🪙</div>
       </div>
 
-      <!-- Нижняя зона: большая кнопка SPIN -->
+      <!-- Нижняя зона: большая 3D кнопка SPIN и подсказка клавиши -->
       <div class="gacha-action-bar">
         <button type="button" id="gacha-modal-roll-btn" class="gacha-spin-btn">
           <div class="gacha-spin-content">
             <span class="gacha-spin-main">SPIN</span>
-            <span class="gacha-spin-price">100 🪙</span>
+            <span class="gacha-spin-price">100 <img src="${MENU_ICONS.coin}" class="gacha-btn-coin-img" alt="🪙"></span>
           </div>
         </button>
+        <div class="gacha-space-hint">PRESS [SPACE] TO SPIN</div>
       </div>
     </div>
   </div>
 
   <!-- Модальное окно Коллекции скинов -->
   <div id="skins-modal" class="modal hidden" style="z-index: 110;">
-    <div class="modal-card" style="max-width: 520px;">
-      <h2 style="color: #38bdf8;" data-i18n="skins_title">👤 КОЛЛЕКЦИЯ СКИНОВ</h2>
-      <p style="margin-bottom: 16px;" data-i18n="skins_desc">Выберите персонажа для следующего забега:</p>
-      <div id="skins-modal-list" class="gacha-modal-grid"></div>
-      <button type="button" id="skins-modal-close-btn" class="menu-btn menu-btn-secondary" style="margin-top: 16px;" data-i18n="modal_close">Закрыть</button>
+    <div class="modal-card modal-card-skins-pc">
+      <!-- Верхний левый блок: плашка баланса монет -->
+      <div class="skins-top-left-group skins-coin-capsule-wrap">
+        <div class="skins-coin-capsule" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle;" title="Баланс монет">
+          <span class="skins-coin-val" id="skins-modal-coins">0</span>
+          <span class="skins-coin-label">COINS</span>
+          <span class="skins-coin-icon"><img src="${MENU_ICONS.coin}" class="skins-coin-icon-img" alt="🪙" /></span>
+        </div>
+      </div>
+
+      <!-- Верхний правый блок: кнопка закрытия [ESC] -->
+      <div class="skins-top-right-group skins-top-bar">
+        <div class="skins-close-box">
+          <button type="button" id="skins-modal-close-btn" class="skins-close-btn-3d" aria-label="Закрыть" title="Закрыть [ESC]">
+            <img src="${SKINS_MENU_ICONS.close}" class="skins-close-btn-img" alt="✕" />
+          </button>
+          <span class="skins-esc-hint">[ESC]</span>
+        </div>
+      </div>
+
+      <!-- 3D Заголовок SKINS -->
+      <div class="skins-header-wrap">
+        <span style="display:none;" data-i18n="skins_title">👤 КОЛЛЕКЦИЯ СКИНОВ</span>
+        <img src="${SKINS_MENU_ICONS.title}" class="skins-3d-title-img" alt="SKINS" />
+      </div>
+
+      <!-- Переключатель разделов: Персонажи / Миры -->
+      <div class="skins-tabs-nav">
+        <button type="button" id="skins-tab-btn-characters" class="skins-tab-btn active" data-tab="characters">
+          <span class="skins-tab-icon">👤</span> ПЕРСОНАЖИ
+        </button>
+        <button type="button" id="skins-tab-btn-worlds" class="skins-tab-btn" data-tab="worlds">
+          <span class="skins-tab-icon">🌍</span> МИРЫ
+        </button>
+      </div>
+
+      <!-- Вкладка 1: Карточки персонажей -->
+      <div id="skins-tab-characters-content" class="skins-tab-content active">
+        <div id="skins-modal-list" class="skins-cards-grid"></div>
+        <div class="skins-nav-hint">
+          <span class="skins-key-badge">[A]</span> / <span class="skins-key-badge">[D]</span> <span data-i18n="skins_nav_hint">ВЫБОР</span> • <span class="skins-key-badge">[ENTER]</span> <span data-i18n="skins_select_hint">ВЫБРАТЬ</span>
+        </div>
+      </div>
+
+      <!-- Вкладка 2: Карточки миров / локаций -->
+      <div id="skins-tab-worlds-content" class="skins-tab-content hidden">
+        <div id="skins-worlds-list" class="skins-cards-grid"></div>
+        <div class="skins-nav-hint">
+          <span class="skins-key-badge">[A]</span> / <span class="skins-key-badge">[D]</span> ВЫБОР МИРА • <span class="skins-key-badge">[ENTER]</span> ПРИМЕНИТЬ
+        </div>
+      </div>
     </div>
   </div>
 

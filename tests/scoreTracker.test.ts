@@ -133,8 +133,11 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     assert.equal(dupRoll.rarity, 'Common');
     assert.equal(dupRoll.isDuplicate, true);
     assert.equal(dupRoll.cashback, 40);
-    // 200 - 100 (cost) + 40 (cashback) = 140 coins remaining
-    assert.equal(tracker.getCoins(), 140);
+    // 200 - 100 (cost) = 100 coins remaining during spin
+    assert.equal(tracker.getCoins(), 100, 'Roll deducts 100 coins immediately');
+    tracker.claimDuplicateCashback(dupRoll.cashback);
+    // 100 + 40 (cashback) = 140 coins after spin completes
+    assert.equal(tracker.getCoins(), 140, 'Cashback credited after spin completion');
 
     // Roll weighted probability 0.97 -> Legendary 'capybara_zen' (new skin!)
     const legRoll = tracker.rollGacha(0.97);
@@ -150,7 +153,9 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     const dupLegRoll = tracker.rollGacha(0.97);
     assert.equal(dupLegRoll.isDuplicate, true);
     assert.equal(dupLegRoll.cashback, 40);
-    assert.equal(tracker.getCoins(), 40);
+    assert.equal(tracker.getCoins(), 0, '100 - 100 = 0 coins during spin');
+    tracker.claimDuplicateCashback(dupLegRoll.cashback);
+    assert.equal(tracker.getCoins(), 40, 'Cashback +40 credited after spin completes');
   });
 
   it('Property 6 (Achievements System & Persistence): unlocks First 50 Steps, Collector, Train Conqueror, Rich Hopper, and Leaderboard Champion', () => {
@@ -175,9 +180,9 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     // 3. Rich Hopper (200+ coins) & Collector (all 4 skins unlocked)
     tracker.addCoins(400);
     assert.equal(tracker.isAchievementUnlocked('rich_hopper'), true);
-    tracker.rollGacha(1);
-    tracker.rollGacha(2);
-    tracker.rollGacha(3);
+    tracker.rollGacha(0, 'box_cat');
+    tracker.rollGacha(0, 'pigeon_pizza');
+    tracker.rollGacha(0, 'raccoon_bandit');
     assert.equal(tracker.isAchievementUnlocked('collector'), true);
 
     // 4. Leaderboard Champion (beat top bot CyberKaiser > 250 pts)

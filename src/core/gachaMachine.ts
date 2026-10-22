@@ -35,6 +35,7 @@ export interface GachaRollResult {
   isDuplicate?: boolean;
   cashback?: number;
   reason?: string;
+  allUnlocked?: boolean;
 }
 
 function mulberry32(seed: number): number {
@@ -53,13 +54,44 @@ export class GachaMachine {
     return SKIN_RARITY_MAP[skinId] ?? SkinRarity.COMMON;
   }
 
-  pickSkin(seedOrNonce: number): SkinId {
+  getAvailableSkins(inventory: SkinInventory): SkinId[] {
+    return ALL_SKINS.map((s) => s.id).filter((id) => !inventory.isUnlocked(id));
+  }
+
+  isAllUnlocked(inventory: SkinInventory): boolean {
+    return this.getAvailableSkins(inventory).length === 0;
+  }
+
+  pickSkin(seedOrNonce: number, availablePool?: SkinId[]): SkinId {
+    if (availablePool && availablePool.length > 0) {
+      if (availablePool.length === 1) return availablePool[0];
+      const rand = !Number.isInteger(seedOrNonce) && seedOrNonce > 0 && seedOrNonce < 1
+        ? seedOrNonce
+        : mulberry32(seedOrNonce);
+
+      const weights = availablePool.map((id) => SKIN_RARITY_WEIGHTS[this.getSkinRarity(id)] ?? 10);
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+      let threshold = rand * totalWeight;
+      for (let i = 0; i < availablePool.length; i++) {
+        threshold -= weights[i];
+        if (threshold <= 0) {
+          return availablePool[i];
+        }
+      }
+      return availablePool[availablePool.length - 1];
+    }
+
     const rand = !Number.isInteger(seedOrNonce) && seedOrNonce > 0 && seedOrNonce < 1
       ? seedOrNonce
       : mulberry32(seedOrNonce);
 
     const rollPct = rand * 100;
-    if (rollPct < 50) return Math.abs(seedOrNonce) % 2 === 0 ? 'corgi' : 'pigeon_pizza';
+    if (rollPct < 50) {
+      if (Number.isInteger(seedOrNonce)) {
+        return Math.abs(seedOrNonce) % 2 === 0 ? 'corgi' : 'pigeon_pizza';
+      }
+      return rollPct < 25 ? 'corgi' : 'pigeon_pizza';
+    }
     if (rollPct < 80) return 'box_cat';
     if (rollPct < 95) return 'raccoon_bandit';
     return 'capybara_zen';
@@ -69,7 +101,8 @@ export class GachaMachine {
     seedOrNonce: number,
     wallet: CoinWallet,
     inventory: SkinInventory,
-    forceSkinId?: SkinId
+    forceSkinId?: SkinId,
+    pool?: SkinId[]
   ): GachaRollResult {
     if (!wallet.canAfford(WORLD_CONFIG.GACHA_COST)) {
       return { success: false, reason: 'NOT_ENOUGH_COINS' };
@@ -80,12 +113,11 @@ export class GachaMachine {
       return { success: false, reason: 'NOT_ENOUGH_COINS' };
     }
 
-    const chosenSkin: SkinId = forceSkinId ?? this.pickSkin(seedOrNonce);
+    const chosenSkin: SkinId = forceSkinId ?? this.pickSkin(seedOrNonce, pool);
     const rarity = this.getSkinRarity(chosenSkin);
     const isDuplicate = inventory.isUnlocked(chosenSkin);
 
     if (isDuplicate) {
-      wallet.addCoins(GACHA_DUPLICATE_CASHBACK);
       return {
         success: true,
         skinId: chosenSkin,
@@ -104,4 +136,13 @@ export class GachaMachine {
       cashback: 0,
     };
   }
+
+  applyCashback(wallet: CoinWallet, amount: number = GACHA_DUPLICATE_CASHBACK): number {
+    if (amount > 0) {
+      wallet.addCoins(amount);
+      return amount;
+    }
+    return 0;
+  }
 }
+

@@ -61,10 +61,10 @@ export const VOXEL_PALETTE = {
 export type VoxelColorKey = keyof typeof VOXEL_PALETTE;
 
 export class VoxelPalette {
-  private static readonly geoCache = new Map<string, THREE.BoxGeometry>();
-  private static readonly matCache = new Map<number, THREE.MeshLambertMaterial>();
-  private static readonly basicMatCache = new Map<string, THREE.MeshBasicMaterial>();
-  private static ghostMaterial: THREE.MeshLambertMaterial | null = null;
+  public static readonly geoCache = new Map<string, THREE.BoxGeometry>();
+  public static readonly matCache = new Map<number, THREE.MeshLambertMaterial>();
+  public static readonly basicMatCache = new Map<string, THREE.MeshBasicMaterial>();
+  public static ghostMaterial: THREE.MeshLambertMaterial | null = null;
 
   static getGhostMaterial(): THREE.MeshLambertMaterial {
     if (!VoxelPalette.ghostMaterial) {
@@ -73,6 +73,7 @@ export class VoxelPalette {
         transparent: true,
         opacity: 0.42,
       });
+      VoxelPalette.ghostMaterial.dispose = () => {};
     }
     return VoxelPalette.ghostMaterial;
   }
@@ -88,6 +89,7 @@ export class VoxelPalette {
     let mat = VoxelPalette.matCache.get(hex);
     if (!mat) {
       mat = new THREE.MeshLambertMaterial({ color: hex });
+      mat.dispose = () => {};
       VoxelPalette.matCache.set(hex, mat);
     }
     return mat;
@@ -102,6 +104,7 @@ export class VoxelPalette {
     let mat = VoxelPalette.basicMatCache.get(key);
     if (!mat) {
       mat = new THREE.MeshBasicMaterial({ color, transparent, opacity });
+      mat.dispose = () => {};
       VoxelPalette.basicMatCache.set(key, mat);
     }
     return mat;
@@ -112,9 +115,30 @@ export class VoxelPalette {
     let geo = VoxelPalette.geoCache.get(key);
     if (!geo) {
       geo = new THREE.BoxGeometry(w, h, d);
+      geo.dispose = () => {};
       VoxelPalette.geoCache.set(key, geo);
     }
     return geo;
+  }
+
+  static isSharedGeometry(geometry: THREE.BufferGeometry | null | undefined): boolean {
+    if (!geometry) return false;
+    for (const cached of VoxelPalette.geoCache.values()) {
+      if (cached === geometry) return true;
+    }
+    return false;
+  }
+
+  static isSharedMaterial(material: THREE.Material | null | undefined): boolean {
+    if (!material) return false;
+    if (material === VoxelPalette.ghostMaterial) return true;
+    for (const cached of VoxelPalette.matCache.values()) {
+      if (cached === material) return true;
+    }
+    for (const cached of VoxelPalette.basicMatCache.values()) {
+      if (cached === material) return true;
+    }
+    return false;
   }
 }
 
