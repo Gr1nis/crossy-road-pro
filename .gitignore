@@ -34,3 +34,7 @@ pnpm-debug.log*
 # Antigravity local cache
 .antigravity/
 
+# Python cache
+__pycache__/
+*.pyc
+

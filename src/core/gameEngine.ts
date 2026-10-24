@@ -55,6 +55,10 @@ export class GameEngine {
   constructor(seed: number = 42, storage?: StorageAdapter) {
     this.generator = new LaneGenerator(seed);
     this.scoreTracker = new ScoreTracker(storage);
+    const worldId = this.scoreTracker.getSelectedWorld();
+    if (worldId !== 'auto') {
+      this.biomeOverride = worldId as BiomeType;
+    }
     this.player = this.createInitialPlayer();
     this.ensureLanesAround(0);
   }
@@ -87,7 +91,11 @@ export class GameEngine {
     for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
         const effectiveScore = Math.max(0, r, currentScore);
-        this.lanes.set(r, this.generator.generateLane(r, effectiveScore));
+        const lane = this.generator.generateLane(r, effectiveScore);
+        if (this.biomeOverride) {
+          lane.biome = this.biomeOverride;
+        }
+        this.lanes.set(r, lane);
       }
     }
     this.evictOldLanes();
@@ -120,6 +128,7 @@ export class GameEngine {
 
   setBiomeOverride(biome: BiomeType | null): void {
     this.biomeOverride = biome;
+    this.scoreTracker.setSelectedWorld(biome ?? 'auto');
     if (biome) {
       for (const cachedLane of this.lanes.values()) {
         cachedLane.biome = biome;
@@ -129,6 +138,18 @@ export class GameEngine {
       for (const [r, cachedLane] of this.lanes.entries()) {
         cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
       }
+    }
+  }
+
+  getSelectedWorld(): string {
+    return this.scoreTracker.getSelectedWorld();
+  }
+
+  setSelectedWorld(world: string): void {
+    if (world === 'auto') {
+      this.setBiomeOverride(null);
+    } else {
+      this.setBiomeOverride(world as BiomeType);
     }
   }
 
@@ -175,6 +196,9 @@ export class GameEngine {
     if (!lane) {
       const effectiveScore = Math.max(0, row, this.scoreTracker.getScore());
       lane = this.generator.generateLane(row, effectiveScore);
+      if (this.biomeOverride) {
+        lane.biome = this.biomeOverride;
+      }
       this.lanes.set(row, lane);
     }
     return lane;
@@ -273,6 +297,7 @@ export class GameEngine {
 
   resetAllProgress(): void {
     this.scoreTracker.resetAllProgress();
+    this.setBiomeOverride(null);
   }
 
   claimAchievement(id: AchievementId): { success: boolean; rewardCoins: number } {
@@ -485,10 +510,12 @@ export class GameEngine {
           this.comboTimer = 1.25;
         }
         this.scoreTracker.updateRow(this.player.row, this.getComboMultiplier());
-        const currentScore = this.scoreTracker.getScore();
-        for (const [r, cachedLane] of this.lanes.entries()) {
-          if (r >= this.player.row) {
-            cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
+        if (!this.biomeOverride) {
+          const currentScore = this.scoreTracker.getScore();
+          for (const [r, cachedLane] of this.lanes.entries()) {
+            if (r >= this.player.row) {
+              cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
+            }
           }
         }
         this.ensureLanesAround(this.player.row);

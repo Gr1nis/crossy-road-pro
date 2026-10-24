@@ -65,8 +65,8 @@ export class MeshFactory {
     return createUrbanVehicle(v);
   }
 
-  static createLog(log: LogPlatform): THREE.Group {
-    return createUrbanPallet(log);
+  static createLog(log: LogPlatform, biome: BiomeType = 'forest'): THREE.Group {
+    return createUrbanPallet(log, biome);
   }
 
   static createRiverbankEdge(side: 'left' | 'right', biome: BiomeType = 'forest'): THREE.Group {

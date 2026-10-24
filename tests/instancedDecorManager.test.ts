@@ -14,7 +14,7 @@ describe('InstancedDecorManager — InstancedMesh Environment & Coins Suite', ()
     assert.equal(manager.rockMesh.count, 0, 'Initial rockMesh count must be 0');
     assert.equal(manager.coinMesh.count, 0, 'Initial coinMesh count must be 0');
 
-    assert.equal(manager.group.children.length, 3, 'Group must contain exactly 3 instanced meshes');
+    assert.equal(manager.group.children.length, 9, 'Group must contain 4 tree, 4 rock, and 1 coin instanced meshes');
     manager.dispose();
   });
 
@@ -74,6 +74,39 @@ describe('InstancedDecorManager — InstancedMesh Environment & Coins Suite', ()
     assert.equal(manager.treeMesh.count, 0);
     assert.equal(manager.rockMesh.count, 0);
     assert.equal(manager.coinMesh.count, 0);
+
+    manager.dispose();
+  });
+
+  it('Property 4 (Biome Instanced Meshes): independently manages forest, winter, desert, and neon decor', () => {
+    const manager = new InstancedDecorManager(20, 20, 20);
+
+    manager.beginFrame();
+    manager.addTree(1, 0, 1, 1, 0, 'forest');
+    manager.addTree(2, 0, 2, 1, 0, 'winter');
+    manager.addTree(3, 0, 3, 1, 0, 'desert');
+    manager.addTree(4, 0, 4, 1, 0, 'neon');
+
+    manager.addRock(1, 0, 1, 1, 'forest');
+    manager.addRock(2, 0, 2, 1, 'winter');
+    manager.addRock(3, 0, 3, 1, 'desert');
+    manager.addRock(4, 0, 4, 1, 'neon');
+    manager.endFrame();
+
+    assert.equal(manager.treeMeshes.forest.count, 1);
+    assert.equal(manager.treeMeshes.winter.count, 1);
+    assert.equal(manager.treeMeshes.desert.count, 1);
+    assert.equal(manager.treeMeshes.neon.count, 1);
+
+    assert.equal(manager.rockMeshes.forest.count, 1);
+    assert.equal(manager.rockMeshes.winter.count, 1);
+    assert.equal(manager.rockMeshes.desert.count, 1);
+    assert.equal(manager.rockMeshes.neon.count, 1);
+
+    manager.clear();
+    assert.equal(manager.treeMeshes.winter.count, 0);
+    assert.equal(manager.treeMeshes.desert.count, 0);
+    assert.equal(manager.treeMeshes.neon.count, 0);
 
     manager.dispose();
   });

@@ -28,6 +28,7 @@ interface DecorRockItem {
 }
 
 interface RenderedLane {
+  biome: BiomeType;
   group: THREE.Group;
   vehicleMeshes: Map<number, THREE.Object3D>;
   logMeshes: Map<number, THREE.Object3D>;
@@ -686,7 +687,7 @@ export class SceneManager {
     }
 
     for (const log of lane.logs) {
-      const mesh = MeshFactory.createLog(log);
+      const mesh = MeshFactory.createLog(log, biome);
       mesh.position.x = worldToScreenX(log.x);
       group.add(mesh);
       logMeshes.set(log.id, mesh);
@@ -707,6 +708,7 @@ export class SceneManager {
     }
 
     return {
+      biome,
       group,
       vehicleMeshes,
       logMeshes,
@@ -776,6 +778,13 @@ export class SceneManager {
     for (const lane of activeLanes) {
       this.activeIndices.add(lane.index);
       let rendered = this.renderedLanes.get(lane.index);
+      const laneBiome = lane.biome ?? 'forest';
+      if (rendered && rendered.biome !== laneBiome) {
+        this.scene.remove(rendered.group);
+        this.disposeHierarchy(rendered.group);
+        this.renderedLanes.delete(lane.index);
+        rendered = undefined;
+      }
       if (!rendered) {
         const nextLane = engine.getLane(lane.index + 1);
         const hasNextRoad = nextLane?.type === LaneType.ROAD;
@@ -787,13 +796,13 @@ export class SceneManager {
       if (rendered.decorTrees) {
         for (let i = 0; i < rendered.decorTrees.length; i++) {
           const t = rendered.decorTrees[i];
-          this.decorManager.addTree(t.x, t.y, t.z, t.scale, t.rotation);
+          this.decorManager.addTree(t.x, t.y, t.z, t.scale, t.rotation, laneBiome);
         }
       }
       if (rendered.decorRocks) {
         for (let i = 0; i < rendered.decorRocks.length; i++) {
           const r = rendered.decorRocks[i];
-          this.decorManager.addRock(r.x, r.y, r.z, r.scale);
+          this.decorManager.addRock(r.x, r.y, r.z, r.scale, laneBiome);
         }
       }
       if (lane.coins) {
@@ -1072,6 +1081,35 @@ export class SceneManager {
       this.playerMesh.rotation.set(0, 0, 0);
       this.playerMesh.position.set(0, 0, 0);
     }
+  }
+
+  refreshWorld(engine: GameEngine): void {
+    for (const rendered of this.renderedLanes.values()) {
+      this.scene.remove(rendered.group);
+      this.disposeHierarchy(rendered.group);
+    }
+    this.renderedLanes.clear();
+    this.decorManager.clear();
+
+    const currentBiome: BiomeType = engine.getBiome();
+    const targetAtmos = BIOME_ATMOSPHERES[currentBiome] ?? BIOME_ATMOSPHERES[Biome.FOREST];
+    this.cachedSkyColor.setHex(targetAtmos.sky);
+    if (this.scene.background instanceof THREE.Color) {
+      this.scene.background.copy(this.cachedSkyColor);
+    } else {
+      this.scene.background = this.cachedSkyColor.clone();
+    }
+    this.cachedFogColor.setHex(targetAtmos.fogColor);
+    this.fog.color.copy(this.cachedFogColor);
+    this.fog.density = targetAtmos.fogDensity;
+    this.cachedAmbientColor.setHex(targetAtmos.ambientColor);
+    this.ambientLight.color.copy(this.cachedAmbientColor);
+    this.ambientLight.intensity = targetAtmos.ambientIntensity;
+    this.cachedDirColor.setHex(targetAtmos.dirColor);
+    this.dirLight.color.copy(this.cachedDirColor);
+    this.dirLight.intensity = targetAtmos.dirIntensity;
+
+    this.sync(engine, 0.016);
   }
 }
 

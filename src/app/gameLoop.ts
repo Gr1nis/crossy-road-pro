@@ -140,6 +140,11 @@ export class GameLoop {
       this.sceneManager.setRecordFlag?.(this.runStartHighScore, RECORD_FLAG_X);
     }
     this.sceneManager.setMenuMode?.(true, true);
+    const savedWorld = this.engine.getScoreTracker().getSelectedWorld();
+    if (savedWorld && savedWorld !== 'auto') {
+      this.engine.setBiomeOverride(savedWorld as BiomeType);
+      this.sceneManager.refreshWorld?.(this.engine);
+    }
     this.setupDevGlobal();
     if (typeof document !== 'undefined') {
       document.getElementById('menu-skins-btn')?.addEventListener('click', () => {
@@ -893,6 +898,7 @@ export class GameLoop {
         } else {
           this.engine.setBiomeOverride(worldId as BiomeType);
         }
+        this.sceneManager.refreshWorld?.(this.engine);
         this.audio.playSkinVoice?.(this.engine.getSelectedSkin());
         this.ui.showToast('🌍', 'Мир выбран', worldId === 'auto' ? 'Динамический цикл (смена каждые 25 очков)' : `Выбран биом: ${worldId}`);
         this.renderSkinsUI();
@@ -929,6 +935,7 @@ export class GameLoop {
         const currentIdx = biomes.indexOf(this.engine.getBiome());
         const nextBiome = biomes[(currentIdx + 1) % biomes.length];
         this.engine.setBiomeOverride(nextBiome);
+        this.sceneManager.refreshWorld?.(this.engine);
         this.ui.showToast('🌲', 'Биом изменён', `Биом переключен на: ${nextBiome}`);
       },
       onDevToggleGodMode: () => {

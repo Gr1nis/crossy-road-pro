@@ -45,6 +45,8 @@ const moduleOrder = [
   'src/view/townhouse/shopfront.ts',
   'src/view/townhouse/upperFloors.ts',
   'src/view/townhouse/roof.ts',
+  'src/view/townhouse/cafe.ts',
+  'src/view/townhouse/bakery.ts',
   'src/view/urbanBuildings.ts',
   'src/view/meshFactory.ts',
   'src/view/modelRegistry.ts',
@@ -3248,6 +3250,8 @@ const viewerModuleOrder = [
   'src/view/townhouse/shopfront.ts',
   'src/view/townhouse/upperFloors.ts',
   'src/view/townhouse/roof.ts',
+  'src/view/townhouse/cafe.ts',
+  'src/view/townhouse/bakery.ts',
   'src/view/urbanBuildings.ts',
   'src/view/meshFactory.ts',
   'src/view/modelRegistry.ts',
@@ -3520,14 +3524,17 @@ ${viewerModulesJs}
     // Dynamic Model Registry from Game Code
     const MODELS = getModelCatalog();
 
-    // Current State
-    let activeCategory = 'chars';
-    let currentModelId = MODELS[0] ? MODELS[0].id : 'corgi';
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedModel = urlParams.get('model');
+    const requestedBiome = urlParams.get('biome');
+    let currentModelId = requestedModel || (MODELS[0] ? MODELS[0].id : 'corgi');
+    const foundModel = MODELS.find(m => m.id === currentModelId);
+    let activeCategory = foundModel ? foundModel.cat : 'chars';
     let currentMesh = null;
-    let autoSpin = true;
+    let autoSpin = urlParams.get('autospin') !== 'false';
     let hopTest = false;
     let ghostMode = false;
-    let currentBiome = 'forest';
+    let currentBiome = requestedBiome || 'forest';
 
     // Model Mount Node
     const modelRoot = new THREE.Group();

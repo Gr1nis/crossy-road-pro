@@ -215,7 +215,7 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
       icon: '☕',
       cat: 'buildings',
       desc: 'Парижский таунхаус цвета ультрамарин: кофейня, полосатая маркиза, вывеска CAFE, мансарда и кашпо.',
-      create: (b: BiomeType = 'forest') => createTownhouseA(b === 'winter'),
+      create: (b: BiomeType = 'forest') => createTownhouseA(b),
     },
     {
       id: 'townhouse_bakery',
@@ -223,7 +223,7 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
       icon: '🥖',
       cat: 'buildings',
       desc: 'Зимняя кирпичная пекарня по эталонному референсу: зубчатый парапет со снегом, хвойные гирлянды, вывеска BAKERY, арочные окна, рустовка и дымоход с клубящимся дымом.',
-      create: (b: BiomeType = 'winter') => createTownhouseB(b === 'winter'),
+      create: (b: BiomeType = 'forest') => createTownhouseB(b),
     },
     {
       id: 'townhouse_books',
@@ -231,7 +231,7 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
       icon: '📚',
       cat: 'buildings',
       desc: 'Изумрудная лавка: витрина с книжными полками, вывески BOOKS, угловая консоль и черепичная крыша.',
-      create: (b: BiomeType = 'forest') => createTownhouseC(b === 'winter'),
+      create: (b: BiomeType = 'forest') => createTownhouseC(b),
     },
   ];
 }

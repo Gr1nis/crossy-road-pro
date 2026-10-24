@@ -4720,11 +4720,13 @@ const DEFAULT_BOT_RIVALS                                                = [
   { playerName: 'TrainDodger', score: 35, skinId: 'box_cat', date: '2026-09-25', isBot: true },
   { playerName: 'RookieFeather', score: 18, skinId: 'pigeon_pizza', date: '2026-09-26', isBot: true },
 ];
+const VALID_WORLD_IDS                      = new Set(['auto', 'forest', 'winter', 'desert', 'neon']);
 class ScoreTracker {
           currentScore = 0;
           highScore = 0;
           bestRow = 0;
           playerName = 'Игрок';
+          selectedWorld = 'auto';
           playerRuns                                        = [];
           storage                 ;
 
@@ -4879,6 +4881,11 @@ class ScoreTracker {
           this.dailyQuests = new DailyQuestTracker(data.dailyQuestState);
           this.dailyQuests.checkDateRollover(getDailyDateKey());
         }
+        if (typeof data.selectedWorld === 'string' && VALID_WORLD_IDS.has(data.selectedWorld)) {
+          this.selectedWorld = data.selectedWorld;
+        } else {
+          this.selectedWorld = 'auto';
+        }
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -4895,6 +4902,7 @@ class ScoreTracker {
         coins: this.wallet.getCoins(),
         unlockedSkins: this.inventory.getUnlockedSkins(),
         selectedSkin: this.inventory.getSelectedSkin(),
+        selectedWorld: this.selectedWorld,
         playerName: this.playerName,
         playerRuns: this.playerRuns,
         unlockedAchievements: this.achievements.getUnlockedIds(),
@@ -5247,6 +5255,15 @@ class ScoreTracker {
     return { success: false, coins: 0, isDouble: false };
   }
 
+  getSelectedWorld()         {
+    return this.selectedWorld;
+  }
+
+  setSelectedWorld(world        )       {
+    this.selectedWorld = VALID_WORLD_IDS.has(world) ? world : 'auto';
+    this.saveToStorage();
+  }
+
   resetAllProgress()       {
     this.currentScore = 0;
     this.highScore = 0;
@@ -5258,6 +5275,7 @@ class ScoreTracker {
     this.achievements = new AchievementTracker();
     this.dailyReward = new DailyRewardManager();
     this.dailyQuests = new DailyQuestTracker(getDailyDateKey());
+    this.selectedWorld = 'auto';
     this.saveToStorage();
   }
 }
@@ -5457,6 +5475,10 @@ class GameEngine {
   constructor(seed         = 42, storage                 ) {
     this.generator = new LaneGenerator(seed);
     this.scoreTracker = new ScoreTracker(storage);
+    const worldId = this.scoreTracker.getSelectedWorld();
+    if (worldId !== 'auto') {
+      this.biomeOverride = worldId             ;
+    }
     this.player = this.createInitialPlayer();
     this.ensureLanesAround(0);
   }
@@ -5489,7 +5511,11 @@ class GameEngine {
     for (let r = minR; r <= maxR; r++) {
       if (!this.lanes.has(r)) {
         const effectiveScore = Math.max(0, r, currentScore);
-        this.lanes.set(r, this.generator.generateLane(r, effectiveScore));
+        const lane = this.generator.generateLane(r, effectiveScore);
+        if (this.biomeOverride) {
+          lane.biome = this.biomeOverride;
+        }
+        this.lanes.set(r, lane);
       }
     }
     this.evictOldLanes();
@@ -5522,6 +5548,7 @@ class GameEngine {
 
   setBiomeOverride(biome                  )       {
     this.biomeOverride = biome;
+    this.scoreTracker.setSelectedWorld(biome ?? 'auto');
     if (biome) {
       for (const cachedLane of this.lanes.values()) {
         cachedLane.biome = biome;
@@ -5531,6 +5558,18 @@ class GameEngine {
       for (const [r, cachedLane] of this.lanes.entries()) {
         cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
       }
+    }
+  }
+
+  getSelectedWorld()         {
+    return this.scoreTracker.getSelectedWorld();
+  }
+
+  setSelectedWorld(world        )       {
+    if (world === 'auto') {
+      this.setBiomeOverride(null);
+    } else {
+      this.setBiomeOverride(world             );
     }
   }
 
@@ -5577,6 +5616,9 @@ class GameEngine {
     if (!lane) {
       const effectiveScore = Math.max(0, row, this.scoreTracker.getScore());
       lane = this.generator.generateLane(row, effectiveScore);
+      if (this.biomeOverride) {
+        lane.biome = this.biomeOverride;
+      }
       this.lanes.set(row, lane);
     }
     return lane;
@@ -5675,6 +5717,7 @@ class GameEngine {
 
   resetAllProgress()       {
     this.scoreTracker.resetAllProgress();
+    this.setBiomeOverride(null);
   }
 
   claimAchievement(id               )                                            {
@@ -5887,10 +5930,12 @@ class GameEngine {
           this.comboTimer = 1.25;
         }
         this.scoreTracker.updateRow(this.player.row, this.getComboMultiplier());
-        const currentScore = this.scoreTracker.getScore();
-        for (const [r, cachedLane] of this.lanes.entries()) {
-          if (r >= this.player.row) {
-            cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
+        if (!this.biomeOverride) {
+          const currentScore = this.scoreTracker.getScore();
+          for (const [r, cachedLane] of this.lanes.entries()) {
+            if (r >= this.player.row) {
+              cachedLane.biome = getBiomeForScore(Math.max(0, r, currentScore));
+            }
           }
         }
         this.ensureLanesAround(this.player.row);
@@ -8228,24 +8273,112 @@ function buildTrain()                   {
   ];
 }
 
-function buildPallet(length        )                   {
-  const timberColor = 0xd97706; // Light timber planks
+function buildPallet(length        , biome            = 'forest')                   {
+  if (biome === 'winter') {
+    // Winter: Ice floe / floating ice sheet with snowy surface (0xbae6fd, 0xe0f2fe, 0xf8fafc)
+    const deepIce = 0x0369a1;  // Submerged keel
+    const frostWake = 0xe0f2fe; // Frost/ice rime wake
+    const iceBase = 0xbae6fd;   // Main translucent ice floe
+    const midIce = 0xe0f2fe;    // Upper stepped ice shelf
+    const snowTop = 0xf8fafc;   // Snowy crust
+    const frostNotch = 0x7dd3fc;// Hop slot notches
+
+    const specs                   = [
+      [length * 0.90, 0.08, 0.64, 0, -0.06, 0, deepIce],
+      [length + 0.16, 0.02, 0.86, 0, -0.02, 0, frostWake],
+      [length * 0.96, 0.08, 0.72, 0, 0.03, 0, iceBase],
+      [length * 0.86, 0.06, 0.62, 0, 0.09, 0, midIce],
+      [length * 0.78, 0.05, 0.54, 0, 0.14, 0, snowTop],
+      [length * 0.40, 0.04, 0.18, -length * 0.20, 0.16, -0.12, 0xf1f5f9],
+      [length * 0.35, 0.04, 0.16, length * 0.22, 0.16, 0.10, 0xf1f5f9],
+    ];
+
+    const slotCount = Math.floor(length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
+        specs.push([0.05, 0.045, 0.60, s, 0.14, 0, frostNotch]);
+      }
+    }
+    return specs;
+  }
+
+  if (biome === 'desert') {
+    // Desert: Tied canyon timber raft (0x92400e, 0xb45309, 0x78350f)
+    const waterColor = 0x0d9488;  // Canyon turquoise river
+    const foamColor = 0xfef08a;   // Sandy foam ripples
+    const bottomLogs = 0x78350f;  // Heavy weathered logs
+    const ropeColor = 0xb45309;   // Bound rope lashings
+    const topTimber = 0x92400e;   // Heavy timber cross boards
+
+    const specs                   = [
+      [length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
+      [length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor],
+      [length * 0.94, 0.08, 0.18, 0, 0.02, -0.25, bottomLogs],
+      [length * 0.94, 0.08, 0.20, 0, 0.02, 0, bottomLogs],
+      [length * 0.94, 0.08, 0.18, 0, 0.02, 0.25, bottomLogs],
+    ];
+
+    const blockXPositions = [-length * 0.42, 0, length * 0.42];
+    for (const bx of blockXPositions) {
+      specs.push([0.08, 0.10, 0.74, bx, 0.05, 0, ropeColor]);
+      specs.push([0.14, 0.05, 0.72, bx, 0.10, 0, bottomLogs]);
+    }
+
+    const boardZ = [-0.28, -0.14, 0, 0.14, 0.28];
+    for (const bz of boardZ) {
+      specs.push([length, 0.04, 0.11, 0, 0.14, bz, topTimber]);
+    }
+
+    const slotCount = Math.floor(length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
+        specs.push([0.04, 0.045, 0.74, s, 0.14, 0, 0x78350f]);
+      }
+    }
+    return specs;
+  }
+
+  if (biome === 'neon') {
+    // Neon: Hover platform / cyber-barge with dark core and glowing cyan/magenta trim (0x0f172a, 0x06b6d4, 0xec4899)
+    const energyField = 0x4338ca; // Magnetic levitation glow
+    const cyanGlow = 0x06b6d4;    // Cyan trim & thrusters
+    const magentaGlow = 0xec4899; // Magenta edge lights
+    const darkChassis = 0x0f172a; // Obsidian carbon-fiber core
+    const deckPlate = 0x1e1b4b;   // Deep indigo deck
+
+    const specs                   = [
+      [length * 0.90, 0.06, 0.64, 0, -0.05, 0, energyField, true],
+      [length + 0.16, 0.02, 0.86, 0, -0.02, 0, cyanGlow, true],
+      [length * 0.96, 0.08, 0.70, 0, 0.03, 0, darkChassis],
+      [length * 0.90, 0.04, 0.62, 0, 0.09, 0, deckPlate],
+      [length * 0.94, 0.05, 0.04, 0, 0.13, -0.30, magentaGlow, true],
+      [length * 0.94, 0.05, 0.04, 0, 0.13, 0.30, magentaGlow, true],
+      [0.40, 0.045, 0.20, 0, 0.12, 0, cyanGlow, true],
+    ];
+
+    const slotCount = Math.floor(length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
+        specs.push([0.05, 0.045, 0.58, s, 0.13, 0, cyanGlow, true]);
+      }
+    }
+    return specs;
+  }
+
+  // Forest: Classic wooden pallet (0x78350f, 0xa16207)
+  const timberColor = 0xa16207; // Light timber planks
   const darkWood = 0x78350f;    // Stringers, blocks, stamp
   const foamColor = 0xf8fafc;   // Water foam ripples
   const waterColor = 0x0284c7;  // Submerged keel
 
   const specs                   = [
-    // Submerged buoyancy keel
     [length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
-    // White foam wake around floating pallet
     [length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor],
-    // 3 Longitudinal bottom skids
     [length * 0.94, 0.04, 0.12, 0, 0.01, -0.28, darkWood],
     [length * 0.94, 0.04, 0.12, 0, 0.01, 0, darkWood],
     [length * 0.94, 0.04, 0.12, 0, 0.01, 0.28, darkWood],
   ];
 
-  // 9 Support spacer blocks along pallet length
   const blockXPositions = [-length * 0.42, 0, length * 0.42];
   for (const bx of blockXPositions) {
     specs.push([0.14, 0.06, 0.12, bx, 0.05, -0.28, darkWood]);
@@ -8253,21 +8386,17 @@ function buildPallet(length        )                   {
     specs.push([0.14, 0.06, 0.12, bx, 0.05, 0.28, darkWood]);
   }
 
-  // 3 Cross stringer beams on top of blocks
   for (const bx of blockXPositions) {
     specs.push([0.10, 0.04, 0.72, bx, 0.10, 0, darkWood]);
   }
 
-  // 5 Top longitudinal timber boards with realistic gaps (Ref: 20_euro_pallet_turnaround.jpg)
   const boardZ = [-0.29, -0.15, 0, 0.15, 0.29];
   for (const bz of boardZ) {
     specs.push([length, 0.04, 0.11, 0, 0.14, bz, timberColor]);
   }
 
-  // Burned wood 'PALLET' stamp brand on front board
   specs.push([0.48, 0.042, 0.02, 0, 0.14, 0.35, darkWood]);
 
-  // Discrete 1.0-spaced slot notches for hop magnetism
   const slotCount = Math.floor(length);
   for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
     if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
@@ -8339,11 +8468,11 @@ function createUrbanTrain(lengthOrSpeed         = -1, speed         )           
   group.rotation.y = vehicleScreenRotationY(actualSpeed);
   return group;
 }
-function createUrbanPallet(log             )              {
+function createUrbanPallet(log             , biome            = 'forest')              {
   const group = new THREE.Group();
-  const key = `pallet_${log.length.toFixed(2)}`;
+  const key = `pallet_${biome}_${log.length.toFixed(2)}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
-    const specs = buildPallet(log.length);
+    const specs = buildPallet(log.length, biome);
     for (let i = 0; i < specs.length; i++) {
       const s = specs[i];
       builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
@@ -9009,211 +9138,291 @@ function buildBooksRoof(b                  , isWinter         )       {
   }
 }
 
-// --- Module: src/view/urbanBuildings.ts ---
-function populateCafeBuilder(b                  , isWinter         )       {
-  const cPlinth = 0x334155;
-  const cWall = 0x2563eb;
-  const cTrim = 0x1d4ed8;
-  const cWhite = 0xf8fafc;
-  const cDoor = 0x713f12;
-  const cGlass = 0xfef08a;
-  const cGold = 0xfacc15;
-  const cRed = 0xdc2626;
-  const cSign = 0x451a03;
-  const cGreen = 0x16a34a;
-  const cBerry = 0xef4444;
-  const cRoof = 0xb45309;
-  const cRidge = 0x92400e;
-  const cChimney = 0x64748b;
-  const cGarland = 0x166534;
-  const cSmoke = 0xe2e8f0;
+// --- Module: src/view/townhouse/cafe.ts ---
+/**
+ * Parisian Blue Cafe / Desert Cantina / Cyber Diner Modeler for Townhouse A.
+ * Compiled from authoritative Blockbench model assets/models/cafe_townhouse.bbmodel (215 cubes).
+ * Complies strictly with docs/VOXEL_GRID_SPECIFICATION.md.
+ */
 
-  // 1. Plinth (Цоколь) — Basalt dark slate, 1 voxel wider than walls
-  b.addBox(1.70, 0.10, 1.50, 0, 0.05, 0, cPlinth);
-  b.addBox(1.65, 0.10, 1.45, 0, 0.15, 0, cPlinth);
+// Palette swatches per biome [0..19]
+const CAFE_PALETTE_FOREST                    = [
+  0xffffff, // 0: white
+  0xfef08a, // 1: yellow_glow
+  0xf472b6, // 2: flower_pink
+  0xfcd34d, // 3: flower_yellow
+  0xef4444, // 4: flower_red
+  0x22c55e, // 5: plant_green
+  0x5c3217, // 6: wood_dark
+  0x3e1f0b, // 7: wood_recess
+  0xdc2626, // 8: awning_red
+  0xc2410c, // 9: roof_terracotta
+  0xea580c, // 10: pot_clay
+  0x1e293b, // 11: slate_menu
+  0xf1f5f9, // 12: chalk_white
+  0xeab308, // 13: gold_handle
+  0xcbd5e1, // 14: stone_grey
+  0x64748b, // 15: pipe_grey
+  0x2f78cf, // 16: wall_blue
+  0x2563eb, // 17: brick_blue
+  0x334155, // 18: chimney_pot
+  0xc27835, // 19: dormer_caramel
+];
 
-  // 2. Commercial 1st floor — Ultramarine facade & white mid-cornice
-  b.addBox(1.60, 1.20, 1.40, 0, 0.80, 0, cWall);
-  b.addBox(1.70, 0.10, 1.50, 0, 1.45, 0, cWhite);
+const CAFE_PALETTE_WINTER                    = [
+  0xf8fafc, // 0: snow white
+  0xfef08a, // 1: yellow_glow
+  0xf472b6, // 2: flower_pink
+  0xfcd34d, // 3: flower_yellow
+  0xef4444, // 4: flower_red
+  0x15803d, // 5: plant_green (deep pine)
+  0x5c3217, // 6: wood_dark
+  0x3e1f0b, // 7: wood_recess
+  0xdc2626, // 8: awning_red
+  0xc2410c, // 9: roof_terracotta
+  0xea580c, // 10: pot_clay
+  0x1e293b, // 11: slate_menu
+  0xf1f5f9, // 12: chalk_white
+  0xeab308, // 13: gold_handle
+  0x94a3b8, // 14: stone_grey
+  0x475569, // 15: pipe_grey
+  0x2563eb, // 16: wall_blue (deep winter blue)
+  0x1d4ed8, // 17: brick_blue
+  0x1e293b, // 18: chimney_pot
+  0xb45309, // 19: dormer_caramel
+];
 
-  // Entrance door portal (bog oak with warm transom and brass doorknob)
-  b.addBox(0.45, 1.00, 0.05, -0.45, 0.70, 0.75, cTrim);
-  b.addBox(0.35, 0.90, 0.05, -0.45, 0.65, 0.75, cDoor);
-  b.addBox(0.25, 0.35, 0.05, -0.45, 0.85, 0.75, cGlass);
-  b.addBox(0.05, 0.05, 0.05, -0.30, 0.55, 0.80, cGold);
-  b.addBox(0.45, 0.05, 0.10, -0.45, 0.20, 0.75, cPlinth);
+const CAFE_PALETTE_DESERT                    = [
+  0xfef3c7, // 0: warm cream white
+  0xfde68a, // 1: yellow_glow
+  0xf59e0b, // 2: flower_pink
+  0xfbbf24, // 3: flower_yellow
+  0xd97706, // 4: flower_red
+  0x84cc16, // 5: plant_green (succulent)
+  0x78350f, // 6: wood_dark
+  0x451a03, // 7: wood_recess
+  0xb45309, // 8: awning_red (terracotta)
+  0xb45309, // 9: roof_terracotta (adobe)
+  0x9a3412, // 10: pot_clay
+  0x451a03, // 11: slate_menu
+  0xfef3c7, // 12: chalk_white
+  0xf59e0b, // 13: gold_handle
+  0xd97706, // 14: stone_grey (sandstone)
+  0x92400e, // 15: pipe_grey
+  0xd97706, // 16: wall_blue (warm adobe)
+  0xb45309, // 17: brick_blue
+  0x78350f, // 18: chimney_pot
+  0x92400e, // 19: dormer_caramel
+];
 
-  // Wide showcase window (warm interior light with white frames)
-  b.addBox(0.75, 0.85, 0.05, 0.30, 0.70, 0.75, cWhite);
-  b.addBox(0.65, 0.75, 0.05, 0.30, 0.70, 0.75, cGlass);
-  b.addBox(0.75, 0.05, 0.10, 0.30, 0.25, 0.75, cDoor);
-  b.addBox(0.05, 0.75, 0.05, 0.30, 0.70, 0.80, cWhite);
-  b.addBox(0.65, 0.05, 0.05, 0.30, 0.90, 0.80, cWhite);
+const CAFE_PALETTE_NEON                    = [
+  0x06b6d4, // 0: cyan neon trim
+  0xec4899, // 1: magenta neon glow
+  0xec4899, // 2: flower_pink (neon pink)
+  0x06b6d4, // 3: flower_yellow (cyan glow)
+  0xf43f5e, // 4: flower_red
+  0x10b981, // 5: plant_green (matrix green)
+  0x1e1b4b, // 6: wood_dark (dark synth)
+  0x0f172a, // 7: wood_recess
+  0xec4899, // 8: awning_red (neon magenta)
+  0x1e1b4b, // 9: roof_terracotta (obsidian)
+  0x06b6d4, // 10: pot_clay (neon cyan)
+  0x0f172a, // 11: slate_menu
+  0x06b6d4, // 12: chalk_white
+  0x06b6d4, // 13: gold_handle
+  0x090d16, // 14: stone_grey (dark plinth)
+  0x1e1b4b, // 15: pipe_grey
+  0x0f172a, // 16: wall_blue (dark obsidian)
+  0x1e1b4b, // 17: brick_blue
+  0x090d16, // 18: chimney_pot
+  0x06b6d4, // 19: dormer_caramel
+];
 
-  // Striped awning (8 alternating red and white stripes, sloped)
-  for (let i = 0; i < 8; i++) {
-    const ax = -0.05 + i * 0.10;
-    const col = i % 2 === 0 ? cRed : cWhite;
-    b.addBox(0.10, 0.05, 0.15, ax, 1.25, 0.80, col);
-    b.addBox(0.10, 0.10, 0.15, ax, 1.15, 0.95, col);
+// 215 Monolithic Boxes: [w, h, d, x, y, z, swatchId]
+const CAFE_BOXES                                                                      = [
+  [1.71,0.135,0.075,0,0.068,0.667,14], [0.075,0.135,1.335,0.818,0.068,-0.037,14],
+  [0.075,0.135,1.335,-0.818,0.068,-0.037,14], [1.56,0.135,0.075,0,0.068,-0.667,14],
+  [0.037,0.105,1.35,-0.806,0.188,0,16], [0.037,0.33,1.35,-0.806,0.87,0,16],
+  [0.037,0.465,0.33,-0.806,0.473,0.51,16], [0.037,0.465,0.33,-0.806,0.473,-0.51,16],
+  [0.037,0.9,1.35,0.806,0.585,0,16], [1.575,0.9,0.037,0,0.585,-0.656,16],
+  [0.09,0.9,0.037,0.78,0.585,0.656,16], [0.945,0.09,0.037,0.263,0.18,0.656,16],
+  [0.105,0.9,0.037,-0.263,0.585,0.656,16], [0.12,0.9,0.037,-0.765,0.585,0.656,16],
+  [1.47,0.33,0.037,0,0.87,0.656,16], [0.045,0.57,0.037,-0.337,0.42,0.671,6],
+  [0.045,0.57,0.037,-0.683,0.42,0.671,6], [0.39,0.045,0.037,-0.51,0.683,0.671,6],
+  [0.3,0.525,0.022,-0.51,0.398,0.664,6], [0.21,0.195,0.021,-0.51,0.263,0.678,6],
+  [0.165,0.15,0.017,-0.51,0.263,0.678,7], [0.24,0.24,0.037,-0.51,0.51,0.664,1],
+  [0.015,0.24,0.049,-0.51,0.51,0.666,6], [0.045,0.06,0.037,-0.367,0.375,0.682,13],
+  [0.96,0.48,0.037,0.27,0.465,0.671,0], [0.87,0.39,0.041,0.27,0.465,0.681,1],
+  [0.049,0.465,0.69,-0.819,0.473,0,0], [0.049,0.39,0.615,-0.827,0.473,0,1],
+  [0.105,0.27,0.026,-0.765,0.54,0.681,6], [0.083,0.24,0.035,-0.765,0.54,0.681,11],
+  [0.068,0.03,0.043,-0.765,0.63,0.682,12], [0.06,0.019,0.043,-0.761,0.572,0.682,12],
+  [0.052,0.019,0.043,-0.757,0.519,0.682,12], [0.06,0.019,0.043,-0.761,0.467,0.682,12],
+  [0.113,0.045,0.24,0.708,0.713,0.81,8], [0.113,0.112,0.022,0.708,0.634,0.919,8],
+  [0.113,0.045,0.24,0.595,0.713,0.81,0], [0.113,0.083,0.022,0.595,0.649,0.919,0],
+  [0.113,0.045,0.24,0.482,0.713,0.81,8], [0.113,0.112,0.022,0.482,0.634,0.919,8],
+  [0.113,0.045,0.24,0.368,0.713,0.81,0], [0.113,0.083,0.022,0.368,0.649,0.919,0],
+  [0.113,0.045,0.24,0.255,0.713,0.81,8], [0.113,0.112,0.022,0.255,0.634,0.919,8],
+  [0.113,0.045,0.24,0.142,0.713,0.81,0], [0.113,0.083,0.022,0.142,0.649,0.919,0],
+  [0.113,0.045,0.24,0.028,0.713,0.81,8], [0.113,0.112,0.022,0.028,0.634,0.919,8],
+  [0.113,0.045,0.24,-0.085,0.713,0.81,0], [0.113,0.083,0.022,-0.085,0.649,0.919,0],
+  [0.113,0.045,0.24,-0.198,0.713,0.81,8], [0.113,0.112,0.022,-0.198,0.634,0.919,8],
+  [0.24,0.045,0.099,-0.945,0.713,0.296,8], [0.022,0.112,0.099,-1.054,0.634,0.296,8],
+  [0.24,0.045,0.099,-0.945,0.713,0.197,0], [0.022,0.083,0.099,-1.054,0.649,0.197,0],
+  [0.24,0.045,0.099,-0.945,0.713,0.099,8], [0.022,0.112,0.099,-1.054,0.634,0.099,8],
+  [0.24,0.045,0.099,-0.945,0.713,0,0], [0.022,0.083,0.099,-1.054,0.649,0,0],
+  [0.24,0.045,0.099,-0.945,0.713,-0.099,8], [0.022,0.112,0.099,-1.054,0.634,-0.099,8],
+  [0.24,0.045,0.099,-0.945,0.713,-0.197,0], [0.022,0.083,0.099,-1.054,0.649,-0.197,0],
+  [0.24,0.045,0.099,-0.945,0.713,-0.296,8], [0.022,0.112,0.099,-1.054,0.634,-0.296,8],
+  [0.795,0.21,0.041,0.263,0.892,0.711,6], [0.825,0.022,0.056,0.263,1.009,0.711,6],
+  [0.825,0.022,0.056,0.263,0.776,0.711,6], [0.037,0.135,0.03,-0.041,0.892,0.746,0],
+  [0.12,0.037,0.03,0,0.941,0.746,0], [0.12,0.037,0.03,0,0.844,0.746,0],
+  [0.03,0.135,0.03,0.112,0.892,0.746,0], [0.03,0.135,0.03,0.188,0.892,0.746,0],
+  [0.105,0.037,0.03,0.15,0.941,0.746,0], [0.105,0.03,0.03,0.15,0.892,0.746,0],
+  [0.03,0.135,0.03,0.255,0.892,0.746,0], [0.105,0.037,0.03,0.292,0.941,0.746,0],
+  [0.09,0.03,0.03,0.285,0.892,0.746,0], [0.03,0.135,0.03,0.397,0.892,0.746,0],
+  [0.105,0.037,0.03,0.435,0.941,0.746,0], [0.09,0.03,0.03,0.427,0.892,0.746,0],
+  [0.105,0.037,0.03,0.435,0.844,0.746,0], [0.315,0.045,0.03,-0.982,1.177,-0.435,15],
+  [0.255,0.03,0.045,-1.027,1.155,-0.435,6], [0.255,0.03,0.045,-1.027,0.93,-0.435,6],
+  [0.03,0.195,0.045,-0.915,1.042,-0.435,6], [0.03,0.195,0.045,-1.14,1.042,-0.435,6],
+  [0.195,0.195,0.03,-1.027,1.042,-0.435,0], [0.135,0.022,0.068,-1.027,0.975,-0.435,6],
+  [0.09,0.075,0.068,-1.027,1.024,-0.435,6], [0.037,0.045,0.06,-1.091,1.024,-0.435,6],
+  [0.015,0.034,0.06,-1.009,1.093,-0.435,6], [0.015,0.034,0.06,-1.046,1.093,-0.435,6],
+  [1.71,0.09,0.075,0,1.08,0.675,0], [0.075,0.09,1.342,0.818,1.08,-0.034,0],
+  [0.075,0.09,1.342,-0.818,1.08,-0.034,0], [1.725,0.09,0.083,0,1.08,-0.671,0],
+  [0.037,0.862,1.35,0.806,1.556,0,16], [0.037,0.862,1.35,-0.806,1.556,0,16],
+  [1.575,0.862,0.037,0,1.556,-0.656,16], [1.575,0.862,0.037,0,1.556,0.641,16],
+  [0.33,0.547,0.049,0.51,1.511,0.677,0], [0.24,0.457,0.049,0.51,1.511,0.684,1],
+  [0.03,0.502,0.058,0.51,1.511,0.685,0], [0.27,0.037,0.058,0.51,1.504,0.685,0],
+  [0.375,0.09,0.098,0.51,1.2,0.709,6], [0.345,0.06,0.083,0.51,1.275,0.709,5],
+  [0.037,0.045,0.045,0.611,1.327,0.713,2], [0.045,0.052,0.037,0.51,1.331,0.709,3],
+  [0.037,0.045,0.045,0.416,1.327,0.713,4], [0.33,0.547,0.049,0,1.511,0.677,0],
+  [0.24,0.457,0.049,0,1.511,0.684,1], [0.03,0.502,0.058,0,1.511,0.685,0],
+  [0.27,0.037,0.058,0,1.504,0.685,0], [0.375,0.09,0.098,0,1.2,0.709,6],
+  [0.345,0.06,0.083,0,1.275,0.709,5], [0.037,0.045,0.045,0.101,1.327,0.713,2],
+  [0.045,0.052,0.037,0,1.331,0.709,3], [0.037,0.045,0.045,-0.094,1.327,0.713,4],
+  [0.33,0.547,0.049,-0.51,1.511,0.677,0], [0.24,0.457,0.049,-0.51,1.511,0.684,1],
+  [0.03,0.502,0.058,-0.51,1.511,0.685,0], [0.27,0.037,0.058,-0.51,1.504,0.685,0],
+  [0.375,0.09,0.098,-0.51,1.2,0.709,6], [0.345,0.06,0.083,-0.51,1.275,0.709,5],
+  [0.037,0.045,0.045,-0.409,1.327,0.713,2], [0.045,0.052,0.037,-0.51,1.331,0.709,3],
+  [0.037,0.045,0.045,-0.604,1.327,0.713,4], [0.049,0.547,0.27,-0.819,1.511,0.21,0],
+  [0.049,0.457,0.195,-0.827,1.511,0.21,1], [0.05,0.502,0.022,-0.831,1.511,0.21,0],
+  [0.05,0.037,0.225,-0.831,1.504,0.21,0], [0.049,0.547,0.27,-0.819,1.511,-0.21,0],
+  [0.049,0.457,0.195,-0.827,1.511,-0.21,1], [0.05,0.502,0.022,-0.831,1.511,-0.21,0],
+  [0.05,0.037,0.225,-0.831,1.504,-0.21,0], [0.09,0.06,0.045,0.593,1.867,0.66,17],
+  [0.09,0.06,0.045,-0.593,1.867,0.66,17], [0.09,0.06,0.045,-0.3,1.417,0.66,17],
+  [0.045,0.06,0.09,-0.817,0.667,-0.457,17], [0.045,0.06,0.09,-0.817,1.492,-0.435,17],
+  [1.74,0.098,0.09,0,2.036,0.675,0], [0.09,0.098,1.342,0.825,2.036,-0.041,0],
+  [0.09,0.098,1.342,-0.825,2.036,-0.041,0], [1.74,0.098,0.09,0,2.036,-0.675,0],
+  [1.53,0.135,0.037,0,2.153,0.656,16], [1.53,0.135,0.037,0,2.153,-0.656,16],
+  [1.26,0.142,0.037,0,2.284,0.656,16], [1.26,0.142,0.037,0,2.284,-0.656,16],
+  [0.99,0.142,0.037,0,2.419,0.656,16], [0.99,0.142,0.037,0,2.419,-0.656,16],
+  [0.72,0.142,0.037,0,2.554,0.656,16], [0.72,0.142,0.037,0,2.554,-0.656,16],
+  [0.45,0.142,0.037,0,2.689,0.656,16], [0.45,0.142,0.037,0,2.689,-0.656,16],
+  [0.18,0.128,0.037,0,2.816,0.656,16], [0.18,0.128,0.037,0,2.816,-0.656,16],
+  [0.09,0.06,0.045,0.292,2.467,0.66,17], [0.09,0.06,0.045,-0.292,2.467,0.66,17],
+  [0.09,0.06,0.045,0,2.19,0.66,17], [0.15,0.135,1.5,-0.84,2.153,0,9],
+  [0.15,0.135,1.5,0.84,2.153,0,9], [0.15,0.135,1.5,-0.705,2.28,0,9],
+  [0.15,0.135,1.5,0.705,2.28,0,9], [0.15,0.135,1.5,-0.57,2.408,0,9],
+  [0.15,0.135,1.5,0.57,2.408,0,9], [0.15,0.135,1.5,-0.435,2.535,0,9],
+  [0.15,0.135,1.5,0.435,2.535,0,9], [0.15,0.135,1.5,-0.3,2.663,0,9],
+  [0.15,0.135,1.5,0.3,2.663,0,9], [0.15,0.135,1.5,-0.165,2.79,0,9],
+  [0.15,0.135,1.5,0.165,2.79,0,9], [0.21,0.112,1.53,0,2.906,0,9],
+  [0.27,0.337,0.056,0,2.456,0.673,0], [0.195,0.263,0.056,0,2.456,0.681,1],
+  [0.022,0.292,0.065,0,2.456,0.681,0], [0.225,0.037,0.065,0,2.456,0.681,0],
+  [0.36,0.285,0.24,-0.495,2.438,0.3,19], [0.041,0.255,0.21,-0.681,2.438,0.3,0],
+  [0.041,0.195,0.165,-0.688,2.438,0.3,1], [0.043,0.225,0.022,-0.693,2.438,0.3,0],
+  [0.043,0.03,0.188,-0.693,2.438,0.3,0], [0.443,0.068,0.285,-0.506,2.599,0.3,9],
+  [0.443,0.06,0.165,-0.506,2.663,0.3,9], [0.36,0.285,0.24,-0.495,2.438,-0.3,19],
+  [0.041,0.255,0.21,-0.681,2.438,-0.3,0], [0.041,0.195,0.165,-0.688,2.438,-0.3,1],
+  [0.043,0.225,0.022,-0.693,2.438,-0.3,0], [0.043,0.03,0.188,-0.693,2.438,-0.3,0],
+  [0.443,0.068,0.285,-0.506,2.599,-0.3,9], [0.443,0.06,0.165,-0.506,2.663,-0.3,9],
+  [0.24,0.135,0.21,0,2.917,-0.525,14], [0.18,0.375,0.15,0,3.172,-0.525,15],
+  [0.24,0.075,0.21,0,3.397,-0.525,14], [0.09,0.105,0.075,0,3.487,-0.525,18],
+  [0.045,1.875,0.045,-0.896,1.073,-0.578,15], [0.068,0.075,0.075,-0.896,2.047,-0.577,15],
+  [0.101,0.045,0.06,-0.876,0.585,-0.577,15], [0.101,0.045,0.06,-0.876,1.485,-0.577,15],
+  [0.487,0.075,0.15,0.281,0.172,0.825,6], [0.06,0.135,0.105,0.45,0.068,0.825,6],
+  [0.06,0.135,0.105,0.112,0.068,0.825,6], [0.165,0.135,0.165,-0.9,0.068,-0.345,10],
+  [0.135,0.12,0.135,-0.9,0.195,-0.345,5], [0.09,0.09,0.09,-0.9,0.3,-0.345,5],
+  [0.052,0.052,0.052,-0.9,0.371,-0.345,5], [0.165,0.135,0.165,-0.27,0.068,0.795,10],
+  [0.135,0.12,0.135,-0.27,0.195,0.795,5], [0.09,0.09,0.09,-0.27,0.3,0.795,5],
+  [0.052,0.052,0.052,-0.27,0.371,0.795,5], [0.165,0.135,0.165,0.637,0.068,0.795,10],
+  [0.135,0.12,0.135,0.637,0.195,0.795,5], [0.09,0.09,0.09,0.637,0.3,0.795,5],
+  [0.052,0.052,0.052,0.637,0.371,0.795,5],
+];
+function populateCafeBuilder(b                  , biome            = 'forest')       {
+  let pal = CAFE_PALETTE_FOREST;
+  if (biome === 'winter') pal = CAFE_PALETTE_WINTER;
+  else if (biome === 'desert') pal = CAFE_PALETTE_DESERT;
+  else if (biome === 'neon') pal = CAFE_PALETTE_NEON;
+
+  for (let i = 0; i < CAFE_BOXES.length; i++) {
+    const box = CAFE_BOXES[i];
+    b.addBox(box[0], box[1], box[2], box[3], box[4], box[5], pal[box[6]]);
   }
 
-  // Front 'CAFE' sign above awning
-  b.addBox(0.65, 0.15, 0.05, 0.30, 1.35, 0.75, cSign);
-  b.addBox(0.70, 0.05, 0.05, 0.30, 1.45, 0.75, cDoor);
-  b.addBox(0.05, 0.10, 0.05, 0.15, 1.35, 0.80, cWhite); // C
-  b.addBox(0.05, 0.10, 0.05, 0.25, 1.35, 0.80, cWhite); // A
-  b.addBox(0.05, 0.10, 0.05, 0.35, 1.35, 0.80, cWhite); // F
-  b.addBox(0.05, 0.10, 0.05, 0.45, 1.35, 0.80, cWhite); // E
-
-  // Hanging cantilever sign with coffee cup
-  b.addBox(0.15, 0.05, 0.05, -0.85, 1.25, 0.40, cPlinth);
-  b.addBox(0.05, 0.25, 0.25, -0.95, 1.15, 0.40, cSign);
-  b.addBox(0.05, 0.20, 0.20, -0.95, 1.15, 0.40, cWhite);
-  b.addBox(0.05, 0.10, 0.10, -0.95, 1.10, 0.40, cDoor);
-  b.addBox(0.05, 0.05, 0.05, -0.95, 1.20, 0.40, cGlass);
-
-  // Sidewalk planters & cafe bench
-  for (const px of [-0.70, 0.70]) {
-    b.addBox(0.15, 0.15, 0.15, px, 0.25, 0.75, cRoof);
-    b.addBox(0.10, 0.20, 0.10, px, 0.40, 0.75, cGreen);
-  }
-  b.addBox(0.40, 0.05, 0.15, 0.30, 0.20, 0.80, cDoor);
-  b.addBox(0.05, 0.10, 0.10, 0.15, 0.10, 0.80, cDoor);
-  b.addBox(0.05, 0.10, 0.10, 0.45, 0.10, 0.80, cDoor);
-
-  // 3. Quoins (Рустовка на 4 углах)
-  const cornerXs = [-0.80, 0.80];
-  const cornerZs = [-0.70, 0.70];
-  const quoinYs = [0.30, 0.70, 1.10, 1.70, 2.10, 2.50];
-  for (let ci = 0; ci < 2; ci++) {
-    const cx = cornerXs[ci];
-    for (let cj = 0; cj < 2; cj++) {
-      const cz = cornerZs[cj];
-      for (let q = 0; q < quoinYs.length; q++) {
-        const isLong = q % 2 === 0;
-        const qw = isLong ? 0.15 : 0.10;
-        const qd = isLong ? 0.10 : 0.15;
-        b.addBox(qw, 0.10, qd, cx, quoinYs[q], cz, cWhite);
-      }
-    }
-  }
-
-  // 4. 2nd Floor Walls, Windows & Flower Boxes
-  b.addBox(1.60, 1.20, 1.40, 0, 2.10, 0, cWall);
-  b.addBox(1.70, 0.10, 1.50, 0, 2.75, 0, cWhite); // Upper cornice
-
-  for (const wx of [-0.35, 0.35]) {
-    b.addBox(0.35, 0.70, 0.05, wx, 2.15, 0.75, cWhite);
-    b.addBox(0.25, 0.60, 0.05, wx, 2.15, 0.75, cGlass);
-    b.addBox(0.40, 0.05, 0.10, wx, 1.75, 0.75, cWhite);
-    b.addBox(0.40, 0.05, 0.10, wx, 2.55, 0.75, cWhite);
-    b.addBox(0.35, 0.10, 0.10, wx, 1.65, 0.80, cDoor);
-    b.addBox(0.30, 0.05, 0.05, wx, 1.75, 0.80, cGreen);
-    b.addBox(0.05, 0.05, 0.05, wx - 0.10, 1.80, 0.80, cBerry);
-    b.addBox(0.05, 0.05, 0.05, wx + 0.10, 1.80, 0.80, cBerry);
-  }
-
-  // Side facade windows & downspout
-  b.addBox(0.05, 0.60, 0.30, -0.85, 2.15, 0, cWhite);
-  b.addBox(0.05, 0.50, 0.20, -0.85, 2.15, 0, cGlass);
-  b.addBox(0.10, 0.05, 0.35, -0.85, 1.80, 0, cWhite);
-  b.addBox(0.05, 0.60, 0.30, -0.85, 0.80, 0, cWhite);
-  b.addBox(0.05, 0.50, 0.20, -0.85, 0.80, 0, cGlass);
-  b.addBox(0.10, 0.05, 0.35, -0.85, 0.45, 0, cWhite);
-  b.addBox(0.05, 2.40, 0.05, -0.80, 1.40, 0.65, cChimney);
-
-  // 5. Mansard Roof, Dormer Windows & Chimney
-  b.addBox(1.55, 0.20, 1.35, 0, 2.90, 0, cRoof);
-  b.addBox(1.45, 0.20, 1.20, 0, 3.10, 0, cRoof);
-  b.addBox(1.35, 0.20, 1.05, 0, 3.30, 0, cRoof);
-  b.addBox(1.25, 0.20, 0.90, 0, 3.50, 0, cRoof);
-  b.addBox(1.15, 0.10, 0.80, 0, 3.65, 0, cRidge);
-
-  for (const lx of [-0.35, 0.35]) {
-    b.addBox(0.30, 0.25, 0.25, lx, 3.10, 0.55, cWall);
-    b.addBox(0.20, 0.20, 0.05, lx, 3.10, 0.70, cGlass);
-    b.addBox(0.25, 0.05, 0.05, lx, 2.95, 0.70, cWhite);
-    b.addBox(0.35, 0.10, 0.30, lx, 3.30, 0.55, cRoof);
-  }
-
-  // Brick chimney with cap
-  b.addBox(0.25, 0.60, 0.25, 0.45, 3.80, -0.25, cChimney);
-  b.addBox(0.30, 0.10, 0.30, 0.45, 4.15, -0.25, cPlinth);
-  b.addBox(0.15, 0.10, 0.15, 0.45, 4.25, -0.25, cTrim);
-
-  // 6. Winter Layer (Snow caps, garland, chimney smoke)
-  if (isWinter) {
-    b.addBox(1.20, 0.10, 0.85, 0, 3.75, 0, cWhite); // Roof snow
-    b.addBox(1.40, 0.05, 0.20, 0, 3.55, 0.40, cWhite); // Front mansard slope snow
-    b.addBox(1.40, 0.05, 0.20, 0, 3.55, -0.40, cWhite); // Back slope snow
-    for (const lx of [-0.35, 0.35]) {
-      b.addBox(0.35, 0.05, 0.30, lx, 3.40, 0.55, cWhite);
-    }
-    b.addBox(1.70, 0.05, 0.10, 0, 2.85, 0.70, cWhite);
-    b.addBox(0.10, 0.05, 1.50, -0.80, 2.85, 0, cWhite);
-    b.addBox(1.70, 0.05, 0.10, 0, 1.55, 0.70, cWhite);
-    b.addBox(0.10, 0.05, 1.50, -0.80, 1.55, 0, cWhite);
-
-    for (const wx of [-0.35, 0.35]) {
-      b.addBox(0.40, 0.05, 0.10, wx, 2.60, 0.75, cWhite);
-      b.addBox(0.35, 0.05, 0.10, wx, 1.80, 0.75, cWhite);
-    }
-    b.addBox(0.10, 0.05, 0.35, -0.85, 1.85, 0, cWhite);
-    b.addBox(0.85, 0.05, 0.20, 0.30, 1.30, 0.90, cWhite);
-    b.addBox(0.70, 0.05, 0.05, 0.30, 1.45, 0.75, cWhite);
-    b.addBox(0.05, 0.05, 0.25, -0.95, 1.30, 0.40, cWhite);
-
-    for (const px of [-0.70, 0.70]) {
-      b.addBox(0.15, 0.05, 0.15, px, 0.55, 0.75, cWhite);
-    }
-    b.addBox(0.40, 0.05, 0.15, 0.30, 0.25, 0.80, cWhite);
-    b.addBox(0.30, 0.05, 0.30, 0.45, 4.25, -0.25, cWhite);
-
-    // Chimney smoke puffs
-    b.addBox(0.10, 0.10, 0.10, 0.45, 4.40, -0.25, cSmoke);
-    b.addBox(0.10, 0.10, 0.10, 0.40, 4.55, -0.20, cSmoke);
-    b.addBox(0.10, 0.10, 0.10, 0.45, 4.70, -0.15, cSmoke);
-    b.addBox(0.05, 0.05, 0.05, 0.40, 4.80, -0.15, cSmoke);
-
-    // Festive garland with berries along cornice
-    for (const gx of [-0.50, 0.00, 0.50]) {
-      b.addBox(0.45, 0.05, 0.05, gx, 1.40, 0.75, cGarland);
-    }
-    for (const bx of [-0.65, -0.25, 0.25, 0.65]) {
-      b.addBox(0.05, 0.05, 0.05, bx, 1.40, 0.80, cBerry);
-    }
-    b.addBox(0.05, 0.05, 0.60, -0.85, 1.40, 0.20, cGarland);
-    for (const bz of [-0.10, 0.50]) {
-      b.addBox(0.05, 0.05, 0.05, -0.85, 1.40, bz, cBerry);
-    }
+  // Winter snow caps on roof ridge and chimney if winter biome
+  if (biome === 'winter') {
+    b.addBox(0.24, 0.05, 1.55, 0, 2.98, 0, 0xf8fafc);
+    b.addBox(0.30, 0.05, 0.30, 0, 3.48, -0.52, 0xf8fafc);
   }
 }
 
-function populateBakeryBuilder(builder                  , isWinter         )       {
+// --- Module: src/view/townhouse/bakery.ts ---
+/**
+ * Red Brick Bakery / Desert Adobe Bakehouse / Neon Synth-Bakery for Townhouse B.
+ * Strictly complies with docs/VOXEL_GRID_SPECIFICATION.md (VOXEL_UNIT = 0.05).
+ */
+function populateBakeryBuilder(builder                  , biome            = 'forest')       {
   const W = 1.60;
   const D = 1.40;
   const hw = W * 0.5;
   const hd = D * 0.5;
 
-  // Colors based on reference: 22_winter_brick_bakery_turnaround.jpg
-  const cPlinth = 0x334155;
-  const cBrick = 0xba3224;
-  const cStone = 0xf59e0b;
+  const isWinter = biome === 'winter';
+  const isDesert = biome === 'desert';
+  const isNeon = biome === 'neon';
+
+  // Palettes for biomes
+  let cPlinth = 0x334155;
+  let cBrick = 0xba3224;
+  let cStone = 0xf59e0b;
   const cSnow = 0xf8fafc;
-  const cWindow = 0xfef08a;
-  const cDoor = 0x713f12;
+  const cWindow = isNeon ? 0xec4899 : 0xfef08a;
+  let cDoor = 0x713f12;
   const cGarland = 0x166534;
-  const cBerry = 0xef4444;
-  const cSign = 0x451a03;
-  const cSignText = 0xffedd5;
-  const cSmoke = 0xe2e8f0;
+  let cBerry = 0xef4444;
+  let cSign = 0x451a03;
+  let cSignText = 0xffedd5;
+  const cSmoke = isNeon ? 0x38bdf8 : 0xe2e8f0;
+  let cRoof = 0x78350f;
+
+  if (isDesert) {
+    // Desert: sandstone/terracotta walls 0xd97706, 0xf59e0b, adobe roof 0xb45309
+    cPlinth = 0x78350f;
+    cBrick = 0xd97706;
+    cStone = 0xf59e0b;
+    cDoor = 0x78350f;
+    cBerry = 0xb45309;
+    cSign = 0x78350f;
+    cSignText = 0xfde68a;
+    cRoof = 0xb45309;
+  } else if (isNeon) {
+    // Neon: dark obsidian 0x0f172a, 0x1e1b4b, cyan/magenta neon trim 0x06b6d4, 0xec4899
+    cPlinth = 0x090d16;
+    cBrick = 0x0f172a;
+    cStone = 0x06b6d4;
+    cDoor = 0x1e1b4b;
+    cBerry = 0x06b6d4;
+    cSign = 0x1e1b4b;
+    cSignText = 0x06b6d4;
+    cRoof = 0x1e1b4b;
+  }
 
   // 1. Plinth / Foundation
   builder.addBox(1.68, 0.14, 1.48, 0, 0.07, 0, cPlinth);
   builder.addBox(1.64, 0.04, 1.44, 0, 0.16, 0, cPlinth);
 
-  // 2. Core Brick Walls & Cornices
+  // 2. Core Brick / Sandstone / Obsidian Walls & Cornices
   builder.addBox(W, 1.25, D, 0, 0.805, 0, cBrick);
   builder.addBox(1.66, 0.10, 1.46, 0, 1.48, 0, cStone);
   builder.addBox(W, 0.95, D, 0, 2.005, 0, cBrick);
@@ -9306,8 +9515,8 @@ function populateBakeryBuilder(builder                  , isWinter         )    
     }
   }
 
-  // 8. Flat Roof & Battlements (Zubtsy with Snow Caps)
-  builder.addBox(W - 0.12, 0.12, D - 0.12, 0, 3.52, 0, isWinter ? cSnow : 0x78350f);
+  // 8. Flat Roof & Battlements (Zubtsy)
+  builder.addBox(W - 0.12, 0.12, D - 0.12, 0, 3.52, 0, isWinter ? cSnow : cRoof);
   const teethX = [-0.60, -0.20, 0.20, 0.60];
   const teethZBounds = [-hd + 0.06, hd - 0.06];
   for (let x = 0; x < 4; x++) {
@@ -9347,38 +9556,43 @@ function populateBakeryBuilder(builder                  , isWinter         )    
   }
 }
 
+// --- Module: src/view/urbanBuildings.ts ---
 function populateBooksBuilder(builder                  , isWinter         )       {
   buildBooksShopfront(builder, isWinter);
   buildBooksUpperFloors(builder, isWinter);
   buildBooksRoof(builder, isWinter);
 }
 
-/** Townhouse A: Parisian Blue Cafe (Ref: 11_townhouse_cafe_turnaround.jpg) */
-function createTownhouseA(isWinter = false)              {
+/** Townhouse A: Parisian Blue Cafe / Desert Cantina / Cyber Diner (Ref: 11_townhouse_cafe_turnaround.jpg) */
+function createTownhouseA(biomeOrWinter                      = 'forest')              {
+  const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
-  const key = isWinter ? 'townhouse_a_winter' : 'townhouse_a';
+  const key = `townhouse_a_${biome}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
-    populateCafeBuilder(b, isWinter);
+    populateCafeBuilder(b, biome);
   });
   group.add(mesh);
   return group;
 }
 
-/** Townhouse B: Red Brick Bakery (Ref: 12_townhouse_bakery_turnaround.jpg / 22_winter_brick_bakery_turnaround.jpg) */
-function createTownhouseB(isWinter = false)              {
+/** Townhouse B: Red Brick Bakery / Adobe Bakehouse / Synth-Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */
+function createTownhouseB(biomeOrWinter                      = 'forest')              {
+  const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
-  const key = isWinter ? 'townhouse_b_winter' : 'townhouse_b';
+  const key = `townhouse_b_${biome}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
-    populateBakeryBuilder(b, isWinter);
+    populateBakeryBuilder(b, biome);
   });
   group.add(mesh);
   return group;
 }
 
 /** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */
-function createTownhouseC(isWinter = false)              {
+function createTownhouseC(biomeOrWinter                      = 'forest')              {
+  const isWinter = biomeOrWinter === 'winter' || biomeOrWinter === true;
+  const biomeKey = typeof biomeOrWinter === 'string' ? biomeOrWinter : isWinter ? 'winter' : 'forest';
   const group = new THREE.Group();
-  const key = isWinter ? 'townhouse_c_winter' : 'townhouse_c';
+  const key = `townhouse_c_${biomeKey}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
     populateBooksBuilder(b, isWinter);
   });
@@ -9389,11 +9603,14 @@ function createUrbanTownhouse(seed        , biome            = 'forest')        
   const root = new THREE.Group();
   root.name = 'urbanTownhouse';
   const variant = Math.abs(seed) % 3;
-  const isWinter = biome === 'winter';
   let bldg             ;
-  if (variant === 0) bldg = createTownhouseA(isWinter);
-  else if (variant === 1) bldg = createTownhouseB(isWinter);
-  else bldg = createTownhouseC(isWinter);
+  if (biome === 'desert' || biome === 'neon') {
+    bldg = variant % 2 === 0 ? createTownhouseA(biome) : createTownhouseB(biome);
+  } else {
+    if (variant === 0) bldg = createTownhouseA(biome);
+    else if (variant === 1) bldg = createTownhouseB(biome);
+    else bldg = createTownhouseC(biome);
+  }
 
   bldg.position.z = -0.1325;
   root.add(bldg);
@@ -9451,8 +9668,8 @@ class MeshFactory {
     return createUrbanVehicle(v);
   }
 
-  static createLog(log             )              {
-    return createUrbanPallet(log);
+  static createLog(log             , biome            = 'forest')              {
+    return createUrbanPallet(log, biome);
   }
 
   static createRiverbankEdge(side                  , biome            = 'forest')              {
@@ -9680,7 +9897,7 @@ function getBuildingModelItems()                     {
       icon: '☕',
       cat: 'buildings',
       desc: 'Парижский таунхаус цвета ультрамарин: кофейня, полосатая маркиза, вывеска CAFE, мансарда и кашпо.',
-      create: (b            = 'forest') => createTownhouseA(b === 'winter'),
+      create: (b            = 'forest') => createTownhouseA(b),
     },
     {
       id: 'townhouse_bakery',
@@ -9688,7 +9905,7 @@ function getBuildingModelItems()                     {
       icon: '🥖',
       cat: 'buildings',
       desc: 'Зимняя кирпичная пекарня по эталонному референсу: зубчатый парапет со снегом, хвойные гирлянды, вывеска BAKERY, арочные окна, рустовка и дымоход с клубящимся дымом.',
-      create: (b            = 'winter') => createTownhouseB(b === 'winter'),
+      create: (b            = 'forest') => createTownhouseB(b),
     },
     {
       id: 'townhouse_books',
@@ -9696,7 +9913,7 @@ function getBuildingModelItems()                     {
       icon: '📚',
       cat: 'buildings',
       desc: 'Изумрудная лавка: витрина с книжными полками, вывески BOOKS, угловая консоль и черепичная крыша.',
-      create: (b            = 'forest') => createTownhouseC(b === 'winter'),
+      create: (b            = 'forest') => createTownhouseC(b),
     },
   ];
 }
@@ -9928,6 +10145,10 @@ for (const col of LANE_STRIP_COLORS) {
 }
 
 // --- Module: src/view/instancedDecorManager.ts ---
+const b = (w        , h        , d        , x        , y        , z        , color        )                    => ({
+  w, h, d, x, y, z, color,
+});
+
 function createMergedDecorGeometry(boxes                              )                       {
   const totalVerts = boxes.length * 36;
   const positions = new Float32Array(totalVerts * 3);
@@ -9936,8 +10157,8 @@ function createMergedDecorGeometry(boxes                              )         
   const colorHelper = new THREE.Color();
 
   let vOffset = 0;
-  for (let b = 0; b < boxes.length; b++) {
-    const box = boxes[b];
+  for (let bi = 0; bi < boxes.length; bi++) {
+    const box = boxes[bi];
     const geo = new THREE.BoxGeometry(box.w, box.h, box.d).toNonIndexed();
     geo.translate(box.x, box.y, box.z);
     colorHelper.setHex(box.color);
@@ -9964,125 +10185,180 @@ function createMergedDecorGeometry(boxes                              )         
   return merged;
 }
 
-const INSTANCED_TREE_BOXES                               = [
-  { w: 0.64, h: 0.44, d: 0.64, x: 0, y: 0.22, z: 0, color: 0x78350f },
-  { w: 0.68, h: 0.06, d: 0.68, x: 0, y: 0.42, z: 0, color: 0x451a03 },
-  { w: 0.18, h: 0.56, d: 0.18, x: 0, y: 0.70, z: 0, color: 0x854d0e },
-  { w: 0.76, h: 0.64, d: 0.76, x: 0, y: 1.25, z: 0, color: 0x16a34a },
-  { w: 0.64, h: 0.40, d: 0.64, x: 0, y: 1.60, z: 0, color: 0x22c55e },
-  { w: 0.12, h: 0.12, d: 0.12, x: 0.22, y: 1.35, z: 0.35, color: 0x4ade80 },
+// Forest Biome: Brown trunk 0x854d0e, green foliage 0x16a34a, 0x22c55e, 0x4ade80 | Rock: slate gray 0x64748b, 0x475569, 0x94a3b8
+const INSTANCED_FOREST_TREE_BOXES                               = [
+  b(0.60, 0.10, 0.60, 0, 0.05, 0, 0x854d0e), b(0.20, 0.60, 0.20, 0, 0.35, 0, 0x854d0e),
+  b(0.75, 0.55, 0.75, 0, 0.85, 0, 0x16a34a), b(0.60, 0.40, 0.60, 0, 1.25, 0, 0x22c55e),
+  b(0.35, 0.25, 0.35, 0, 1.55, 0, 0x4ade80), b(0.15, 0.15, 0.15, 0.20, 1.15, 0.30, 0x4ade80),
+];
+const INSTANCED_FOREST_ROCK_BOXES                               = [
+  b(0.60, 0.25, 0.60, 0, 0.125, 0, 0x64748b), b(0.45, 0.20, 0.45, -0.05, 0.30, 0.05, 0x475569),
+  b(0.30, 0.15, 0.30, 0.05, 0.45, -0.05, 0x94a3b8), b(0.15, 0.10, 0.15, 0.25, 0.05, 0.20, 0x64748b),
 ];
 
-const INSTANCED_ROCK_BOXES                               = [
-  { w: 0.58, h: 0.26, d: 0.58, x: 0, y: 0.13, z: 0, color: 0x64748b },
-  { w: 0.44, h: 0.22, d: 0.44, x: -0.04, y: 0.32, z: 0.02, color: 0x475569 },
-  { w: 0.28, h: 0.16, d: 0.28, x: 0.04, y: 0.48, z: -0.02, color: 0x94a3b8 },
-  { w: 0.16, h: 0.10, d: 0.16, x: 0.24, y: 0.05, z: 0.20, color: 0x64748b },
+// Winter Biome: Dark trunk 0x475569, pine teal 0x0f766e, snow cap 0xf8fafc, 0xe2e8f0 | Rock: 0x94a3b8, snow cap 0xf1f5f9
+const INSTANCED_WINTER_TREE_BOXES                               = [
+  b(0.20, 0.50, 0.20, 0, 0.25, 0, 0x475569), b(0.80, 0.40, 0.80, 0, 0.65, 0, 0x0f766e),
+  b(0.85, 0.05, 0.85, 0, 0.85, 0, 0xe2e8f0), b(0.60, 0.35, 0.60, 0, 1.00, 0, 0x0f766e),
+  b(0.65, 0.05, 0.65, 0, 1.18, 0, 0xf8fafc), b(0.35, 0.30, 0.35, 0, 1.30, 0, 0x0f766e),
+  b(0.40, 0.10, 0.40, 0, 1.48, 0, 0xf8fafc),
+];
+const INSTANCED_WINTER_ROCK_BOXES                               = [
+  b(0.60, 0.25, 0.60, 0, 0.125, 0, 0x94a3b8), b(0.45, 0.20, 0.45, -0.05, 0.30, 0.05, 0x64748b),
+  b(0.45, 0.08, 0.45, -0.05, 0.42, 0.05, 0xf1f5f9), b(0.25, 0.10, 0.25, 0.15, 0.20, -0.15, 0xf1f5f9),
+];
+
+// Desert Biome: Terracotta trunk 0x78350f, cactus green / golden-olive 0xa16207, 0xb45309, 0xd97706 | Rock: 0xd97706, 0xb45309, 0x92400e
+const INSTANCED_DESERT_TREE_BOXES                               = [
+  b(0.45, 0.05, 0.45, 0, 0.025, 0, 0x78350f), b(0.25, 1.35, 0.25, 0, 0.70, 0, 0xa16207),
+  b(0.28, 1.05, 0.20, 0, 0.65, 0, 0xb45309), b(0.25, 0.20, 0.20, -0.22, 0.60, 0, 0xa16207),
+  b(0.20, 0.50, 0.20, -0.32, 0.85, 0, 0xd97706), b(0.25, 0.20, 0.20, 0.22, 0.80, 0, 0xa16207),
+  b(0.20, 0.45, 0.20, 0.32, 1.025, 0, 0xd97706), b(0.15, 0.10, 0.15, 0, 1.425, 0, 0xd97706),
+];
+const INSTANCED_DESERT_ROCK_BOXES                               = [
+  b(0.65, 0.20, 0.65, 0, 0.10, 0, 0x92400e), b(0.50, 0.20, 0.50, 0.05, 0.28, -0.05, 0xb45309),
+  b(0.35, 0.15, 0.35, 0.05, 0.43, -0.05, 0xd97706), b(0.18, 0.12, 0.18, -0.25, 0.06, 0.20, 0xd97706),
+];
+
+// Neon Biome: Obsidian trunk 0x1e1b4b, glowing cyan/magenta 0x06b6d4, 0xd946ef, 0xa855f7 | Rock: 0x312e81, 0x4338ca, 0x06b6d4
+const INSTANCED_NEON_TREE_BOXES                               = [
+  b(0.50, 0.10, 0.50, 0, 0.05, 0, 0x1e1b4b), b(0.25, 1.40, 0.25, 0, 0.75, 0, 0x1e1b4b),
+  b(0.65, 0.10, 0.65, 0, 0.70, 0, 0x06b6d4), b(0.50, 0.10, 0.50, 0, 1.05, 0, 0xd946ef),
+  b(0.35, 0.10, 0.35, 0, 1.35, 0, 0xa855f7), b(0.15, 0.20, 0.15, 0, 1.55, 0, 0x06b6d4),
+];
+const INSTANCED_NEON_ROCK_BOXES                               = [
+  b(0.55, 0.20, 0.55, 0, 0.10, 0, 0x312e81), b(0.35, 0.35, 0.35, -0.05, 0.35, 0.05, 0x4338ca),
+  b(0.15, 0.25, 0.15, 0.18, 0.25, -0.12, 0x06b6d4), b(0.10, 0.18, 0.10, -0.15, 0.48, -0.05, 0x06b6d4),
 ];
 
 const INSTANCED_COIN_BOXES                               = [
-  { w: 0.44, h: 0.44, d: 0.12, x: 0, y: 0, z: 0, color: 0xfacc15 },
-  { w: 0.18, h: 0.22, d: 0.15, x: 0, y: 0, z: 0, color: 0xef4444 },
+  b(0.44, 0.44, 0.12, 0, 0, 0, 0xfacc15), b(0.18, 0.22, 0.15, 0, 0, 0, 0xef4444),
 ];
 
 const INSTANCED_DECOR_Y_AXIS = new THREE.Vector3(0, 1, 0);
+const INSTANCED_BIOMES                       = ['forest', 'winter', 'desert', 'neon'];
 class InstancedDecorManager {
                   group = new THREE.Group();
-                  treeMesh                     ;
-                  rockMesh                     ;
+                  treeMeshes                                        ;
+                  rockMeshes                                        ;
                   coinMesh                     ;
+
+         get treeMesh()                      { return this.treeMeshes.forest; }
+         get rockMesh()                      { return this.rockMeshes.forest; }
 
                    maxTrees        ;
                    maxRocks        ;
                    maxCoins        ;
 
-          treeCount = 0;
-          rockCount = 0;
+                   treeCounts                            = { forest: 0, winter: 0, desert: 0, neon: 0 };
+                   rockCounts                            = { forest: 0, winter: 0, desert: 0, neon: 0 };
           coinCount = 0;
 
-          treeDirty = false;
-          rockDirty = false;
+                   treeDirty                             = { forest: false, winter: false, desert: false, neon: false };
+                   rockDirty                             = { forest: false, winter: false, desert: false, neon: false };
           coinDirty = false;
 
                    scratchMatrix = new THREE.Matrix4();
                    scratchPos = new THREE.Vector3();
                    scratchQuat = new THREE.Quaternion();
                    scratchScale = new THREE.Vector3();
+                   decorMaterial                           ;
 
   constructor(maxTrees = 1500, maxRocks = 400, maxCoins = 200) {
     this.maxTrees = maxTrees;
     this.maxRocks = maxRocks;
     this.maxCoins = maxCoins;
+    this.decorMaterial = new THREE.MeshLambertMaterial({ vertexColors: true });
 
-    const decorMaterial = new THREE.MeshLambertMaterial({ vertexColors: true });
+    const treeGeos                                          = {
+      forest: createMergedDecorGeometry(INSTANCED_FOREST_TREE_BOXES),
+      winter: createMergedDecorGeometry(INSTANCED_WINTER_TREE_BOXES),
+      desert: createMergedDecorGeometry(INSTANCED_DESERT_TREE_BOXES),
+      neon: createMergedDecorGeometry(INSTANCED_NEON_TREE_BOXES),
+    };
+    const rockGeos                                          = {
+      forest: createMergedDecorGeometry(INSTANCED_FOREST_ROCK_BOXES),
+      winter: createMergedDecorGeometry(INSTANCED_WINTER_ROCK_BOXES),
+      desert: createMergedDecorGeometry(INSTANCED_DESERT_ROCK_BOXES),
+      neon: createMergedDecorGeometry(INSTANCED_NEON_ROCK_BOXES),
+    };
 
-    const treeGeo = createMergedDecorGeometry(INSTANCED_TREE_BOXES);
-    this.treeMesh = new THREE.InstancedMesh(treeGeo, decorMaterial, this.maxTrees);
-    this.treeMesh.count = 0;
-    this.treeMesh.castShadow = true;
-    this.treeMesh.receiveShadow = true;
-    this.treeMesh.frustumCulled = false;
+    this.treeMeshes = {}                                          ;
+    this.rockMeshes = {}                                          ;
 
-    const rockGeo = createMergedDecorGeometry(INSTANCED_ROCK_BOXES);
-    this.rockMesh = new THREE.InstancedMesh(rockGeo, decorMaterial, this.maxRocks);
-    this.rockMesh.count = 0;
-    this.rockMesh.castShadow = true;
-    this.rockMesh.receiveShadow = true;
-    this.rockMesh.frustumCulled = false;
+    for (let i = 0; i < INSTANCED_BIOMES.length; i++) {
+      const bm = INSTANCED_BIOMES[i];
+      const tm = new THREE.InstancedMesh(treeGeos[bm], this.decorMaterial, this.maxTrees);
+      tm.count = 0;
+      tm.castShadow = true;
+      tm.receiveShadow = true;
+      tm.frustumCulled = false;
+      this.treeMeshes[bm] = tm;
+      this.group.add(tm);
+
+      const rm = new THREE.InstancedMesh(rockGeos[bm], this.decorMaterial, this.maxRocks);
+      rm.count = 0;
+      rm.castShadow = true;
+      rm.receiveShadow = true;
+      rm.frustumCulled = false;
+      this.rockMeshes[bm] = rm;
+      this.group.add(rm);
+    }
 
     const coinGeo = createMergedDecorGeometry(INSTANCED_COIN_BOXES);
-    this.coinMesh = new THREE.InstancedMesh(coinGeo, decorMaterial, this.maxCoins);
+    this.coinMesh = new THREE.InstancedMesh(coinGeo, this.decorMaterial, this.maxCoins);
     this.coinMesh.count = 0;
     this.coinMesh.castShadow = true;
     this.coinMesh.receiveShadow = false;
     this.coinMesh.frustumCulled = false;
+    this.group.add(this.coinMesh);
 
     this.group.name = 'instancedDecorGroup';
-    this.group.add(this.treeMesh, this.rockMesh, this.coinMesh);
   }
 
   beginFrame()       {
-    this.treeCount = 0;
-    this.rockCount = 0;
+    for (let i = 0; i < INSTANCED_BIOMES.length; i++) {
+      const bm = INSTANCED_BIOMES[i];
+      this.treeCounts[bm] = 0;
+      this.rockCounts[bm] = 0;
+    }
     this.coinCount = 0;
   }
 
-  addTree(x        , y        , z        , scale = 1, rotation = 0)       {
-    if (this.treeCount >= this.maxTrees) return;
+          writeMatrix(mesh                     , idx        , onDirty            )       {
+    const offset = idx * 16;
+    const elems = this.scratchMatrix.elements;
+    const arr = mesh.instanceMatrix.array                ;
+    for (let i = 0; i < 16; i++) {
+      if (Math.abs(arr[offset + i] - elems[i]) > 1e-5) {
+        arr[offset + i] = elems[i];
+        onDirty();
+      }
+    }
+  }
+
+  addTree(x        , y        , z        , scale = 1, rotation = 0, biome            = 'forest')       {
+    const validBiome = this.treeMeshes[biome] ? biome : 'forest';
+    const count = this.treeCounts[validBiome];
+    if (count >= this.maxTrees) return;
     this.scratchPos.set(x, y, z);
     this.scratchQuat.setFromAxisAngle(INSTANCED_DECOR_Y_AXIS, rotation);
     this.scratchScale.set(scale, scale, scale);
     this.scratchMatrix.compose(this.scratchPos, this.scratchQuat, this.scratchScale);
-
-    const offset = this.treeCount * 16;
-    const elems = this.scratchMatrix.elements;
-    const arr = this.treeMesh.instanceMatrix.array                ;
-    for (let i = 0; i < 16; i++) {
-      if (Math.abs(arr[offset + i] - elems[i]) > 1e-5) {
-        arr[offset + i] = elems[i];
-        this.treeDirty = true;
-      }
-    }
-    this.treeCount++;
+    this.writeMatrix(this.treeMeshes[validBiome], count, () => { this.treeDirty[validBiome] = true; });
+    this.treeCounts[validBiome] = count + 1;
   }
 
-  addRock(x        , y        , z        , scale = 1)       {
-    if (this.rockCount >= this.maxRocks) return;
+  addRock(x        , y        , z        , scale = 1, biome            = 'forest')       {
+    const validBiome = this.rockMeshes[biome] ? biome : 'forest';
+    const count = this.rockCounts[validBiome];
+    if (count >= this.maxRocks) return;
     this.scratchPos.set(x, y, z);
     this.scratchQuat.identity();
     this.scratchScale.set(scale, scale, scale);
     this.scratchMatrix.compose(this.scratchPos, this.scratchQuat, this.scratchScale);
-
-    const offset = this.rockCount * 16;
-    const elems = this.scratchMatrix.elements;
-    const arr = this.rockMesh.instanceMatrix.array                ;
-    for (let i = 0; i < 16; i++) {
-      if (Math.abs(arr[offset + i] - elems[i]) > 1e-5) {
-        arr[offset + i] = elems[i];
-        this.rockDirty = true;
-      }
-    }
-    this.rockCount++;
+    this.writeMatrix(this.rockMeshes[validBiome], count, () => { this.rockDirty[validBiome] = true; });
+    this.rockCounts[validBiome] = count + 1;
   }
 
   addCoin(x        , y        , z        , rotationY = 0)       {
@@ -10091,36 +10367,32 @@ class InstancedDecorManager {
     this.scratchQuat.setFromAxisAngle(INSTANCED_DECOR_Y_AXIS, rotationY);
     this.scratchScale.set(1, 1, 1);
     this.scratchMatrix.compose(this.scratchPos, this.scratchQuat, this.scratchScale);
-
-    const offset = this.coinCount * 16;
-    const elems = this.scratchMatrix.elements;
-    const arr = this.coinMesh.instanceMatrix.array                ;
-    for (let i = 0; i < 16; i++) {
-      if (Math.abs(arr[offset + i] - elems[i]) > 1e-5) {
-        arr[offset + i] = elems[i];
-        this.coinDirty = true;
-      }
-    }
+    this.writeMatrix(this.coinMesh, this.coinCount, () => { this.coinDirty = true; });
     this.coinCount++;
   }
 
   endFrame()       {
-    if (this.treeMesh.count !== this.treeCount) {
-      this.treeMesh.count = this.treeCount;
-      this.treeDirty = true;
-    }
-    if (this.treeDirty) {
-      this.treeMesh.instanceMatrix.needsUpdate = true;
-      this.treeDirty = false;
-    }
+    for (let i = 0; i < INSTANCED_BIOMES.length; i++) {
+      const bm = INSTANCED_BIOMES[i];
+      const tm = this.treeMeshes[bm];
+      if (tm.count !== this.treeCounts[bm]) {
+        tm.count = this.treeCounts[bm];
+        this.treeDirty[bm] = true;
+      }
+      if (this.treeDirty[bm]) {
+        tm.instanceMatrix.needsUpdate = true;
+        this.treeDirty[bm] = false;
+      }
 
-    if (this.rockMesh.count !== this.rockCount) {
-      this.rockMesh.count = this.rockCount;
-      this.rockDirty = true;
-    }
-    if (this.rockDirty) {
-      this.rockMesh.instanceMatrix.needsUpdate = true;
-      this.rockDirty = false;
+      const rm = this.rockMeshes[bm];
+      if (rm.count !== this.rockCounts[bm]) {
+        rm.count = this.rockCounts[bm];
+        this.rockDirty[bm] = true;
+      }
+      if (this.rockDirty[bm]) {
+        rm.instanceMatrix.needsUpdate = true;
+        this.rockDirty[bm] = false;
+      }
     }
 
     if (this.coinMesh.count !== this.coinCount) {
@@ -10134,24 +10406,28 @@ class InstancedDecorManager {
   }
 
   clear()       {
-    this.treeCount = 0;
-    this.rockCount = 0;
+    for (let i = 0; i < INSTANCED_BIOMES.length; i++) {
+      const bm = INSTANCED_BIOMES[i];
+      this.treeCounts[bm] = 0;
+      this.rockCounts[bm] = 0;
+      this.treeMeshes[bm].count = 0;
+      this.rockMeshes[bm].count = 0;
+      this.treeMeshes[bm].instanceMatrix.needsUpdate = true;
+      this.rockMeshes[bm].instanceMatrix.needsUpdate = true;
+    }
     this.coinCount = 0;
-    this.treeMesh.count = 0;
-    this.rockMesh.count = 0;
     this.coinMesh.count = 0;
-    this.treeMesh.instanceMatrix.needsUpdate = true;
-    this.rockMesh.instanceMatrix.needsUpdate = true;
     this.coinMesh.instanceMatrix.needsUpdate = true;
   }
 
   dispose()       {
-    this.treeMesh.geometry.dispose();
-    (this.treeMesh.material                  ).dispose();
-    this.rockMesh.geometry.dispose();
-    (this.rockMesh.material                  ).dispose();
+    for (let i = 0; i < INSTANCED_BIOMES.length; i++) {
+      const bm = INSTANCED_BIOMES[i];
+      this.treeMeshes[bm].geometry.dispose();
+      this.rockMeshes[bm].geometry.dispose();
+    }
     this.coinMesh.geometry.dispose();
-    (this.coinMesh.material                  ).dispose();
+    this.decorMaterial.dispose();
   }
 }
 
@@ -11183,7 +11459,7 @@ class SceneManager {
     }
 
     for (const log of lane.logs) {
-      const mesh = MeshFactory.createLog(log);
+      const mesh = MeshFactory.createLog(log, biome);
       mesh.position.x = worldToScreenX(log.x);
       group.add(mesh);
       logMeshes.set(log.id, mesh);
@@ -11204,6 +11480,7 @@ class SceneManager {
     }
 
     return {
+      biome,
       group,
       vehicleMeshes,
       logMeshes,
@@ -11273,6 +11550,13 @@ class SceneManager {
     for (const lane of activeLanes) {
       this.activeIndices.add(lane.index);
       let rendered = this.renderedLanes.get(lane.index);
+      const laneBiome = lane.biome ?? 'forest';
+      if (rendered && rendered.biome !== laneBiome) {
+        this.scene.remove(rendered.group);
+        this.disposeHierarchy(rendered.group);
+        this.renderedLanes.delete(lane.index);
+        rendered = undefined;
+      }
       if (!rendered) {
         const nextLane = engine.getLane(lane.index + 1);
         const hasNextRoad = nextLane?.type === LaneType.ROAD;
@@ -11284,13 +11568,13 @@ class SceneManager {
       if (rendered.decorTrees) {
         for (let i = 0; i < rendered.decorTrees.length; i++) {
           const t = rendered.decorTrees[i];
-          this.decorManager.addTree(t.x, t.y, t.z, t.scale, t.rotation);
+          this.decorManager.addTree(t.x, t.y, t.z, t.scale, t.rotation, laneBiome);
         }
       }
       if (rendered.decorRocks) {
         for (let i = 0; i < rendered.decorRocks.length; i++) {
           const r = rendered.decorRocks[i];
-          this.decorManager.addRock(r.x, r.y, r.z, r.scale);
+          this.decorManager.addRock(r.x, r.y, r.z, r.scale, laneBiome);
         }
       }
       if (lane.coins) {
@@ -11569,6 +11853,35 @@ class SceneManager {
       this.playerMesh.rotation.set(0, 0, 0);
       this.playerMesh.position.set(0, 0, 0);
     }
+  }
+
+  refreshWorld(engine            )       {
+    for (const rendered of this.renderedLanes.values()) {
+      this.scene.remove(rendered.group);
+      this.disposeHierarchy(rendered.group);
+    }
+    this.renderedLanes.clear();
+    this.decorManager.clear();
+
+    const currentBiome            = engine.getBiome();
+    const targetAtmos = BIOME_ATMOSPHERES[currentBiome] ?? BIOME_ATMOSPHERES[Biome.FOREST];
+    this.cachedSkyColor.setHex(targetAtmos.sky);
+    if (this.scene.background instanceof THREE.Color) {
+      this.scene.background.copy(this.cachedSkyColor);
+    } else {
+      this.scene.background = this.cachedSkyColor.clone();
+    }
+    this.cachedFogColor.setHex(targetAtmos.fogColor);
+    this.fog.color.copy(this.cachedFogColor);
+    this.fog.density = targetAtmos.fogDensity;
+    this.cachedAmbientColor.setHex(targetAtmos.ambientColor);
+    this.ambientLight.color.copy(this.cachedAmbientColor);
+    this.ambientLight.intensity = targetAtmos.ambientIntensity;
+    this.cachedDirColor.setHex(targetAtmos.dirColor);
+    this.dirLight.color.copy(this.cachedDirColor);
+    this.dirLight.intensity = targetAtmos.dirIntensity;
+
+    this.sync(engine, 0.016);
   }
 }
 
@@ -14880,6 +15193,11 @@ class GameLoop {
       this.sceneManager.setRecordFlag?.(this.runStartHighScore, RECORD_FLAG_X);
     }
     this.sceneManager.setMenuMode?.(true, true);
+    const savedWorld = this.engine.getScoreTracker().getSelectedWorld();
+    if (savedWorld && savedWorld !== 'auto') {
+      this.engine.setBiomeOverride(savedWorld             );
+      this.sceneManager.refreshWorld?.(this.engine);
+    }
     this.setupDevGlobal();
     if (typeof document !== 'undefined') {
       document.getElementById('menu-skins-btn')?.addEventListener('click', () => {
@@ -15633,6 +15951,7 @@ class GameLoop {
         } else {
           this.engine.setBiomeOverride(worldId             );
         }
+        this.sceneManager.refreshWorld?.(this.engine);
         this.audio.playSkinVoice?.(this.engine.getSelectedSkin());
         this.ui.showToast('🌍', 'Мир выбран', worldId === 'auto' ? 'Динамический цикл (смена каждые 25 очков)' : `Выбран биом: ${worldId}`);
         this.renderSkinsUI();
@@ -15669,6 +15988,7 @@ class GameLoop {
         const currentIdx = biomes.indexOf(this.engine.getBiome());
         const nextBiome = biomes[(currentIdx + 1) % biomes.length];
         this.engine.setBiomeOverride(nextBiome);
+        this.sceneManager.refreshWorld?.(this.engine);
         this.ui.showToast('🌲', 'Биом изменён', `Биом переключен на: ${nextBiome}`);
       },
       onDevToggleGodMode: () => {

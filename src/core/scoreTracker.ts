@@ -83,12 +83,15 @@ export const DEFAULT_BOT_RIVALS: ReadonlyArray<Omit<LeaderboardEntry, 'rank'>> =
   { playerName: 'RookieFeather', score: 18, skinId: 'pigeon_pizza', date: '2026-09-26', isBot: true },
 ];
 
+export const VALID_WORLD_IDS: ReadonlySet<string> = new Set(['auto', 'forest', 'winter', 'desert', 'neon']);
+
 interface SavedProfile {
   highScore: number;
   bestRow: number;
   coins: number;
   unlockedSkins: SkinId[];
   selectedSkin: SkinId;
+  selectedWorld?: string;
   playerName?: string;
   playerRuns?: Array<Omit<LeaderboardEntry, 'rank'>>;
   unlockedAchievements?: AchievementId[];
@@ -105,6 +108,7 @@ export class ScoreTracker {
   private highScore = 0;
   private bestRow = 0;
   private playerName = 'Игрок';
+  private selectedWorld = 'auto';
   private playerRuns: Array<Omit<LeaderboardEntry, 'rank'>> = [];
   private storage?: StorageAdapter;
 
@@ -259,6 +263,11 @@ export class ScoreTracker {
           this.dailyQuests = new DailyQuestTracker(data.dailyQuestState);
           this.dailyQuests.checkDateRollover(getDailyDateKey());
         }
+        if (typeof data.selectedWorld === 'string' && VALID_WORLD_IDS.has(data.selectedWorld)) {
+          this.selectedWorld = data.selectedWorld;
+        } else {
+          this.selectedWorld = 'auto';
+        }
       }
     } catch {
       // Resilient fallback on corrupted storage
@@ -275,6 +284,7 @@ export class ScoreTracker {
         coins: this.wallet.getCoins(),
         unlockedSkins: this.inventory.getUnlockedSkins(),
         selectedSkin: this.inventory.getSelectedSkin(),
+        selectedWorld: this.selectedWorld,
         playerName: this.playerName,
         playerRuns: this.playerRuns,
         unlockedAchievements: this.achievements.getUnlockedIds(),
@@ -627,6 +637,15 @@ export class ScoreTracker {
     return { success: false, coins: 0, isDouble: false };
   }
 
+  getSelectedWorld(): string {
+    return this.selectedWorld;
+  }
+
+  setSelectedWorld(world: string): void {
+    this.selectedWorld = VALID_WORLD_IDS.has(world) ? world : 'auto';
+    this.saveToStorage();
+  }
+
   resetAllProgress(): void {
     this.currentScore = 0;
     this.highScore = 0;
@@ -638,6 +657,7 @@ export class ScoreTracker {
     this.achievements = new AchievementTracker();
     this.dailyReward = new DailyRewardManager();
     this.dailyQuests = new DailyQuestTracker(getDailyDateKey());
+    this.selectedWorld = 'auto';
     this.saveToStorage();
   }
 }

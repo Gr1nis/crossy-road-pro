@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { vehicleScreenRotationY } from '../core/collision.ts';
-import type { LogPlatform, Vehicle } from '../core/types.ts';
+import type { BiomeType, LogPlatform, Vehicle } from '../core/types.ts';
 import { VoxelMeshBuilder } from './voxelMeshBuilder.ts';
 
 type UrbanVoxelSpec = [
@@ -683,24 +683,112 @@ function buildTrain(): UrbanVoxelSpec[] {
   ];
 }
 
-function buildPallet(length: number): UrbanVoxelSpec[] {
-  const timberColor = 0xd97706; // Light timber planks
+function buildPallet(length: number, biome: BiomeType = 'forest'): UrbanVoxelSpec[] {
+  if (biome === 'winter') {
+    // Winter: Ice floe / floating ice sheet with snowy surface (0xbae6fd, 0xe0f2fe, 0xf8fafc)
+    const deepIce = 0x0369a1;  // Submerged keel
+    const frostWake = 0xe0f2fe; // Frost/ice rime wake
+    const iceBase = 0xbae6fd;   // Main translucent ice floe
+    const midIce = 0xe0f2fe;    // Upper stepped ice shelf
+    const snowTop = 0xf8fafc;   // Snowy crust
+    const frostNotch = 0x7dd3fc;// Hop slot notches
+
+    const specs: UrbanVoxelSpec[] = [
+      [length * 0.90, 0.08, 0.64, 0, -0.06, 0, deepIce],
+      [length + 0.16, 0.02, 0.86, 0, -0.02, 0, frostWake],
+      [length * 0.96, 0.08, 0.72, 0, 0.03, 0, iceBase],
+      [length * 0.86, 0.06, 0.62, 0, 0.09, 0, midIce],
+      [length * 0.78, 0.05, 0.54, 0, 0.14, 0, snowTop],
+      [length * 0.40, 0.04, 0.18, -length * 0.20, 0.16, -0.12, 0xf1f5f9],
+      [length * 0.35, 0.04, 0.16, length * 0.22, 0.16, 0.10, 0xf1f5f9],
+    ];
+
+    const slotCount = Math.floor(length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
+        specs.push([0.05, 0.045, 0.60, s, 0.14, 0, frostNotch]);
+      }
+    }
+    return specs;
+  }
+
+  if (biome === 'desert') {
+    // Desert: Tied canyon timber raft (0x92400e, 0xb45309, 0x78350f)
+    const waterColor = 0x0d9488;  // Canyon turquoise river
+    const foamColor = 0xfef08a;   // Sandy foam ripples
+    const bottomLogs = 0x78350f;  // Heavy weathered logs
+    const ropeColor = 0xb45309;   // Bound rope lashings
+    const topTimber = 0x92400e;   // Heavy timber cross boards
+
+    const specs: UrbanVoxelSpec[] = [
+      [length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
+      [length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor],
+      [length * 0.94, 0.08, 0.18, 0, 0.02, -0.25, bottomLogs],
+      [length * 0.94, 0.08, 0.20, 0, 0.02, 0, bottomLogs],
+      [length * 0.94, 0.08, 0.18, 0, 0.02, 0.25, bottomLogs],
+    ];
+
+    const blockXPositions = [-length * 0.42, 0, length * 0.42];
+    for (const bx of blockXPositions) {
+      specs.push([0.08, 0.10, 0.74, bx, 0.05, 0, ropeColor]);
+      specs.push([0.14, 0.05, 0.72, bx, 0.10, 0, bottomLogs]);
+    }
+
+    const boardZ = [-0.28, -0.14, 0, 0.14, 0.28];
+    for (const bz of boardZ) {
+      specs.push([length, 0.04, 0.11, 0, 0.14, bz, topTimber]);
+    }
+
+    const slotCount = Math.floor(length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
+        specs.push([0.04, 0.045, 0.74, s, 0.14, 0, 0x78350f]);
+      }
+    }
+    return specs;
+  }
+
+  if (biome === 'neon') {
+    // Neon: Hover platform / cyber-barge with dark core and glowing cyan/magenta trim (0x0f172a, 0x06b6d4, 0xec4899)
+    const energyField = 0x4338ca; // Magnetic levitation glow
+    const cyanGlow = 0x06b6d4;    // Cyan trim & thrusters
+    const magentaGlow = 0xec4899; // Magenta edge lights
+    const darkChassis = 0x0f172a; // Obsidian carbon-fiber core
+    const deckPlate = 0x1e1b4b;   // Deep indigo deck
+
+    const specs: UrbanVoxelSpec[] = [
+      [length * 0.90, 0.06, 0.64, 0, -0.05, 0, energyField, true],
+      [length + 0.16, 0.02, 0.86, 0, -0.02, 0, cyanGlow, true],
+      [length * 0.96, 0.08, 0.70, 0, 0.03, 0, darkChassis],
+      [length * 0.90, 0.04, 0.62, 0, 0.09, 0, deckPlate],
+      [length * 0.94, 0.05, 0.04, 0, 0.13, -0.30, magentaGlow, true],
+      [length * 0.94, 0.05, 0.04, 0, 0.13, 0.30, magentaGlow, true],
+      [0.40, 0.045, 0.20, 0, 0.12, 0, cyanGlow, true],
+    ];
+
+    const slotCount = Math.floor(length);
+    for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
+      if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
+        specs.push([0.05, 0.045, 0.58, s, 0.13, 0, cyanGlow, true]);
+      }
+    }
+    return specs;
+  }
+
+  // Forest: Classic wooden pallet (0x78350f, 0xa16207)
+  const timberColor = 0xa16207; // Light timber planks
   const darkWood = 0x78350f;    // Stringers, blocks, stamp
   const foamColor = 0xf8fafc;   // Water foam ripples
   const waterColor = 0x0284c7;  // Submerged keel
 
   const specs: UrbanVoxelSpec[] = [
-    // Submerged buoyancy keel
     [length * 0.92, 0.08, 0.68, 0, -0.06, 0, waterColor],
-    // White foam wake around floating pallet
     [length + 0.16, 0.02, 0.86, 0, -0.02, 0, foamColor],
-    // 3 Longitudinal bottom skids
     [length * 0.94, 0.04, 0.12, 0, 0.01, -0.28, darkWood],
     [length * 0.94, 0.04, 0.12, 0, 0.01, 0, darkWood],
     [length * 0.94, 0.04, 0.12, 0, 0.01, 0.28, darkWood],
   ];
 
-  // 9 Support spacer blocks along pallet length
   const blockXPositions = [-length * 0.42, 0, length * 0.42];
   for (const bx of blockXPositions) {
     specs.push([0.14, 0.06, 0.12, bx, 0.05, -0.28, darkWood]);
@@ -708,21 +796,17 @@ function buildPallet(length: number): UrbanVoxelSpec[] {
     specs.push([0.14, 0.06, 0.12, bx, 0.05, 0.28, darkWood]);
   }
 
-  // 3 Cross stringer beams on top of blocks
   for (const bx of blockXPositions) {
     specs.push([0.10, 0.04, 0.72, bx, 0.10, 0, darkWood]);
   }
 
-  // 5 Top longitudinal timber boards with realistic gaps (Ref: 20_euro_pallet_turnaround.jpg)
   const boardZ = [-0.29, -0.15, 0, 0.15, 0.29];
   for (const bz of boardZ) {
     specs.push([length, 0.04, 0.11, 0, 0.14, bz, timberColor]);
   }
 
-  // Burned wood 'PALLET' stamp brand on front board
   specs.push([0.48, 0.042, 0.02, 0, 0.14, 0.35, darkWood]);
 
-  // Discrete 1.0-spaced slot notches for hop magnetism
   const slotCount = Math.floor(length);
   for (let s = -Math.floor(slotCount / 2); s <= Math.floor(slotCount / 2); s++) {
     if (Math.abs(s) > 0.1 && Math.abs(s) < length / 2 - 0.2) {
@@ -797,11 +881,11 @@ export function createUrbanTrain(lengthOrSpeed: number = -1, speed?: number): TH
   return group;
 }
 
-export function createUrbanPallet(log: LogPlatform): THREE.Group {
+export function createUrbanPallet(log: LogPlatform, biome: BiomeType = 'forest'): THREE.Group {
   const group = new THREE.Group();
-  const key = `pallet_${log.length.toFixed(2)}`;
+  const key = `pallet_${biome}_${log.length.toFixed(2)}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
-    const specs = buildPallet(log.length);
+    const specs = buildPallet(log.length, biome);
     for (let i = 0; i < specs.length; i++) {
       const s = specs[i];
       builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
