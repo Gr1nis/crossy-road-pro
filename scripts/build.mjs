@@ -3143,9 +3143,15 @@ const htmlContent = `<!DOCTYPE html>
         <button id="dev-report-btn" class="menu-btn menu-btn-primary" style="font-size: 13px; padding: 10px; grid-column: span 2; background: #0284c7; border-color: #38bdf8; color: #fff;">📋 Открыть отчёт бенчмарка</button>
       </div>
 
-      <div style="margin-bottom: 14px;">
-        <a id="dev-open-viewer-btn" href="model-viewer.html" onclick="this.href='model-viewer.html?v='+Date.now();" target="_blank" class="menu-btn menu-btn-secondary" style="display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
-          🔍 3D Вьюер моделей (Live Engine Assets)
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+        <a id="dev-open-viewer-btn" href="model-viewer.html" onclick="this.href='model-viewer.html?v='+Date.now();" target="_blank" class="menu-btn menu-btn-secondary" style="grid-column: span 2; display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
+          🔍 3D Вьюер моделей (Все 27 моделей)
+        </a>
+        <a href="model-viewer.html?model=townhouse_bakery&biome=winter" target="_blank" class="menu-btn menu-btn-slate" style="display: block; text-decoration: none; text-align: center; font-size: 12px; padding: 8px; background: #0284c7; border-color: #38bdf8; color: #fff;">
+          🥖 Зимняя Пекарня 3D
+        </a>
+        <a href="model-viewer.html?model=townhouse_cafe&biome=forest" target="_blank" class="menu-btn menu-btn-slate" style="display: block; text-decoration: none; text-align: center; font-size: 12px; padding: 8px; background: #0f766e; border-color: #14b8a6; color: #fff;">
+          ☕ Кафе Таунхаус 3D
         </a>
       </div>
 
@@ -3383,10 +3389,12 @@ const viewerHtmlContent = `<!DOCTYPE html>
     </div>
     <div class="header-links">
       <div style="background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 6px;">
-        <span>🎯 Проверено: 26 моделей</span>
+        <span>🎯 Проверено: 27 моделей</span>
         <span style="color: #64748b;">|</span>
         <span style="color: #4ade80;">✔ Синхронизировано</span>
       </div>
+      <a href="?model=townhouse_bakery&biome=winter" class="nav-btn" style="background: rgba(2, 132, 199, 0.4); border-color: #38bdf8;">🥖 Зимняя пекарня</a>
+      <a href="?model=townhouse_cafe&biome=forest" class="nav-btn">☕ Кафе</a>
       <a href="index.html" class="nav-btn">🎮 В игру</a>
     </div>
   </header>
@@ -3534,13 +3542,25 @@ ${viewerModulesJs}
     let autoSpin = urlParams.get('autospin') !== 'false';
     let hopTest = false;
     let ghostMode = false;
-    let currentBiome = requestedBiome || 'forest';
+    let currentBiome = requestedBiome || (currentModelId === 'townhouse_bakery' ? 'winter' : 'forest');
 
     // Model Mount Node
     const modelRoot = new THREE.Group();
     scene.add(modelRoot);
 
-    function loadModel(id) {
+    function frameCameraToModel(box) {
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z, 0.8);
+      const targetY = size.y * 0.5;
+      controls.target.set(0, targetY, 0);
+
+      const fovRad = (camera.fov * Math.PI) / 180;
+      const camDist = Math.max(3.2, (maxDim / 2) / Math.tan(fovRad / 2) * 1.55);
+      camera.position.set(camDist * 0.72, targetY + camDist * 0.42, camDist * 0.85);
+      controls.update();
+    }
+
+    function loadModel(id, adjustCam = true) {
       currentModelId = id;
       const def = MODELS.find(m => m.id === id) || MODELS[0];
       if (!def) return;
@@ -3559,6 +3579,10 @@ ${viewerModulesJs}
       currentMesh.position.z = -center.z;
       currentMesh.position.y = -box.min.y;
 
+      if (adjustCam) {
+        frameCameraToModel(box);
+      }
+
       // Dynamic diagnostics from actual 3D geometry
       const diag = getModelDiagnostics(currentMesh);
 
@@ -3573,9 +3597,25 @@ ${viewerModulesJs}
       document.querySelectorAll('.model-card-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.id === id);
       });
+
+      // Keep URL query params synchronized
+      try {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('model', id);
+        newUrl.searchParams.set('biome', currentBiome);
+        window.history.replaceState(null, '', newUrl.toString());
+      } catch {}
     }
 
     function renderSidebar() {
+      // Sync tab buttons active state
+      document.querySelectorAll('.cat-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.cat === activeCategory);
+      });
+      if (document.getElementById('biome-select')) {
+        document.getElementById('biome-select').value = currentBiome;
+      }
+
       const listEl = document.getElementById('model-list');
       listEl.innerHTML = '';
       const filtered = MODELS.filter(m => m.cat === activeCategory);
@@ -3682,8 +3722,7 @@ ${viewerModulesJs}
 
     const btnResetCam = document.getElementById('btn-reset-cam');
     btnResetCam.addEventListener('click', () => {
-      camera.position.set(3.2, 2.5, 4.0);
-      controls.target.set(0, 0.5, 0);
+      loadModel(currentModelId, true);
     });
 
     // Resize Handler

@@ -26,7 +26,7 @@ export function createTownhouseA(biomeOrWinter: BiomeType | boolean = 'forest'):
 }
 
 /** Townhouse B: Red Brick Bakery / Adobe Bakehouse / Synth-Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */
-export function createTownhouseB(biomeOrWinter: BiomeType | boolean = 'forest'): THREE.Group {
+export function createTownhouseB(biomeOrWinter: BiomeType | boolean = 'winter'): THREE.Group {
   const biome: BiomeType = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_b_${biome}`;

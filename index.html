@@ -3046,9 +3046,15 @@
         <button id="dev-report-btn" class="menu-btn menu-btn-primary" style="font-size: 13px; padding: 10px; grid-column: span 2; background: #0284c7; border-color: #38bdf8; color: #fff;">📋 Открыть отчёт бенчмарка</button>
       </div>
 
-      <div style="margin-bottom: 14px;">
-        <a id="dev-open-viewer-btn" href="model-viewer.html" onclick="this.href='model-viewer.html?v='+Date.now();" target="_blank" class="menu-btn menu-btn-secondary" style="display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
-          🔍 3D Вьюер моделей (Live Engine Assets)
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+        <a id="dev-open-viewer-btn" href="model-viewer.html" onclick="this.href='model-viewer.html?v='+Date.now();" target="_blank" class="menu-btn menu-btn-secondary" style="grid-column: span 2; display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
+          🔍 3D Вьюер моделей (Все 27 моделей)
+        </a>
+        <a href="model-viewer.html?model=townhouse_bakery&biome=winter" target="_blank" class="menu-btn menu-btn-slate" style="display: block; text-decoration: none; text-align: center; font-size: 12px; padding: 8px; background: #0284c7; border-color: #38bdf8; color: #fff;">
+          🥖 Зимняя Пекарня 3D
+        </a>
+        <a href="model-viewer.html?model=townhouse_cafe&biome=forest" target="_blank" class="menu-btn menu-btn-slate" style="display: block; text-decoration: none; text-align: center; font-size: 12px; padding: 8px; background: #0f766e; border-color: #14b8a6; color: #fff;">
+          ☕ Кафе Таунхаус 3D
         </a>
       </div>
 
@@ -9584,7 +9590,7 @@ function createTownhouseA(biomeOrWinter                      = 'forest')        
 }
 
 /** Townhouse B: Red Brick Bakery / Adobe Bakehouse / Synth-Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */
-function createTownhouseB(biomeOrWinter                      = 'forest')              {
+function createTownhouseB(biomeOrWinter                      = 'winter')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_b_${biome}`;
@@ -9913,7 +9919,7 @@ function getBuildingModelItems()                     {
       icon: '🥖',
       cat: 'buildings',
       desc: 'Зимняя кирпичная пекарня по эталонному референсу: зубчатый парапет со снегом, хвойные гирлянды, вывеска BAKERY, арочные окна, рустовка и дымоход с клубящимся дымом.',
-      create: (b            = 'forest') => createTownhouseB(b),
+      create: (b            = 'winter') => createTownhouseB(b),
     },
     {
       id: 'townhouse_books',

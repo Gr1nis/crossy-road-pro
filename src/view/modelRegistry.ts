@@ -223,7 +223,7 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
       icon: '🥖',
       cat: 'buildings',
       desc: 'Зимняя кирпичная пекарня по эталонному референсу: зубчатый парапет со снегом, хвойные гирлянды, вывеска BAKERY, арочные окна, рустовка и дымоход с клубящимся дымом.',
-      create: (b: BiomeType = 'forest') => createTownhouseB(b),
+      create: (b: BiomeType = 'winter') => createTownhouseB(b),
     },
     {
       id: 'townhouse_books',
