@@ -36,19 +36,18 @@ describe('Gacha Machine Stage 3 — Silhouettes, Fair Pool & Continuous Conveyor
     const inventory = new SkinInventory(['corgi']);
 
     const available = gacha.getAvailableSkins(inventory);
-    assert.equal(available.length, 4, 'Should have 4 locked skins remaining');
+    assert.equal(available.length, ALL_SKINS.length - 1, 'Should have all remaining locked skins');
     assert.ok(!available.includes('corgi'), 'Unlocked corgi must NOT be in available pool');
-    assert.deepEqual(available, ['pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen']);
 
     // Progressively unlock skins
     inventory.unlockSkin('box_cat');
     const availableAfter = gacha.getAvailableSkins(inventory);
-    assert.equal(availableAfter.length, 3);
+    assert.equal(availableAfter.length, ALL_SKINS.length - 2);
     assert.ok(!availableAfter.includes('box_cat'), 'box_cat must now be excluded from pool');
 
-    inventory.unlockSkin('pigeon_pizza');
-    inventory.unlockSkin('raccoon_bandit');
-    inventory.unlockSkin('capybara_zen');
+    for (const skin of ALL_SKINS) {
+      inventory.unlockSkin(skin.id);
+    }
     assert.equal(gacha.getAvailableSkins(inventory).length, 0, 'Pool must be empty when all unlocked');
     assert.equal(gacha.isAllUnlocked(inventory), true, 'isAllUnlocked must report true');
   });
@@ -133,13 +132,16 @@ describe('Gacha Machine Stage 3 — Silhouettes, Fair Pool & Continuous Conveyor
     tracker.claimDuplicateCashback(dupRes.cashback);
     assert.equal(tracker.getCoins(), 940, 'Cashback credited separately (900 + 40 = 940)');
 
-    // Unlock remaining skins
-    tracker.rollGacha(0, 'box_cat');
-    tracker.rollGacha(0, 'pigeon_pizza');
-    tracker.rollGacha(0, 'raccoon_bandit');
-    tracker.rollGacha(0, 'capybara_zen');
+    tracker.addCoins(1000);
 
-    assert.equal(tracker.getUnlockedSkins().length, 5);
+    // Unlock remaining skins
+    for (const skin of ALL_SKINS) {
+      if (skin.id !== 'corgi') {
+        tracker.rollGacha(0, skin.id);
+      }
+    }
+
+    assert.equal(tracker.getUnlockedSkins().length, ALL_SKINS.length);
     assert.equal(tracker.isAllSkinsUnlocked(), true);
 
     // Roll when all 5 skins are already unlocked: must succeed with duplicate cashback

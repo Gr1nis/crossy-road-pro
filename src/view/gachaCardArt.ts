@@ -7,9 +7,14 @@ import { GACHA_CHARACTER_SKIN_BASE64 } from './gachaSkinsBase64.ts';
 export const CARD_NAMES_UPPER: Record<string, string> = {
   corgi: 'CORGI',
   pigeon_pizza: 'PIZZA PIGEON',
+  barista_pug: 'BARISTA PUG',
+  skater_ferret: 'SKATER FERRET',
   box_cat: 'BOX CAT',
+  subway_rat: 'SUBWAY RAT',
   raccoon_bandit: 'RACCOON',
+  raincoat_duck: 'RAINCOAT DUCK',
   capybara_zen: 'CAPYBARA',
+  pigeon_king: 'PIGEON KING',
 };
 
 export const RARITY_CSS_MAP: Record<SkinRarityValue, { label: string; css: string }> = {

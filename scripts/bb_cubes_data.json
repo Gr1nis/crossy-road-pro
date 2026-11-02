@@ -1,0 +1,572 @@
+[
+  {
+    "name": "front_paw_pad_left",
+    "from": [
+      -3.8,
+      0.0,
+      -4.2
+    ],
+    "to": [
+      -1.8,
+      0.6,
+      -2.2
+    ],
+    "color": "nosePink",
+    "col_idx": 2
+  },
+  {
+    "name": "front_paw_sock_left",
+    "from": [
+      -3.8,
+      0.6,
+      -4.2
+    ],
+    "to": [
+      -1.8,
+      3.0,
+      -2.2
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "front_paw_pad_right",
+    "from": [
+      1.8,
+      0.0,
+      -4.2
+    ],
+    "to": [
+      3.8,
+      0.6,
+      -2.2
+    ],
+    "color": "nosePink",
+    "col_idx": 2
+  },
+  {
+    "name": "front_paw_sock_right",
+    "from": [
+      1.8,
+      0.6,
+      -4.2
+    ],
+    "to": [
+      3.8,
+      3.0,
+      -2.2
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "rear_paw_pad_left",
+    "from": [
+      -3.8,
+      0.0,
+      2.2
+    ],
+    "to": [
+      -1.8,
+      0.6,
+      4.2
+    ],
+    "color": "nosePink",
+    "col_idx": 2
+  },
+  {
+    "name": "rear_paw_sock_left",
+    "from": [
+      -3.8,
+      0.6,
+      2.2
+    ],
+    "to": [
+      -1.8,
+      3.0,
+      4.2
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "rear_paw_pad_right",
+    "from": [
+      1.8,
+      0.0,
+      2.2
+    ],
+    "to": [
+      3.8,
+      0.6,
+      4.2
+    ],
+    "color": "nosePink",
+    "col_idx": 2
+  },
+  {
+    "name": "rear_paw_sock_right",
+    "from": [
+      1.8,
+      0.6,
+      2.2
+    ],
+    "to": [
+      3.8,
+      3.0,
+      4.2
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "rear_thigh_fluff_left",
+    "from": [
+      -3.9,
+      3.0,
+      2.1
+    ],
+    "to": [
+      -1.7,
+      4.6,
+      4.3
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "rear_thigh_fluff_right",
+    "from": [
+      1.7,
+      3.0,
+      2.1
+    ],
+    "to": [
+      3.9,
+      4.6,
+      4.3
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "body_loaf_core",
+    "from": [
+      -3.8,
+      2.8,
+      -4.2
+    ],
+    "to": [
+      3.8,
+      7.2,
+      4.6
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "body_belly_white",
+    "from": [
+      -2.8,
+      2.4,
+      -3.6
+    ],
+    "to": [
+      2.8,
+      3.2,
+      4.0
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "chest_bib_main",
+    "from": [
+      -3.4,
+      3.2,
+      -4.6
+    ],
+    "to": [
+      3.4,
+      7.2,
+      -2.2
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "chest_bib_tuft",
+    "from": [
+      -2.0,
+      4.2,
+      -5.2
+    ],
+    "to": [
+      2.0,
+      6.6,
+      -4.2
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "rear_bum_core",
+    "from": [
+      -3.6,
+      3.2,
+      3.8
+    ],
+    "to": [
+      3.6,
+      7.2,
+      5.4
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "butt_peach_heart",
+    "from": [
+      -2.4,
+      3.2,
+      4.8
+    ],
+    "to": [
+      2.4,
+      6.4,
+      6.0
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "butt_tail_bob",
+    "from": [
+      -1.2,
+      5.6,
+      4.2
+    ],
+    "to": [
+      1.2,
+      8.0,
+      6.2
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "butt_tail_tip",
+    "from": [
+      -0.8,
+      6.4,
+      5.6
+    ],
+    "to": [
+      0.8,
+      8.0,
+      6.8
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "collar_ring",
+    "from": [
+      -3.4,
+      6.7,
+      -5.2
+    ],
+    "to": [
+      3.4,
+      7.7,
+      -0.4
+    ],
+    "color": "pizzaRed",
+    "col_idx": 4
+  },
+  {
+    "name": "collar_tag_gold",
+    "from": [
+      -0.6,
+      5.8,
+      -5.4
+    ],
+    "to": [
+      0.6,
+      7.0,
+      -4.6
+    ],
+    "color": "pizzaCheese",
+    "col_idx": 5
+  },
+  {
+    "name": "head_core",
+    "from": [
+      -3.6,
+      7.0,
+      -6.2
+    ],
+    "to": [
+      3.6,
+      12.2,
+      -0.2
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "cheek_fluff_left",
+    "from": [
+      -4.2,
+      7.5,
+      -4.8
+    ],
+    "to": [
+      -3.2,
+      10.1,
+      -2.0
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "cheek_fluff_right",
+    "from": [
+      3.2,
+      7.5,
+      -4.8
+    ],
+    "to": [
+      4.2,
+      10.1,
+      -2.0
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "blaze_forehead",
+    "from": [
+      -0.9,
+      7.4,
+      -6.5
+    ],
+    "to": [
+      0.9,
+      12.2,
+      -3.9
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "snout_muzzle",
+    "from": [
+      -2.0,
+      7.2,
+      -8.0
+    ],
+    "to": [
+      2.0,
+      9.6,
+      -5.2
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "chin_under_mouth",
+    "from": [
+      -1.4,
+      6.8,
+      -7.0
+    ],
+    "to": [
+      1.4,
+      7.6,
+      -5.4
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "nose_button",
+    "from": [
+      -0.8,
+      8.6,
+      -8.6
+    ],
+    "to": [
+      0.8,
+      9.8,
+      -7.4
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "tongue_playful",
+    "from": [
+      0.0,
+      7.35,
+      -8.6
+    ],
+    "to": [
+      1.2,
+      8.05,
+      -7.0
+    ],
+    "color": "nosePink",
+    "col_idx": 2
+  },
+  {
+    "name": "eye_left_iris",
+    "from": [
+      -2.8,
+      9.5,
+      -6.2
+    ],
+    "to": [
+      -1.6,
+      10.9,
+      -5.4
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "eye_left_sparkle",
+    "from": [
+      -2.45,
+      10.35,
+      -6.4
+    ],
+    "to": [
+      -1.95,
+      10.85,
+      -6.0
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "eye_right_iris",
+    "from": [
+      1.6,
+      9.5,
+      -6.2
+    ],
+    "to": [
+      2.8,
+      10.9,
+      -5.4
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "eye_right_sparkle",
+    "from": [
+      1.95,
+      10.35,
+      -6.4
+    ],
+    "to": [
+      2.45,
+      10.85,
+      -6.0
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "ear_base_left",
+    "from": [
+      -3.8,
+      11.6,
+      -3.8
+    ],
+    "to": [
+      -1.8,
+      14.4,
+      -2.2
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "ear_tip_left",
+    "from": [
+      -3.4,
+      14.0,
+      -3.6
+    ],
+    "to": [
+      -2.2,
+      16.0,
+      -2.4
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "ear_pink_left",
+    "from": [
+      -3.4,
+      11.8,
+      -3.82
+    ],
+    "to": [
+      -2.2,
+      14.2,
+      -3.22
+    ],
+    "color": "nosePink",
+    "col_idx": 2
+  },
+  {
+    "name": "ear_base_right",
+    "from": [
+      1.8,
+      11.6,
+      -3.8
+    ],
+    "to": [
+      3.8,
+      14.4,
+      -2.2
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "ear_tip_right",
+    "from": [
+      2.2,
+      14.0,
+      -3.6
+    ],
+    "to": [
+      3.4,
+      16.0,
+      -2.4
+    ],
+    "color": "corgiOrange",
+    "col_idx": 0
+  },
+  {
+    "name": "ear_pink_right",
+    "from": [
+      2.2,
+      11.8,
+      -3.82
+    ],
+    "to": [
+      3.4,
+      14.2,
+      -3.22
+    ],
+    "color": "nosePink",
+    "col_idx": 2
+  }
+]

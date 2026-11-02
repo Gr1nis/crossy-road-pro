@@ -1,0 +1,59 @@
+
+Cube.all.slice().forEach(c => c.remove());
+Texture.all.slice().forEach(t => t.remove());
+
+const canvas = document.createElement('canvas');
+canvas.width = 16;
+canvas.height = 16;
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = '#1e293b';
+ctx.fillRect(0, 0, 16, 16);
+
+const swatches = [
+  '#ea580c',
+  '#ffffff',
+  '#f472b6',
+  '#1e293b',
+  '#b45309',
+  '#92400e',
+  '#f97316',
+  '#dc2626',
+  '#9a3412',
+  '#facc15'
+];
+swatches.forEach((hex, idx) => {
+  ctx.fillStyle = hex;
+  ctx.fillRect(idx, 0, 1, 1);
+});
+
+const tex = new Texture({ name: 'box_cat_palette' });
+tex.fromDataURL(canvas.toDataURL('image/png')).add(false);
+
+const cubesData = [{"name": "box_floor", "from": [-4.8, 0.0, -4.8], "to": [4.8, 0.8, 4.8], "color": "cardboard", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "box_wall_front", "from": [-5.0, 0.1, -5.0], "to": [5.0, 5.2, -4.2], "color": "cardboard", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "box_wall_back", "from": [-5.0, 0.1, 4.2], "to": [5.0, 5.2, 5.0], "color": "cardboard", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "box_wall_left", "from": [-4.95, 0.25, -4.5], "to": [-4.25, 5.05, 4.5], "color": "cardboard", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "box_wall_right", "from": [4.25, 0.25, -4.5], "to": [4.95, 5.05, 4.5], "color": "cardboard", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "box_flap_front", "from": [-4.6, 4.75, -6.4], "to": [4.6, 5.35, -4.7], "color": "boxFlap", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "box_flap_back", "from": [-4.6, 4.75, 4.7], "to": [4.6, 5.35, 6.4], "color": "boxFlap", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "box_flap_left", "from": [-6.4, 4.78, -4.3], "to": [-4.7, 5.38, 4.3], "color": "boxFlap", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "box_flap_right", "from": [4.7, 4.78, -4.3], "to": [6.4, 5.38, 4.3], "color": "boxFlap", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "tape_strip_base", "from": [-5.08, -0.04, -5.08], "to": [5.08, 0.45, -4.12], "color": "boxTape", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "shipping_label_white", "from": [0.4, 1.2, -5.18], "to": [3.8, 3.8, -4.92], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "fragile_stamp_red", "from": [0.8, 2.2, -5.26], "to": [2.2, 3.5, -5.05], "color": "deliveryRed", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "barcode_strip_dark", "from": [0.8, 1.45, -5.26], "to": [3.4, 1.95, -5.05], "color": "darkCharcoal", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "cat_torso_loaf", "from": [-3.6, 0.7, -3.6], "to": [3.6, 5.8, 3.6], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "cat_chest_bib", "from": [-2.2, 4.45, -4.1], "to": [2.2, 6.35, -3.1], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "cat_bib_tuft", "from": [-1.1, 4.25, -4.3], "to": [1.1, 5.55, -3.3], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "paw_left_arm", "from": [-3.2, 4.6, -4.4], "to": [-1.8, 5.85, -2.8], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "paw_left_mitten", "from": [-3.3, 4.88, -4.85], "to": [-1.7, 5.82, -3.85], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "paw_left_beans", "from": [-3.05, 4.62, -4.88], "to": [-1.95, 5.12, -4.15], "color": "nosePink", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "paw_right_arm", "from": [1.8, 4.6, -4.4], "to": [3.2, 5.85, -2.8], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "paw_right_mitten", "from": [1.7, 4.88, -4.85], "to": [3.3, 5.82, -3.85], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "paw_right_beans", "from": [1.95, 4.62, -4.88], "to": [3.05, 5.12, -4.15], "color": "nosePink", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "body_side_fluff_left", "from": [-4.3, 4.45, -2.5], "to": [-3.3, 5.75, 2.5], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_side_fluff_right", "from": [3.3, 4.45, -2.5], "to": [4.3, 5.75, 2.5], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_core", "from": [-3.2, 5.62, -2.6], "to": [3.2, 10.38, 2.8], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "cheek_fluff_left", "from": [-4.0, 5.82, -2.2], "to": [-2.85, 8.38, 1.8], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "cheek_fluff_right", "from": [2.85, 5.82, -2.2], "to": [4.0, 8.38, 1.8], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "muzzle_snout_white", "from": [-1.8, 6.02, -3.8], "to": [1.8, 7.98, -2.25], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "chin_under_mouth", "from": [-1.2, 5.38, -3.38], "to": [1.2, 6.38, -2.32], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "nose_pink_button", "from": [-0.5, 7.12, -3.98], "to": [0.5, 7.78, -3.22], "color": "nosePink", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "forehead_stripe_mid", "from": [-0.5, 8.22, -2.98], "to": [0.5, 10.58, -1.82], "color": "catStripe", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "forehead_stripe_left", "from": [-2.15, 8.42, -2.88], "to": [-1.15, 10.18, -1.92], "color": "catStripe", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "forehead_stripe_right", "from": [1.15, 8.42, -2.88], "to": [2.15, 10.18, -1.92], "color": "catStripe", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "eye_left_iris", "from": [-2.5, 7.38, -2.95], "to": [-1.1, 8.92, -2.42], "color": "catEye", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "eye_left_pupil", "from": [-2.2, 7.48, -3.05], "to": [-1.3, 8.82, -2.5], "color": "darkCharcoal", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "eye_left_sparkle", "from": [-2.4, 8.22, -3.15], "to": [-1.7, 8.78, -2.58], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "eye_right_iris", "from": [1.1, 7.38, -2.95], "to": [2.5, 8.92, -2.42], "color": "catEye", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "eye_right_pupil", "from": [1.3, 7.48, -3.05], "to": [2.2, 8.82, -2.5], "color": "darkCharcoal", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "eye_right_sparkle", "from": [1.7, 8.22, -3.15], "to": [2.4, 8.78, -2.45], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "head_crown_top", "from": [-2.4, 10.22, -2.0], "to": [2.4, 10.98, 2.0], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "cheek_stripe_left", "from": [-3.95, 6.78, -2.08], "to": [-3.05, 7.78, -0.58], "color": "catStripe", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "cheek_stripe_right", "from": [3.05, 6.78, -2.08], "to": [3.95, 7.78, -0.58], "color": "catStripe", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "ear_base_left", "from": [-3.0, 10.18, -1.6], "to": [-1.4, 12.18, 0.6], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "ear_tip_left", "from": [-2.7, 11.98, -1.3], "to": [-1.7, 13.38, 0.3], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "ear_pink_left", "from": [-2.6, 10.25, -1.88], "to": [-1.6, 11.85, -1.28], "color": "nosePink", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "ear_base_right", "from": [1.4, 10.18, -1.6], "to": [3.0, 12.18, 0.6], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "ear_tip_right", "from": [1.7, 11.98, -1.3], "to": [2.7, 13.38, 0.3], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "ear_pink_right", "from": [1.6, 10.25, -1.88], "to": [2.6, 11.85, -1.28], "color": "nosePink", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "tail_base", "from": [0.6, 3.6, 2.8], "to": [1.8, 5.0, 4.05], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tail_over_rim", "from": [0.75, 4.85, 3.8], "to": [1.95, 6.15, 5.15], "color": "catStripe", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "tail_arch_back", "from": [0.9, 5.85, 4.4], "to": [2.1, 7.25, 5.6], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tail_curve_up", "from": [0.75, 6.95, 4.2], "to": [1.95, 8.35, 5.4], "color": "catStripe", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "tail_hook_front", "from": [0.55, 7.85, 3.4], "to": [1.75, 8.95, 4.6], "color": "catOrange", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tail_tip_white", "from": [0.35, 7.35, 2.6], "to": [1.55, 8.55, 3.8], "color": "white", "col_idx": 1, "uv": [1, 0, 2, 1]}];
+
+Undo.initEdit({ elements: [] });
+
+cubesData.forEach(d => {
+  const cube = new Cube({
+    name: d.name,
+    from: d.from,
+    to: d.to,
+    faces: {
+      north: { uv: d.uv, texture: tex.uuid },
+      east:  { uv: d.uv, texture: tex.uuid },
+      south: { uv: d.uv, texture: tex.uuid },
+      west:  { uv: d.uv, texture: tex.uuid },
+      up:    { uv: d.uv, texture: tex.uuid },
+      down:  { uv: d.uv, texture: tex.uuid }
+    }
+  });
+  cube.init();
+});
+
+Undo.finishEdit('Zero Z-Fighting Box Cat V2 (Snug Paws & Curved Tail)');
+Canvas.updateAll();
+
+return {
+  cubesCount: Cube.all.length,
+  textureName: tex.name
+};

@@ -1,0 +1,772 @@
+[
+  {
+    "name": "foot_base_left",
+    "from": [
+      -2.25,
+      0.04,
+      -0.65
+    ],
+    "to": [
+      -1.45,
+      0.45,
+      0.85
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "leg_shank_left",
+    "from": [
+      -2.05,
+      0.35,
+      -0.15
+    ],
+    "to": [
+      -1.65,
+      2.55,
+      0.35
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "toe_mid_left",
+    "from": [
+      -2.0,
+      0.0,
+      -1.85
+    ],
+    "to": [
+      -1.7,
+      0.32,
+      -0.55
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "toe_outer_left",
+    "from": [
+      -2.65,
+      0.0,
+      -1.55
+    ],
+    "to": [
+      -2.15,
+      0.3,
+      -0.45
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "toe_inner_left",
+    "from": [
+      -1.55,
+      0.0,
+      -1.55
+    ],
+    "to": [
+      -1.05,
+      0.3,
+      -0.45
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "foot_base_right",
+    "from": [
+      1.45,
+      0.04,
+      -0.65
+    ],
+    "to": [
+      2.25,
+      0.45,
+      0.85
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "leg_shank_right",
+    "from": [
+      1.65,
+      0.35,
+      -0.15
+    ],
+    "to": [
+      2.05,
+      2.55,
+      0.35
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "toe_mid_right",
+    "from": [
+      1.7,
+      0.0,
+      -1.85
+    ],
+    "to": [
+      2.0,
+      0.32,
+      -0.55
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "toe_outer_right",
+    "from": [
+      2.15,
+      0.0,
+      -1.55
+    ],
+    "to": [
+      2.65,
+      0.3,
+      -0.45
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "toe_inner_right",
+    "from": [
+      1.05,
+      0.0,
+      -1.55
+    ],
+    "to": [
+      1.55,
+      0.3,
+      -0.45
+    ],
+    "color": "pigeonFootRed"
+  },
+  {
+    "name": "thigh_fluff_left",
+    "from": [
+      -2.35,
+      2.35,
+      -0.45
+    ],
+    "to": [
+      -1.35,
+      3.45,
+      0.65
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "thigh_fluff_right",
+    "from": [
+      1.35,
+      2.35,
+      -0.45
+    ],
+    "to": [
+      2.35,
+      3.45,
+      0.65
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "body_lower_belly",
+    "from": [
+      -2.65,
+      3.25,
+      -1.85
+    ],
+    "to": [
+      2.65,
+      4.45,
+      2.15
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "body_core_loaf",
+    "from": [
+      -2.55,
+      4.35,
+      -1.65
+    ],
+    "to": [
+      2.55,
+      7.35,
+      2.35
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "breast_puff_main",
+    "from": [
+      -2.25,
+      4.75,
+      -2.45
+    ],
+    "to": [
+      2.25,
+      7.25,
+      -1.55
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "breast_puff_upper",
+    "from": [
+      -1.75,
+      6.75,
+      -2.75
+    ],
+    "to": [
+      1.75,
+      8.45,
+      -1.85
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "tail_fan_upper",
+    "from": [
+      -1.35,
+      3.75,
+      2.25
+    ],
+    "to": [
+      1.35,
+      4.85,
+      4.15
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "tail_fan_tip",
+    "from": [
+      -1.05,
+      3.55,
+      4.05
+    ],
+    "to": [
+      1.05,
+      4.35,
+      5.25
+    ],
+    "color": "featherShade"
+  },
+  {
+    "name": "wing_left_upper",
+    "from": [
+      -2.95,
+      4.55,
+      -0.55
+    ],
+    "to": [
+      -2.45,
+      6.95,
+      1.95
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "wing_left_primaries",
+    "from": [
+      -2.85,
+      3.75,
+      1.35
+    ],
+    "to": [
+      -2.25,
+      4.75,
+      3.35
+    ],
+    "color": "featherShade"
+  },
+  {
+    "name": "wing_right_upper",
+    "from": [
+      2.45,
+      4.55,
+      -0.55
+    ],
+    "to": [
+      2.95,
+      6.95,
+      1.95
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "wing_right_primaries",
+    "from": [
+      2.25,
+      3.75,
+      1.35
+    ],
+    "to": [
+      2.85,
+      4.75,
+      3.35
+    ],
+    "color": "featherShade"
+  },
+  {
+    "name": "mantle_train_back",
+    "from": [
+      -2.35,
+      3.45,
+      2.3
+    ],
+    "to": [
+      2.35,
+      7.45,
+      2.75
+    ],
+    "color": "mantleRed"
+  },
+  {
+    "name": "mantle_shoulder_left",
+    "from": [
+      -2.75,
+      6.85,
+      -1.35
+    ],
+    "to": [
+      -2.25,
+      7.85,
+      1.8
+    ],
+    "color": "mantleRed"
+  },
+  {
+    "name": "mantle_shoulder_right",
+    "from": [
+      2.25,
+      6.85,
+      -1.35
+    ],
+    "to": [
+      2.75,
+      7.85,
+      1.8
+    ],
+    "color": "mantleRed"
+  },
+  {
+    "name": "ermine_collar_ring",
+    "from": [
+      -2.45,
+      7.7,
+      -1.65
+    ],
+    "to": [
+      2.45,
+      8.55,
+      1.85
+    ],
+    "color": "ermineFur"
+  },
+  {
+    "name": "ermine_lapel_left",
+    "from": [
+      -2.15,
+      6.25,
+      -2.25
+    ],
+    "to": [
+      -1.45,
+      7.75,
+      -1.6
+    ],
+    "color": "ermineFur"
+  },
+  {
+    "name": "ermine_lapel_right",
+    "from": [
+      1.45,
+      6.25,
+      -2.25
+    ],
+    "to": [
+      2.15,
+      7.75,
+      -1.6
+    ],
+    "color": "ermineFur"
+  },
+  {
+    "name": "ermine_spot_left",
+    "from": [
+      -1.95,
+      6.55,
+      -2.35
+    ],
+    "to": [
+      -1.65,
+      7.15,
+      -2.15
+    ],
+    "color": "ermineSpot"
+  },
+  {
+    "name": "ermine_spot_right",
+    "from": [
+      1.65,
+      6.55,
+      -2.35
+    ],
+    "to": [
+      1.95,
+      7.15,
+      -2.15
+    ],
+    "color": "ermineSpot"
+  },
+  {
+    "name": "mantle_gold_clasp",
+    "from": [
+      -0.55,
+      7.35,
+      -2.35
+    ],
+    "to": [
+      0.55,
+      7.95,
+      -1.95
+    ],
+    "color": "crownGold"
+  },
+  {
+    "name": "mantle_ruby_gem",
+    "from": [
+      -0.25,
+      7.45,
+      -2.48
+    ],
+    "to": [
+      0.25,
+      7.85,
+      -2.28
+    ],
+    "color": "royalRuby"
+  },
+  {
+    "name": "neck_pigeon",
+    "from": [
+      -1.35,
+      7.65,
+      -1.25
+    ],
+    "to": [
+      1.35,
+      8.95,
+      0.95
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "head_core",
+    "from": [
+      -1.55,
+      8.65,
+      -1.85
+    ],
+    "to": [
+      1.55,
+      10.95,
+      1.05
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "cheek_fluff_left",
+    "from": [
+      -1.85,
+      8.75,
+      -1.55
+    ],
+    "to": [
+      -1.45,
+      9.95,
+      0.55
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "cheek_fluff_right",
+    "from": [
+      1.45,
+      8.75,
+      -1.55
+    ],
+    "to": [
+      1.85,
+      9.95,
+      0.55
+    ],
+    "color": "featherPureWhite"
+  },
+  {
+    "name": "beak_base",
+    "from": [
+      -0.55,
+      8.95,
+      -3.15
+    ],
+    "to": [
+      0.55,
+      9.65,
+      -1.75
+    ],
+    "color": "pigeonBeak"
+  },
+  {
+    "name": "beak_tip",
+    "from": [
+      -0.35,
+      8.85,
+      -3.95
+    ],
+    "to": [
+      0.35,
+      9.45,
+      -3.05
+    ],
+    "color": "pigeonBeak"
+  },
+  {
+    "name": "beak_cere_white",
+    "from": [
+      -0.45,
+      9.55,
+      -2.85
+    ],
+    "to": [
+      0.45,
+      9.95,
+      -1.8
+    ],
+    "color": "beakCereWhite"
+  },
+  {
+    "name": "beak_lower_mandible",
+    "from": [
+      -0.4,
+      8.6,
+      -3.45
+    ],
+    "to": [
+      0.4,
+      9.05,
+      -1.8
+    ],
+    "color": "pigeonBeak"
+  },
+  {
+    "name": "eye_left",
+    "from": [
+      -1.65,
+      9.55,
+      -1.65
+    ],
+    "to": [
+      -1.05,
+      10.35,
+      -0.95
+    ],
+    "color": "eyeAmber"
+  },
+  {
+    "name": "eye_right",
+    "from": [
+      1.05,
+      9.55,
+      -1.65
+    ],
+    "to": [
+      1.65,
+      10.35,
+      -0.95
+    ],
+    "color": "eyeAmber"
+  },
+  {
+    "name": "sparkle_left",
+    "from": [
+      -1.5,
+      9.85,
+      -1.75
+    ],
+    "to": [
+      -1.2,
+      10.15,
+      -1.45
+    ],
+    "color": "sparkleWhite"
+  },
+  {
+    "name": "sparkle_right",
+    "from": [
+      1.2,
+      9.85,
+      -1.75
+    ],
+    "to": [
+      1.5,
+      10.15,
+      -1.45
+    ],
+    "color": "sparkleWhite"
+  },
+  {
+    "name": "crown_band",
+    "from": [
+      -1.68,
+      10.75,
+      -1.75
+    ],
+    "to": [
+      1.68,
+      11.35,
+      1.15
+    ],
+    "color": "crownGold"
+  },
+  {
+    "name": "crown_peak_front",
+    "from": [
+      -0.55,
+      11.25,
+      -1.85
+    ],
+    "to": [
+      0.55,
+      12.55,
+      -1.15
+    ],
+    "color": "crownGold"
+  },
+  {
+    "name": "crown_peak_rear",
+    "from": [
+      -0.55,
+      11.25,
+      0.45
+    ],
+    "to": [
+      0.55,
+      12.35,
+      1.22
+    ],
+    "color": "crownGold"
+  },
+  {
+    "name": "crown_prong_left",
+    "from": [
+      -1.78,
+      11.25,
+      -0.55
+    ],
+    "to": [
+      -1.08,
+      12.25,
+      0.45
+    ],
+    "color": "crownGold"
+  },
+  {
+    "name": "crown_prong_right",
+    "from": [
+      1.08,
+      11.25,
+      -0.55
+    ],
+    "to": [
+      1.78,
+      12.25,
+      0.45
+    ],
+    "color": "crownGold"
+  },
+  {
+    "name": "crown_gem_ruby",
+    "from": [
+      -0.25,
+      11.55,
+      -1.98
+    ],
+    "to": [
+      0.25,
+      12.05,
+      -1.75
+    ],
+    "color": "royalRuby"
+  },
+  {
+    "name": "croissant_center",
+    "from": [
+      -0.95,
+      5.35,
+      -3.45
+    ],
+    "to": [
+      0.95,
+      6.45,
+      -2.5
+    ],
+    "color": "croissantGold"
+  },
+  {
+    "name": "croissant_horn_left",
+    "from": [
+      -1.65,
+      5.75,
+      -3.15
+    ],
+    "to": [
+      -0.85,
+      6.55,
+      -2.3
+    ],
+    "color": "croissantGold"
+  },
+  {
+    "name": "croissant_horn_right",
+    "from": [
+      0.85,
+      5.75,
+      -3.15
+    ],
+    "to": [
+      1.65,
+      6.55,
+      -2.3
+    ],
+    "color": "croissantGold"
+  },
+  {
+    "name": "croissant_crust_ridge",
+    "from": [
+      -0.75,
+      6.35,
+      -3.25
+    ],
+    "to": [
+      0.75,
+      6.7,
+      -2.65
+    ],
+    "color": "croissantCrust"
+  },
+  {
+    "name": "croissant_highlight",
+    "from": [
+      -0.55,
+      6.65,
+      -3.15
+    ],
+    "to": [
+      0.55,
+      6.95,
+      -2.78
+    ],
+    "color": "croissantHighlight"
+  }
+]

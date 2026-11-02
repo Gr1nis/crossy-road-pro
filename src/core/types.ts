@@ -30,18 +30,28 @@ export type DeathReasonValue = (typeof DeathReason)[keyof typeof DeathReason];
 export type SkinId =
   | 'corgi'
   | 'pigeon_pizza'
+  | 'barista_pug'
+  | 'skater_ferret'
   | 'box_cat'
+  | 'subway_rat'
   | 'raccoon_bandit'
-  | 'capybara_zen';
+  | 'raincoat_duck'
+  | 'capybara_zen'
+  | 'pigeon_king';
 
 export const DEFAULT_SKIN_ID: SkinId = 'corgi';
 
 export const ALL_SKINS: ReadonlyArray<{ id: SkinId; name: string; badge: string }> = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
+  { id: 'barista_pug', name: 'Бариста-Мопс', badge: '☕' },
+  { id: 'skater_ferret', name: 'Скейт-Хорёк', badge: '🛹' },
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
+  { id: 'subway_rat', name: 'Крыса-Метро', badge: '🍩' },
   { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
+  { id: 'raincoat_duck', name: 'Утка в дождевике', badge: '🦆' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
+  { id: 'pigeon_king', name: 'Голубиный Барон', badge: '👑' },
 ];
 
 export const Biome = {

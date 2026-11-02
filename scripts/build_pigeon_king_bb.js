@@ -1,0 +1,70 @@
+
+Cube.all.slice().forEach(c => c.remove());
+Group.all.slice().forEach(g => g.remove());
+Texture.all.slice().forEach(t => t.remove());
+
+Project.texture_width = 16;
+Project.texture_height = 16;
+
+const canvas = document.createElement('canvas');
+canvas.width = 16;
+canvas.height = 16;
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = '#0f172a';
+ctx.fillRect(0, 0, 16, 16);
+
+const swatches = ["#ffffff", "#e2e8f0", "#fde047", "#ffffff", "#f43f5e", "#f59e0b", "#09090b", "#ffffff", "#991b1b", "#f8fafc", "#0f172a", "#facc15", "#ca8a04", "#dc2626", "#2563eb", "#d97706", "#b45309", "#fde68a"];
+swatches.forEach((hex, idx) => {
+  ctx.fillStyle = hex;
+  if (idx < 16) {
+    ctx.fillRect(idx, 0, 1, 1);
+  } else {
+    ctx.fillRect(idx - 16, 1, 1, 1);
+  }
+});
+
+const tex = new Texture({ name: 'pigeon_king_palette' });
+tex.fromDataURL(canvas.toDataURL('image/png')).add(false);
+
+const groupDefs = ["legs", "body", "wings", "mantle", "head", "crown", "croissant"];
+const groups = {};
+groupDefs.forEach(name => {
+  groups[name] = new Group({ name: name }).init();
+});
+
+const cubesData = [{"name": "foot_base_left", "group": "legs", "from": [-2.25, 0.04, -0.65], "to": [-1.45, 0.45, 0.85], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "leg_shank_left", "group": "legs", "from": [-2.05, 0.35, -0.15], "to": [-1.65, 2.55, 0.35], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "toe_mid_left", "group": "legs", "from": [-2.0, 0.0, -1.85], "to": [-1.7, 0.32, -0.55], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "toe_outer_left", "group": "legs", "from": [-2.65, 0.0, -1.55], "to": [-2.15, 0.3, -0.45], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "toe_inner_left", "group": "legs", "from": [-1.55, 0.0, -1.55], "to": [-1.05, 0.3, -0.45], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "foot_base_right", "group": "legs", "from": [1.45, 0.04, -0.65], "to": [2.25, 0.45, 0.85], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "leg_shank_right", "group": "legs", "from": [1.65, 0.35, -0.15], "to": [2.05, 2.55, 0.35], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "toe_mid_right", "group": "legs", "from": [1.7, 0.0, -1.85], "to": [2.0, 0.32, -0.55], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "toe_outer_right", "group": "legs", "from": [2.15, 0.0, -1.55], "to": [2.65, 0.3, -0.45], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "toe_inner_right", "group": "legs", "from": [1.05, 0.0, -1.55], "to": [1.55, 0.3, -0.45], "color": "pigeonFootRed", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "thigh_fluff_left", "group": "body", "from": [-2.35, 2.35, -0.45], "to": [-1.35, 3.45, 0.65], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "thigh_fluff_right", "group": "body", "from": [1.35, 2.35, -0.45], "to": [2.35, 3.45, 0.65], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_lower_belly", "group": "body", "from": [-2.65, 3.25, -1.85], "to": [2.65, 4.45, 2.15], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_core_loaf", "group": "body", "from": [-2.55, 4.35, -1.65], "to": [2.55, 7.35, 2.35], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "breast_puff_main", "group": "body", "from": [-2.25, 4.75, -2.45], "to": [2.25, 7.25, -1.55], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "breast_puff_upper", "group": "body", "from": [-1.75, 6.75, -2.75], "to": [1.75, 8.45, -1.85], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tail_fan_upper", "group": "body", "from": [-1.35, 3.75, 2.25], "to": [1.35, 4.85, 4.15], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tail_fan_tip", "group": "body", "from": [-1.05, 3.55, 4.05], "to": [1.05, 4.35, 5.25], "color": "featherShade", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "wing_left_upper", "group": "wings", "from": [-2.95, 4.55, -0.55], "to": [-2.45, 6.95, 1.95], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_left_primaries", "group": "wings", "from": [-2.85, 3.75, 1.35], "to": [-2.25, 4.75, 3.35], "color": "featherShade", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "wing_right_upper", "group": "wings", "from": [2.45, 4.55, -0.55], "to": [2.95, 6.95, 1.95], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_right_primaries", "group": "wings", "from": [2.25, 3.75, 1.35], "to": [2.85, 4.75, 3.35], "color": "featherShade", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "mantle_train_back", "group": "mantle", "from": [-2.35, 3.45, 2.3], "to": [2.35, 7.45, 2.75], "color": "mantleRed", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "mantle_shoulder_left", "group": "mantle", "from": [-2.75, 6.85, -1.35], "to": [-2.25, 7.85, 1.8], "color": "mantleRed", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "mantle_shoulder_right", "group": "mantle", "from": [2.25, 6.85, -1.35], "to": [2.75, 7.85, 1.8], "color": "mantleRed", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "ermine_collar_ring", "group": "mantle", "from": [-2.45, 7.7, -1.65], "to": [2.45, 8.55, 1.85], "color": "ermineFur", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "ermine_lapel_left", "group": "mantle", "from": [-2.15, 6.25, -2.25], "to": [-1.45, 7.75, -1.6], "color": "ermineFur", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "ermine_lapel_right", "group": "mantle", "from": [1.45, 6.25, -2.25], "to": [2.15, 7.75, -1.6], "color": "ermineFur", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "ermine_spot_left", "group": "mantle", "from": [-1.95, 6.55, -2.35], "to": [-1.65, 7.15, -2.15], "color": "ermineSpot", "col_idx": 10, "uv": [10, 0, 11, 1]}, {"name": "ermine_spot_right", "group": "mantle", "from": [1.65, 6.55, -2.35], "to": [1.95, 7.15, -2.15], "color": "ermineSpot", "col_idx": 10, "uv": [10, 0, 11, 1]}, {"name": "mantle_gold_clasp", "group": "mantle", "from": [-0.55, 7.35, -2.35], "to": [0.55, 7.95, -1.95], "color": "crownGold", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "mantle_ruby_gem", "group": "mantle", "from": [-0.25, 7.45, -2.48], "to": [0.25, 7.85, -2.28], "color": "royalRuby", "col_idx": 13, "uv": [13, 0, 14, 1]}, {"name": "neck_pigeon", "group": "head", "from": [-1.35, 7.65, -1.25], "to": [1.35, 8.95, 0.95], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_core", "group": "head", "from": [-1.55, 8.65, -1.85], "to": [1.55, 10.95, 1.05], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "cheek_fluff_left", "group": "head", "from": [-1.85, 8.75, -1.55], "to": [-1.45, 9.95, 0.55], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "cheek_fluff_right", "group": "head", "from": [1.45, 8.75, -1.55], "to": [1.85, 9.95, 0.55], "color": "featherPureWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "beak_base", "group": "head", "from": [-0.55, 8.95, -3.15], "to": [0.55, 9.65, -1.75], "color": "pigeonBeak", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "beak_tip", "group": "head", "from": [-0.35, 8.85, -3.95], "to": [0.35, 9.45, -3.05], "color": "pigeonBeak", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "beak_cere_white", "group": "head", "from": [-0.45, 9.55, -2.85], "to": [0.45, 9.95, -1.8], "color": "beakCereWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "beak_lower_mandible", "group": "head", "from": [-0.4, 8.6, -3.45], "to": [0.4, 9.05, -1.8], "color": "pigeonBeak", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "eye_left", "group": "head", "from": [-1.65, 9.55, -1.65], "to": [-1.05, 10.35, -0.95], "color": "eyeAmber", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "eye_right", "group": "head", "from": [1.05, 9.55, -1.65], "to": [1.65, 10.35, -0.95], "color": "eyeAmber", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "sparkle_left", "group": "head", "from": [-1.5, 9.85, -1.75], "to": [-1.2, 10.15, -1.45], "color": "sparkleWhite", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "sparkle_right", "group": "head", "from": [1.2, 9.85, -1.75], "to": [1.5, 10.15, -1.45], "color": "sparkleWhite", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "crown_band", "group": "crown", "from": [-1.68, 10.75, -1.75], "to": [1.68, 11.35, 1.15], "color": "crownGold", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "crown_peak_front", "group": "crown", "from": [-0.55, 11.25, -1.85], "to": [0.55, 12.55, -1.15], "color": "crownGold", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "crown_peak_rear", "group": "crown", "from": [-0.55, 11.25, 0.45], "to": [0.55, 12.35, 1.22], "color": "crownGold", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "crown_prong_left", "group": "crown", "from": [-1.78, 11.25, -0.55], "to": [-1.08, 12.25, 0.45], "color": "crownGold", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "crown_prong_right", "group": "crown", "from": [1.08, 11.25, -0.55], "to": [1.78, 12.25, 0.45], "color": "crownGold", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "crown_gem_ruby", "group": "crown", "from": [-0.25, 11.55, -1.98], "to": [0.25, 12.05, -1.75], "color": "royalRuby", "col_idx": 13, "uv": [13, 0, 14, 1]}, {"name": "croissant_center", "group": "croissant", "from": [-0.95, 5.35, -3.45], "to": [0.95, 6.45, -2.5], "color": "croissantGold", "col_idx": 15, "uv": [15, 0, 16, 1]}, {"name": "croissant_horn_left", "group": "croissant", "from": [-1.65, 5.75, -3.15], "to": [-0.85, 6.55, -2.3], "color": "croissantGold", "col_idx": 15, "uv": [15, 0, 16, 1]}, {"name": "croissant_horn_right", "group": "croissant", "from": [0.85, 5.75, -3.15], "to": [1.65, 6.55, -2.3], "color": "croissantGold", "col_idx": 15, "uv": [15, 0, 16, 1]}, {"name": "croissant_crust_ridge", "group": "croissant", "from": [-0.75, 6.35, -3.25], "to": [0.75, 6.7, -2.65], "color": "croissantCrust", "col_idx": 16, "uv": [0, 1, 1, 2]}, {"name": "croissant_highlight", "group": "croissant", "from": [-0.55, 6.65, -3.15], "to": [0.55, 6.95, -2.78], "color": "croissantHighlight", "col_idx": 17, "uv": [1, 1, 2, 2]}];
+
+Undo.initEdit({ elements: [], groups: [] });
+
+cubesData.forEach(d => {
+  const cube = new Cube({
+    name: d.name,
+    from: d.from,
+    to: d.to,
+    faces: {
+      north: { uv: d.uv, texture: tex.uuid },
+      east:  { uv: d.uv, texture: tex.uuid },
+      south: { uv: d.uv, texture: tex.uuid },
+      west:  { uv: d.uv, texture: tex.uuid },
+      up:    { uv: d.uv, texture: tex.uuid },
+      down:  { uv: d.uv, texture: tex.uuid }
+    }
+  });
+  cube.init();
+  if (groups[d.group]) {
+    cube.addTo(groups[d.group]);
+  }
+});
+
+Undo.finishEdit('Pigeon King V1.0 Monolithic & Grouped');
+Canvas.updateAll();
+
+const modelData = Format.codec.compile();
+Blockbench.writeFile('/Users/egorbelogubec/Downloads/GitHub/Crossy road pro/assets/models/pigeon_king.bbmodel', { content: modelData });
+
+return {
+  cubesCount: Cube.all.length,
+  groupsCount: Group.all.length,
+  textureName: tex.name,
+  savedPath: '/Users/egorbelogubec/Downloads/GitHub/Crossy road pro/assets/models/pigeon_king.bbmodel'
+};

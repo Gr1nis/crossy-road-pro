@@ -24,9 +24,14 @@ export interface ModelCatalogItem {
 const SKIN_DESCRIPTIONS: Record<SkinId, string> = {
   corgi: 'Главный маскот игры. Озорной рыже-белый корги с розовыми подушечками лап, торчащими ушками и ошейником с золотым жетоном.',
   pigeon_pizza: 'Городской голубь с переливающейся фиолетово-бирюзовой шеей и аппетитным ломтиком пиццы с пепперони.',
+  barista_pug: 'Мопс в тёмно-зелёном фартуке с воксельным стаканчиком латте и белой пенкой.',
+  skater_ferret: 'Шустрый гибкий хорёк в кепке козырьком назад, прыгающий на мини-скейтборде.',
   box_cat: 'Рыжий котик в посылочной коробке со штампом "FRAGILE / DELIVERY", свесивший лапки через бортик.',
+  subway_rat: 'Серая городская крыса в ретро-наушниках и с целым кунжутным бейглом в лапках.',
   raccoon_bandit: 'Городской енот-воришка в чёрной бандитской маске с кольчатым хвостом и холщовым мешком за спиной.',
+  raincoat_duck: 'Белая уточка в ярко-жёлтом непромокаемом дождевике с капюшоном и синих сапожках.',
   capybara_zen: 'Умиротворённая дзен-капибара в медитативной позе со спелым воксельным мандарином на голове.',
+  pigeon_king: 'Напыщенный белоснежный голубь в золотой короне, мантии с горностаем и царским рубиновым орденом.',
 };
 
 export function getCharacterModelItems(): ModelCatalogItem[] {
@@ -262,9 +267,7 @@ export function getModelDiagnostics(group: THREE.Group): { meshCount: number; di
 }
 
 export function verifyModelRegistry(): {
-  total: number;
-  countsByCategory: Record<string, number>;
-  errors: string[];
+  total: number; countsByCategory: Record<string, number>; errors: string[];
 } {
   const catalog = getModelCatalog();
   const countsByCategory: Record<string, number> = {};

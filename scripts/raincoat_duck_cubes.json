@@ -1,0 +1,688 @@
+[
+  {
+    "name": "boot_sole_left",
+    "from": [
+      -2.45,
+      0.0,
+      -1.95
+    ],
+    "to": [
+      -0.95,
+      0.65,
+      1.25
+    ],
+    "color": "bootSole"
+  },
+  {
+    "name": "boot_sole_right",
+    "from": [
+      0.95,
+      0.0,
+      -1.95
+    ],
+    "to": [
+      2.45,
+      0.65,
+      1.25
+    ],
+    "color": "bootSole"
+  },
+  {
+    "name": "boot_vamp_left",
+    "from": [
+      -2.35,
+      0.55,
+      -1.85
+    ],
+    "to": [
+      -1.05,
+      1.65,
+      1.05
+    ],
+    "color": "bootBlue"
+  },
+  {
+    "name": "boot_vamp_right",
+    "from": [
+      1.05,
+      0.55,
+      -1.85
+    ],
+    "to": [
+      2.35,
+      1.65,
+      1.05
+    ],
+    "color": "bootBlue"
+  },
+  {
+    "name": "boot_shaft_left",
+    "from": [
+      -2.15,
+      1.55,
+      -0.95
+    ],
+    "to": [
+      -1.25,
+      2.85,
+      0.75
+    ],
+    "color": "bootBlue"
+  },
+  {
+    "name": "boot_shaft_right",
+    "from": [
+      1.25,
+      1.55,
+      -0.95
+    ],
+    "to": [
+      2.15,
+      2.85,
+      0.75
+    ],
+    "color": "bootBlue"
+  },
+  {
+    "name": "boot_rim_left",
+    "from": [
+      -2.25,
+      2.75,
+      -1.05
+    ],
+    "to": [
+      -1.15,
+      3.15,
+      0.85
+    ],
+    "color": "bootRim"
+  },
+  {
+    "name": "boot_rim_right",
+    "from": [
+      1.15,
+      2.75,
+      -1.05
+    ],
+    "to": [
+      2.25,
+      3.15,
+      0.85
+    ],
+    "color": "bootRim"
+  },
+  {
+    "name": "leg_left",
+    "from": [
+      -1.95,
+      2.95,
+      -0.65
+    ],
+    "to": [
+      -1.45,
+      3.95,
+      0.45
+    ],
+    "color": "duckOrange"
+  },
+  {
+    "name": "leg_right",
+    "from": [
+      1.45,
+      2.95,
+      -0.65
+    ],
+    "to": [
+      1.95,
+      3.95,
+      0.45
+    ],
+    "color": "duckOrange"
+  },
+  {
+    "name": "raincoat_hem",
+    "from": [
+      -2.45,
+      3.75,
+      -1.95
+    ],
+    "to": [
+      2.45,
+      4.55,
+      2.45
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "raincoat_body",
+    "from": [
+      -2.25,
+      4.45,
+      -1.75
+    ],
+    "to": [
+      2.25,
+      7.25,
+      2.15
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "coat_placket_strip",
+    "from": [
+      -0.35,
+      4.25,
+      -2.05
+    ],
+    "to": [
+      0.35,
+      7.15,
+      -1.7
+    ],
+    "color": "coatAccent"
+  },
+  {
+    "name": "toggle_button_1",
+    "from": [
+      -0.25,
+      4.65,
+      -2.25
+    ],
+    "to": [
+      0.25,
+      5.15,
+      -1.95
+    ],
+    "color": "toggleDark"
+  },
+  {
+    "name": "toggle_button_2",
+    "from": [
+      -0.25,
+      5.65,
+      -2.25
+    ],
+    "to": [
+      0.25,
+      6.15,
+      -1.95
+    ],
+    "color": "toggleDark"
+  },
+  {
+    "name": "toggle_button_3",
+    "from": [
+      -0.25,
+      6.55,
+      -2.25
+    ],
+    "to": [
+      0.25,
+      7.05,
+      -1.95
+    ],
+    "color": "toggleDark"
+  },
+  {
+    "name": "pocket_left",
+    "from": [
+      -2.35,
+      4.62,
+      -1.85
+    ],
+    "to": [
+      -1.45,
+      5.45,
+      -1.05
+    ],
+    "color": "coatAccent"
+  },
+  {
+    "name": "pocket_right",
+    "from": [
+      1.45,
+      4.62,
+      -1.85
+    ],
+    "to": [
+      2.35,
+      5.45,
+      -1.05
+    ],
+    "color": "coatAccent"
+  },
+  {
+    "name": "coat_belt_back",
+    "from": [
+      -1.85,
+      4.85,
+      2.05
+    ],
+    "to": [
+      1.85,
+      5.55,
+      2.35
+    ],
+    "color": "coatAccent"
+  },
+  {
+    "name": "coat_belt_buckle",
+    "from": [
+      -0.45,
+      4.95,
+      2.25
+    ],
+    "to": [
+      0.45,
+      5.45,
+      2.55
+    ],
+    "color": "toggleDark"
+  },
+  {
+    "name": "sleeve_left",
+    "from": [
+      -2.75,
+      4.85,
+      -1.15
+    ],
+    "to": [
+      -2.15,
+      6.75,
+      1.15
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "sleeve_right",
+    "from": [
+      2.15,
+      4.85,
+      -1.15
+    ],
+    "to": [
+      2.75,
+      6.75,
+      1.15
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "wingtip_left",
+    "from": [
+      -2.65,
+      4.15,
+      -0.85
+    ],
+    "to": [
+      -2.28,
+      4.95,
+      0.85
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "wingtip_right",
+    "from": [
+      2.28,
+      4.15,
+      -0.85
+    ],
+    "to": [
+      2.65,
+      4.95,
+      0.85
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "tail_base",
+    "from": [
+      -0.85,
+      4.75,
+      2.1
+    ],
+    "to": [
+      0.85,
+      5.85,
+      3.15
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "tail_curl_tip",
+    "from": [
+      -0.55,
+      5.65,
+      2.85
+    ],
+    "to": [
+      0.55,
+      6.75,
+      3.85
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "neck_duck",
+    "from": [
+      -1.55,
+      7.05,
+      -1.35
+    ],
+    "to": [
+      1.55,
+      8.2,
+      1.05
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "raincoat_collar",
+    "from": [
+      -1.85,
+      6.95,
+      -1.65
+    ],
+    "to": [
+      1.85,
+      7.65,
+      1.35
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "head_core",
+    "from": [
+      -1.85,
+      7.85,
+      -2.15
+    ],
+    "to": [
+      1.85,
+      10.65,
+      1.35
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "cheek_fluff_left",
+    "from": [
+      -2.15,
+      7.95,
+      -1.85
+    ],
+    "to": [
+      -1.65,
+      9.35,
+      0.75
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "cheek_fluff_right",
+    "from": [
+      1.65,
+      7.95,
+      -1.85
+    ],
+    "to": [
+      2.15,
+      9.35,
+      0.75
+    ],
+    "color": "featherWhite"
+  },
+  {
+    "name": "bill_base",
+    "from": [
+      -1.25,
+      7.8,
+      -3.65
+    ],
+    "to": [
+      1.25,
+      8.85,
+      -1.95
+    ],
+    "color": "duckOrange"
+  },
+  {
+    "name": "bill_tip",
+    "from": [
+      -1.05,
+      7.95,
+      -4.55
+    ],
+    "to": [
+      1.05,
+      8.65,
+      -3.55
+    ],
+    "color": "duckOrange"
+  },
+  {
+    "name": "bill_nostrils",
+    "from": [
+      -0.45,
+      8.75,
+      -3.15
+    ],
+    "to": [
+      0.45,
+      8.95,
+      -2.55
+    ],
+    "color": "billDark"
+  },
+  {
+    "name": "eye_left",
+    "from": [
+      -1.65,
+      8.75,
+      -2.45
+    ],
+    "to": [
+      -0.95,
+      9.65,
+      -1.85
+    ],
+    "color": "eyeBlack"
+  },
+  {
+    "name": "eye_right",
+    "from": [
+      0.95,
+      8.75,
+      -2.45
+    ],
+    "to": [
+      1.65,
+      9.65,
+      -1.85
+    ],
+    "color": "eyeBlack"
+  },
+  {
+    "name": "sparkle_left",
+    "from": [
+      -1.55,
+      9.15,
+      -2.55
+    ],
+    "to": [
+      -1.15,
+      9.55,
+      -2.25
+    ],
+    "color": "sparkleWhite"
+  },
+  {
+    "name": "sparkle_right",
+    "from": [
+      1.15,
+      9.15,
+      -2.55
+    ],
+    "to": [
+      1.55,
+      9.55,
+      -2.25
+    ],
+    "color": "sparkleWhite"
+  },
+  {
+    "name": "hood_crown",
+    "from": [
+      -1.95,
+      10.45,
+      -1.95
+    ],
+    "to": [
+      1.95,
+      11.55,
+      1.55
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "hood_drape_rear",
+    "from": [
+      -2.05,
+      8.28,
+      0.45
+    ],
+    "to": [
+      2.05,
+      10.7,
+      1.65
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "hood_flap_left",
+    "from": [
+      -2.25,
+      9.25,
+      -1.75
+    ],
+    "to": [
+      -1.75,
+      10.6,
+      0.55
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "hood_flap_right",
+    "from": [
+      1.75,
+      9.25,
+      -1.75
+    ],
+    "to": [
+      2.25,
+      10.6,
+      0.55
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "hood_visor_main",
+    "from": [
+      -1.75,
+      9.95,
+      -2.75
+    ],
+    "to": [
+      1.75,
+      10.75,
+      -1.75
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "hood_visor_lip",
+    "from": [
+      -1.55,
+      10.25,
+      -3.25
+    ],
+    "to": [
+      1.55,
+      10.65,
+      -2.65
+    ],
+    "color": "raincoatYellow"
+  },
+  {
+    "name": "drawstring_left",
+    "from": [
+      -1.15,
+      6.75,
+      -2.15
+    ],
+    "to": [
+      -0.75,
+      7.75,
+      -1.8
+    ],
+    "color": "drawstringWhite"
+  },
+  {
+    "name": "drawstring_right",
+    "from": [
+      0.75,
+      6.75,
+      -2.15
+    ],
+    "to": [
+      1.15,
+      7.75,
+      -1.8
+    ],
+    "color": "drawstringWhite"
+  },
+  {
+    "name": "umbrella_handle",
+    "from": [
+      -2.88,
+      5.85,
+      -0.45
+    ],
+    "to": [
+      -2.55,
+      6.65,
+      0.25
+    ],
+    "color": "umbrellaSilver"
+  },
+  {
+    "name": "umbrella_canopy_fold",
+    "from": [
+      -2.82,
+      4.25,
+      -0.35
+    ],
+    "to": [
+      -2.48,
+      5.95,
+      0.35
+    ],
+    "color": "bootBlue"
+  },
+  {
+    "name": "umbrella_tip",
+    "from": [
+      -2.75,
+      3.85,
+      -0.15
+    ],
+    "to": [
+      -2.55,
+      4.35,
+      0.15
+    ],
+    "color": "umbrellaSilver"
+  }
+]

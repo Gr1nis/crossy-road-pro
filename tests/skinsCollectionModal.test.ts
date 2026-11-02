@@ -208,9 +208,9 @@ describe('SkinsCollectionModal — State Machine & Gameplay Logic Suite', () => 
       assert.equal(elements.get('skins-modal-coins')?.textContent, '250');
       assert.equal(controller.isOpen(), true);
 
-      // Verify 5 cards rendered
+      // Verify all cards rendered
       const list = elements.get('skins-modal-list')!;
-      assert.equal(list.children.length, 5);
+      assert.equal(list.children.length, ALL_SKINS.length);
 
       // 1. Corgi (unlocked & active)
       const corgiCard = list.children[0];
@@ -223,7 +223,7 @@ describe('SkinsCollectionModal — State Machine & Gameplay Logic Suite', () => 
       assert.ok(corgiCard.innerHTML.includes(SKINS_MENU_ICONS.btnGreen));
 
       // 2. Box Cat (unlocked & available)
-      const boxCatCard = list.children[2];
+      const boxCatCard = list.children.find((c) => c.getAttribute('data-skin-id') === 'box_cat')!;
       assert.ok(boxCatCard.classList.contains('skin-card'));
       assert.ok(!boxCatCard.classList.contains('active'));
       assert.ok(!boxCatCard.classList.contains('locked'));
@@ -233,7 +233,7 @@ describe('SkinsCollectionModal — State Machine & Gameplay Logic Suite', () => 
       assert.ok(boxCatCard.innerHTML.includes(SKINS_MENU_ICONS.btnGold));
 
       // 3. Capybara Zen (locked silhouette)
-      const capyCard = list.children[4];
+      const capyCard = list.children.find((c) => c.getAttribute('data-skin-id') === 'capybara_zen')!;
       assert.ok(capyCard.classList.contains('skin-card'));
       assert.ok(capyCard.classList.contains('locked'));
       assert.ok(capyCard.classList.contains('skin-card-silhouette'));
@@ -334,7 +334,7 @@ describe('SkinsCollectionModal — State Machine & Gameplay Logic Suite', () => 
         code: 'ArrowLeft',
         preventDefault: () => {},
       } as unknown as KeyboardEvent);
-      assert.equal(controller.getFocusedIndex(), 4, 'Left on index 0 must wrap to index 4');
+      assert.equal(controller.getFocusedIndex(), ALL_SKINS.length - 1, `Left on index 0 must wrap to index ${ALL_SKINS.length - 1}`);
 
       // Escape closes window
       handled = controller.handleKeyDown({
@@ -391,8 +391,8 @@ describe('SkinsCollectionModal — State Machine & Gameplay Logic Suite', () => 
       assert.equal(elements.get('skins-modal-coins')?.textContent, '340');
 
       const list = elements.get('skins-modal-list')!;
-      // Index 3 is raccoon_bandit
-      const raccoonCard = list.children[3];
+      // raccoon_bandit
+      const raccoonCard = list.children.find((c) => c.getAttribute('data-skin-id') === 'raccoon_bandit')!;
       assert.ok(raccoonCard.classList.contains('active'));
       assert.ok(raccoonCard.innerHTML.includes('ВЫБРАН'));
 

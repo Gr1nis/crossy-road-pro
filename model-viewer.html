@@ -226,9 +226,14 @@ const DEFAULT_SKIN_ID         = 'corgi';
 const ALL_SKINS                                                             = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
+  { id: 'barista_pug', name: 'Бариста-Мопс', badge: '☕' },
+  { id: 'skater_ferret', name: 'Скейт-Хорёк', badge: '🛹' },
   { id: 'box_cat', name: 'Кот в коробке', badge: '📦' },
+  { id: 'subway_rat', name: 'Крыса-Метро', badge: '🍩' },
   { id: 'raccoon_bandit', name: 'Енот-воришка', badge: '🦝' },
+  { id: 'raincoat_duck', name: 'Утка в дождевике', badge: '🦆' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
+  { id: 'pigeon_king', name: 'Голубиный Барон', badge: '👑' },
 ];
 const Biome = {
   FOREST: 'forest',
@@ -454,6 +459,45 @@ const VOXEL_PALETTE = {
   concreteGrey: 0x64748b,
   goldCoin: 0xfacc15,
   rubyRed: 0xb91c1c,
+
+  // Expansion Pack: Urban Gang (Pug, Ferret, Rat, Duck, Pigeon King)
+  capRed: 0xdc2626,
+  eyeBlack: 0x09090b,
+  ferretCream: 0xfef08a,
+  ferretDark: 0x451a03,
+  ferretSable: 0x78350f,
+  fireRed: 0xef4444,
+  goldButton: 0xfacc15,
+  gripTape: 0x18181b,
+  truckDark: 0x27272a,
+  truckSilver: 0x94a3b8,
+  bagelCrust: 0xd97706,
+  bellyLight: 0x94a3b8,
+  buckTooth: 0xffffff,
+  cupDark: 0x1e293b,
+  headbandMetal: 0x64748b,
+  ratGrey: 0x475569,
+  ratPink: 0xf472b6,
+  retroOrange: 0xf97316,
+  sesameSeed: 0xfef08a,
+  sparkleWhite: 0xffffff,
+  billDark: 0xc2410c,
+  bootBlue: 0x2563eb,
+  bootRim: 0x60a5fa,
+  bootSole: 0x1d4ed8,
+  coatAccent: 0xeab308,
+  drawstringWhite: 0xf1f5f9,
+  duckOrange: 0xf97316,
+  featherWhite: 0xffffff,
+  raincoatYellow: 0xfacc15,
+  toggleDark: 0x1e293b,
+  crownGold: 0xfacc15,
+  ermineFur: 0xf8fafc,
+  ermineSpot: 0x0f172a,
+  eyePupil: 0x09090b,
+  featherPureWhite: 0xffffff,
+  mantleRed: 0x991b1b,
+  royalRuby: 0xdc2626,
 }         ;
 class VoxelPalette {
          static          geoCache = new Map                           ();
@@ -591,19 +635,11 @@ function createVoxelMesh(
 
 // --- Module: src/view/urbanCharacters.ts ---
 function addCharVoxel(
-  group             ,
-  w        ,
-  h        ,
-  d        ,
-  color                        ,
-  x        ,
-  y        ,
-  z        ,
-  isGhost         
+  group             , w        , h        , d        ,
+  color                        , x        , y        , z        , isGhost         
 )       {
   const mat = VoxelPalette.getMaterial(color, isGhost);
-  const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
-  group.add(mesh);
+  group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
 }
 function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
   const group = new THREE.Group();
@@ -876,6 +912,10 @@ function createUrbanCharacter(skinId         = 'corgi', isGhost = false)        
     addCharVoxel(group, 0.050, 0.020, 0.040, 'greenLeaf', 0.033, 0.748, 0.163, isGhost); // mandarin_leaf
     addCharVoxel(group, 0.040, 0.020, 0.035, 'greenLeaf', 0.058, 0.738, 0.150, isGhost); // mandarin_leaf_tip
     addCharVoxel(group, 0.040, 0.020, 0.030, 'greenLeaf', -0.028, 0.748, 0.198, isGhost); // mandarin_leaf_left
+  } else if (skinId === 'barista_pug' || skinId === 'skater_ferret' || skinId === 'subway_rat') {
+    return createUrbanCharacterExpA(skinId, isGhost);
+  } else if (skinId === 'raincoat_duck' || skinId === 'pigeon_king') {
+    return createUrbanCharacterExpB(skinId, isGhost);
   } else {
     // Fallback to Corgi mascot
     return createUrbanCharacter('corgi', isGhost);
@@ -2998,9 +3038,14 @@ class MeshFactory {
 const SKIN_DESCRIPTIONS                         = {
   corgi: 'Главный маскот игры. Озорной рыже-белый корги с розовыми подушечками лап, торчащими ушками и ошейником с золотым жетоном.',
   pigeon_pizza: 'Городской голубь с переливающейся фиолетово-бирюзовой шеей и аппетитным ломтиком пиццы с пепперони.',
+  barista_pug: 'Мопс в тёмно-зелёном фартуке с воксельным стаканчиком латте и белой пенкой.',
+  skater_ferret: 'Шустрый гибкий хорёк в кепке козырьком назад, прыгающий на мини-скейтборде.',
   box_cat: 'Рыжий котик в посылочной коробке со штампом "FRAGILE / DELIVERY", свесивший лапки через бортик.',
+  subway_rat: 'Серая городская крыса в ретро-наушниках и с целым кунжутным бейглом в лапках.',
   raccoon_bandit: 'Городской енот-воришка в чёрной бандитской маске с кольчатым хвостом и холщовым мешком за спиной.',
+  raincoat_duck: 'Белая уточка в ярко-жёлтом непромокаемом дождевике с капюшоном и синих сапожках.',
   capybara_zen: 'Умиротворённая дзен-капибара в медитативной позе со спелым воксельным мандарином на голове.',
+  pigeon_king: 'Напыщенный белоснежный голубь в золотой короне, мантии с горностаем и царским рубиновым орденом.',
 };
 function getCharacterModelItems()                     {
   return ALL_SKINS.map((skin) => ({
@@ -3228,9 +3273,7 @@ function getModelDiagnostics(group             )                                
   return { meshCount, dims: `${w} × ${h} × ${d}` };
 }
 function verifyModelRegistry()   
-                
-                                           
-                   
+                                                                            
   {
   const catalog = getModelCatalog();
   const countsByCategory                         = {};

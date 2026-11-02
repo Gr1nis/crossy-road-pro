@@ -1,20 +1,14 @@
 import * as THREE from 'three';
 import { createVoxelMesh, VoxelPalette, type VoxelColorKey } from './voxelPalette.ts';
+import { createUrbanCharacterExpA } from './urbanCharactersExpansionA.ts';
+import { createUrbanCharacterExpB } from './urbanCharactersExpansionB.ts';
 
 function addCharVoxel(
-  group: THREE.Group,
-  w: number,
-  h: number,
-  d: number,
-  color: VoxelColorKey | number,
-  x: number,
-  y: number,
-  z: number,
-  isGhost: boolean
+  group: THREE.Group, w: number, h: number, d: number,
+  color: VoxelColorKey | number, x: number, y: number, z: number, isGhost: boolean
 ): void {
   const mat = VoxelPalette.getMaterial(color, isGhost);
-  const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
-  group.add(mesh);
+  group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
 }
 
 export function createUrbanCharacter(skinId: string = 'corgi', isGhost = false): THREE.Group {
@@ -288,6 +282,10 @@ export function createUrbanCharacter(skinId: string = 'corgi', isGhost = false):
     addCharVoxel(group, 0.050, 0.020, 0.040, 'greenLeaf', 0.033, 0.748, 0.163, isGhost); // mandarin_leaf
     addCharVoxel(group, 0.040, 0.020, 0.035, 'greenLeaf', 0.058, 0.738, 0.150, isGhost); // mandarin_leaf_tip
     addCharVoxel(group, 0.040, 0.020, 0.030, 'greenLeaf', -0.028, 0.748, 0.198, isGhost); // mandarin_leaf_left
+  } else if (skinId === 'barista_pug' || skinId === 'skater_ferret' || skinId === 'subway_rat') {
+    return createUrbanCharacterExpA(skinId, isGhost);
+  } else if (skinId === 'raincoat_duck' || skinId === 'pigeon_king') {
+    return createUrbanCharacterExpB(skinId, isGhost);
   } else {
     // Fallback to Corgi mascot
     return createUrbanCharacter('corgi', isGhost);

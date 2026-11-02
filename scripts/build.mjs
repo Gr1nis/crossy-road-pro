@@ -38,6 +38,8 @@ const moduleOrder = [
   'src/platform/ysdk.ts',
   'src/view/audioSynth.ts',
   'src/view/voxelPalette.ts',
+  'src/view/urbanCharactersExpansionA.ts',
+  'src/view/urbanCharactersExpansionB.ts',
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
   'src/view/urbanVehicles.ts',

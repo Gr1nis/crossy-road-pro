@@ -16,11 +16,27 @@ from PIL import Image
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PALETTE_FILE = os.path.join(ROOT_DIR, 'src', 'view', 'voxelPalette.ts')
-CHARACTERS_FILE = os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharacters.ts')
 OUT_DIR = os.path.join(ROOT_DIR, 'references', 'processed_icons')
 TS_OUT_FILE = os.path.join(ROOT_DIR, 'src', 'view', 'gachaSkinsBase64.ts')
 
-SKIN_IDS = ['corgi', 'pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen']
+SOURCE_FILES = [
+    os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharacters.ts'),
+    os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharactersExpansionA.ts'),
+    os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharactersExpansionB.ts')
+]
+
+SKIN_IDS = [
+    'corgi',
+    'pigeon_pizza',
+    'barista_pug',
+    'skater_ferret',
+    'box_cat',
+    'subway_rat',
+    'raccoon_bandit',
+    'raincoat_duck',
+    'capybara_zen',
+    'pigeon_king'
+]
 
 
 def load_palette():
@@ -33,18 +49,21 @@ def load_palette():
 
 
 def load_skin_voxels(skin_id, palette):
-    with open(CHARACTERS_FILE, 'r', encoding='utf-8') as f:
-        content = f.read()
+    content = ""
+    for path in SOURCE_FILES:
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                content += "\n" + f.read()
 
-    pattern = rf'if\s*\(\s*skinId\s*===\s*[\x27\x22]{skin_id}[\x27\x22]\s*\)\s*\{{(.*?)\}}\s*else'
+    pattern = rf'if\s*\(\s*skinId\s*===\s*[\x27\x22]{skin_id}[\x27\x22]\s*\)\s*\{{(.*?)\}}\s*(?:else|$)'
     m = re.search(pattern, content, re.DOTALL)
     if not m:
-        pattern = rf'else if\s*\(\s*skinId\s*===\s*[\x27\x22]{skin_id}[\x27\x22]\s*\)\s*\{{(.*?)\}}\s*else'
+        pattern = rf'else if\s*\(\s*skinId\s*===\s*[\x27\x22]{skin_id}[\x27\x22]\s*\)\s*\{{(.*?)\}}\s*(?:else|$)'
         m = re.search(pattern, content, re.DOTALL)
 
     block = m.group(1) if m else ''
     raw_calls = re.findall(
-        r'addCharVoxel\s*\(\s*group\s*,\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*[\x27\x22]([^\x27\x22]+)[\x27\x22],\s*([^,]+),\s*([^,]+),\s*([^,]+)',
+        r'(?:addCharVoxel|addExpAVoxel|addExpBVoxel)\s*\(\s*group\s*,\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*[\x27\x22]([^\x27\x22]+)[\x27\x22],\s*([^,]+),\s*([^,]+),\s*([^,]+)',
         block
     )
 
@@ -245,7 +264,7 @@ def main():
     with open(TS_OUT_FILE, 'w', encoding='utf-8') as f:
         f.write(ts_content)
 
-    print(f"Successfully generated 5 character thumbnails and {TS_OUT_FILE}!")
+    print(f"Successfully generated {len(SKIN_IDS)} character thumbnails and {TS_OUT_FILE}!")
 
 
 if __name__ == '__main__':

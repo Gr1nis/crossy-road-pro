@@ -1,0 +1,797 @@
+[
+  {
+    "name": "arm_shoulder_left",
+    "from": [
+      -3.85,
+      3.85,
+      -2.85
+    ],
+    "to": [
+      -2.75,
+      6.25,
+      -1.25
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "arm_forearm_left",
+    "from": [
+      -3.65,
+      1.45,
+      -3.85
+    ],
+    "to": [
+      -2.45,
+      4.05,
+      -2.25
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "paw_glove_left",
+    "from": [
+      -3.55,
+      0.0,
+      -4.35
+    ],
+    "to": [
+      -2.15,
+      1.65,
+      -2.55
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "paw_fingers_left",
+    "from": [
+      -3.35,
+      0.05,
+      -4.95
+    ],
+    "to": [
+      -2.35,
+      0.85,
+      -4.25
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "arm_shoulder_right",
+    "from": [
+      2.75,
+      3.85,
+      -2.85
+    ],
+    "to": [
+      3.85,
+      6.25,
+      -1.25
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "arm_forearm_right",
+    "from": [
+      2.45,
+      1.45,
+      -3.85
+    ],
+    "to": [
+      3.65,
+      4.05,
+      -2.25
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "paw_glove_right",
+    "from": [
+      2.15,
+      0.0,
+      -4.35
+    ],
+    "to": [
+      3.55,
+      1.65,
+      -2.55
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "paw_fingers_right",
+    "from": [
+      2.35,
+      0.05,
+      -4.95
+    ],
+    "to": [
+      3.35,
+      0.85,
+      -4.25
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "thigh_rear_left",
+    "from": [
+      -3.75,
+      1.15,
+      1.15
+    ],
+    "to": [
+      -2.25,
+      4.15,
+      3.45
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "paw_rear_left",
+    "from": [
+      -3.55,
+      0.0,
+      1.25
+    ],
+    "to": [
+      -2.15,
+      1.45,
+      3.65
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "thigh_rear_right",
+    "from": [
+      2.25,
+      1.15,
+      1.15
+    ],
+    "to": [
+      3.75,
+      4.15,
+      3.45
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "paw_rear_right",
+    "from": [
+      2.15,
+      0.0,
+      1.25
+    ],
+    "to": [
+      3.55,
+      1.45,
+      3.65
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "body_core",
+    "from": [
+      -3.55,
+      2.55,
+      -2.95
+    ],
+    "to": [
+      3.55,
+      7.65,
+      2.95
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "body_belly_white",
+    "from": [
+      -2.55,
+      2.35,
+      -3.75
+    ],
+    "to": [
+      2.55,
+      6.45,
+      -2.35
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "chest_bib_tuft",
+    "from": [
+      -1.85,
+      5.95,
+      -3.95
+    ],
+    "to": [
+      1.85,
+      7.35,
+      -2.55
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "strap_left",
+    "from": [
+      -2.85,
+      4.25,
+      -3.35
+    ],
+    "to": [
+      -1.95,
+      7.75,
+      -2.62
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "strap_right",
+    "from": [
+      1.95,
+      4.25,
+      -3.35
+    ],
+    "to": [
+      2.85,
+      7.75,
+      -2.62
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "head_core",
+    "from": [
+      -3.35,
+      7.15,
+      -2.75
+    ],
+    "to": [
+      3.35,
+      11.95,
+      2.75
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "cheek_upper_left",
+    "from": [
+      -4.35,
+      8.45,
+      -2.25
+    ],
+    "to": [
+      -3.15,
+      10.35,
+      1.45
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "cheek_lower_left",
+    "from": [
+      -4.85,
+      7.25,
+      -2.45
+    ],
+    "to": [
+      -3.25,
+      8.75,
+      0.95
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "cheek_upper_right",
+    "from": [
+      3.15,
+      8.45,
+      -2.25
+    ],
+    "to": [
+      4.35,
+      10.35,
+      1.45
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "cheek_lower_right",
+    "from": [
+      3.25,
+      7.25,
+      -2.45
+    ],
+    "to": [
+      4.85,
+      8.75,
+      0.95
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "snout_muzzle_white",
+    "from": [
+      -1.75,
+      7.45,
+      -4.25
+    ],
+    "to": [
+      1.75,
+      9.45,
+      -2.45
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "snout_chin_white",
+    "from": [
+      -1.25,
+      6.75,
+      -3.75
+    ],
+    "to": [
+      1.25,
+      7.85,
+      -2.65
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "nose_black_button",
+    "from": [
+      -0.55,
+      8.55,
+      -4.45
+    ],
+    "to": [
+      0.55,
+      9.35,
+      -3.65
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "head_crown_top",
+    "from": [
+      -2.75,
+      11.75,
+      -2.15
+    ],
+    "to": [
+      2.75,
+      12.55,
+      2.15
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "ear_base_left",
+    "from": [
+      -3.25,
+      11.65,
+      -1.65
+    ],
+    "to": [
+      -1.65,
+      13.85,
+      0.65
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "ear_tip_left",
+    "from": [
+      -3.05,
+      13.55,
+      -1.35
+    ],
+    "to": [
+      -1.85,
+      15.15,
+      0.35
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "ear_inner_left",
+    "from": [
+      -2.85,
+      12.05,
+      -1.95
+    ],
+    "to": [
+      -1.85,
+      13.45,
+      -1.25
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "ear_base_right",
+    "from": [
+      1.65,
+      11.65,
+      -1.65
+    ],
+    "to": [
+      3.25,
+      13.85,
+      0.65
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "ear_tip_right",
+    "from": [
+      1.85,
+      13.55,
+      -1.35
+    ],
+    "to": [
+      3.05,
+      15.15,
+      0.35
+    ],
+    "color": "white",
+    "col_idx": 1
+  },
+  {
+    "name": "ear_inner_right",
+    "from": [
+      1.85,
+      12.05,
+      -1.95
+    ],
+    "to": [
+      2.85,
+      13.45,
+      -1.25
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "nvg_strap_left",
+    "from": [
+      -3.55,
+      9.25,
+      -2.65
+    ],
+    "to": [
+      -3.2,
+      10.55,
+      2.65
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "nvg_strap_right",
+    "from": [
+      3.2,
+      9.25,
+      -2.65
+    ],
+    "to": [
+      3.55,
+      10.55,
+      2.65
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "nvg_bridge_mount",
+    "from": [
+      -1.05,
+      9.25,
+      -3.95
+    ],
+    "to": [
+      1.05,
+      10.65,
+      -2.55
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "nvg_tube_left",
+    "from": [
+      -2.95,
+      8.85,
+      -4.75
+    ],
+    "to": [
+      -1.25,
+      10.75,
+      -3.25
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "nvg_lens_green_left",
+    "from": [
+      -2.75,
+      9.05,
+      -5.05
+    ],
+    "to": [
+      -1.45,
+      10.55,
+      -4.65
+    ],
+    "color": "nvgGreen",
+    "col_idx": 8
+  },
+  {
+    "name": "nvg_tube_right",
+    "from": [
+      1.25,
+      8.85,
+      -4.75
+    ],
+    "to": [
+      2.95,
+      10.75,
+      -3.25
+    ],
+    "color": "darkCharcoal",
+    "col_idx": 3
+  },
+  {
+    "name": "nvg_lens_green_right",
+    "from": [
+      1.45,
+      9.05,
+      -5.05
+    ],
+    "to": [
+      2.75,
+      10.55,
+      -4.65
+    ],
+    "color": "nvgGreen",
+    "col_idx": 8
+  },
+  {
+    "name": "tail_ring_1",
+    "from": [
+      -1.05,
+      1.25,
+      2.45
+    ],
+    "to": [
+      1.05,
+      2.75,
+      4.05
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "tail_ring_2",
+    "from": [
+      -1.25,
+      0.95,
+      3.85
+    ],
+    "to": [
+      1.25,
+      2.45,
+      5.45
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "tail_ring_3",
+    "from": [
+      -1.35,
+      0.85,
+      5.25
+    ],
+    "to": [
+      1.35,
+      2.55,
+      6.85
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "tail_ring_4",
+    "from": [
+      -1.25,
+      1.25,
+      6.65
+    ],
+    "to": [
+      1.25,
+      3.05,
+      8.05
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "tail_ring_5",
+    "from": [
+      -1.15,
+      2.15,
+      7.65
+    ],
+    "to": [
+      1.15,
+      3.95,
+      8.85
+    ],
+    "color": "raccoonGrey",
+    "col_idx": 0
+  },
+  {
+    "name": "tail_tip_black",
+    "from": [
+      -0.95,
+      3.35,
+      8.35
+    ],
+    "to": [
+      0.95,
+      5.05,
+      9.35
+    ],
+    "color": "maskBlack",
+    "col_idx": 2
+  },
+  {
+    "name": "loot_sack_belly",
+    "from": [
+      -2.55,
+      3.45,
+      1.85
+    ],
+    "to": [
+      2.55,
+      7.55,
+      5.45
+    ],
+    "color": "burlapBag",
+    "col_idx": 4
+  },
+  {
+    "name": "loot_sack_upper",
+    "from": [
+      -2.35,
+      7.35,
+      2.05
+    ],
+    "to": [
+      2.35,
+      9.45,
+      5.25
+    ],
+    "color": "burlapBag",
+    "col_idx": 4
+  },
+  {
+    "name": "loot_sack_rear_bulge",
+    "from": [
+      -1.85,
+      4.25,
+      5.25
+    ],
+    "to": [
+      1.85,
+      7.05,
+      6.35
+    ],
+    "color": "burlapBag",
+    "col_idx": 4
+  },
+  {
+    "name": "loot_sack_cinch",
+    "from": [
+      -1.75,
+      9.25,
+      2.35
+    ],
+    "to": [
+      1.75,
+      9.95,
+      4.95
+    ],
+    "color": "bagRope",
+    "col_idx": 5
+  },
+  {
+    "name": "loot_sack_ruffle",
+    "from": [
+      -2.05,
+      9.75,
+      2.15
+    ],
+    "to": [
+      2.05,
+      10.55,
+      5.15
+    ],
+    "color": "burlapBag",
+    "col_idx": 4
+  },
+  {
+    "name": "loot_gold_bar",
+    "from": [
+      0.25,
+      10.25,
+      2.55
+    ],
+    "to": [
+      1.65,
+      11.65,
+      4.35
+    ],
+    "color": "goldCoin",
+    "col_idx": 6
+  },
+  {
+    "name": "loot_gold_coin",
+    "from": [
+      -1.65,
+      10.15,
+      2.55
+    ],
+    "to": [
+      -0.25,
+      11.55,
+      4.15
+    ],
+    "color": "goldCoin",
+    "col_idx": 6
+  },
+  {
+    "name": "loot_ruby_gem",
+    "from": [
+      -0.75,
+      10.35,
+      2.85
+    ],
+    "to": [
+      0.75,
+      12.05,
+      4.65
+    ],
+    "color": "rubyRed",
+    "col_idx": 7
+  }
+]

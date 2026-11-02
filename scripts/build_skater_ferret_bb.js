@@ -1,0 +1,48 @@
+
+Cube.all.slice().forEach(c => c.remove());
+Texture.all.slice().forEach(t => t.remove());
+
+const canvas = document.createElement('canvas');
+canvas.width = 16;
+canvas.height = 16;
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = '#1e293b';
+ctx.fillRect(0, 0, 16, 16);
+
+const swatches = ["#fef3c7", "#573419", "#29180c", "#fb7185", "#09090b", "#ffffff", "#dc2626", "#facc15", "#ef4444", "#18181b", "#94a3b8", "#475569"];
+swatches.forEach((hex, idx) => {
+  ctx.fillStyle = hex;
+  ctx.fillRect(idx, 0, 1, 1);
+});
+
+const tex = new Texture({ name: 'skater_ferret_palette' });
+tex.fromDataURL(canvas.toDataURL('image/png')).add(false);
+
+const cubesData = [{"name": "wheel_fl", "from": [-2.75, 0.0, -4.45], "to": [-1.85, 1.15, -3.25], "color": "fireRed", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "wheel_fr", "from": [1.85, 0.0, -4.45], "to": [2.75, 1.15, -3.25], "color": "fireRed", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "wheel_rl", "from": [-2.75, 0.0, 3.25], "to": [-1.85, 1.15, 4.45], "color": "fireRed", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "wheel_rr", "from": [1.85, 0.0, 3.25], "to": [2.75, 1.15, 4.45], "color": "fireRed", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "truck_axle_front", "from": [-2.05, 0.45, -4.05], "to": [2.05, 0.95, -3.65], "color": "truckSilver", "col_idx": 10, "uv": [10, 0, 11, 1]}, {"name": "truck_axle_rear", "from": [-2.05, 0.45, 3.65], "to": [2.05, 0.95, 4.05], "color": "truckSilver", "col_idx": 10, "uv": [10, 0, 11, 1]}, {"name": "truck_base_front", "from": [-1.15, 0.85, -4.25], "to": [1.15, 1.65, -3.45], "color": "truckDark", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "truck_base_rear", "from": [-1.15, 0.85, 3.45], "to": [1.15, 1.65, 4.25], "color": "truckDark", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "deck_core", "from": [-2.45, 1.55, -5.25], "to": [2.45, 2.15, 5.25], "color": "capRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "deck_kick_nose", "from": [-2.25, 1.85, -6.15], "to": [2.25, 2.55, -5.1], "color": "capRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "deck_kick_tail", "from": [-2.25, 1.85, 5.1], "to": [2.25, 2.55, 6.15], "color": "capRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "grip_tape_main", "from": [-2.25, 2.05, -5.05], "to": [2.25, 2.25, 5.05], "color": "gripTape", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "grip_tape_nose", "from": [-2.05, 2.35, -5.95], "to": [2.05, 2.65, -4.9], "color": "gripTape", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "grip_tape_tail", "from": [-2.05, 2.35, 4.9], "to": [2.05, 2.65, 5.95], "color": "gripTape", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "deck_graphic_stripe", "from": [-1.25, 1.35, -3.05], "to": [1.25, 1.65, 3.05], "color": "goldButton", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "paw_front_left", "from": [-2.15, 2.2, -3.65], "to": [-1.05, 3.35, -2.15], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "paw_front_right", "from": [1.05, 2.2, -3.65], "to": [2.15, 3.35, -2.15], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "paw_rear_left", "from": [-2.15, 2.2, 2.15], "to": [-0.95, 3.45, 3.65], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "paw_rear_right", "from": [0.95, 2.2, 2.15], "to": [2.15, 3.45, 3.65], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "arm_front_left", "from": [-1.95, 3.15, -3.25], "to": [-1.15, 4.95, -2.25], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "arm_front_right", "from": [1.15, 3.15, -3.25], "to": [1.95, 4.95, -2.25], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "thigh_rear_left", "from": [-2.25, 3.25, 1.95], "to": [-1.05, 5.35, 3.75], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "thigh_rear_right", "from": [1.05, 3.25, 1.95], "to": [2.25, 5.35, 3.75], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "body_underbelly", "from": [-1.55, 3.05, -1.95], "to": [1.55, 4.25, 2.45], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_mid_torso", "from": [-1.85, 3.85, -2.35], "to": [1.85, 5.75, 2.75], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "body_back_arch", "from": [-1.55, 5.55, -1.85], "to": [1.55, 6.65, 2.35], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "body_rump_rear", "from": [-1.75, 4.15, 2.55], "to": [1.75, 6.15, 4.05], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "body_chest_front", "from": [-1.75, 4.15, -3.45], "to": [1.75, 6.45, -2.05], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "chest_cream_bib", "from": [-1.25, 4.45, -3.75], "to": [1.25, 6.15, -3.15], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "neck_base", "from": [-1.45, 5.75, -4.35], "to": [1.45, 7.55, -2.75], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "neck_throat_cream", "from": [-1.15, 5.85, -4.65], "to": [1.15, 7.25, -3.95], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_core", "from": [-1.95, 6.65, -5.95], "to": [1.95, 9.25, -3.65], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "cheek_fluff_left", "from": [-2.25, 6.75, -5.65], "to": [-1.75, 8.35, -4.15], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "cheek_fluff_right", "from": [1.75, 6.75, -5.65], "to": [2.25, 8.35, -4.15], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "muzzle_upper", "from": [-1.25, 6.75, -6.95], "to": [1.25, 8.05, -5.75], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "chin_under", "from": [-0.95, 6.35, -6.65], "to": [0.95, 7.05, -5.55], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "nose_button", "from": [-0.45, 7.55, -7.25], "to": [0.45, 8.15, -6.85], "color": "nosePink", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "eye_mask_band", "from": [-2.05, 7.65, -6.15], "to": [2.05, 8.65, -5.55], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "eye_iris_left", "from": [-1.75, 7.75, -6.35], "to": [-1.05, 8.55, -5.85], "color": "eyeBlack", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "eye_iris_right", "from": [1.05, 7.75, -6.35], "to": [1.75, 8.55, -5.85], "color": "eyeBlack", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "eye_sparkle_left", "from": [-1.65, 8.05, -6.45], "to": [-1.25, 8.45, -6.1], "color": "sparkleWhite", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "eye_sparkle_right", "from": [1.25, 8.05, -6.45], "to": [1.65, 8.45, -6.1], "color": "sparkleWhite", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "ear_outer_left", "from": [-2.45, 8.75, -4.75], "to": [-1.75, 9.75, -3.85], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "ear_outer_right", "from": [1.75, 8.75, -4.75], "to": [2.45, 9.75, -3.85], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "ear_inner_left", "from": [-2.35, 8.85, -4.65], "to": [-1.7, 9.55, -4.15], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "ear_inner_right", "from": [1.7, 8.85, -4.65], "to": [2.35, 9.55, -4.15], "color": "ferretCream", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "forehead_tuft_main", "from": [-0.65, 8.45, -6.25], "to": [0.65, 8.95, -5.7], "color": "sparkleWhite", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "cap_crown", "from": [-1.85, 9.15, -5.45], "to": [1.85, 10.35, -3.25], "color": "capRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "cap_forehead_arch", "from": [-1.55, 9.05, -5.85], "to": [1.55, 9.55, -5.25], "color": "capRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "cap_visor_rear", "from": [-1.65, 8.75, -3.35], "to": [1.65, 9.25, -1.85], "color": "capRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "cap_visor_lip", "from": [-1.45, 8.95, -1.95], "to": [1.45, 9.35, -1.15], "color": "capRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "cap_top_button", "from": [-0.35, 10.25, -4.55], "to": [0.35, 10.65, -3.95], "color": "goldButton", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "tail_root", "from": [-0.65, 4.75, 3.85], "to": [0.65, 5.95, 4.95], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "tail_mid_arch", "from": [-0.55, 5.55, 4.75], "to": [0.55, 6.95, 6.05], "color": "ferretSable", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "tail_high_sweep", "from": [-0.45, 6.75, 5.75], "to": [0.45, 8.25, 7.05], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "tail_bushy_tip", "from": [-0.35, 7.85, 5.35], "to": [0.35, 8.95, 6.45], "color": "ferretDark", "col_idx": 2, "uv": [2, 0, 3, 1]}];
+
+Undo.initEdit({ elements: [] });
+
+cubesData.forEach(d => {
+  const cube = new Cube({
+    name: d.name,
+    from: d.from,
+    to: d.to,
+    faces: {
+      north: { uv: d.uv, texture: tex.uuid },
+      east:  { uv: d.uv, texture: tex.uuid },
+      south: { uv: d.uv, texture: tex.uuid },
+      west:  { uv: d.uv, texture: tex.uuid },
+      up:    { uv: d.uv, texture: tex.uuid },
+      down:  { uv: d.uv, texture: tex.uuid }
+    }
+  });
+  cube.init();
+});
+
+Undo.finishEdit('Skater Ferret V1.0 (Backwards Cap, Skateboard & Dynamic Tail)');
+Canvas.updateAll();
+
+return {
+  cubesCount: Cube.all.length,
+  textureName: tex.name
+};

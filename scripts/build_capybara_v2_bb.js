@@ -1,0 +1,59 @@
+
+Cube.all.slice().forEach(c => c.remove());
+Texture.all.slice().forEach(t => t.remove());
+
+const canvas = document.createElement('canvas');
+canvas.width = 16;
+canvas.height = 16;
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = '#1e293b';
+ctx.fillRect(0, 0, 16, 16);
+
+const swatches = [
+  "#925227",
+  "#78350f",
+  "#542d13",
+  "#2b170a",
+  "#1e293b",
+  "#0f172a",
+  "#f97316",
+  "#16a34a",
+  "#facc15",
+  "#ffffff"
+];
+swatches.forEach((hex, idx) => {
+  ctx.fillStyle = hex;
+  ctx.fillRect(idx, 0, 1, 1);
+});
+
+const tex = new Texture({ name: 'capybara_v2_palette' });
+tex.fromDataURL(canvas.toDataURL('image/png')).add(false);
+
+const cubesData = [{"name": "paw_front_left", "from": [-3.55, 0.0, -3.65], "to": [-2.05, 1.45, -1.95], "color": "capybaraPaws", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "paw_digits_front_left", "from": [-3.35, 0.05, -4.35], "to": [-2.25, 0.75, -3.55], "color": "capybaraPaws", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "leg_front_left", "from": [-3.35, 1.25, -3.45], "to": [-2.25, 3.25, -2.15], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "paw_front_right", "from": [2.05, 0.0, -3.65], "to": [3.55, 1.45, -1.95], "color": "capybaraPaws", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "paw_digits_front_right", "from": [2.25, 0.05, -4.35], "to": [3.35, 0.75, -3.55], "color": "capybaraPaws", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "leg_front_right", "from": [2.25, 1.25, -3.45], "to": [3.35, 3.25, -2.15], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "thigh_rear_left", "from": [-4.15, 1.05, 1.15], "to": [-2.55, 4.35, 3.95], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "paw_rear_left", "from": [-3.85, 0.0, 1.05], "to": [-2.35, 1.35, 3.55], "color": "capybaraPaws", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "thigh_rear_right", "from": [2.55, 1.05, 1.15], "to": [4.15, 4.35, 3.95], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "paw_rear_right", "from": [2.35, 0.0, 1.05], "to": [3.85, 1.35, 3.55], "color": "capybaraPaws", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "body_core", "from": [-3.45, 2.45, -2.85], "to": [3.45, 6.85, 3.55], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_underbelly", "from": [-2.75, 1.75, -2.45], "to": [2.75, 3.05, 3.25], "color": "capybaraMuzzle", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "flank_left", "from": [-4.05, 2.75, -1.75], "to": [-3.35, 6.15, 2.75], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "flank_right", "from": [3.35, 2.75, -1.75], "to": [4.05, 6.15, 2.75], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "back_arch_ridge", "from": [-2.65, 6.75, -0.95], "to": [2.65, 7.45, 2.85], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "rump_rear", "from": [-3.05, 2.85, 3.45], "to": [3.05, 6.55, 4.45], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "rump_slope_top", "from": [-2.55, 6.25, 2.65], "to": [2.55, 7.15, 4.05], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "tail_stub", "from": [-0.65, 3.35, 4.35], "to": [0.65, 4.25, 5.05], "color": "capybaraMuzzle", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "neck_base", "from": [-3.05, 3.75, -4.25], "to": [3.05, 7.35, -2.65], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "neck_bib_throat", "from": [-2.15, 3.05, -4.55], "to": [2.15, 5.55, -3.15], "color": "capybaraMuzzle", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "mala_necklace_left", "from": [-2.75, 4.55, -4.65], "to": [-1.95, 6.65, -3.65], "color": "capybaraDark", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "mala_necklace_right", "from": [1.95, 4.55, -4.65], "to": [2.75, 6.65, -3.65], "color": "capybaraDark", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "mala_necklace_bottom", "from": [-1.85, 4.25, -4.75], "to": [1.85, 5.05, -4.05], "color": "capybaraDark", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "mala_gold_medallion", "from": [-0.75, 3.45, -4.85], "to": [0.75, 4.45, -4.35], "color": "goldCoin", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "head_core", "from": [-2.95, 6.75, -5.65], "to": [2.95, 11.15, -1.75], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_crown_flat", "from": [-2.65, 10.95, -5.25], "to": [2.65, 11.65, -2.05], "color": "capybaraCaramel", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "snout_muzzle", "from": [-2.35, 6.35, -7.25], "to": [2.35, 9.95, -5.55], "color": "capybaraMuzzle", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "snout_chin_under", "from": [-1.85, 5.65, -6.65], "to": [1.85, 7.05, -4.85], "color": "capybaraMuzzle", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "nose_pad_dark", "from": [-1.05, 8.45, -7.55], "to": [1.05, 9.75, -7.15], "color": "capybaraDark", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "nostril_slit_left", "from": [-1.25, 8.75, -7.65], "to": [-0.65, 9.35, -7.35], "color": "maskBlack", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "nostril_slit_right", "from": [0.65, 8.75, -7.65], "to": [1.25, 9.35, -7.35], "color": "maskBlack", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "nostril_bridge", "from": [-0.35, 7.75, -7.45], "to": [0.35, 8.65, -7.05], "color": "capybaraDark", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "cheek_fluff_left", "from": [-3.55, 7.15, -4.75], "to": [-2.75, 9.75, -2.55], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "cheek_fluff_right", "from": [2.75, 7.15, -4.75], "to": [3.55, 9.75, -2.55], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "eye_left_iris", "from": [-3.15, 8.95, -4.65], "to": [-2.85, 10.15, -3.45], "color": "maskBlack", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "eye_left_sparkle", "from": [-3.18, 9.55, -4.55], "to": [-2.9, 10.05, -4.05], "color": "white", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "eye_right_iris", "from": [2.85, 8.95, -4.65], "to": [3.15, 10.15, -3.45], "color": "maskBlack", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "eye_right_sparkle", "from": [2.9, 9.55, -4.55], "to": [3.18, 10.05, -4.05], "color": "white", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "forehead_zen_tuft", "from": [-0.65, 10.35, -5.75], "to": [0.65, 11.35, -5.35], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "ear_base_left", "from": [-3.25, 11.05, -2.75], "to": [-2.15, 12.55, -1.55], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "ear_inner_left", "from": [-2.95, 11.35, -2.85], "to": [-2.35, 12.25, -2.55], "color": "capybaraMuzzle", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "ear_base_right", "from": [2.15, 11.05, -2.75], "to": [3.25, 12.55, -1.55], "color": "capybaraBrown", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "ear_inner_right", "from": [2.35, 11.35, -2.85], "to": [2.95, 12.25, -2.55], "color": "capybaraMuzzle", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "onsen_towel_main", "from": [-2.05, 11.55, -4.85], "to": [2.05, 12.25, -2.45], "color": "white", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "onsen_towel_fold_top", "from": [-1.75, 12.15, -4.55], "to": [1.75, 12.65, -2.65], "color": "white", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "mandarin_base", "from": [-1.25, 12.55, -4.45], "to": [1.25, 13.05, -2.85], "color": "orangeFruit", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "mandarin_middle_bulge", "from": [-1.55, 12.95, -4.75], "to": [1.55, 14.15, -2.55], "color": "orangeFruit", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "mandarin_top_dome", "from": [-1.05, 14.05, -4.35], "to": [1.05, 14.65, -2.95], "color": "orangeFruit", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "mandarin_sun_spot", "from": [-1.25, 13.45, -4.85], "to": [-0.65, 14.05, -4.35], "color": "goldCoin", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "mandarin_stem", "from": [-0.25, 14.55, -3.85], "to": [0.25, 15.25, -3.45], "color": "greenLeaf", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "mandarin_leaf", "from": [0.15, 14.75, -3.65], "to": [1.15, 15.15, -2.85], "color": "greenLeaf", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "mandarin_leaf_tip", "from": [0.75, 14.55, -3.35], "to": [1.55, 14.95, -2.65], "color": "greenLeaf", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "mandarin_leaf_left", "from": [-0.95, 14.75, -4.25], "to": [-0.15, 15.15, -3.65], "color": "greenLeaf", "col_idx": 7, "uv": [7, 0, 8, 1]}];
+
+Undo.initEdit({ elements: [] });
+
+cubesData.forEach(d => {
+  const cube = new Cube({
+    name: d.name,
+    from: d.from,
+    to: d.to,
+    faces: {
+      north: { uv: d.uv, texture: tex.uuid },
+      east:  { uv: d.uv, texture: tex.uuid },
+      south: { uv: d.uv, texture: tex.uuid },
+      west:  { uv: d.uv, texture: tex.uuid },
+      up:    { uv: d.uv, texture: tex.uuid },
+      down:  { uv: d.uv, texture: tex.uuid }
+    }
+  });
+  cube.init();
+});
+
+Undo.finishEdit('Legendary Zen Capybara V2.0 (Expressive Eyes, Folded Spa Towel, Mala Beads)');
+Canvas.updateAll();
+
+return {
+  cubesCount: Cube.all.length,
+  textureName: tex.name
+};

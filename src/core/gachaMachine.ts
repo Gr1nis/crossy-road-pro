@@ -16,9 +16,14 @@ export const GACHA_DUPLICATE_CASHBACK = 40;
 export const SKIN_RARITY_MAP: Record<SkinId, SkinRarityValue> = {
   corgi: SkinRarity.COMMON,
   pigeon_pizza: SkinRarity.COMMON,
+  barista_pug: SkinRarity.COMMON,
+  skater_ferret: SkinRarity.COMMON,
   box_cat: SkinRarity.RARE,
+  subway_rat: SkinRarity.RARE,
   raccoon_bandit: SkinRarity.EPIC,
+  raincoat_duck: SkinRarity.EPIC,
   capybara_zen: SkinRarity.LEGENDARY,
+  pigeon_king: SkinRarity.LEGENDARY,
 };
 
 export const SKIN_RARITY_WEIGHTS: Record<SkinRarityValue, number> = {

@@ -7,7 +7,7 @@ import { GameLoop } from '../src/app/gameLoop.ts';
 import { UIManager } from '../src/app/uiManager.ts';
 import { SceneManager } from '../src/view/sceneManager.ts';
 import { AudioSynth } from '../src/view/audioSynth.ts';
-import { type SkinId } from '../src/core/types.ts';
+import { type SkinId, ALL_SKINS } from '../src/core/types.ts';
 
 interface MockElement {
   id: string; tagName: string; className: string; innerHTML: string; textContent: string;
@@ -193,7 +193,7 @@ describe('Skins GameLoop Integration Tests', () => {
       assert.equal(coinsEl.textContent, '250');
 
       const listEl = elements.get('skins-modal-list')!;
-      assert.equal(listEl.children.length, 5);
+      assert.equal(listEl.children.length, ALL_SKINS.length);
 
       const corgiCard = listEl.children.find((c) => c.getAttribute('data-skin-id') === 'corgi');
       assert.ok(corgiCard?.className.includes('active'));

@@ -38,3 +38,8 @@ pnpm-debug.log*
 __pycache__/
 *.pyc
 
+# Scratch comparison PNGs
+corgi_revised_comparison.png
+side_by_side_corgi_review.png
+side_by_side_review.png
+

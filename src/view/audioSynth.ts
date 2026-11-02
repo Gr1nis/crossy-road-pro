@@ -485,6 +485,19 @@ export class AudioSynth {
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.075);
+    } else if (id.includes('pigeon_king')) {
+      // Pigeon King: majestic regal fanfare coo with royal fanfare chord
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.035);
+      osc.frequency.setValueAtTime(783.99, now + 0.07);
+      osc.frequency.exponentialRampToValueAtTime(392.0, now + 0.14);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.16);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.165);
     } else if (id.includes('pigeon')) {
       // Pigeon: gentle urban cooing
       osc.type = 'sine';
@@ -497,6 +510,30 @@ export class AudioSynth {
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.125);
+    } else if (id.includes('pug') || id.includes('barista')) {
+      // Barista Pug: snorty playful grunt + barista espresso cup tap
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(260, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.045);
+      osc.frequency.exponentialRampToValueAtTime(520, now + 0.08);
+      gain.gain.setValueAtTime(0.11, now);
+      gain.gain.exponentialRampToValueAtTime(0.003, now + 0.09);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.095);
+    } else if (id.includes('ferret') || id.includes('skater')) {
+      // Skater Ferret: skateboard wood pop 'ollie' click + chirpy chitter
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.02);
+      osc.frequency.exponentialRampToValueAtTime(1400, now + 0.06);
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.003, now + 0.07);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.075);
     } else if (id.includes('cat')) {
       // Box Cat: cute soft purr / kitten meow
       osc.type = 'triangle';
@@ -509,6 +546,18 @@ export class AudioSynth {
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.12);
+    } else if (id.includes('rat') || id.includes('subway')) {
+      // Subway Rat: sneaky high-pitched squeak + metro turnstile click
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1750, now);
+      osc.frequency.exponentialRampToValueAtTime(2400, now + 0.03);
+      osc.frequency.exponentialRampToValueAtTime(950, now + 0.07);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.075);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
     } else if (id.includes('raccoon')) {
       // Raccoon: curious mischievous chitter / chirp
       osc.type = 'sine';
@@ -521,29 +570,18 @@ export class AudioSynth {
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.065);
-    } else if (id.includes('capybara')) {
-      // Capybara Zen: resonant Tibetan meditation bell chime
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1046.5, now);
-      osc.frequency.exponentialRampToValueAtTime(1050, now + 0.22);
-      gain.gain.setValueAtTime(0.13, now);
-      gain.gain.exponentialRampToValueAtTime(0.002, now + 0.24);
-      osc.connect(gain);
-      gain.connect(this.sfxGainNode ?? ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.25);
     } else if (id.includes('duck')) {
-      // Cyber-Duck: nasal synth quack with digital pitch inflection
+      // Raincoat Duck: rubbery puddle splash quack
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(640, now);
-      osc.frequency.exponentialRampToValueAtTime(410, now + 0.045);
-      osc.frequency.exponentialRampToValueAtTime(530, now + 0.09);
-      gain.gain.setValueAtTime(0.09, now);
-      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.095);
+      osc.frequency.setValueAtTime(560, now);
+      osc.frequency.exponentialRampToValueAtTime(340, now + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(460, now + 0.085);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.09);
       osc.connect(gain);
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.1);
+      osc.stop(now + 0.095);
     } else if (id.includes('ninja') || id.includes('shadow')) {
       // Shadow-Ninja: stealthy swift blade/breath accent
       osc.type = 'sine';

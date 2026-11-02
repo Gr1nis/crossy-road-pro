@@ -20,9 +20,14 @@ export interface SkinRarityMeta {
 export const SKINS_RARITY_MAP: Record<string, SkinRarityMeta> = {
   corgi: { label: 'Обычный', css: 'rarity-common', color: '#94a3b8', glow: 'rgba(148, 163, 184, 0.45)' },
   pigeon_pizza: { label: 'Обычный', css: 'rarity-common', color: '#94a3b8', glow: 'rgba(148, 163, 184, 0.45)' },
+  barista_pug: { label: 'Обычный', css: 'rarity-common', color: '#94a3b8', glow: 'rgba(148, 163, 184, 0.45)' },
+  skater_ferret: { label: 'Обычный', css: 'rarity-common', color: '#94a3b8', glow: 'rgba(148, 163, 184, 0.45)' },
   box_cat: { label: 'Редкий', css: 'rarity-rare', color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.5)' },
+  subway_rat: { label: 'Редкий', css: 'rarity-rare', color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.5)' },
   raccoon_bandit: { label: 'Эпический', css: 'rarity-epic', color: '#c084fc', glow: 'rgba(192, 132, 252, 0.55)' },
+  raincoat_duck: { label: 'Эпический', css: 'rarity-epic', color: '#c084fc', glow: 'rgba(192, 132, 252, 0.55)' },
   capybara_zen: { label: 'Легендарный', css: 'rarity-legendary', color: '#fbbf24', glow: 'rgba(251, 191, 36, 0.6)' },
+  pigeon_king: { label: 'Легендарный', css: 'rarity-legendary', color: '#fbbf24', glow: 'rgba(251, 191, 36, 0.6)' },
 };
 
 export class SkinsCollectionModal {
