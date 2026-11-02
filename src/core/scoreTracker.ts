@@ -396,6 +396,10 @@ export class ScoreTracker {
     return this.getLockedSkins().length === 0;
   }
 
+  getGachaProbabilities(): Record<SkinId, number> {
+    return this.gacha.getDropProbabilities(this.inventory);
+  }
+
   rollGacha(randomIndex?: number, forceSkinId?: SkinId): GachaRollResult {
     const seed = randomIndex !== undefined ? randomIndex : Math.random();
     const result = this.gacha.roll(seed, this.wallet, this.inventory, forceSkinId);

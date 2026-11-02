@@ -12,6 +12,7 @@ export const SkinRarity = {
 export type SkinRarityValue = (typeof SkinRarity)[keyof typeof SkinRarity];
 
 export const GACHA_DUPLICATE_CASHBACK = 40;
+export const GACHA_DUPLICATE_WEIGHT_MULTIPLIER = 0.25;
 
 export const SKIN_RARITY_MAP: Record<SkinId, SkinRarityValue> = {
   corgi: SkinRarity.COMMON,
@@ -40,9 +41,33 @@ export const GACHA_SKINS_BY_RARITY: Record<SkinRarityValue, SkinId[]> = {
   [SkinRarity.LEGENDARY]: [],
 };
 
+export const SKIN_BASE_WEIGHTS: Record<SkinId, number> = {} as Record<SkinId, number>;
+
 for (const skin of ALL_SKINS) {
   const rarity = SKIN_RARITY_MAP[skin.id] ?? SkinRarity.COMMON;
   GACHA_SKINS_BY_RARITY[rarity].push(skin.id);
+}
+
+for (const skin of ALL_SKINS) {
+  const rarity = SKIN_RARITY_MAP[skin.id] ?? SkinRarity.COMMON;
+  const countInTier = GACHA_SKINS_BY_RARITY[rarity].length;
+  SKIN_BASE_WEIGHTS[skin.id] = (SKIN_RARITY_WEIGHTS[rarity] ?? 10) / Math.max(1, countInTier);
+}
+
+export type UnlockedSource = SkinInventory | ReadonlySet<SkinId> | SkinId[] | ReadonlyArray<SkinId>;
+
+export function extractUnlockedChecker(source?: UnlockedSource): (id: SkinId) => boolean {
+  if (!source) return () => false;
+  if (typeof (source as SkinInventory).isUnlocked === 'function') {
+    return (id: SkinId) => (source as SkinInventory).isUnlocked(id);
+  }
+  if (source instanceof Set) {
+    return (id: SkinId) => (source as Set<SkinId>).has(id);
+  }
+  if (Array.isArray(source)) {
+    return (id: SkinId) => (source as SkinId[]).includes(id);
+  }
+  return () => false;
 }
 
 export interface GachaRollResult {
@@ -79,49 +104,69 @@ export class GachaMachine {
     return this.getAvailableSkins(inventory).length === 0;
   }
 
-  pickSkin(seedOrNonce: number, availablePool?: SkinId[]): SkinId {
-    if (availablePool && availablePool.length > 0) {
-      if (availablePool.length === 1) return availablePool[0];
-      const rand = !Number.isInteger(seedOrNonce) && seedOrNonce > 0 && seedOrNonce < 1
-        ? seedOrNonce
-        : mulberry32(seedOrNonce);
+  getDropProbabilities(
+    inventoryOrUnlocked?: UnlockedSource,
+    availablePool?: SkinId[]
+  ): Record<SkinId, number> {
+    const candidateIds = availablePool && availablePool.length > 0
+      ? availablePool
+      : ALL_SKINS.map((s) => s.id);
 
-      const weights = availablePool.map((id) => SKIN_RARITY_WEIGHTS[this.getSkinRarity(id)] ?? 10);
-      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-      let threshold = rand * totalWeight;
-      for (let i = 0; i < availablePool.length; i++) {
-        threshold -= weights[i];
-        if (threshold <= 0) {
-          return availablePool[i];
-        }
+    const isUnlocked = extractUnlockedChecker(inventoryOrUnlocked);
+    const weights = candidateIds.map((id) => {
+      let w = SKIN_BASE_WEIGHTS[id] ?? 10;
+      if (isUnlocked(id)) {
+        w *= GACHA_DUPLICATE_WEIGHT_MULTIPLIER;
       }
-      return availablePool[availablePool.length - 1];
-    }
+      return { id, w };
+    });
 
+    const totalWeight = weights.reduce((sum, item) => sum + item.w, 0);
+    const result = {} as Record<SkinId, number>;
+    for (const item of weights) {
+      result[item.id] = totalWeight > 0 ? (item.w / totalWeight) * 100 : 0;
+    }
+    return result;
+  }
+
+  pickSkin(
+    seedOrNonce: number,
+    availablePool?: SkinId[],
+    inventoryOrUnlocked?: UnlockedSource
+  ): SkinId {
     if (seedOrNonce === 0) {
       return 'corgi';
     }
+
+    const candidateIds = availablePool && availablePool.length > 0
+      ? availablePool
+      : ALL_SKINS.map((s) => s.id);
+
+    if (candidateIds.length === 1) return candidateIds[0];
+
+    const isUnlocked = extractUnlockedChecker(inventoryOrUnlocked);
 
     const rand = !Number.isInteger(seedOrNonce) && seedOrNonce > 0 && seedOrNonce < 1
       ? seedOrNonce
       : mulberry32(seedOrNonce);
 
-    const rollPct = rand * 100;
-    const selectFromList = (list: SkinId[], minPct: number, maxPct: number): SkinId => {
-      if (list.length === 0) return 'corgi';
-      if (list.length === 1) return list[0];
-      const range = maxPct - minPct;
-      const idx = Math.min(
-        list.length - 1,
-        Math.floor(((rollPct - minPct) / range) * list.length)
-      );
-      return list[idx];
-    };
+    const weights = candidateIds.map((id) => {
+      let w = SKIN_BASE_WEIGHTS[id] ?? 10;
+      if (isUnlocked(id)) {
+        w *= GACHA_DUPLICATE_WEIGHT_MULTIPLIER;
+      }
+      return { id, w };
+    });
 
-    if (rollPct < 50) return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.COMMON], 0, 50);
-    if (rollPct < 80) return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.RARE], 50, 80);
-    if (rollPct < 95) return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.EPIC], 80, 95);
-    return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.LEGENDARY], 95, 100);
+    const totalWeight = weights.reduce((sum, item) => sum + item.w, 0);
+    let threshold = rand * totalWeight;
+    for (const item of weights) {
+      threshold -= item.w;
+      if (threshold <= 0) {
+        return item.id;
+      }
+    }
+    return weights[weights.length - 1].id;
   }
 
   roll(
@@ -140,7 +185,7 @@ export class GachaMachine {
       return { success: false, reason: 'NOT_ENOUGH_COINS' };
     }
 
-    const chosenSkin: SkinId = forceSkinId ?? this.pickSkin(seedOrNonce, pool);
+    const chosenSkin: SkinId = forceSkinId ?? this.pickSkin(seedOrNonce, pool, inventory);
     const rarity = this.getSkinRarity(chosenSkin);
     const isDuplicate = inventory.isUnlocked(chosenSkin);
 

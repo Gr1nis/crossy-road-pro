@@ -153,4 +153,54 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
       assert.ok(droppedSkins.has(newSkin), `New skin "${newSkin}" must drop in live GameEngine rolls`);
     }
   });
+
+  it('Property 6 (Duplicate penalty in getDropProbabilities): unlocked characters have 0.25x weight and ~4x lower drop chance than new characters', () => {
+    const gacha = new GachaMachine();
+
+    // 1. Base probabilities (no unlocked skins):
+    const baseProbs = gacha.getDropProbabilities();
+    assert.equal(Math.round(baseProbs.corgi * 10) / 10, 12.5, 'Common base is 12.5%');
+    assert.equal(Math.round(baseProbs.box_cat * 10) / 10, 15.0, 'Rare base is 15.0%');
+    assert.equal(Math.round(baseProbs.raccoon_bandit * 10) / 10, 7.5, 'Epic base is 7.5%');
+    assert.equal(Math.round(baseProbs.capybara_zen * 10) / 10, 2.5, 'Legendary base is 2.5%');
+
+    // 2. With corgi unlocked:
+    const probsWithCorgi = gacha.getDropProbabilities(new Set(['corgi']));
+    // corgi weight is 12.5 * 0.25 = 3.125. Total weight = 90.625.
+    // corgi prob = (3.125 / 90.625) * 100 = 3.448%
+    // pigeon_pizza prob = (12.5 / 90.625) * 100 = 13.793%
+    assert.ok(probsWithCorgi.corgi < 4.0, 'Owned corgi probability drops to ~3.45%');
+    assert.ok(probsWithCorgi.pigeon_pizza > 13.0, 'New common pigeon_pizza has ~13.79%');
+    const ratio = probsWithCorgi.pigeon_pizza / probsWithCorgi.corgi;
+    assert.ok(Math.abs(ratio - 4.0) < 0.05, `New character chance must be 4x higher than owned duplicate (got ${ratio.toFixed(2)})`);
+
+    // 3. When all skins are unlocked: relative chances return to base
+    const allUnlockedProbs = gacha.getDropProbabilities(new Set(ALL_SKINS.map((s) => s.id)));
+    assert.equal(Math.round(allUnlockedProbs.corgi * 10) / 10, 12.5);
+    assert.equal(Math.round(allUnlockedProbs.box_cat * 10) / 10, 15.0);
+    assert.equal(Math.round(allUnlockedProbs.raccoon_bandit * 10) / 10, 7.5);
+    assert.equal(Math.round(allUnlockedProbs.capybara_zen * 10) / 10, 2.5);
+  });
+
+  it('Property 7 (Monte Carlo verification): pickSkin favors new skins over owned skins', () => {
+    const gacha = new GachaMachine();
+    const owned = new Set<SkinId>(['corgi', 'box_cat']);
+
+    let corgiDrops = 0;
+    let pizzaDrops = 0;
+    const iterations = 5000;
+
+    for (let i = 0; i < iterations; i++) {
+      const picked = gacha.pickSkin(Math.random(), undefined, owned);
+      if (picked === 'corgi') corgiDrops++;
+      if (picked === 'pigeon_pizza') pizzaDrops++;
+    }
+
+    // pigeon_pizza (new Common) should drop ~4x more than corgi (owned Common)
+    const observedRatio = pizzaDrops / Math.max(1, corgiDrops);
+    assert.ok(
+      observedRatio >= 3.0 && observedRatio <= 5.2,
+      `Observed drop ratio for new vs owned Common should be ~4.0x (got ${observedRatio.toFixed(2)})`
+    );
+  });
 });

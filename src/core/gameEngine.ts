@@ -308,6 +308,10 @@ export class GameEngine {
     return this.scoreTracker.isAllSkinsUnlocked();
   }
 
+  getGachaProbabilities(): Record<SkinId, number> {
+    return this.scoreTracker.getGachaProbabilities();
+  }
+
   rollGacha() {
     this.gachaNonce += 1;
     return this.scoreTracker.rollGacha(Math.random());
