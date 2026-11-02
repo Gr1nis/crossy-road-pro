@@ -1,5 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import { ALL_SKINS } from '../src/core/types.ts';
 import {
   getBuildingModelItems,
@@ -149,5 +151,35 @@ describe('3D Model Viewer & Dynamic Model Registry Suite', () => {
       assert.ok(parts[1] > 0, `Height for ${item.id} must be > 0`);
       assert.ok(parts[2] > 0, `Depth for ${item.id} must be > 0`);
     }
+  });
+
+  it('Property 9 (Viewer Bundle Integrity): model-viewer.html defines character expansion modules and all 10 characters', () => {
+    const viewerPath = path.join(process.cwd(), 'model-viewer.html');
+    assert.ok(fs.existsSync(viewerPath), 'model-viewer.html must exist');
+    const content = fs.readFileSync(viewerPath, 'utf8');
+
+    // Check expansion functions are defined
+    assert.ok(
+      content.includes('function createUrbanCharacterExpA'),
+      'createUrbanCharacterExpA must be defined in model-viewer.html'
+    );
+    assert.ok(
+      content.includes('function createUrbanCharacterExpB'),
+      'createUrbanCharacterExpB must be defined in model-viewer.html'
+    );
+
+    // Check all 10 character skin IDs are included
+    for (const skin of ALL_SKINS) {
+      assert.ok(
+        content.includes(skin.id),
+        `Character "${skin.id}" must be included in model-viewer.html`
+      );
+    }
+
+    // Check category count reflects all 10 characters
+    assert.ok(
+      content.includes('Персонажи (10)'),
+      'Sidebar tab must display "Персонажи (10)"'
+    );
   });
 });

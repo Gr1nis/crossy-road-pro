@@ -3145,7 +3145,13 @@ const htmlContent = `<!DOCTYPE html>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
         <a id="dev-open-viewer-btn" href="model-viewer.html" onclick="this.href='model-viewer.html?v='+Date.now();" target="_blank" class="menu-btn menu-btn-secondary" style="grid-column: span 2; display: block; text-decoration: none; text-align: center; background: #6366f1; border-color: #818cf8; color: #fff;">
-          🔍 3D Вьюер моделей (Все 27 моделей)
+          🔍 3D Вьюер моделей (Все 32 модели: 10 персонажей, транспорт, здания)
+        </a>
+        <a href="model-viewer.html?model=raincoat_duck" target="_blank" class="menu-btn menu-btn-slate" style="display: block; text-decoration: none; text-align: center; font-size: 12px; padding: 8px; background: #0284c7; border-color: #38bdf8; color: #fff;">
+          🦆 Утка в дождевике 3D
+        </a>
+        <a href="model-viewer.html?model=pigeon_king" target="_blank" class="menu-btn menu-btn-slate" style="display: block; text-decoration: none; text-align: center; font-size: 12px; padding: 8px; background: #9333ea; border-color: #c084fc; color: #fff;">
+          👑 Голубиный Барон 3D
         </a>
         <a href="model-viewer.html?model=townhouse_bakery&biome=winter" target="_blank" class="menu-btn menu-btn-slate" style="display: block; text-decoration: none; text-align: center; font-size: 12px; padding: 8px; background: #0284c7; border-color: #38bdf8; color: #fff;">
           🥖 Зимняя Пекарня 3D
@@ -3249,6 +3255,8 @@ const viewerModuleOrder = [
   'src/core/types.ts',
   'src/core/collision.ts',
   'src/view/voxelPalette.ts',
+  'src/view/urbanCharactersExpansionA.ts',
+  'src/view/urbanCharactersExpansionB.ts',
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
   'src/view/urbanVehicles.ts',
@@ -3387,12 +3395,14 @@ const viewerHtmlContent = `<!DOCTYPE html>
     </div>
     <div class="header-links">
       <div style="background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 6px;">
-        <span>🎯 Проверено: 27 моделей</span>
+        <span>🎯 Проверено: 32 модели</span>
         <span style="color: #64748b;">|</span>
         <span style="color: #4ade80;">✔ Синхронизировано</span>
       </div>
-      <a href="?model=townhouse_bakery&biome=winter" class="nav-btn" style="background: rgba(2, 132, 199, 0.4); border-color: #38bdf8;">🥖 Зимняя пекарня</a>
-      <a href="?model=townhouse_cafe&biome=forest" class="nav-btn">☕ Кафе</a>
+      <a href="?model=raincoat_duck" class="nav-btn" style="background: rgba(2, 132, 199, 0.35); border-color: #38bdf8;">🦆 Утка</a>
+      <a href="?model=pigeon_king" class="nav-btn" style="background: rgba(147, 51, 234, 0.35); border-color: #c084fc;">👑 Барон</a>
+      <a href="?model=capybara_zen" class="nav-btn" style="background: rgba(245, 158, 11, 0.35); border-color: #fbbf24;">🍊 Капибара</a>
+      <a href="?model=townhouse_bakery&biome=winter" class="nav-btn">🥖 Пекарня</a>
       <a href="index.html" class="nav-btn">🎮 В игру</a>
     </div>
   </header>
@@ -3400,7 +3410,7 @@ const viewerHtmlContent = `<!DOCTYPE html>
   <!-- Left Sidebar (Models Catalog) -->
   <aside class="sidebar">
     <div class="category-tabs">
-      <button class="cat-tab active" data-cat="chars">Персонажи (5)</button>
+      <button class="cat-tab active" data-cat="chars">Персонажи (10)</button>
       <button class="cat-tab" data-cat="vehicles">Транспорт (6)</button>
       <button class="cat-tab" data-cat="props">Окружение (10)</button>
       <button class="cat-tab" data-cat="nature">Биомы (3)</button>
