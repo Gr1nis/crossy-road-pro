@@ -396,8 +396,9 @@ export class ScoreTracker {
     return this.getLockedSkins().length === 0;
   }
 
-  rollGacha(randomIndex: number = 0, forceSkinId?: SkinId): GachaRollResult {
-    const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forceSkinId);
+  rollGacha(randomIndex?: number, forceSkinId?: SkinId): GachaRollResult {
+    const seed = randomIndex !== undefined ? randomIndex : Math.random();
+    const result = this.gacha.roll(seed, this.wallet, this.inventory, forceSkinId);
     if (result.success) {
       this.achievements.recordGachaRoll();
       if (!result.isDuplicate && result.skinId) {

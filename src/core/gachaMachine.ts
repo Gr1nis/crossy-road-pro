@@ -98,6 +98,10 @@ export class GachaMachine {
       return availablePool[availablePool.length - 1];
     }
 
+    if (seedOrNonce === 0) {
+      return 'corgi';
+    }
+
     const rand = !Number.isInteger(seedOrNonce) && seedOrNonce > 0 && seedOrNonce < 1
       ? seedOrNonce
       : mulberry32(seedOrNonce);
@@ -106,9 +110,6 @@ export class GachaMachine {
     const selectFromList = (list: SkinId[], minPct: number, maxPct: number): SkinId => {
       if (list.length === 0) return 'corgi';
       if (list.length === 1) return list[0];
-      if (Number.isInteger(seedOrNonce)) {
-        return list[Math.abs(seedOrNonce) % list.length];
-      }
       const range = maxPct - minPct;
       const idx = Math.min(
         list.length - 1,

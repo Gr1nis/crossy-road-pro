@@ -3932,6 +3932,10 @@ class GachaMachine {
       return availablePool[availablePool.length - 1];
     }
 
+    if (seedOrNonce === 0) {
+      return 'corgi';
+    }
+
     const rand = !Number.isInteger(seedOrNonce) && seedOrNonce > 0 && seedOrNonce < 1
       ? seedOrNonce
       : mulberry32(seedOrNonce);
@@ -3940,9 +3944,6 @@ class GachaMachine {
     const selectFromList = (list          , minPct        , maxPct        )         => {
       if (list.length === 0) return 'corgi';
       if (list.length === 1) return list[0];
-      if (Number.isInteger(seedOrNonce)) {
-        return list[Math.abs(seedOrNonce) % list.length];
-      }
       const range = maxPct - minPct;
       const idx = Math.min(
         list.length - 1,
@@ -5050,8 +5051,9 @@ class ScoreTracker {
     return this.getLockedSkins().length === 0;
   }
 
-  rollGacha(randomIndex         = 0, forceSkinId         )                  {
-    const result = this.gacha.roll(randomIndex, this.wallet, this.inventory, forceSkinId);
+  rollGacha(randomIndex         , forceSkinId         )                  {
+    const seed = randomIndex !== undefined ? randomIndex : Math.random();
+    const result = this.gacha.roll(seed, this.wallet, this.inventory, forceSkinId);
     if (result.success) {
       this.achievements.recordGachaRoll();
       if (!result.isDuplicate && result.skinId) {
@@ -5766,7 +5768,7 @@ class GameEngine {
 
   rollGacha() {
     this.gachaNonce += 1;
-    return this.scoreTracker.rollGacha(this.gachaNonce);
+    return this.scoreTracker.rollGacha(Math.random());
   }
 
   claimDuplicateCashback(amount         = GACHA_DUPLICATE_CASHBACK)         {

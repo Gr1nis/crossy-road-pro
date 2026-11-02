@@ -310,7 +310,7 @@ export class GameEngine {
 
   rollGacha() {
     this.gachaNonce += 1;
-    return this.scoreTracker.rollGacha(this.gachaNonce);
+    return this.scoreTracker.rollGacha(Math.random());
   }
 
   claimDuplicateCashback(amount: number = GACHA_DUPLICATE_CASHBACK): number {

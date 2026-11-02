@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { ALL_SKINS, type SkinId, type StorageAdapter } from '../src/core/types.ts';
 import { GachaMachine, SkinRarity } from '../src/core/gachaMachine.ts';
 import { ScoreTracker } from '../src/core/scoreTracker.ts';
+import { GameEngine } from '../src/core/gameEngine.ts';
 import { preloadGachaCardThumbnails, GACHA_CARD_THUMB_CACHE } from '../src/view/gachaCardArt.ts';
 
 class MemoryStorage implements StorageAdapter {
@@ -119,6 +120,37 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
         GACHA_CARD_THUMB_CACHE.has(skin.id),
         `Thumbnail cache must include character "${skin.id}"`
       );
+    }
+  });
+
+  it('Property 5 (GameEngine live gacha rolls): engine.rollGacha() rolls all 10 characters in live gameplay simulation', () => {
+    const storage = new MemoryStorage();
+    const engine = new GameEngine(42, storage);
+
+    const droppedSkins = new Set<SkinId>();
+    // Provide coins and roll repeatedly
+    for (let i = 0; i < 300; i++) {
+      engine.addCoins(100);
+      const res = engine.rollGacha();
+      assert.equal(res.success, true);
+      if (res.skinId) {
+        droppedSkins.add(res.skinId);
+      }
+      if (res.isDuplicate && res.cashback) {
+        engine.claimDuplicateCashback(res.cashback);
+      }
+    }
+
+    assert.equal(droppedSkins.size, 10, 'Live GameEngine.rollGacha() must drop all 10 characters');
+    const newCharacters: SkinId[] = [
+      'barista_pug',
+      'skater_ferret',
+      'subway_rat',
+      'raincoat_duck',
+      'pigeon_king',
+    ];
+    for (const newSkin of newCharacters) {
+      assert.ok(droppedSkins.has(newSkin), `New skin "${newSkin}" must drop in live GameEngine rolls`);
     }
   });
 });
