@@ -414,6 +414,7 @@ const VOXEL_PALETTE = {
   darkCharcoal: 0x1e293b,
   nosePink: 0xf472b6,
   greenLeaf: 0x16a34a,
+  nvgGreen: 0x22c55e,
   ghostYellow: 0xfbbf24,
   burlapBag: 0xd4b285,
   bagRope: 0x854d0e,
@@ -434,7 +435,7 @@ const VOXEL_PALETTE = {
   corgiGold: 0xfacc15,
   pigeonDark: 0x1e293b,
   pigeonBeak: 0xf97316,
-  pigeonTeal: 0x8b5cf6,
+  pigeonTeal: 0x0d9488, // Emerald teal sheen for street pigeon neck
   pizzaCrust: 0xb45309,
   pizzaPepperoni: 0xb91c1c,
   boxTan: 0xb45309,
@@ -608,233 +609,273 @@ function createUrbanCharacter(skinId         = 'corgi', isGhost = false)        
   const group = new THREE.Group();
 
   if (skinId === 'corgi') {
-    // 32 voxels: Corgi with stubby paws, pink pads, white chest & blaze, tongue, upright ears, peach tail
-    // 4 Stubby paws with pink pads
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, -0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, -0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, -0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, -0.16, isGhost);
-    // Body, underbelly, fluffy chest & rear bum
-    addCharVoxel(group, 0.38, 0.22, 0.46, 'corgiOrange', 0, 0.25, -0.01, isGhost);
-    addCharVoxel(group, 0.26, 0.04, 0.38, 'white', 0, 0.15, -0.01, isGhost);
-    addCharVoxel(group, 0.34, 0.20, 0.12, 'white', 0, 0.26, 0.18, isGhost);
-    addCharVoxel(group, 0.36, 0.20, 0.08, 'corgiOrange', 0, 0.26, -0.24, isGhost);
-    addCharVoxel(group, 0.16, 0.12, 0.03, 'white', 0, 0.25, -0.28, isGhost);
-    addCharVoxel(group, 0.12, 0.12, 0.10, 'corgiOrange', 0, 0.35, -0.27, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.05, 'white', 0, 0.37, -0.31, isGhost);
-    // Collar & golden tag
-    addCharVoxel(group, 0.32, 0.04, 0.22, 'pizzaRed', 0, 0.35, 0.15, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.03, 'pizzaCheese', 0, 0.33, 0.26, isGhost);
-    // Head, blaze, muzzle, nose, tongue, expressive eyes
-    addCharVoxel(group, 0.36, 0.26, 0.30, 'corgiOrange', 0, 0.48, 0.18, isGhost);
-    addCharVoxel(group, 0.08, 0.22, 0.12, 'white', 0, 0.50, 0.28, isGhost);
-    addCharVoxel(group, 0.20, 0.12, 0.14, 'white', 0, 0.42, 0.35, isGhost);
-    addCharVoxel(group, 0.08, 0.06, 0.06, 'darkCharcoal', 0, 0.46, 0.42, isGhost);
-    addCharVoxel(group, 0.06, 0.03, 0.08, 'nosePink', 0.03, 0.38, 0.41, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', -0.11, 0.51, 0.33, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', -0.11, 0.53, 0.35, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', 0.11, 0.51, 0.33, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', 0.11, 0.53, 0.35, isGhost);
-    // Big fox ears with pink inner layer
-    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', -0.14, 0.66, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', -0.15, 0.76, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', -0.14, 0.67, 0.18, isGhost);
-    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', 0.14, 0.66, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', 0.15, 0.76, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', 0.14, 0.67, 0.18, isGhost);
+    // 43 voxels: Zero Z-Fighting Certified Solid Corgi (0 coplanar overlaps)
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', -0.140, 0.015, 0.150, isGhost); // front_paw_pad_left
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', -0.140, 0.085, 0.150, isGhost); // front_paw_sock_left
+    addCharVoxel(group, 0.060, 0.022, 0.030, 'nosePink', -0.140, 0.016, 0.205, isGhost); // front_toe_beans_left
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', 0.140, 0.015, 0.150, isGhost); // front_paw_pad_right
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', 0.140, 0.085, 0.150, isGhost); // front_paw_sock_right
+    addCharVoxel(group, 0.060, 0.022, 0.030, 'nosePink', 0.140, 0.016, 0.205, isGhost); // front_toe_beans_right
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', -0.140, 0.015, -0.150, isGhost); // rear_paw_pad_left
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', -0.140, 0.085, -0.150, isGhost); // rear_paw_sock_left
+    addCharVoxel(group, 0.110, 0.095, 0.120, 'corgiOrange', -0.140, 0.188, -0.150, isGhost); // rear_thigh_fluff_left
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', 0.140, 0.015, -0.150, isGhost); // rear_paw_pad_right
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', 0.140, 0.085, -0.150, isGhost); // rear_paw_sock_right
+    addCharVoxel(group, 0.110, 0.095, 0.120, 'corgiOrange', 0.140, 0.188, -0.150, isGhost); // rear_thigh_fluff_right
+    addCharVoxel(group, 0.350, 0.225, 0.370, 'corgiOrange', 0.000, 0.237, -0.000, isGhost); // body_loaf_core
+    addCharVoxel(group, 0.260, 0.025, 0.330, 'white', 0.000, 0.122, -0.000, isGhost); // body_belly_white
+    addCharVoxel(group, 0.320, 0.180, 0.110, 'white', 0.000, 0.245, 0.165, isGhost); // chest_bib_main
+    addCharVoxel(group, 0.180, 0.110, 0.050, 'white', 0.000, 0.255, 0.220, isGhost); // chest_bib_tuft
+    addCharVoxel(group, 0.330, 0.200, 0.065, 'corgiOrange', 0.000, 0.235, -0.203, isGhost); // rear_bum_core
+    addCharVoxel(group, 0.270, 0.140, 0.045, 'white', 0.000, 0.235, -0.237, isGhost); // butt_peach_heart
+    addCharVoxel(group, 0.110, 0.125, 0.080, 'corgiOrange', 0.000, 0.328, -0.245, isGhost); // butt_tail_bob
+    addCharVoxel(group, 0.070, 0.070, 0.045, 'white', 0.000, 0.330, -0.292, isGhost); // butt_tail_tip
+    addCharVoxel(group, 0.360, 0.045, 0.245, 'pizzaRed', 0.000, 0.347, 0.133, isGhost); // collar_ring
+    addCharVoxel(group, 0.060, 0.060, 0.035, 'pizzaCheese', 0.000, 0.305, 0.253, isGhost); // collar_tag_gold
+    addCharVoxel(group, 0.340, 0.230, 0.270, 'corgiOrange', 0.000, 0.470, 0.155, isGhost); // head_core
+    addCharVoxel(group, 0.045, 0.110, 0.130, 'white', -0.177, 0.430, 0.165, isGhost); // cheek_fluff_left
+    addCharVoxel(group, 0.045, 0.110, 0.130, 'white', 0.177, 0.430, 0.165, isGhost); // cheek_fluff_right
+    addCharVoxel(group, 0.080, 0.260, 0.110, 'white', 0.000, 0.475, 0.250, isGhost); // blaze_forehead
+    addCharVoxel(group, 0.070, 0.040, 0.100, 'white', 0.000, 0.595, 0.170, isGhost); // blaze_crown
+    addCharVoxel(group, 0.180, 0.100, 0.130, 'white', 0.000, 0.415, 0.310, isGhost); // snout_muzzle
+    addCharVoxel(group, 0.130, 0.020, 0.090, 'white', 0.000, 0.350, 0.290, isGhost); // chin_under_mouth
+    addCharVoxel(group, 0.070, 0.055, 0.050, 'darkCharcoal', 0.000, 0.448, 0.380, isGhost); // nose_button
+    addCharVoxel(group, 0.030, 0.030, 0.075, 'nosePink', 0.025, 0.370, 0.362, isGhost); // tongue_playful
+    addCharVoxel(group, 0.055, 0.050, 0.040, 'darkCharcoal', -0.098, 0.500, 0.290, isGhost); // eye_left_iris
+    addCharVoxel(group, 0.025, 0.015, 0.025, 'white', -0.102, 0.512, 0.307, isGhost); // eye_left_sparkle
+    addCharVoxel(group, 0.045, 0.020, 0.025, 'white', -0.098, 0.550, 0.287, isGhost); // eyebrow_left
+    addCharVoxel(group, 0.055, 0.050, 0.040, 'darkCharcoal', 0.098, 0.500, 0.290, isGhost); // eye_right_iris
+    addCharVoxel(group, 0.025, 0.015, 0.025, 'white', 0.102, 0.512, 0.307, isGhost); // eye_right_sparkle
+    addCharVoxel(group, 0.045, 0.020, 0.025, 'white', 0.098, 0.550, 0.287, isGhost); // eyebrow_right
+    addCharVoxel(group, 0.090, 0.120, 0.080, 'corgiOrange', -0.130, 0.630, 0.150, isGhost); // ear_base_left
+    addCharVoxel(group, 0.070, 0.100, 0.060, 'corgiOrange', -0.130, 0.725, 0.150, isGhost); // ear_tip_left
+    addCharVoxel(group, 0.040, 0.110, 0.035, 'nosePink', -0.130, 0.650, 0.182, isGhost); // ear_pink_left
+    addCharVoxel(group, 0.090, 0.120, 0.080, 'corgiOrange', 0.130, 0.630, 0.150, isGhost); // ear_base_right
+    addCharVoxel(group, 0.070, 0.100, 0.060, 'corgiOrange', 0.130, 0.725, 0.150, isGhost); // ear_tip_right
+    addCharVoxel(group, 0.040, 0.110, 0.035, 'nosePink', 0.130, 0.650, 0.182, isGhost); // ear_pink_right
   } else if (skinId === 'pigeon_pizza') {
-    // 33 voxels: Pigeon with iridescent neck, wing stripes, and triangular pepperoni pizza
-    // Coral feet & legs
-    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', -0.10, 0.015, 0.02, isGhost);
-    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', -0.10, 0.07, 0.00, isGhost);
-    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', 0.10, 0.015, 0.02, isGhost);
-    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', 0.10, 0.07, 0.00, isGhost);
-    // Body, light chest, tail feathers
-    addCharVoxel(group, 0.40, 0.28, 0.42, 'pigeonGrey', 0, 0.28, -0.04, isGhost);
-    addCharVoxel(group, 0.30, 0.20, 0.12, 'white', 0, 0.28, 0.12, isGhost);
-    addCharVoxel(group, 0.22, 0.08, 0.18, 'pigeonGrey', 0, 0.26, -0.28, isGhost);
-    addCharVoxel(group, 0.18, 0.05, 0.12, 'darkCharcoal', 0, 0.24, -0.38, isGhost);
-    // Wings with black bars & tips
-    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', -0.22, 0.32, -0.04, isGhost);
-    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', -0.22, 0.28, -0.06, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', -0.20, 0.24, -0.20, isGhost);
-    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', 0.22, 0.32, -0.04, isGhost);
-    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', 0.22, 0.28, -0.06, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', 0.20, 0.24, -0.20, isGhost);
-    // Iridescent shimmering neck & collar
-    addCharVoxel(group, 0.28, 0.12, 0.26, 'purpleNeck', 0, 0.43, 0.10, isGhost);
-    addCharVoxel(group, 0.29, 0.04, 0.27, 'pigeonTeal', 0, 0.41, 0.10, isGhost);
-    // Head, eyes with orange ring, beak & cere
-    addCharVoxel(group, 0.26, 0.22, 0.26, 'pigeonGrey', 0, 0.56, 0.14, isGhost);
-    addCharVoxel(group, 0.18, 0.06, 0.18, 'pigeonGrey', 0, 0.68, 0.14, isGhost);
-    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', -0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', -0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', 0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', 0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.09, 0.06, 0.12, 'orangeFruit', 0, 0.55, 0.26, isGhost);
-    addCharVoxel(group, 0.08, 0.04, 0.08, 'orangeFruit', 0, 0.50, 0.24, isGhost);
-    addCharVoxel(group, 0.08, 0.04, 0.04, 'white', 0, 0.59, 0.23, isGhost);
-    // Realistic triangular pizza slice with cheese, crust & pepperoni
-    addCharVoxel(group, 0.08, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.26, isGhost);
-    addCharVoxel(group, 0.16, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.31, isGhost);
-    addCharVoxel(group, 0.24, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.36, isGhost);
-    addCharVoxel(group, 0.26, 0.06, 0.06, 'pizzaCrust', 0, 0.53, 0.41, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', -0.05, 0.54, 0.36, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', 0.05, 0.54, 0.32, isGhost);
-    addCharVoxel(group, 0.04, 0.02, 0.04, 'pizzaRed', 0, 0.54, 0.28, isGhost);
-    addCharVoxel(group, 0.03, 0.02, 0.03, 'greenLeaf', -0.02, 0.54, 0.33, isGhost);
+    // 55 voxels: Zero Z-Fighting Certified Solid Pigeon Pizza (0 coplanar overlaps)
+    addCharVoxel(group, 0.060, 0.025, 0.100, 'pigeonFootRed', -0.100, 0.013, -0.000, isGhost); // left_foot_base
+    addCharVoxel(group, 0.030, 0.020, 0.075, 'pigeonFootRed', -0.100, 0.013, 0.083, isGhost); // left_toe_mid
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', -0.140, 0.013, 0.075, isGhost); // left_toe_outer
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', -0.060, 0.013, 0.075, isGhost); // left_toe_inner
+    addCharVoxel(group, 0.030, 0.020, 0.050, 'pigeonFootRed', -0.100, 0.013, -0.070, isGhost); // left_toe_hallux
+    addCharVoxel(group, 0.030, 0.105, 0.030, 'pigeonFootRed', -0.100, 0.072, -0.000, isGhost); // left_leg_shank
+    addCharVoxel(group, 0.050, 0.070, 0.070, 'pigeonGrey', -0.100, 0.150, -0.000, isGhost); // left_thigh_fluff
+    addCharVoxel(group, 0.060, 0.025, 0.100, 'pigeonFootRed', 0.100, 0.013, -0.000, isGhost); // right_foot_base
+    addCharVoxel(group, 0.030, 0.020, 0.075, 'pigeonFootRed', 0.100, 0.013, 0.083, isGhost); // right_toe_mid
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', 0.140, 0.013, 0.075, isGhost); // right_toe_outer
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', 0.060, 0.013, 0.075, isGhost); // right_toe_inner
+    addCharVoxel(group, 0.030, 0.020, 0.050, 'pigeonFootRed', 0.100, 0.013, -0.070, isGhost); // right_toe_hallux
+    addCharVoxel(group, 0.030, 0.105, 0.030, 'pigeonFootRed', 0.100, 0.072, -0.000, isGhost); // right_leg_shank
+    addCharVoxel(group, 0.050, 0.070, 0.070, 'pigeonGrey', 0.100, 0.150, -0.000, isGhost); // right_thigh_fluff
+    addCharVoxel(group, 0.320, 0.065, 0.300, 'pigeonGrey', 0.000, 0.182, -0.010, isGhost); // body_belly_base
+    addCharVoxel(group, 0.380, 0.205, 0.350, 'pigeonGrey', 0.000, 0.307, -0.005, isGhost); // body_core_loaf
+    addCharVoxel(group, 0.300, 0.165, 0.070, 'white', 0.000, 0.308, 0.195, isGhost); // breast_puff_front
+    addCharVoxel(group, 0.200, 0.080, 0.080, 'pigeonGrey', 0.000, 0.230, -0.210, isGhost); // undertail_cushion
+    addCharVoxel(group, 0.040, 0.150, 0.250, 'pigeonGrey', -0.200, 0.315, 0.015, isGhost); // left_wing_mantle
+    addCharVoxel(group, 0.040, 0.105, 0.045, 'darkCharcoal', -0.205, 0.308, -0.002, isGhost); // left_wing_bar_1
+    addCharVoxel(group, 0.040, 0.100, 0.045, 'darkCharcoal', -0.205, 0.285, -0.072, isGhost); // left_wing_bar_2
+    addCharVoxel(group, 0.095, 0.070, 0.205, 'darkCharcoal', -0.163, 0.255, -0.208, isGhost); // left_wing_primaries
+    addCharVoxel(group, 0.040, 0.150, 0.250, 'pigeonGrey', 0.200, 0.315, 0.015, isGhost); // right_wing_mantle
+    addCharVoxel(group, 0.040, 0.105, 0.045, 'darkCharcoal', 0.205, 0.308, -0.002, isGhost); // right_wing_bar_1
+    addCharVoxel(group, 0.040, 0.100, 0.045, 'darkCharcoal', 0.205, 0.285, -0.072, isGhost); // right_wing_bar_2
+    addCharVoxel(group, 0.095, 0.070, 0.205, 'darkCharcoal', 0.163, 0.255, -0.208, isGhost); // right_wing_primaries
+    addCharVoxel(group, 0.240, 0.065, 0.140, 'pigeonGrey', 0.000, 0.288, -0.260, isGhost); // tail_base_grey
+    addCharVoxel(group, 0.260, 0.055, 0.120, 'darkCharcoal', 0.000, 0.258, -0.380, isGhost); // tail_black_band
+    addCharVoxel(group, 0.240, 0.035, 0.050, 'white', 0.000, 0.258, -0.455, isGhost); // tail_white_tip
+    addCharVoxel(group, 0.190, 0.065, 0.120, 'pigeonTeal', 0.000, 0.428, 0.135, isGhost); // neck_base_teal
+    addCharVoxel(group, 0.180, 0.065, 0.100, 'purpleNeck', 0.000, 0.483, 0.135, isGhost); // neck_collar_purple
+    addCharVoxel(group, 0.140, 0.075, 0.035, 'pigeonTeal', 0.000, 0.448, 0.193, isGhost); // neck_sheen_front
+    addCharVoxel(group, 0.250, 0.190, 0.210, 'pigeonGrey', 0.000, 0.595, 0.095, isGhost); // head_core
+    addCharVoxel(group, 0.190, 0.045, 0.145, 'pigeonGrey', 0.000, 0.703, 0.102, isGhost); // head_crown
+    addCharVoxel(group, 0.020, 0.080, 0.080, 'orangeFruit', -0.128, 0.600, 0.125, isGhost); // eye_ring_left
+    addCharVoxel(group, 0.025, 0.050, 0.050, 'darkCharcoal', -0.128, 0.600, 0.125, isGhost); // eye_pupil_left
+    addCharVoxel(group, 0.023, 0.020, 0.025, 'white', -0.131, 0.610, 0.128, isGhost); // eye_sparkle_left
+    addCharVoxel(group, 0.020, 0.080, 0.080, 'orangeFruit', 0.128, 0.600, 0.125, isGhost); // eye_ring_right
+    addCharVoxel(group, 0.025, 0.050, 0.050, 'darkCharcoal', 0.128, 0.600, 0.125, isGhost); // eye_pupil_right
+    addCharVoxel(group, 0.023, 0.020, 0.025, 'white', 0.131, 0.610, 0.128, isGhost); // eye_sparkle_right
+    addCharVoxel(group, 0.080, 0.035, 0.115, 'orangeFruit', 0.000, 0.578, 0.247, isGhost); // beak_upper
+    addCharVoxel(group, 0.050, 0.040, 0.050, 'orangeFruit', 0.000, 0.565, 0.310, isGhost); // beak_tip
+    addCharVoxel(group, 0.070, 0.035, 0.080, 'orangeFruit', 0.000, 0.533, 0.235, isGhost); // beak_lower
+    addCharVoxel(group, 0.090, 0.035, 0.060, 'white', 0.000, 0.608, 0.225, isGhost); // cere_waxy_bump
+    addCharVoxel(group, 0.280, 0.050, 0.055, 'pizzaCrust', 0.000, 0.565, 0.298, isGhost); // pizza_crust
+    addCharVoxel(group, 0.240, 0.028, 0.160, 'pizzaRed', 0.000, 0.544, 0.380, isGhost); // pizza_sauce_base
+    addCharVoxel(group, 0.230, 0.027, 0.060, 'pizzaCheese', 0.000, 0.566, 0.340, isGhost); // pizza_cheese_wide
+    addCharVoxel(group, 0.160, 0.028, 0.070, 'pizzaCheese', 0.000, 0.561, 0.395, isGhost); // pizza_cheese_mid
+    addCharVoxel(group, 0.080, 0.028, 0.060, 'pizzaCheese', 0.000, 0.556, 0.450, isGhost); // pizza_cheese_tip
+    addCharVoxel(group, 0.055, 0.020, 0.050, 'pizzaRed', -0.057, 0.582, 0.340, isGhost); // pepperoni_back_left
+    addCharVoxel(group, 0.055, 0.020, 0.050, 'pizzaRed', 0.057, 0.582, 0.340, isGhost); // pepperoni_back_right
+    addCharVoxel(group, 0.060, 0.020, 0.050, 'pizzaRed', 0.000, 0.578, 0.400, isGhost); // pepperoni_front
+    addCharVoxel(group, 0.035, 0.018, 0.035, 'greenLeaf', -0.043, 0.581, 0.398, isGhost); // basil_leaf
+    addCharVoxel(group, 0.030, 0.065, 0.030, 'pizzaCheese', -0.080, 0.522, 0.350, isGhost); // cheese_drip_left
+    addCharVoxel(group, 0.030, 0.055, 0.030, 'pizzaCheese', 0.070, 0.528, 0.370, isGhost); // cheese_drip_right
   } else if (skinId === 'box_cat') {
-    // 37 voxels: Ginger cat in cardboard parcel box with flaps, FRAGILE stamp & paws on rim
-    // Corrugated box & angled flaps
-    addCharVoxel(group, 0.52, 0.04, 0.52, 'cardboard', 0, 0.02, 0, isGhost);
-    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, 0.24, isGhost);
-    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, -0.24, isGhost);
-    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', -0.24, 0.17, 0, isGhost);
-    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', 0.24, 0.17, 0, isGhost);
-    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, 0.31, isGhost);
-    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, -0.31, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', -0.31, 0.29, 0, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', 0.31, 0.29, 0, isGhost);
-    // Red DELIVERY / FRAGILE stamp label
-    addCharVoxel(group, 0.22, 0.12, 0.02, 'deliveryRed', 0.10, 0.15, 0.262, isGhost);
-    addCharVoxel(group, 0.16, 0.04, 0.02, 'white', 0.10, 0.16, 0.272, isGhost);
-    addCharVoxel(group, 0.04, 0.05, 0.02, 'darkCharcoal', 0.02, 0.15, 0.274, isGhost);
-    // Cat body & white chest
-    addCharVoxel(group, 0.38, 0.22, 0.38, 'catOrange', 0, 0.20, 0, isGhost);
-    addCharVoxel(group, 0.20, 0.14, 0.06, 'white', 0, 0.26, 0.18, isGhost);
-    // Paws resting over the front rim
-    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', -0.13, 0.32, 0.24, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', -0.13, 0.29, 0.26, isGhost);
-    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', 0.13, 0.32, 0.24, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', 0.13, 0.29, 0.26, isGhost);
-    // Cat head, tabby stripes, cheeks & nose
-    addCharVoxel(group, 0.34, 0.26, 0.30, 'catOrange', 0, 0.44, 0.06, isGhost);
-    addCharVoxel(group, 0.05, 0.12, 0.26, 'catStripe', 0, 0.52, 0.06, isGhost);
-    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', -0.09, 0.51, 0.06, isGhost);
-    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', 0.09, 0.51, 0.06, isGhost);
-    addCharVoxel(group, 0.18, 0.09, 0.08, 'white', 0, 0.39, 0.21, isGhost);
-    addCharVoxel(group, 0.05, 0.04, 0.04, 'nosePink', 0, 0.42, 0.25, isGhost);
-    // Expressive cat eyes with dark pupils
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', -0.08, 0.46, 0.212, isGhost);
-    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', -0.08, 0.46, 0.216, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', 0.08, 0.46, 0.212, isGhost);
-    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', 0.08, 0.46, 0.216, isGhost);
-    // Ears with pink inner lining
-    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', -0.12, 0.60, 0.06, isGhost);
-    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', -0.12, 0.59, 0.08, isGhost);
-    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', 0.12, 0.60, 0.06, isGhost);
-    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', 0.12, 0.59, 0.08, isGhost);
-    // Striped tail sticking straight up out of the back
-    addCharVoxel(group, 0.07, 0.14, 0.07, 'catOrange', 0.06, 0.35, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.44, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.07, 'catOrange', 0.06, 0.51, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.58, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.08, 'white', 0.06, 0.65, -0.19, isGhost);
+    // 54 voxels: Zero Z-Fighting Certified Solid Ginger Cat in Cardboard Box (0 coplanar overlaps)
+    addCharVoxel(group, 0.480, 0.040, 0.480, 'cardboard', 0.000, 0.020, -0.000, isGhost); // box_floor
+    addCharVoxel(group, 0.500, 0.255, 0.040, 'cardboard', 0.000, 0.133, 0.230, isGhost); // box_wall_front
+    addCharVoxel(group, 0.500, 0.255, 0.040, 'cardboard', 0.000, 0.133, -0.230, isGhost); // box_wall_back
+    addCharVoxel(group, 0.035, 0.240, 0.450, 'cardboard', -0.230, 0.133, -0.000, isGhost); // box_wall_left
+    addCharVoxel(group, 0.035, 0.240, 0.450, 'cardboard', 0.230, 0.133, -0.000, isGhost); // box_wall_right
+    addCharVoxel(group, 0.460, 0.030, 0.085, 'boxFlap', 0.000, 0.253, 0.278, isGhost); // box_flap_front
+    addCharVoxel(group, 0.460, 0.030, 0.085, 'boxFlap', 0.000, 0.253, -0.278, isGhost); // box_flap_back
+    addCharVoxel(group, 0.085, 0.030, 0.430, 'boxFlap', -0.278, 0.254, -0.000, isGhost); // box_flap_left
+    addCharVoxel(group, 0.085, 0.030, 0.430, 'boxFlap', 0.278, 0.254, -0.000, isGhost); // box_flap_right
+    addCharVoxel(group, 0.508, 0.025, 0.048, 'boxTape', 0.000, 0.010, 0.230, isGhost); // tape_strip_base
+    addCharVoxel(group, 0.170, 0.130, 0.013, 'white', 0.105, 0.125, 0.253, isGhost); // shipping_label_white
+    addCharVoxel(group, 0.070, 0.065, 0.010, 'deliveryRed', 0.075, 0.143, 0.258, isGhost); // fragile_stamp_red
+    addCharVoxel(group, 0.130, 0.025, 0.010, 'darkCharcoal', 0.105, 0.085, 0.258, isGhost); // barcode_strip_dark
+    addCharVoxel(group, 0.360, 0.255, 0.360, 'catOrange', 0.000, 0.163, -0.000, isGhost); // cat_torso_loaf
+    addCharVoxel(group, 0.220, 0.095, 0.050, 'white', 0.000, 0.270, 0.180, isGhost); // cat_chest_bib
+    addCharVoxel(group, 0.110, 0.065, 0.050, 'white', 0.000, 0.245, 0.190, isGhost); // cat_bib_tuft
+    addCharVoxel(group, 0.070, 0.062, 0.080, 'catOrange', -0.125, 0.261, 0.180, isGhost); // paw_left_arm
+    addCharVoxel(group, 0.080, 0.047, 0.050, 'white', -0.125, 0.268, 0.217, isGhost); // paw_left_mitten
+    addCharVoxel(group, 0.055, 0.025, 0.036, 'nosePink', -0.125, 0.244, 0.226, isGhost); // paw_left_beans
+    addCharVoxel(group, 0.070, 0.062, 0.080, 'catOrange', 0.125, 0.261, 0.180, isGhost); // paw_right_arm
+    addCharVoxel(group, 0.080, 0.047, 0.050, 'white', 0.125, 0.268, 0.217, isGhost); // paw_right_mitten
+    addCharVoxel(group, 0.055, 0.025, 0.036, 'nosePink', 0.125, 0.244, 0.226, isGhost); // paw_right_beans
+    addCharVoxel(group, 0.050, 0.065, 0.250, 'catOrange', -0.190, 0.255, -0.000, isGhost); // body_side_fluff_left
+    addCharVoxel(group, 0.050, 0.065, 0.250, 'catOrange', 0.190, 0.255, -0.000, isGhost); // body_side_fluff_right
+    addCharVoxel(group, 0.320, 0.238, 0.270, 'catOrange', 0.000, 0.400, -0.005, isGhost); // head_core
+    addCharVoxel(group, 0.057, 0.128, 0.200, 'catOrange', -0.171, 0.355, 0.010, isGhost); // cheek_fluff_left
+    addCharVoxel(group, 0.057, 0.128, 0.200, 'catOrange', 0.171, 0.355, 0.010, isGhost); // cheek_fluff_right
+    addCharVoxel(group, 0.180, 0.098, 0.077, 'white', 0.000, 0.350, 0.151, isGhost); // muzzle_snout_white
+    addCharVoxel(group, 0.120, 0.050, 0.053, 'white', 0.000, 0.294, 0.142, isGhost); // chin_under_mouth
+    addCharVoxel(group, 0.050, 0.033, 0.038, 'nosePink', 0.000, 0.373, 0.180, isGhost); // nose_pink_button
+    addCharVoxel(group, 0.050, 0.118, 0.058, 'catStripe', 0.000, 0.470, 0.120, isGhost); // forehead_stripe_mid
+    addCharVoxel(group, 0.050, 0.088, 0.048, 'catStripe', -0.083, 0.465, 0.120, isGhost); // forehead_stripe_left
+    addCharVoxel(group, 0.050, 0.088, 0.048, 'catStripe', 0.083, 0.465, 0.120, isGhost); // forehead_stripe_right
+    addCharVoxel(group, 0.070, 0.077, 0.027, 'catEye', -0.090, 0.408, 0.134, isGhost); // eye_left_iris
+    addCharVoxel(group, 0.045, 0.067, 0.027, 'darkCharcoal', -0.088, 0.408, 0.139, isGhost); // eye_left_pupil
+    addCharVoxel(group, 0.035, 0.028, 0.028, 'white', -0.102, 0.425, 0.143, isGhost); // eye_left_sparkle
+    addCharVoxel(group, 0.070, 0.077, 0.027, 'catEye', 0.090, 0.408, 0.134, isGhost); // eye_right_iris
+    addCharVoxel(group, 0.045, 0.067, 0.027, 'darkCharcoal', 0.088, 0.408, 0.139, isGhost); // eye_right_pupil
+    addCharVoxel(group, 0.035, 0.028, 0.035, 'white', 0.102, 0.425, 0.140, isGhost); // eye_right_sparkle
+    addCharVoxel(group, 0.240, 0.038, 0.200, 'catOrange', 0.000, 0.530, -0.000, isGhost); // head_crown_top
+    addCharVoxel(group, 0.045, 0.050, 0.075, 'catStripe', -0.175, 0.364, 0.067, isGhost); // cheek_stripe_left
+    addCharVoxel(group, 0.045, 0.050, 0.075, 'catStripe', 0.175, 0.364, 0.067, isGhost); // cheek_stripe_right
+    addCharVoxel(group, 0.080, 0.100, 0.110, 'catOrange', -0.110, 0.559, 0.025, isGhost); // ear_base_left
+    addCharVoxel(group, 0.050, 0.070, 0.080, 'catOrange', -0.110, 0.634, 0.025, isGhost); // ear_tip_left
+    addCharVoxel(group, 0.050, 0.080, 0.030, 'nosePink', -0.105, 0.553, 0.079, isGhost); // ear_pink_left
+    addCharVoxel(group, 0.080, 0.100, 0.110, 'catOrange', 0.110, 0.559, 0.025, isGhost); // ear_base_right
+    addCharVoxel(group, 0.050, 0.070, 0.080, 'catOrange', 0.110, 0.634, 0.025, isGhost); // ear_tip_right
+    addCharVoxel(group, 0.050, 0.080, 0.030, 'nosePink', 0.105, 0.553, 0.079, isGhost); // ear_pink_right
+    addCharVoxel(group, 0.060, 0.070, 0.062, 'catOrange', 0.060, 0.215, -0.171, isGhost); // tail_base
+    addCharVoxel(group, 0.060, 0.065, 0.068, 'catStripe', 0.068, 0.275, -0.224, isGhost); // tail_over_rim
+    addCharVoxel(group, 0.060, 0.070, 0.060, 'catOrange', 0.075, 0.328, -0.250, isGhost); // tail_arch_back
+    addCharVoxel(group, 0.060, 0.070, 0.060, 'catStripe', 0.068, 0.383, -0.240, isGhost); // tail_curve_up
+    addCharVoxel(group, 0.060, 0.055, 0.060, 'catOrange', 0.057, 0.420, -0.200, isGhost); // tail_hook_front
+    addCharVoxel(group, 0.060, 0.060, 0.060, 'white', 0.048, 0.398, -0.160, isGhost); // tail_tip_white
   } else if (skinId === 'raccoon_bandit') {
-    // 41 voxels: Bandit Raccoon with mask, fur cheeks, striped tail & canvas loot bag
-    // 4 Stubby paws & legs
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, 0.14, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, 0.14, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, -0.13, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, -0.13, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, 0.14, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, 0.14, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, -0.13, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, -0.13, isGhost);
-
-    // Ash-grey body & white underbelly / chest
-    addCharVoxel(group, 0.36, 0.22, 0.38, 'raccoonGrey', 0, 0.23, 0, isGhost);
-    addCharVoxel(group, 0.24, 0.16, 0.24, 'white', 0, 0.20, 0.06, isGhost);
-    addCharVoxel(group, 0.24, 0.16, 0.06, 'white', 0, 0.25, 0.19, isGhost);
-    addCharVoxel(group, 0.28, 0.08, 0.20, 'raccoonGrey', 0, 0.34, 0.12, isGhost);
-
-    // Head core & white fur cheeks
-    addCharVoxel(group, 0.32, 0.22, 0.24, 'raccoonGrey', 0, 0.45, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', -0.17, 0.42, 0.18, isGhost);
-    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', 0.17, 0.42, 0.18, isGhost);
-
-    // Bandit mask & eye features
-    addCharVoxel(group, 0.22, 0.08, 0.05, 'maskBlack', 0, 0.46, 0.28, isGhost);
-    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', -0.12, 0.46, 0.28, isGhost);
-    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', 0.12, 0.46, 0.28, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', -0.11, 0.46, 0.31, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', 0.11, 0.46, 0.31, isGhost);
-    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', -0.11, 0.53, 0.27, isGhost);
-    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', 0.11, 0.53, 0.27, isGhost);
-
-    // White snout, black nose & chin
-    addCharVoxel(group, 0.14, 0.09, 0.10, 'white', 0, 0.39, 0.31, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.04, 'maskBlack', 0, 0.42, 0.36, isGhost);
-    addCharVoxel(group, 0.10, 0.04, 0.06, 'white', 0, 0.34, 0.28, isGhost);
-
-    // Pointed ears with white inner rim
-    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', -0.13, 0.58, 0.14, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', -0.13, 0.57, 0.16, isGhost);
-    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', 0.13, 0.58, 0.14, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', 0.13, 0.57, 0.16, isGhost);
-
-    // 5-segment alternating ringed fluffy tail
-    addCharVoxel(group, 0.14, 0.14, 0.06, 'raccoonGrey', 0, 0.24, -0.21, isGhost);
-    addCharVoxel(group, 0.15, 0.15, 0.06, 'maskBlack', 0, 0.26, -0.26, isGhost);
-    addCharVoxel(group, 0.15, 0.15, 0.06, 'raccoonGrey', 0, 0.28, -0.31, isGhost);
-    addCharVoxel(group, 0.14, 0.14, 0.06, 'maskBlack', 0, 0.30, -0.36, isGhost);
-    addCharVoxel(group, 0.10, 0.10, 0.05, 'raccoonGrey', 0, 0.32, -0.41, isGhost);
-
-    // Burlap loot sack on back with tied rope neck & patches
-    addCharVoxel(group, 0.26, 0.18, 0.20, 'burlapBag', 0, 0.37, -0.08, isGhost);
-    addCharVoxel(group, 0.22, 0.10, 0.16, 'burlapBag', 0, 0.47, -0.08, isGhost);
-    addCharVoxel(group, 0.12, 0.04, 0.12, 'bagRope', 0, 0.53, -0.08, isGhost);
-    addCharVoxel(group, 0.14, 0.06, 0.12, 'burlapBag', 0, 0.57, -0.08, isGhost);
-    addCharVoxel(group, 0.27, 0.03, 0.21, 'bagRope', 0, 0.43, -0.08, isGhost);
-    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', -0.135, 0.38, -0.08, isGhost);
-    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', 0.135, 0.38, -0.08, isGhost);
+    // 53 voxels: Zero Z-Fighting Raccoon Bandit with Defined Paws, Centered Tail & Sack Loot
+    addCharVoxel(group, 0.055, 0.120, 0.080, 'raccoonGrey', -0.165, 0.253, 0.102, isGhost); // arm_shoulder_left
+    addCharVoxel(group, 0.060, 0.130, 0.080, 'raccoonGrey', -0.152, 0.138, 0.152, isGhost); // arm_forearm_left
+    addCharVoxel(group, 0.070, 0.083, 0.090, 'maskBlack', -0.142, 0.041, 0.172, isGhost); // paw_glove_left
+    addCharVoxel(group, 0.050, 0.040, 0.035, 'maskBlack', -0.142, 0.022, 0.230, isGhost); // paw_fingers_left
+    addCharVoxel(group, 0.055, 0.120, 0.080, 'raccoonGrey', 0.165, 0.253, 0.102, isGhost); // arm_shoulder_right
+    addCharVoxel(group, 0.060, 0.130, 0.080, 'raccoonGrey', 0.152, 0.138, 0.152, isGhost); // arm_forearm_right
+    addCharVoxel(group, 0.070, 0.083, 0.090, 'maskBlack', 0.142, 0.041, 0.172, isGhost); // paw_glove_right
+    addCharVoxel(group, 0.050, 0.040, 0.035, 'maskBlack', 0.142, 0.022, 0.230, isGhost); // paw_fingers_right
+    addCharVoxel(group, 0.075, 0.150, 0.115, 'raccoonGrey', -0.150, 0.133, -0.115, isGhost); // thigh_rear_left
+    addCharVoxel(group, 0.070, 0.072, 0.120, 'maskBlack', -0.142, 0.036, -0.122, isGhost); // paw_rear_left
+    addCharVoxel(group, 0.075, 0.150, 0.115, 'raccoonGrey', 0.150, 0.133, -0.115, isGhost); // thigh_rear_right
+    addCharVoxel(group, 0.070, 0.072, 0.120, 'maskBlack', 0.142, 0.036, -0.122, isGhost); // paw_rear_right
+    addCharVoxel(group, 0.355, 0.255, 0.295, 'raccoonGrey', 0.000, 0.255, -0.000, isGhost); // body_core
+    addCharVoxel(group, 0.255, 0.205, 0.070, 'white', 0.000, 0.220, 0.152, isGhost); // body_belly_white
+    addCharVoxel(group, 0.185, 0.070, 0.070, 'white', 0.000, 0.333, 0.163, isGhost); // chest_bib_tuft
+    addCharVoxel(group, 0.045, 0.175, 0.036, 'darkCharcoal', -0.120, 0.300, 0.149, isGhost); // strap_left
+    addCharVoxel(group, 0.045, 0.175, 0.036, 'darkCharcoal', 0.120, 0.300, 0.149, isGhost); // strap_right
+    addCharVoxel(group, 0.335, 0.240, 0.275, 'raccoonGrey', 0.000, 0.477, -0.000, isGhost); // head_core
+    addCharVoxel(group, 0.060, 0.095, 0.185, 'white', -0.188, 0.470, 0.020, isGhost); // cheek_upper_left
+    addCharVoxel(group, 0.080, 0.075, 0.170, 'white', -0.203, 0.400, 0.037, isGhost); // cheek_lower_left
+    addCharVoxel(group, 0.060, 0.095, 0.185, 'white', 0.188, 0.470, 0.020, isGhost); // cheek_upper_right
+    addCharVoxel(group, 0.080, 0.075, 0.170, 'white', 0.203, 0.400, 0.037, isGhost); // cheek_lower_right
+    addCharVoxel(group, 0.175, 0.100, 0.090, 'white', 0.000, 0.422, 0.168, isGhost); // snout_muzzle_white
+    addCharVoxel(group, 0.125, 0.055, 0.055, 'white', 0.000, 0.365, 0.160, isGhost); // snout_chin_white
+    addCharVoxel(group, 0.055, 0.040, 0.040, 'maskBlack', 0.000, 0.448, 0.203, isGhost); // nose_black_button
+    addCharVoxel(group, 0.275, 0.040, 0.215, 'raccoonGrey', 0.000, 0.608, -0.000, isGhost); // head_crown_top
+    addCharVoxel(group, 0.080, 0.110, 0.115, 'darkCharcoal', -0.122, 0.637, 0.025, isGhost); // ear_base_left
+    addCharVoxel(group, 0.060, 0.080, 0.085, 'white', -0.122, 0.718, 0.025, isGhost); // ear_tip_left
+    addCharVoxel(group, 0.050, 0.070, 0.035, 'maskBlack', -0.117, 0.637, 0.080, isGhost); // ear_inner_left
+    addCharVoxel(group, 0.080, 0.110, 0.115, 'darkCharcoal', 0.122, 0.637, 0.025, isGhost); // ear_base_right
+    addCharVoxel(group, 0.060, 0.080, 0.085, 'white', 0.122, 0.718, 0.025, isGhost); // ear_tip_right
+    addCharVoxel(group, 0.050, 0.070, 0.035, 'maskBlack', 0.117, 0.637, 0.080, isGhost); // ear_inner_right
+    addCharVoxel(group, 0.018, 0.065, 0.265, 'maskBlack', -0.169, 0.495, -0.000, isGhost); // nvg_strap_left
+    addCharVoxel(group, 0.018, 0.065, 0.265, 'maskBlack', 0.169, 0.495, -0.000, isGhost); // nvg_strap_right
+    addCharVoxel(group, 0.105, 0.070, 0.070, 'maskBlack', 0.000, 0.497, 0.163, isGhost); // nvg_bridge_mount
+    addCharVoxel(group, 0.085, 0.095, 0.075, 'darkCharcoal', -0.105, 0.490, 0.200, isGhost); // nvg_tube_left
+    addCharVoxel(group, 0.065, 0.075, 0.020, 'nvgGreen', -0.105, 0.490, 0.242, isGhost); // nvg_lens_green_left
+    addCharVoxel(group, 0.085, 0.095, 0.075, 'darkCharcoal', 0.105, 0.490, 0.200, isGhost); // nvg_tube_right
+    addCharVoxel(group, 0.065, 0.075, 0.020, 'nvgGreen', 0.105, 0.490, 0.242, isGhost); // nvg_lens_green_right
+    addCharVoxel(group, 0.105, 0.075, 0.080, 'raccoonGrey', 0.000, 0.100, -0.163, isGhost); // tail_ring_1
+    addCharVoxel(group, 0.125, 0.075, 0.080, 'maskBlack', 0.000, 0.085, -0.233, isGhost); // tail_ring_2
+    addCharVoxel(group, 0.135, 0.085, 0.080, 'raccoonGrey', 0.000, 0.085, -0.302, isGhost); // tail_ring_3
+    addCharVoxel(group, 0.125, 0.090, 0.070, 'maskBlack', 0.000, 0.107, -0.367, isGhost); // tail_ring_4
+    addCharVoxel(group, 0.115, 0.090, 0.060, 'raccoonGrey', 0.000, 0.152, -0.412, isGhost); // tail_ring_5
+    addCharVoxel(group, 0.095, 0.085, 0.050, 'maskBlack', 0.000, 0.210, -0.443, isGhost); // tail_tip_black
+    addCharVoxel(group, 0.255, 0.205, 0.180, 'burlapBag', 0.000, 0.275, -0.182, isGhost); // loot_sack_belly
+    addCharVoxel(group, 0.235, 0.105, 0.160, 'burlapBag', 0.000, 0.420, -0.182, isGhost); // loot_sack_upper
+    addCharVoxel(group, 0.185, 0.140, 0.055, 'burlapBag', 0.000, 0.282, -0.290, isGhost); // loot_sack_rear_bulge
+    addCharVoxel(group, 0.175, 0.035, 0.130, 'bagRope', 0.000, 0.480, -0.182, isGhost); // loot_sack_cinch
+    addCharVoxel(group, 0.205, 0.040, 0.150, 'burlapBag', 0.000, 0.507, -0.182, isGhost); // loot_sack_ruffle
+    addCharVoxel(group, 0.070, 0.070, 0.090, 'goldCoin', 0.048, 0.547, -0.172, isGhost); // loot_gold_bar
+    addCharVoxel(group, 0.070, 0.070, 0.080, 'goldCoin', -0.048, 0.542, -0.168, isGhost); // loot_gold_coin
+    addCharVoxel(group, 0.075, 0.085, 0.090, 'rubyRed', 0.000, 0.560, -0.188, isGhost); // loot_ruby_gem
   } else if (skinId === 'capybara_zen') {
-    // 32 voxels: Zen Capybara in grounded meditative pose with mandarin on flat head
-    // 4 Paws touching ground & front leg pillars
-    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', -0.14, 0.04, 0.15, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', 0.14, 0.04, 0.15, isGhost);
-    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', -0.15, 0.04, -0.15, isGhost);
-    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', 0.15, 0.04, -0.15, isGhost);
-    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', -0.14, 0.14, 0.15, isGhost);
-    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', 0.14, 0.14, 0.15, isGhost);
-
-    // Caramel monolithic torso, underbelly tone & wide zen haunches
-    addCharVoxel(group, 0.38, 0.32, 0.42, 'capybaraCaramel', 0, 0.24, -0.02, isGhost);
-    addCharVoxel(group, 0.28, 0.08, 0.34, 'capybaraMuzzle', 0, 0.10, -0.02, isGhost);
-    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', -0.19, 0.20, -0.12, isGhost);
-    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', 0.19, 0.20, -0.12, isGhost);
-    addCharVoxel(group, 0.32, 0.26, 0.08, 'capybaraCaramel', 0, 0.22, -0.26, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.04, 'capybaraDark', 0, 0.24, -0.31, isGhost);
-
-    // Neck slope & heavy square flat-topped capybara head
-    addCharVoxel(group, 0.32, 0.22, 0.14, 'capybaraCaramel', 0, 0.32, 0.16, isGhost);
-    addCharVoxel(group, 0.30, 0.24, 0.26, 'capybaraCaramel', 0, 0.46, 0.19, isGhost);
-    addCharVoxel(group, 0.26, 0.20, 0.14, 'capybaraCaramel', 0, 0.42, 0.33, isGhost);
-    addCharVoxel(group, 0.04, 0.12, 0.02, 'capybaraDark', 0, 0.41, 0.405, isGhost);
-    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', -0.05, 0.42, 0.405, isGhost);
-    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', 0.05, 0.42, 0.405, isGhost);
-    addCharVoxel(group, 0.20, 0.06, 0.10, 'capybaraMuzzle', 0, 0.30, 0.32, isGhost);
-
-    // Serene meditative closed slit eyes & cute rounded ears
-    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', -0.155, 0.48, 0.22, isGhost);
-    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', 0.155, 0.48, 0.22, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', -0.155, 0.50, 0.22, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', 0.155, 0.50, 0.22, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', -0.16, 0.57, 0.12, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', 0.16, 0.57, 0.12, isGhost);
-    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', -0.16, 0.56, 0.13, isGhost);
-    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', 0.16, 0.56, 0.13, isGhost);
-
-    // Round voxel mandarin/yuzu on head with green stem & leaf
-    addCharVoxel(group, 0.14, 0.03, 0.14, 'orangeFruit', 0, 0.595, 0.19, isGhost);
-    addCharVoxel(group, 0.18, 0.08, 0.18, 'orangeFruit', 0, 0.64, 0.19, isGhost);
-    addCharVoxel(group, 0.12, 0.03, 0.12, 'orangeFruit', 0, 0.69, 0.19, isGhost);
-    addCharVoxel(group, 0.03, 0.05, 0.03, 'greenLeaf', 0, 0.725, 0.19, isGhost);
-    addCharVoxel(group, 0.06, 0.03, 0.04, 'greenLeaf', 0.035, 0.73, 0.21, isGhost);
+    // 53 voxels: Legendary Zen Capybara (Expressive Eyes, Folded Spa Towel, Mala Beads)
+    addCharVoxel(group, 0.075, 0.072, 0.085, 'capybaraPaws', -0.140, 0.036, 0.140, isGhost); // paw_front_left
+    addCharVoxel(group, 0.055, 0.035, 0.040, 'capybaraPaws', -0.140, 0.020, 0.198, isGhost); // paw_digits_front_left
+    addCharVoxel(group, 0.055, 0.100, 0.065, 'capybaraCaramel', -0.140, 0.113, 0.140, isGhost); // leg_front_left
+    addCharVoxel(group, 0.075, 0.072, 0.085, 'capybaraPaws', 0.140, 0.036, 0.140, isGhost); // paw_front_right
+    addCharVoxel(group, 0.055, 0.035, 0.040, 'capybaraPaws', 0.140, 0.020, 0.198, isGhost); // paw_digits_front_right
+    addCharVoxel(group, 0.055, 0.100, 0.065, 'capybaraCaramel', 0.140, 0.113, 0.140, isGhost); // leg_front_right
+    addCharVoxel(group, 0.080, 0.165, 0.140, 'capybaraCaramel', -0.168, 0.135, -0.128, isGhost); // thigh_rear_left
+    addCharVoxel(group, 0.075, 0.068, 0.125, 'capybaraPaws', -0.155, 0.034, -0.115, isGhost); // paw_rear_left
+    addCharVoxel(group, 0.080, 0.165, 0.140, 'capybaraCaramel', 0.168, 0.135, -0.128, isGhost); // thigh_rear_right
+    addCharVoxel(group, 0.075, 0.068, 0.125, 'capybaraPaws', 0.155, 0.034, -0.115, isGhost); // paw_rear_right
+    addCharVoxel(group, 0.345, 0.220, 0.320, 'capybaraCaramel', 0.000, 0.233, -0.018, isGhost); // body_core
+    addCharVoxel(group, 0.275, 0.065, 0.285, 'capybaraMuzzle', 0.000, 0.120, -0.020, isGhost); // body_underbelly
+    addCharVoxel(group, 0.035, 0.170, 0.225, 'capybaraBrown', -0.185, 0.223, -0.025, isGhost); // flank_left
+    addCharVoxel(group, 0.035, 0.170, 0.225, 'capybaraBrown', 0.185, 0.223, -0.025, isGhost); // flank_right
+    addCharVoxel(group, 0.265, 0.035, 0.190, 'capybaraBrown', 0.000, 0.355, -0.048, isGhost); // back_arch_ridge
+    addCharVoxel(group, 0.305, 0.185, 0.050, 'capybaraCaramel', 0.000, 0.235, -0.198, isGhost); // rump_rear
+    addCharVoxel(group, 0.255, 0.045, 0.070, 'capybaraBrown', 0.000, 0.335, -0.168, isGhost); // rump_slope_top
+    addCharVoxel(group, 0.065, 0.045, 0.035, 'capybaraMuzzle', 0.000, 0.190, -0.235, isGhost); // tail_stub
+    addCharVoxel(group, 0.305, 0.180, 0.080, 'capybaraCaramel', 0.000, 0.278, 0.172, isGhost); // neck_base
+    addCharVoxel(group, 0.215, 0.125, 0.070, 'capybaraMuzzle', 0.000, 0.215, 0.193, isGhost); // neck_bib_throat
+    addCharVoxel(group, 0.040, 0.105, 0.050, 'capybaraDark', -0.117, 0.280, 0.207, isGhost); // mala_necklace_left
+    addCharVoxel(group, 0.040, 0.105, 0.050, 'capybaraDark', 0.117, 0.280, 0.207, isGhost); // mala_necklace_right
+    addCharVoxel(group, 0.185, 0.040, 0.035, 'capybaraDark', 0.000, 0.233, 0.220, isGhost); // mala_necklace_bottom
+    addCharVoxel(group, 0.075, 0.050, 0.025, 'goldCoin', 0.000, 0.198, 0.230, isGhost); // mala_gold_medallion
+    addCharVoxel(group, 0.295, 0.220, 0.195, 'capybaraCaramel', 0.000, 0.448, 0.185, isGhost); // head_core
+    addCharVoxel(group, 0.265, 0.035, 0.160, 'capybaraCaramel', 0.000, 0.565, 0.182, isGhost); // head_crown_flat
+    addCharVoxel(group, 0.235, 0.180, 0.085, 'capybaraMuzzle', 0.000, 0.407, 0.320, isGhost); // snout_muzzle
+    addCharVoxel(group, 0.185, 0.070, 0.090, 'capybaraMuzzle', 0.000, 0.318, 0.287, isGhost); // snout_chin_under
+    addCharVoxel(group, 0.105, 0.065, 0.020, 'capybaraDark', 0.000, 0.455, 0.367, isGhost); // nose_pad_dark
+    addCharVoxel(group, 0.030, 0.030, 0.015, 'maskBlack', -0.048, 0.453, 0.375, isGhost); // nostril_slit_left
+    addCharVoxel(group, 0.030, 0.030, 0.015, 'maskBlack', 0.048, 0.453, 0.375, isGhost); // nostril_slit_right
+    addCharVoxel(group, 0.035, 0.045, 0.020, 'capybaraDark', 0.000, 0.410, 0.362, isGhost); // nostril_bridge
+    addCharVoxel(group, 0.040, 0.130, 0.110, 'capybaraBrown', -0.158, 0.422, 0.182, isGhost); // cheek_fluff_left
+    addCharVoxel(group, 0.040, 0.130, 0.110, 'capybaraBrown', 0.158, 0.422, 0.182, isGhost); // cheek_fluff_right
+    addCharVoxel(group, 0.015, 0.060, 0.060, 'maskBlack', -0.150, 0.477, 0.203, isGhost); // eye_left_iris
+    addCharVoxel(group, 0.014, 0.025, 0.025, 'white', -0.152, 0.490, 0.215, isGhost); // eye_left_sparkle
+    addCharVoxel(group, 0.015, 0.060, 0.060, 'maskBlack', 0.150, 0.477, 0.203, isGhost); // eye_right_iris
+    addCharVoxel(group, 0.014, 0.025, 0.025, 'white', 0.152, 0.490, 0.215, isGhost); // eye_right_sparkle
+    addCharVoxel(group, 0.065, 0.050, 0.020, 'capybaraBrown', 0.000, 0.542, 0.278, isGhost); // forehead_zen_tuft
+    addCharVoxel(group, 0.055, 0.075, 0.060, 'capybaraBrown', -0.135, 0.590, 0.107, isGhost); // ear_base_left
+    addCharVoxel(group, 0.030, 0.045, 0.015, 'capybaraMuzzle', -0.133, 0.590, 0.135, isGhost); // ear_inner_left
+    addCharVoxel(group, 0.055, 0.075, 0.060, 'capybaraBrown', 0.135, 0.590, 0.107, isGhost); // ear_base_right
+    addCharVoxel(group, 0.030, 0.045, 0.015, 'capybaraMuzzle', 0.133, 0.590, 0.135, isGhost); // ear_inner_right
+    addCharVoxel(group, 0.205, 0.035, 0.120, 'white', 0.000, 0.595, 0.182, isGhost); // onsen_towel_main
+    addCharVoxel(group, 0.175, 0.025, 0.095, 'white', 0.000, 0.620, 0.180, isGhost); // onsen_towel_fold_top
+    addCharVoxel(group, 0.125, 0.025, 0.080, 'orangeFruit', 0.000, 0.640, 0.182, isGhost); // mandarin_base
+    addCharVoxel(group, 0.155, 0.060, 0.110, 'orangeFruit', 0.000, 0.677, 0.182, isGhost); // mandarin_middle_bulge
+    addCharVoxel(group, 0.105, 0.030, 0.070, 'orangeFruit', 0.000, 0.718, 0.182, isGhost); // mandarin_top_dome
+    addCharVoxel(group, 0.030, 0.030, 0.025, 'goldCoin', -0.048, 0.688, 0.230, isGhost); // mandarin_sun_spot
+    addCharVoxel(group, 0.025, 0.035, 0.020, 'greenLeaf', 0.000, 0.745, 0.182, isGhost); // mandarin_stem
+    addCharVoxel(group, 0.050, 0.020, 0.040, 'greenLeaf', 0.033, 0.748, 0.163, isGhost); // mandarin_leaf
+    addCharVoxel(group, 0.040, 0.020, 0.035, 'greenLeaf', 0.058, 0.738, 0.150, isGhost); // mandarin_leaf_tip
+    addCharVoxel(group, 0.040, 0.020, 0.030, 'greenLeaf', -0.028, 0.748, 0.198, isGhost); // mandarin_leaf_left
   } else {
     // Fallback to Corgi mascot
     return createUrbanCharacter('corgi', isGhost);
@@ -2163,379 +2204,227 @@ const createUrbanBush = (seedVariant        , biome                      )      
     ? createUrbanBench()
     : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
 
-// --- Module: src/view/townhouse/shopfront.ts ---
+// --- Module: src/view/townhouse/books.ts ---
 /**
- * Books Shopfront Modeler for Townhouse C (Green Books Store).
- * Strictly complies with docs/VOXEL_GRID_SPECIFICATION.md (VOXEL_UNIT = 0.05).
- * All dimensions (w, h, d) and coordinates (x, y, z) are exact multiples of 0.05.
+ * Green Books Store / Alpine Bookstore / Desert Scrolls / Synth-Library for Townhouse C.
+ * Compiled from authoritative Blockbench model assets/models/books_townhouse.bbmodel (178 cubes).
+ * Complies strictly with docs/VOXEL_GRID_SPECIFICATION.md.
  */
-function buildBooksShopfront(b                  , isWinter         )       {
-  // Palettes (docs/VOXEL_GRID_SPECIFICATION.md §4)
-  const cBasalt = 0x334155;    // Slate plinth, brackets, steps, metal
-  const cEmerald = 0x15803d;   // Ground floor facade wall
-  const cOak = 0x713f12;       // Bog oak wood trim, door, planter base
-  const cDarkWood = 0x451a03;   // Dark door core / cart frame
-  const cWarmGlass = 0xfef08a; // Transom & window warm evening light
-  const cBrass = 0xfacc15;     // Brass doorknob & gold book accent
-  const cSageTrim = 0xdcfce7;  // Shopfront frame & signboard border
-  const cDarkGreen = 0x166534; // Deep pine awning stripe & garlands
-  const cMint = 0x86efac;      // Mint pastel awning stripe
-  const cSignBg = 0x14532d;    // Forest green signboard background
-  const cLimeText = 0xa3e635;  // 3D letters 'BOOKS'
-  const cPurpleBook = 0x9333ea;
-  const cBlueBook = 0x2563eb;
-  const cRedBook = 0xdc2626;
-  const cTerracotta = 0x9a3412;
-  const cFoliage = 0x16a34a;
-  const cFoliageLight = 0x22c55e;
-  const cBerry = 0xef4444;
-  const cSnow = 0xf8fafc;
 
-  // -------------------------------------------------------------
-  // 1. Цоколь / Фундамент (2 яруса базальта 0x334155)
-  // W=1.70/1.65, Y=0.05/0.15
-  // -------------------------------------------------------------
-  b.addBox(1.70, 0.10, 1.50, 0.00, 0.05, 0.00, cBasalt);
-  b.addBox(1.65, 0.10, 1.45, 0.00, 0.15, 0.00, cBasalt);
+// Palette swatches per biome [0..24]
+const BOOKS_PALETTE_FOREST                    = [
+  0xffffff, // 0: white_trim
+  0xfef08a, // 1: yellow_glow
+  0xfef3c7, // 2: cornice_cream (warm limestone)
+  0x3e6b27, // 3: facade_green (rich sage forest green)
+  0x2d4e1c, // 4: brick_accent
+  0x713f12, // 5: wood_door
+  0x451a03, // 6: wood_dark
+  0xfacc15, // 7: brass_gold
+  0x166534, // 8: awning_dark (deep forest green)
+  0x84cc16, // 9: awning_light (warm salad lime green, NO MINT!)
+  0x0f381e, // 10: sign_bg_dark
+  0xffe066, // 11: sign_lime (warm golden honey)
+  0x334155, // 12: plinth_slate
+  0x386b5c, // 13: drainpipe_teal
+  0xc2410c, // 14: roof_terracotta
+  0x9a3412, // 15: roof_dark
+  0x991b1b, // 16: book_wine (classic burgundy)
+  0x1e3a8a, // 17: book_navy (deep blue)
+  0xc2410c, // 18: book_terracotta
+  0xd97706, // 19: book_amber (golden ochre)
+  0xd4a373, // 20: chimney_stone
+  0xc2410c, // 21: chimney_pot
+  0xcbd5e1, // 22: smoke_puff (light slate electric box)
+  0x166534, // 23: book_green (forest green)
+  0x1c2e24, // 24: chalkboard_dark (chalkboard surface)
+];
 
-  // -------------------------------------------------------------
-  // 2. Фасад первого этажа (изумруд 0x15803d, 1.60 x 1.20 x 1.40, Y=0.80)
-  // -------------------------------------------------------------
-  b.addBox(1.60, 1.20, 1.40, 0.00, 0.80, 0.00, cEmerald);
+const BOOKS_PALETTE_WINTER                    = [
+  0xffffff, // 0: white_trim
+  0xfef08a, // 1: yellow_glow
+  0xf8fafc, // 2: snow white cornice
+  0x1e3a2f, // 3: alpine pine green
+  0x14532d, // 4: dark pine accent
+  0x582d0c, // 5: rustic wood door
+  0x3b1d0e, // 6: dark timber
+  0xfacc15, // 7: brass_gold
+  0x0f381e, // 8: winter awning dark
+  0xffffff, // 9: snow white awning stripe
+  0x0a2714, // 10: dark spruce sign bg
+  0x4ade80, // 11: mint green sign text
+  0x1e293b, // 12: frosted slate plinth
+  0x334155, // 13: frosted drainpipe
+  0xf8fafc, // 14: snow roof
+  0xe2e8f0, // 15: snow shadow
+  0x9333ea, // 16: book_purple
+  0x2563eb, // 17: book_blue
+  0xdc2626, // 18: book_red
+  0xf59e0b, // 19: book_yellow
+  0xcbd5e1, // 20: frost stone chimney
+  0x991b1b, // 21: terracotta pot
+  0xffffff, // 22: white smoke
+  0x16a34a, // 23: book_green
+  0x0f381e, // 24: chalkboard_green
+];
 
-  // -------------------------------------------------------------
-  // 3. Входной портал (мореный дуб 0x713f12, X=-0.45)
-  // Ступенька 0x334155, фрамуга с теплым светом 0xfef08a, ручка 0xfacc15
-  // -------------------------------------------------------------
-  // Ступенька у входа (базальт)
-  b.addBox(0.45, 0.05, 0.10, -0.45, 0.20, 0.75, cBasalt);
-  // Наличник входного портала (мореный дуб)
-  b.addBox(0.45, 1.00, 0.05, -0.45, 0.70, 0.75, cOak);
-  // Полотно двери (темное дерево с филенками)
-  b.addBox(0.35, 0.65, 0.05, -0.45, 0.55, 0.75, cDarkWood);
-  // Фрамуга с теплым светом над дверью (0xfef08a)
-  b.addBox(0.35, 0.25, 0.05, -0.45, 1.00, 0.75, cWarmGlass);
-  // Латунная ручка (0xfacc15)
-  b.addBox(0.05, 0.05, 0.05, -0.30, 0.55, 0.80, cBrass);
+const BOOKS_PALETTE_DESERT                    = [
+  0xfef3c7, // 0: cream sandstone trim
+  0xfde68a, // 1: golden glow
+  0xfde68a, // 2: sandstone cornice
+  0xd97706, // 3: adobe ochre facade
+  0xb45309, // 4: terracotta accent
+  0x78350f, // 5: cedar wood door
+  0x451a03, // 6: dark cedar
+  0xfbbf24, // 7: desert gold handle
+  0xb45309, // 8: terracotta awning
+  0xfde68a, // 9: sandstone awning
+  0x78350f, // 10: cedar sign bg
+  0xfbbf24, // 11: golden text
+  0x78350f, // 12: adobe plinth
+  0x92400e, // 13: copper drainpipe
+  0xea580c, // 14: sunbaked tile roof
+  0xc2410c, // 15: dark terracotta
+  0x9333ea, // 16: scroll purple
+  0x0284c7, // 17: lapis blue
+  0xea580c, // 18: terracotta red
+  0xfbbf24, // 19: gold parchment
+  0xd97706, // 20: adobe chimney
+  0x78350f, // 21: clay pot
+  0xe2e8f0, // 22: smoke puff
+  0x65a30d, // 23: scroll green
+  0x78350f, // 24: chalkboard cedar
+];
 
-  // -------------------------------------------------------------
-  // 4. Большая книжная витрина (X=0.30)
-  // Рама 0xdcfce7, теплое стекло 0xfef08a, полка с книгами
-  // -------------------------------------------------------------
-  // Обрамление витрины (мятный светлый наличник)
-  b.addBox(0.75, 0.85, 0.05, 0.30, 0.70, 0.75, cSageTrim);
-  // Подоконник витрины (дуб)
-  b.addBox(0.80, 0.05, 0.10, 0.30, 0.25, 0.75, cOak);
-  // Витринное стекло с теплым светом (0xfef08a)
-  b.addBox(0.65, 0.75, 0.05, 0.30, 0.70, 0.75, cWarmGlass);
-  // Оконный переплет (импост и горбылек)
-  b.addBox(0.05, 0.75, 0.05, 0.30, 0.70, 0.80, cSageTrim);
-  b.addBox(0.65, 0.05, 0.05, 0.30, 0.90, 0.80, cSageTrim);
-  // Деревянная полка для книг
-  b.addBox(0.60, 0.05, 0.10, 0.30, 0.40, 0.75, cOak);
-  // Выкладка книг на витрине (0x9333ea, 0x2563eb, 0xdc2626, 0xfacc15)
-  b.addBox(0.10, 0.15, 0.05, 0.10, 0.50, 0.75, cPurpleBook);
-  b.addBox(0.10, 0.15, 0.05, 0.20, 0.50, 0.75, cBlueBook);
-  b.addBox(0.10, 0.15, 0.05, 0.30, 0.50, 0.75, cRedBook);
-  b.addBox(0.10, 0.15, 0.05, 0.40, 0.50, 0.75, cBrass);
-  b.addBox(0.10, 0.10, 0.05, 0.50, 0.45, 0.75, cPurpleBook);
+const BOOKS_PALETTE_NEON                    = [
+  0x06b6d4, // 0: cyan neon trim
+  0xec4899, // 1: magenta neon glow
+  0x06b6d4, // 2: cyan cornice
+  0x0f172a, // 3: dark obsidian facade
+  0x1e1b4b, // 4: synth-violet brick
+  0x1e1b4b, // 5: cyber door
+  0x090d16, // 6: carbon frame
+  0xfacc15, // 7: gold terminal
+  0x831843, // 8: synth awning dark
+  0xec4899, // 9: pink neon awning
+  0x090d16, // 10: black mirror sign bg
+  0x38bdf8, // 11: holographic cyan text
+  0x090d16, // 12: carbon plinth
+  0x06b6d4, // 13: cyan conduit pipe
+  0x0f172a, // 14: solar carbon roof
+  0x1e1b4b, // 15: synth roof grid
+  0xd946ef, // 16: neon magenta datapad
+  0x06b6d4, // 17: cyan datapad
+  0xf43f5e, // 18: neon red datapad
+  0xfacc15, // 19: neon yellow datapad
+  0x334155, // 20: tech vent chimney
+  0x06b6d4, // 21: cyan emitter pot
+  0x38bdf8, // 22: plasma vapor
+  0x10b981, // 23: emerald datapad
+  0x090d16, // 24: holographic board
+];
 
-  // -------------------------------------------------------------
-  // 5. Полосатая маркиза (8 наклонных полос: 0x166534 и 0x86efac)
-  // -------------------------------------------------------------
-  for (let i = 0; i < 8; i++) {
-    const ax = -0.05 + i * 0.10;
-    const col = i % 2 === 0 ? cDarkGreen : cMint;
-    // Верхний наклонный ярус
-    b.addBox(0.10, 0.05, 0.15, ax, 1.25, 0.80, col);
-    // Нижний свес с ламбрекеном
-    b.addBox(0.10, 0.10, 0.15, ax, 1.15, 0.95, col);
-  }
+// 178 Monolithic Boxes: [w, h, d, x, y, z, swatchId]
+const BOOKS_BOXES                                                                      = [
+  [1.2,0.12,0.03,0,0.06,0.495,12], [0.03,0.12,0.968,0.6,0.06,-0.004,12],
+  [0.03,0.12,0.968,-0.6,0.06,-0.004,12], [1.17,0.12,0.022,0,0.06,-0.484,12],
+  [0.36,0.03,0.037,-0.3,0.015,0.529,12], [0.022,0.99,0.96,0.596,0.615,0,3],
+  [0.022,0.99,0.96,-0.596,0.615,0,3], [1.17,0.99,0.022,0,0.615,-0.476,3],
+  [0.105,0.75,0.022,-0.532,0.495,0.476,3], [0.06,0.75,0.022,-0.09,0.495,0.476,3],
+  [0.075,0.75,0.022,0.547,0.495,0.476,3], [0.36,0.18,0.022,-0.3,0.78,0.476,3],
+  [0.57,0.12,0.022,0.225,0.81,0.476,3], [0.045,0.06,0.165,0.611,0.18,0.098,4],
+  [0.045,0.06,0.165,0.611,0.18,-0.203,4], [0.045,0.57,0.041,-0.457,0.405,0.493,6],
+  [0.045,0.57,0.041,-0.143,0.405,0.493,6], [0.27,0.03,0.041,-0.3,0.675,0.493,6],
+  [0.27,0.54,0.019,-0.3,0.39,0.489,5], [0.21,0.24,0.022,-0.3,0.51,0.497,1],
+  [0.21,0.195,0.022,-0.3,0.263,0.499,5], [0.022,0.045,0.022,-0.191,0.382,0.514,7],
+  [0.57,0.045,0.052,0.225,0.143,0.499,5], [0.566,0.045,0.045,0.227,0.713,0.495,5],
+  [0.045,0.525,0.045,0.487,0.427,0.495,5], [0.045,0.525,0.045,-0.037,0.427,0.495,5],
+  [0.48,0.532,0.015,0.225,0.424,0.457,1], [0.472,0.03,0.034,0.225,0.188,0.474,5],
+  [0.472,0.03,0.034,0.225,0.42,0.474,5], [0.075,0.195,0.026,0.397,0.532,0.474,16],
+  [0.083,0.15,0.026,0.304,0.51,0.474,17], [0.083,0.098,0.026,0.206,0.484,0.474,19],
+  [0.075,0.18,0.026,0.112,0.525,0.474,23], [0.06,0.128,0.026,0.03,0.499,0.474,18],
+  [0.09,0.158,0.026,0.375,0.281,0.474,17], [0.098,0.128,0.026,0.259,0.266,0.474,18],
+  [0.12,0.142,0.026,0.12,0.274,0.474,19], [0.117,0.135,0.158,0.467,0.787,0.566,8],
+  [0.117,0.135,0.158,0.349,0.787,0.566,9], [0.117,0.135,0.158,0.232,0.787,0.566,8],
+  [0.117,0.135,0.158,0.115,0.787,0.566,9], [0.117,0.135,0.158,-0.002,0.787,0.566,8],
+  [0.09,0.068,0.026,0.465,0.686,0.647,8], [0.09,0.068,0.026,0.348,0.686,0.647,9],
+  [0.09,0.068,0.026,0.231,0.686,0.647,8], [0.09,0.068,0.026,0.114,0.686,0.647,9],
+  [0.09,0.068,0.026,-0.003,0.686,0.647,8], [0.037,0.195,0.06,0.371,0.098,0.6,5],
+  [0.037,0.195,0.06,0.019,0.098,0.6,5], [0.315,0.022,0.045,0.195,0.056,0.6,5],
+  [0.315,0.022,0.045,0.195,0.131,0.6,5], [0.315,0.068,0.022,0.195,0.176,0.574,5],
+  [0.098,0.049,0.03,0.289,0.092,0.6,16], [0.112,0.049,0.03,0.161,0.092,0.6,19],
+  [0.083,0.064,0.03,0.296,0.174,0.6,18], [0.083,0.064,0.03,0.199,0.174,0.6,23],
+  [0.083,0.056,0.03,0.101,0.171,0.6,17], [0.045,0.225,0.068,0.563,0.112,0.686,5],
+  [0.045,0.225,0.068,0.457,0.112,0.686,5], [0.128,0.03,0.045,0.51,0.218,0.686,5],
+  [0.06,0.142,0.045,0.51,0.131,0.694,24], [0.03,0.019,0.034,0.51,0.159,0.707,11],
+  [0.03,0.019,0.034,0.51,0.107,0.707,11], [0.135,0.037,0.105,-0.667,0.679,0.307,5],
+  [0.075,0.15,0.075,-0.682,0.585,0.307,5], [0.083,0.068,0.045,-0.683,0.589,0.307,11],
+  [0.049,0.075,0.045,-0.553,1.688,0.51,13], [0.026,1.575,0.03,-0.553,0.862,0.51,13],
+  [0.037,0.086,0.041,-0.532,0.763,0.519,22], [0.034,0.03,0.037,-0.553,0.84,0.51,13],
+  [0.026,0.06,0.06,-0.553,0.045,0.525,13], [1.02,0.21,0.037,0,0.99,0.499,10],
+  [1.05,0.03,0.052,0,1.095,0.499,5], [1.05,0.03,0.052,0,0.885,0.499,5],
+  [0.03,0.18,0.052,-0.51,0.99,0.499,5], [0.03,0.18,0.052,0.51,0.99,0.499,5],
+  [0.03,0.15,0.022,-0.39,0.99,0.525,11], [0.068,0.03,0.022,-0.341,1.05,0.525,11],
+  [0.068,0.03,0.022,-0.341,0.99,0.525,11], [0.068,0.03,0.022,-0.341,0.93,0.525,11],
+  [0.022,0.052,0.022,-0.296,1.024,0.525,11], [0.022,0.052,0.022,-0.296,0.956,0.525,11],
+  [0.03,0.15,0.022,-0.225,0.99,0.525,11], [0.03,0.15,0.022,-0.135,0.99,0.525,11],
+  [0.06,0.03,0.022,-0.18,1.05,0.525,11], [0.06,0.03,0.022,-0.18,0.93,0.525,11],
+  [0.03,0.15,0.022,-0.06,0.99,0.525,11], [0.03,0.15,0.022,0.03,0.99,0.525,11],
+  [0.06,0.03,0.022,-0.015,1.05,0.525,11], [0.06,0.03,0.022,-0.015,0.93,0.525,11],
+  [0.03,0.15,0.022,0.105,0.99,0.525,11], [0.037,0.03,0.022,0.139,0.99,0.525,11],
+  [0.052,0.06,0.022,0.184,1.035,0.525,11], [0.052,0.06,0.022,0.184,0.945,0.525,11],
+  [0.12,0.03,0.022,0.315,1.05,0.525,11], [0.03,0.045,0.022,0.27,1.012,0.525,11],
+  [0.09,0.03,0.022,0.33,0.99,0.525,11], [0.03,0.03,0.022,0.36,0.96,0.525,11],
+  [0.09,0.03,0.022,0.3,0.93,0.525,11], [0.022,0.6,0.96,0.596,1.41,0,3],
+  [0.022,0.6,0.96,-0.596,1.41,0,3], [1.17,0.6,0.022,0,1.41,-0.476,3],
+  [0.019,0.037,0.975,0.621,1.129,0,2], [0.022,0.037,0.975,-0.619,1.129,0,2],
+  [1.17,0.06,0.022,0,1.14,0.476,3], [1.17,0.165,0.022,0,1.628,0.476,3],
+  [0.09,0.33,0.022,-0.54,1.38,0.476,3], [0.06,0.33,0.022,-0.165,1.38,0.476,3],
+  [0.06,0.33,0.022,0.165,1.38,0.476,3], [0.09,0.33,0.022,0.54,1.38,0.476,3],
+  [0.345,0.045,0.06,-0.345,1.192,0.502,0], [0.3,0.045,0.03,-0.345,1.522,0.491,0],
+  [0.045,0.285,0.03,-0.472,1.358,0.491,0], [0.045,0.285,0.03,-0.218,1.358,0.491,0],
+  [0.21,0.285,0.022,-0.345,1.358,0.484,1], [0.225,0.03,0.019,-0.345,1.358,0.493,0],
+  [0.315,0.045,0.06,0,1.192,0.502,0], [0.27,0.045,0.03,0,1.522,0.491,0],
+  [0.045,0.285,0.03,-0.112,1.358,0.491,0], [0.045,0.285,0.03,0.112,1.358,0.491,0],
+  [0.18,0.285,0.022,0,1.358,0.484,1], [0.195,0.03,0.019,0,1.358,0.493,0],
+  [0.345,0.045,0.06,0.345,1.192,0.502,0], [0.3,0.045,0.03,0.345,1.522,0.491,0],
+  [0.045,0.285,0.03,0.218,1.358,0.491,0], [0.045,0.285,0.03,0.472,1.358,0.491,0],
+  [0.21,0.285,0.022,0.345,1.358,0.484,1], [0.225,0.03,0.019,0.345,1.358,0.493,0],
+  [0.071,0.045,0.24,0.609,1.192,-0.165,0], [0.064,0.045,0.21,0.606,1.522,-0.165,0],
+  [0.064,0.285,0.045,0.606,1.358,-0.083,0], [0.064,0.285,0.045,0.606,1.358,-0.247,0],
+  [0.056,0.285,0.12,0.606,1.358,-0.165,1], [0.065,0.03,0.128,0.606,1.358,-0.165,0],
+  [0.086,0.03,0.03,0.632,1.541,0.457,6], [0.086,0.03,0.03,0.632,1.144,0.457,6],
+  [0.03,0.45,0.12,0.634,1.342,0.405,10], [0.045,0.052,0.06,0.634,1.519,0.405,11],
+  [0.045,0.052,0.06,0.634,1.444,0.405,11], [0.045,0.052,0.06,0.634,1.369,0.405,11],
+  [0.045,0.052,0.06,0.634,1.294,0.405,11], [0.045,0.052,0.06,0.634,1.219,0.405,11],
+  [0.022,0.06,0.105,0.607,1.605,-0.367,4], [0.045,0.06,0.015,-0.532,1.605,0.487,4],
+  [1.26,0.037,0.037,0,1.729,0.491,2], [1.26,0.037,0.037,0,1.729,-0.491,2],
+  [0.019,0.037,0.945,0.617,1.725,0,2], [0.019,0.037,0.945,-0.617,1.725,0,2],
+  [0.022,0.139,0.51,0.596,1.779,0.067,3], [0.022,0.135,0.375,0.596,1.916,0.053,3],
+  [0.022,0.146,0.21,0.596,2.057,0.03,3], [0.022,0.139,0.652,-0.596,1.779,-0.004,3],
+  [0.022,0.135,0.427,-0.596,1.916,0.026,3], [0.022,0.146,0.225,-0.596,2.057,0.023,3],
+  [1.282,0.075,0.083,0,1.762,0.446,14], [1.282,0.075,0.083,0,1.83,0.367,14],
+  [1.282,0.075,0.083,0,1.897,0.289,14], [1.282,0.075,0.083,0,1.965,0.21,14],
+  [1.282,0.075,0.083,0,2.033,0.131,14], [1.282,0.075,0.101,0,2.1,0.043,14],
+  [1.26,0.052,0.06,0,2.156,0,14], [0.09,0.071,0.105,0.42,1.768,0.45,14],
+  [0.09,0.071,0.105,0.12,1.768,0.45,14], [0.09,0.071,0.105,-0.12,1.768,0.45,14],
+  [0.09,0.071,0.105,-0.42,1.768,0.45,14], [1.282,0.075,0.098,0,2.1,-0.049,14],
+  [1.282,0.075,0.101,0,2.033,-0.144,14], [0.93,0.142,0.146,-0.176,1.931,-0.264,14],
+  [0.93,0.142,0.154,-0.176,1.796,-0.411,14], [0.315,0.495,0.27,0.45,2.047,-0.33,20],
+  [0.33,0.06,0.285,0.45,2.07,-0.33,20], [0.345,0.045,0.3,0.45,2.317,-0.33,2],
+  [0.09,0.12,0.09,0.502,2.4,-0.33,21], [0.112,0.037,0.112,0.502,2.479,-0.33,21],
+  [0.09,0.12,0.09,0.382,2.4,-0.33,21], [0.112,0.037,0.112,0.382,2.479,-0.33,21],
+  [0.03,0.09,0.09,0.596,1.92,-0.285,4], [0.06,0.075,0.007,0.33,2.175,-0.195,4],
+];
+function populateBooksBuilder(b                  , biome            = 'forest')       {
+  let pal = BOOKS_PALETTE_FOREST;
+  if (biome === 'winter') pal = BOOKS_PALETTE_WINTER;
+  else if (biome === 'desert') pal = BOOKS_PALETTE_DESERT;
+  else if (biome === 'neon') pal = BOOKS_PALETTE_NEON;
 
-  // -------------------------------------------------------------
-  // 6. Объемная 3D-вывеска 'BOOKS' над маркизой
-  // Фон 0x14532d, рамка 0xdcfce7, буквы 0xa3e635
-  // -------------------------------------------------------------
-  // Фон вывески
-  b.addBox(0.75, 0.20, 0.05, 0.30, 1.35, 0.75, cSignBg);
-  // Рамка вывески (верх, низ, боковины)
-  b.addBox(0.80, 0.05, 0.05, 0.30, 1.45, 0.75, cSageTrim);
-  b.addBox(0.80, 0.05, 0.05, 0.30, 1.25, 0.75, cSageTrim);
-  b.addBox(0.05, 0.20, 0.05, -0.10, 1.35, 0.75, cSageTrim);
-  b.addBox(0.05, 0.20, 0.05, 0.70, 1.35, 0.75, cSageTrim);
-  // Буквы 'B', 'O', 'O', 'K', 'S' (0xa3e635)
-  b.addBox(0.05, 0.10, 0.05, 0.10, 1.35, 0.80, cLimeText); // B
-  b.addBox(0.05, 0.10, 0.05, 0.20, 1.35, 0.80, cLimeText); // O
-  b.addBox(0.05, 0.10, 0.05, 0.30, 1.35, 0.80, cLimeText); // O
-  b.addBox(0.05, 0.10, 0.05, 0.40, 1.35, 0.80, cLimeText); // K
-  b.addBox(0.05, 0.10, 0.05, 0.50, 1.35, 0.80, cLimeText); // S
-
-  // -------------------------------------------------------------
-  // 7. Угловая консольная вертикальная вывеска (Blade sign)
-  // Кронштейн 0x334155, табло 0x14532d, буквы 0xa3e635
-  // -------------------------------------------------------------
-  // Верхний и нижний кронштейны из кованого базальта
-  b.addBox(0.15, 0.05, 0.05, -0.85, 1.30, 0.40, cBasalt);
-  b.addBox(0.15, 0.05, 0.05, -0.85, 0.90, 0.40, cBasalt);
-  // Вертикальное табло вывески
-  b.addBox(0.05, 0.45, 0.20, -0.95, 1.10, 0.40, cSignBg);
-  // Рамка табло (верх и низ)
-  b.addBox(0.05, 0.05, 0.25, -0.95, 1.35, 0.40, cSageTrim);
-  b.addBox(0.05, 0.05, 0.25, -0.95, 0.85, 0.40, cSageTrim);
-  // Вертикальная надпись 'B-O-K-S'
-  b.addBox(0.05, 0.05, 0.10, -0.95, 1.25, 0.40, cLimeText);
-  b.addBox(0.05, 0.05, 0.10, -0.95, 1.15, 0.40, cLimeText);
-  b.addBox(0.05, 0.05, 0.10, -0.95, 1.05, 0.40, cLimeText);
-  b.addBox(0.05, 0.05, 0.10, -0.95, 0.95, 0.40, cLimeText);
-
-  // -------------------------------------------------------------
-  // 8. Уличные детали: кашпо слева, книжная тележка справа
-  // -------------------------------------------------------------
-  // Кашпо с зеленью слева (X=-0.70)
-  b.addBox(0.15, 0.15, 0.15, -0.70, 0.25, 0.75, cOak);
-  b.addBox(0.20, 0.05, 0.20, -0.70, 0.35, 0.75, cTerracotta);
-  b.addBox(0.20, 0.15, 0.20, -0.70, 0.45, 0.75, cFoliage);
-  b.addBox(0.10, 0.10, 0.10, -0.70, 0.55, 0.75, cFoliageLight);
-  b.addBox(0.05, 0.05, 0.05, -0.65, 0.45, 0.85, cBerry);
-  b.addBox(0.05, 0.05, 0.05, -0.75, 0.50, 0.85, cBerry);
-
-  // Книжная тележка справа (X=0.65)
-  // Колеса и ось
-  b.addBox(0.05, 0.10, 0.10, 0.55, 0.15, 0.80, cBasalt);
-  b.addBox(0.05, 0.10, 0.10, 0.75, 0.15, 0.80, cBasalt);
-  b.addBox(0.20, 0.05, 0.05, 0.65, 0.15, 0.80, cBasalt);
-  // Лоток тележки
-  b.addBox(0.25, 0.05, 0.15, 0.65, 0.25, 0.80, cOak);
-  b.addBox(0.25, 0.10, 0.05, 0.65, 0.30, 0.85, cDarkWood);
-  b.addBox(0.25, 0.10, 0.05, 0.65, 0.30, 0.75, cDarkWood);
-  b.addBox(0.05, 0.10, 0.15, 0.55, 0.30, 0.80, cDarkWood);
-  b.addBox(0.05, 0.10, 0.15, 0.75, 0.30, 0.80, cDarkWood);
-  b.addBox(0.05, 0.15, 0.05, 0.80, 0.35, 0.80, cBasalt); // ручка
-  // Книги в тележке
-  b.addBox(0.05, 0.10, 0.10, 0.60, 0.35, 0.80, cRedBook);
-  b.addBox(0.05, 0.10, 0.10, 0.65, 0.35, 0.80, cBlueBook);
-  b.addBox(0.05, 0.10, 0.10, 0.70, 0.35, 0.80, cBrass);
-
-  // -------------------------------------------------------------
-  // 9. Зимний слой (isWinter: boolean)
-  // Шапки снега на маркизе, вывеске и тележке; хвойная гирлянда с ягодами
-  // -------------------------------------------------------------
-  if (isWinter) {
-    // Снег на маркизе (два яруса)
-    b.addBox(0.80, 0.05, 0.15, 0.30, 1.30, 0.80, cSnow);
-    b.addBox(0.80, 0.05, 0.15, 0.30, 1.20, 0.95, cSnow);
-
-    // Снег на вывеске 'BOOKS'
-    b.addBox(0.80, 0.05, 0.10, 0.30, 1.50, 0.75, cSnow);
-
-    // Снег на консольной вывеске
-    b.addBox(0.05, 0.05, 0.25, -0.95, 1.40, 0.40, cSnow);
-
-    // Снег на уличных деталях: тележка, кашпо, ступенька
-    b.addBox(0.20, 0.05, 0.10, 0.65, 0.40, 0.80, cSnow);
-    b.addBox(0.15, 0.05, 0.15, -0.70, 0.60, 0.75, cSnow);
-    b.addBox(0.45, 0.05, 0.05, -0.45, 0.25, 0.80, cSnow);
-
-    // Праздничная хвойная гирлянда над дверью
-    b.addBox(0.45, 0.05, 0.05, -0.45, 1.20, 0.80, cDarkGreen);
-    b.addBox(0.05, 0.05, 0.05, -0.65, 1.20, 0.85, cBerry);
-    b.addBox(0.05, 0.05, 0.05, -0.25, 1.20, 0.85, cBerry);
-
-    // Рождественский венок на двери с ягодой
-    b.addBox(0.15, 0.15, 0.05, -0.45, 0.75, 0.80, cDarkGreen);
-    b.addBox(0.05, 0.05, 0.05, -0.45, 0.75, 0.85, cBerry);
-
-    // Боковая гирлянда на левом фасаде
-    b.addBox(0.05, 0.05, 0.60, -0.85, 1.40, 0.20, cDarkGreen);
-    b.addBox(0.05, 0.05, 0.05, -0.85, 1.40, 0.00, cBerry);
-    b.addBox(0.05, 0.05, 0.05, -0.85, 1.40, 0.40, cBerry);
-  }
-}
-
-// --- Module: src/view/townhouse/upperFloors.ts ---
-/**
- * Townhouse C (Books): Upper floors, quoins, cornices, windows, downspout and winter snow layer.
- * Strictly adheres to docs/VOXEL_GRID_SPECIFICATION.md (VOXEL_UNIT = 0.05).
- */
-function buildBooksUpperFloors(b                  , isWinter         )       {
-  // Color palette constants
-  const cLimestone = 0xdcfce7; // Известняк (карнизы, рустовка, наличники, сандрики)
-  const cWall = 0x15803d;      // Изумрудные стены книжного таунхауса
-  const cGlass = 0xfef08a;     // Теплое стекло с внутренним светом
-  const cWood = 0x713f12;      // Мореный дуб (цветочные ящики)
-  const cGreen = 0x166534;     // Хвойная / растительная зелень
-  const cBerry = 0xef4444;     // Красные акцентные ягоды / цветы
-  const cPipe = 0x334155;      // Базальтовый сланец (водосточная труба)
-  const cSnow = 0xf8fafc;      // Чистый снежный покров
-
-  // 1. Междуэтажный карниз (Mid-Cornice) — поясок из известняка на Y=1.45
-  b.addBox(1.70, 0.10, 1.50, 0.00, 1.45, 0.00, cLimestone);
-
-  // 2. Жилые этажи (Upper Floors Walls) — изумрудные стены на Y=2.10
-  b.addBox(1.60, 1.20, 1.40, 0.00, 2.10, 0.00, cWall);
-
-  // 3. Венчающий карниз (Upper Cornice) — завершение стен на Y=2.75
-  b.addBox(1.70, 0.10, 1.50, 0.00, 2.75, 0.00, cLimestone);
-
-  // 4. Рустовка на 4 углах (Quoins) — чередующиеся длинные (0.15) и короткие (0.10) блоки
-  const cornerXs = [-0.80, 0.80];
-  const cornerZs = [-0.70, 0.70];
-  const quoinYs = [0.30, 0.70, 1.10, 1.70, 2.10, 2.50];
-
-  for (let ci = 0; ci < 2; ci++) {
-    const cx = cornerXs[ci];
-    for (let cj = 0; cj < 2; cj++) {
-      const cz = cornerZs[cj];
-      for (let q = 0; q < quoinYs.length; q++) {
-        const isLong = q % 2 === 0;
-        const qw = isLong ? 0.15 : 0.10;
-        const qd = isLong ? 0.10 : 0.15;
-        b.addBox(qw, 0.10, qd, cx, quoinYs[q], cz, cLimestone);
-      }
-    }
-  }
-
-  // 5. 3 окна верхнего этажа на главном фасаде (X = -0.45, 0.00, 0.45)
-  const frontWindowXs = [-0.45, 0.00, 0.45];
-  for (let i = 0; i < frontWindowXs.length; i++) {
-    const wx = frontWindowXs[i];
-
-    // Наличники и теплое стекло (Z = 0.75)
-    b.addBox(0.35, 0.70, 0.05, wx, 2.15, 0.75, cLimestone);
-    b.addBox(0.25, 0.60, 0.05, wx, 2.15, 0.75, cGlass);
-
-    // Выступающий подоконник и верхний сандрик
-    b.addBox(0.40, 0.05, 0.10, wx, 1.75, 0.75, cLimestone);
-    b.addBox(0.40, 0.05, 0.10, wx, 2.55, 0.75, cLimestone);
-
-    // Деревянные ящики с цветами (дерево, зелень, красные ягоды)
-    b.addBox(0.35, 0.10, 0.10, wx, 1.65, 0.80, cWood);
-    b.addBox(0.30, 0.05, 0.05, wx, 1.75, 0.80, cGreen);
-    b.addBox(0.05, 0.05, 0.05, wx - 0.10, 1.80, 0.80, cBerry);
-    b.addBox(0.05, 0.05, 0.05, wx + 0.10, 1.80, 0.80, cBerry);
-  }
-
-  // 6. Боковой фасад: 2 окна (1-й и 2-й этажи) и вертикальная водосточная труба
-  // Окно 2-го этажа (Y = 2.15)
-  b.addBox(0.05, 0.60, 0.30, -0.85, 2.15, 0.00, cLimestone);
-  b.addBox(0.05, 0.50, 0.20, -0.85, 2.15, 0.00, cGlass);
-  b.addBox(0.10, 0.05, 0.35, -0.85, 1.80, 0.00, cLimestone);
-
-  // Окно 1-го этажа (Y = 0.80)
-  b.addBox(0.05, 0.60, 0.30, -0.85, 0.80, 0.00, cLimestone);
-  b.addBox(0.05, 0.50, 0.20, -0.85, 0.80, 0.00, cGlass);
-  b.addBox(0.10, 0.05, 0.35, -0.85, 0.45, 0.00, cLimestone);
-
-  // Вертикальная водосточная труба на передне-левом углу
-  b.addBox(0.05, 2.40, 0.05, -0.80, 1.40, 0.65, cPipe);
-
-  // 7. Зимний слой (isWinter) — снежные шапки на выступах
-  if (isWinter) {
-    // Верхний карниз (передний и боковой свесы)
-    b.addBox(1.70, 0.05, 0.10, 0.00, 2.85, 0.70, cSnow);
-    b.addBox(0.10, 0.05, 1.50, -0.80, 2.85, 0.00, cSnow);
-
-    // Междуэтажный карниз (передний и боковой свесы)
-    b.addBox(1.70, 0.05, 0.10, 0.00, 1.55, 0.70, cSnow);
-    b.addBox(0.10, 0.05, 1.50, -0.80, 1.55, 0.00, cSnow);
-
-    // Подоконники и сандрики 3 главных окон
-    for (let i = 0; i < frontWindowXs.length; i++) {
-      const wx = frontWindowXs[i];
-      b.addBox(0.40, 0.05, 0.10, wx, 2.60, 0.75, cSnow); // Снег на сандрике
-      b.addBox(0.35, 0.05, 0.10, wx, 1.80, 0.75, cSnow); // Снег на подоконнике
-    }
-
-    // Подоконники боковых окон (1-й и 2-й этажи)
-    b.addBox(0.10, 0.05, 0.35, -0.85, 1.85, 0.00, cSnow);
-    b.addBox(0.10, 0.05, 0.35, -0.85, 0.50, 0.00, cSnow);
-  }
-}
-
-// --- Module: src/view/townhouse/roof.ts ---
-/**
- * Books Roof & Chimney Modeler for Townhouse C (Green Books Store).
- * Strictly complies with docs/VOXEL_GRID_SPECIFICATION.md (VOXEL_UNIT = 0.05).
- * All dimensions (w, h, d) and coordinates (x, y, z) are exact multiples of 0.05.
- */
-function buildBooksRoof(b                  , isWinter         )       {
-  // Palettes (docs/VOXEL_GRID_SPECIFICATION.md §4)
-  const cTileLight = 0xc2410c;    // Терракотовая черепица (светлый ярус / оголовки)
-  const cTileDark = 0x9a3412;     // Темная обожженная терракота
-  const cRidge = 0x7c2d12;        // Коньковая черепица (Y=3.85)
-  const cDormerWall = 0x15803d;   // Изумрудные стенки люкарны
-  const cGlass = 0xfef08a;        // Теплый вечерний свет внутри люкарны
-  const cSill = 0xdcfce7;         // Известняковый подоконник люкарны
-  const cChimneyBrick = 0x854d0e; // Обожженный кирпич дымохода
-  const cCollar = 0x334155;       // Базальтовый каменный воротник
-  const cSnow = 0xf8fafc;         // Чистый снежный покров
-  const cSmoke = 0xe2e8f0;        // Клубящийся дым из трубы
-
-  // =========================================================================
-  // 1. Двускатная терракотовая крыша: 5 ступенчатых ярусов черепицы
-  // Свесы по X=1.70 (симметрично над стенами W=1.60 и карнизом W=1.70).
-  // Ступени по Z: 1.50 -> 1.20 -> 0.90 -> 0.60 -> 0.30 (шаг ската 0.15 = 3 вокселя).
-  // Стыковка по Y: 2.80 -> 3.00 -> 3.20 -> 3.50 -> 3.80 -> 3.90 (конек Y=3.85).
-  // =========================================================================
-  b.addBox(1.70, 0.20, 1.50, 0.00, 2.90, 0.00, cTileLight); // Ярус 1 (Y: 2.80 - 3.00)
-  b.addBox(1.70, 0.20, 1.20, 0.00, 3.10, 0.00, cTileDark);  // Ярус 2 (Y: 3.00 - 3.20)
-  b.addBox(1.70, 0.30, 0.90, 0.00, 3.35, 0.00, cTileLight); // Ярус 3 (Y: 3.20 - 3.50)
-  b.addBox(1.70, 0.30, 0.60, 0.00, 3.65, 0.00, cTileDark);  // Ярус 4 (Y: 3.50 - 3.80)
-  b.addBox(1.70, 0.10, 0.30, 0.00, 3.85, 0.00, cRidge);     // Ярус 5: Коньковая черепица (Y=3.85, span 3.80 - 3.90)
-
-  // =========================================================================
-  // 2. Фронтонная люкарна (Dormer window) на переднем скате крыши (X = -0.35)
-  // Балансирует фасад напротив дымохода (X = +0.45, Z = -0.25).
-  // =========================================================================
-  const dormerX = -0.35;
-  // Стенки люкарны (изумрудный фасадный цвет)
-  b.addBox(0.30, 0.25, 0.25, dormerX, 3.30, 0.55, cDormerWall);
-  // Окно люкарны с теплым светом
-  b.addBox(0.20, 0.20, 0.05, dormerX, 3.30, 0.70, cGlass);
-  // Выступающий подоконник (известняк / светлый камень)
-  b.addBox(0.25, 0.05, 0.05, dormerX, 3.15, 0.70, cSill);
-  // Скатная крыша люкарны (терракота)
-  b.addBox(0.35, 0.10, 0.30, dormerX, 3.50, 0.55, cTileLight);
-
-  // =========================================================================
-  // 3. Кирпичный дымоход: шахта (0.45, 3.85, -0.25), воротник и 2 оголовка
-  // =========================================================================
-  const chimX = 0.45;
-  const chimZ = -0.25;
-
-  // Шахта из кирпича (Y: 3.50 - 4.20)
-  b.addBox(0.25, 0.70, 0.25, chimX, 3.85, chimZ, cChimneyBrick);
-  // Базальтовый каменный воротник (Y: 4.20 - 4.30)
-  b.addBox(0.30, 0.10, 0.30, chimX, 4.25, chimZ, cCollar);
-  // 2 терракотовые трубы / оголовка на Y=4.35 (Y: 4.30 - 4.40)
-  b.addBox(0.10, 0.10, 0.10, chimX - 0.05, 4.35, chimZ, cTileLight); // Левая труба (X = 0.40)
-  b.addBox(0.10, 0.10, 0.10, chimX + 0.05, 4.35, chimZ, cTileLight); // Правая труба (X = 0.50)
-
-  // =========================================================================
-  // 4. Зимний слой (isWinter)
-  // Снежные шапки на коньке, скатах, люкарне, воротнике и 4 клуба дыма.
-  // =========================================================================
-  if (isWinter) {
-    // Снежная шапка вдоль конька крыши
-    b.addBox(1.70, 0.05, 0.25, 0.00, 3.95, 0.00, cSnow);
-
-    // Снежный покров на ступенчатых скатах (передний и задний)
-    b.addBox(1.40, 0.05, 0.20, 0.00, 3.55, 0.40, cSnow);  // Передний верхний скат
-    b.addBox(1.40, 0.05, 0.20, 0.00, 3.55, -0.40, cSnow); // Задний верхний скат
-    b.addBox(1.50, 0.05, 0.15, 0.00, 3.25, 0.55, cSnow);  // Передний нижний скат
-    b.addBox(1.50, 0.05, 0.15, 0.00, 3.25, -0.55, cSnow); // Задний нижний скат
-
-    // Снег на крыше люкарны
-    b.addBox(0.35, 0.05, 0.30, dormerX, 3.60, 0.55, cSnow);
-
-    // Снег на воротнике дымохода
-    b.addBox(0.30, 0.05, 0.30, chimX, 4.30, chimZ, cSnow);
-
-    // 4 клубящихся воксельных шарика дыма со смещением по ветру
-    b.addBox(0.10, 0.10, 0.10, chimX, 4.50, chimZ, cSmoke);
-    b.addBox(0.10, 0.10, 0.10, chimX - 0.05, 4.65, chimZ + 0.05, cSmoke);
-    b.addBox(0.10, 0.10, 0.10, chimX, 4.80, chimZ + 0.10, cSmoke);
-    b.addBox(0.05, 0.05, 0.05, chimX - 0.05, 4.90, chimZ + 0.15, cSmoke);
+  for (let i = 0; i < BOOKS_BOXES.length; i++) {
+    const box = BOOKS_BOXES[i];
+    b.addBox(box[0], box[1], box[2], box[3], box[4], box[5], pal[box[6]]);
   }
 }
 
@@ -2862,9 +2751,9 @@ const BAKERY_PALETTE_NEON                    = [
 
 // 180 Monolithic Boxes: [w, h, d, x, y, z, swatchId]
 const BAKERY_BOXES                                                                      = [
-  [0.675,0.105,0.056,-0.502,0.052,0.673,14], [0.675,0.105,0.056,0.502,0.052,0.673,14],
+  [0.652,0.105,0.056,-0.514,0.052,0.673,14], [0.652,0.105,0.056,0.514,0.052,0.673,14],
   [0.06,0.105,1.305,-0.81,0.052,-0.008,14], [0.06,0.105,1.305,0.81,0.052,-0.008,14],
-  [1.56,0.105,0.06,0,0.052,-0.63,14], [0.33,0.03,0.068,0,0.015,0.679,14],
+  [1.56,0.105,0.06,0,0.052,-0.63,14], [0.375,0.03,0.068,0,0.015,0.679,14],
   [0.06,1.965,1.29,-0.78,1.087,0,4], [0.06,1.965,1.29,0.78,1.087,0,4],
   [1.5,1.965,0.06,0,1.087,-0.615,4], [1.5,0.795,0.06,0,0.502,0.615,4],
   [1.5,1.095,0.06,0,1.522,0.615,4], [0.116,0.405,0.034,-0.771,0.307,0.662,2],
@@ -2872,86 +2761,86 @@ const BAKERY_BOXES                                                              
   [0.064,0.337,0.124,-0.797,1.481,0.617,2], [0.116,0.345,0.034,-0.771,1.823,0.662,2],
   [0.116,0.405,0.034,0.771,0.307,0.662,2], [0.064,0.39,0.124,0.797,0.705,0.617,2],
   [0.116,0.337,0.034,0.771,1.144,0.662,2], [0.064,0.337,0.124,0.797,1.481,0.617,2],
-  [0.116,0.345,0.034,0.771,1.823,0.662,2], [0.094,0.795,0.105,-0.782,0.502,-0.608,2],
-  [0.064,1.02,0.06,-0.797,1.485,-0.63,2], [0.094,1.89,0.105,0.782,1.05,-0.608,2],
-  [1.702,0.075,0.049,0,0.938,0.669,2], [0.041,0.075,1.304,-0.831,0.938,-0.008,2],
-  [0.041,0.075,1.304,0.831,0.938,-0.008,2], [1.702,0.075,0.056,0,2.033,0.673,2],
-  [0.041,0.075,1.304,-0.831,2.033,-0.008,2], [0.041,0.075,1.304,0.831,2.033,-0.008,2],
-  [0.052,0.57,0.052,-0.161,0.315,0.671,2], [0.052,0.57,0.052,0.161,0.315,0.671,2],
-  [0.375,0.09,0.06,0,0.645,0.671,2], [0.27,0.57,0.026,0,0.315,0.658,6],
-  [0.165,0.18,0.037,0,0.48,0.66,1], [0.022,0.045,0.034,0.101,0.263,0.677,17],
-  [0.375,0.06,0.056,-0.435,0.135,0.673,2], [0.06,0.375,0.052,-0.593,0.352,0.671,2],
-  [0.06,0.375,0.052,-0.277,0.352,0.671,2], [0.09,0.075,0.054,-0.563,0.577,0.672,2],
-  [0.09,0.075,0.054,-0.307,0.577,0.672,2], [0.195,0.075,0.06,-0.435,0.652,0.671,2],
-  [0.255,0.457,0.03,-0.435,0.394,0.656,1], [0.375,0.06,0.056,0.435,0.135,0.673,2],
-  [0.06,0.375,0.052,0.277,0.352,0.671,2], [0.06,0.375,0.052,0.593,0.352,0.671,2],
-  [0.09,0.075,0.054,0.307,0.577,0.672,2], [0.09,0.075,0.054,0.563,0.577,0.672,2],
-  [0.195,0.075,0.06,0.435,0.652,0.671,2], [0.255,0.457,0.03,0.435,0.394,0.656,1],
-  [0.81,0.21,0.056,0,0.795,0.688,7], [0.87,0.075,0.094,0,0.938,0.692,0],
-  [0.06,0.06,0.075,-0.39,0.87,0.698,0], [0.06,0.06,0.075,0.39,0.87,0.698,0],
-  [0.022,0.135,0.03,-0.326,0.802,0.724,0], [0.06,0.052,0.03,-0.285,0.844,0.724,0],
-  [0.045,0.03,0.03,-0.293,0.802,0.724,0], [0.06,0.052,0.03,-0.285,0.761,0.724,0],
-  [0.022,0.105,0.03,-0.214,0.787,0.724,0], [0.022,0.105,0.03,-0.161,0.787,0.724,0],
-  [0.075,0.03,0.03,-0.188,0.855,0.724,0], [0.03,0.03,0.03,-0.188,0.787,0.724,0],
-  [0.022,0.135,0.03,-0.109,0.802,0.724,0], [0.03,0.045,0.03,-0.083,0.802,0.724,0],
-  [0.03,0.045,0.03,-0.052,0.848,0.724,0], [0.03,0.045,0.03,-0.052,0.758,0.724,0],
-  [0.022,0.135,0.03,-0.004,0.802,0.724,0], [0.052,0.03,0.03,0.034,0.855,0.724,0],
-  [0.037,0.03,0.03,0.026,0.802,0.724,0], [0.052,0.03,0.03,0.034,0.75,0.724,0],
-  [0.022,0.135,0.03,0.101,0.802,0.724,0], [0.06,0.045,0.03,0.142,0.848,0.724,0],
-  [0.06,0.037,0.03,0.142,0.806,0.724,0], [0.037,0.052,0.03,0.146,0.761,0.724,0],
-  [0.03,0.06,0.03,0.24,0.765,0.724,0], [0.037,0.075,0.03,0.214,0.832,0.724,0],
-  [0.037,0.075,0.03,0.266,0.832,0.724,0], [0.225,0.045,0.06,-0.39,1.027,0.675,2],
-  [0.21,0.037,0.064,-0.39,1.069,0.681,0], [0.045,0.232,0.052,-0.472,1.204,0.671,2],
-  [0.045,0.232,0.052,-0.307,1.204,0.671,2], [0.15,0.075,0.06,-0.39,1.358,0.671,2],
-  [0.12,0.263,0.03,-0.39,1.219,0.656,1], [0.12,0.022,0.037,-0.39,1.211,0.66,7],
-  [0.225,0.045,0.06,0,1.027,0.675,2], [0.21,0.037,0.064,0,1.069,0.681,0],
-  [0.045,0.232,0.052,-0.083,1.204,0.671,2], [0.045,0.232,0.052,0.083,1.204,0.671,2],
-  [0.15,0.075,0.06,0,1.358,0.671,2], [0.12,0.263,0.03,0,1.219,0.656,1],
-  [0.12,0.022,0.037,0,1.211,0.66,7], [0.225,0.045,0.06,0.39,1.027,0.675,2],
-  [0.21,0.037,0.064,0.39,1.069,0.681,0], [0.045,0.232,0.052,0.307,1.204,0.671,2],
-  [0.045,0.232,0.052,0.472,1.204,0.671,2], [0.15,0.075,0.06,0.39,1.358,0.671,2],
-  [0.12,0.263,0.03,0.39,1.219,0.656,1], [0.12,0.022,0.037,0.39,1.211,0.66,7],
-  [0.225,0.045,0.06,-0.39,1.508,0.675,2], [0.21,0.037,0.064,-0.39,1.549,0.681,0],
-  [0.045,0.232,0.052,-0.472,1.684,0.671,2], [0.045,0.232,0.052,-0.307,1.684,0.671,2],
-  [0.15,0.075,0.06,-0.39,1.837,0.671,2], [0.12,0.263,0.03,-0.39,1.699,0.656,1],
-  [0.12,0.022,0.037,-0.39,1.691,0.66,7], [0.225,0.045,0.06,0,1.508,0.675,2],
-  [0.21,0.037,0.064,0,1.549,0.681,0], [0.045,0.232,0.052,-0.083,1.684,0.671,2],
-  [0.045,0.232,0.052,0.083,1.684,0.671,2], [0.15,0.075,0.06,0,1.837,0.671,2],
-  [0.12,0.263,0.03,0,1.699,0.656,1], [0.12,0.022,0.037,0,1.691,0.66,7],
-  [0.225,0.045,0.06,0.39,1.508,0.675,2], [0.21,0.037,0.064,0.39,1.549,0.681,0],
-  [0.045,0.232,0.052,0.307,1.684,0.671,2], [0.045,0.232,0.052,0.472,1.684,0.671,2],
-  [0.15,0.075,0.06,0.39,1.837,0.671,2], [0.12,0.263,0.03,0.39,1.699,0.656,1],
-  [0.12,0.022,0.037,0.39,1.691,0.66,7], [0.105,0.045,0.056,-0.765,1.958,0.688,8],
-  [0.135,0.045,0.056,-0.232,1.958,0.688,8], [0.135,0.045,0.056,0.232,1.958,0.688,8],
-  [0.105,0.045,0.056,0.765,1.958,0.688,8], [0.412,0.045,0.056,-0.506,1.867,0.688,8],
-  [0.33,0.045,0.056,0,1.867,0.688,8], [0.412,0.045,0.056,0.506,1.867,0.688,8],
-  [0.045,0.045,0.045,-0.457,1.823,0.705,11], [0.045,0.045,0.045,0,1.823,0.705,12],
-  [0.045,0.045,0.045,0.457,1.823,0.705,10], [0.045,0.06,0.135,-0.836,1.95,0.457,8],
-  [0.045,0.045,0.21,-0.836,1.867,0.3,8], [0.045,0.045,0.045,-0.84,1.823,0.3,13],
+  [0.116,0.345,0.034,0.771,1.823,0.662,2], [0.128,1.894,0.165,-0.776,1.048,-0.578,2],
+  [0.128,1.894,0.165,0.776,1.048,-0.578,2], [1.702,0.075,0.049,0,0.938,0.669,2],
+  [0.041,0.075,1.298,-0.831,0.938,-0.004,2], [0.041,0.075,1.298,0.831,0.938,-0.004,2],
+  [1.702,0.075,0.056,0,2.033,0.673,2], [0.041,0.075,1.298,-0.831,2.033,-0.004,2],
+  [0.041,0.075,1.298,0.831,2.033,-0.004,2], [0.052,0.57,0.052,-0.161,0.315,0.671,2],
+  [0.052,0.57,0.052,0.161,0.315,0.671,2], [0.375,0.09,0.06,0,0.645,0.671,2],
+  [0.27,0.57,0.026,0,0.315,0.658,6], [0.165,0.18,0.037,0,0.48,0.66,1],
+  [0.022,0.045,0.034,0.101,0.263,0.677,17], [0.375,0.06,0.064,-0.435,0.135,0.677,2],
+  [0.06,0.375,0.052,-0.593,0.352,0.671,2], [0.06,0.375,0.052,-0.277,0.352,0.671,2],
+  [0.09,0.075,0.054,-0.563,0.577,0.672,2], [0.09,0.075,0.054,-0.307,0.577,0.672,2],
+  [0.195,0.075,0.056,-0.435,0.652,0.673,2], [0.255,0.454,0.034,-0.435,0.392,0.654,1],
+  [0.375,0.06,0.064,0.435,0.135,0.677,2], [0.06,0.375,0.052,0.277,0.352,0.671,2],
+  [0.06,0.375,0.052,0.593,0.352,0.671,2], [0.09,0.075,0.054,0.307,0.577,0.672,2],
+  [0.09,0.075,0.054,0.563,0.577,0.672,2], [0.195,0.075,0.056,0.435,0.652,0.673,2],
+  [0.255,0.454,0.034,0.435,0.392,0.654,1], [0.81,0.195,0.056,0,0.795,0.688,7],
+  [0.87,0.03,0.041,0,0.908,0.718,0], [0.06,0.049,0.068,-0.39,0.872,0.701,0],
+  [0.06,0.049,0.068,0.39,0.872,0.701,0], [0.022,0.135,0.026,-0.349,0.795,0.729,0],
+  [0.068,0.06,0.026,-0.304,0.832,0.729,0], [0.068,0.06,0.026,-0.304,0.757,0.729,0],
+  [0.03,0.105,0.026,-0.218,0.78,0.729,0], [0.03,0.105,0.026,-0.15,0.78,0.729,0],
+  [0.098,0.03,0.026,-0.184,0.848,0.729,0], [0.037,0.03,0.026,-0.184,0.787,0.729,0],
+  [0.03,0.135,0.026,-0.09,0.795,0.729,0], [0.03,0.045,0.026,-0.06,0.795,0.729,0],
+  [0.037,0.045,0.026,-0.026,0.84,0.729,0], [0.037,0.045,0.026,-0.026,0.75,0.729,0],
+  [0.03,0.135,0.026,0.037,0.795,0.729,0], [0.06,0.03,0.026,0.083,0.848,0.729,0],
+  [0.045,0.03,0.026,0.075,0.795,0.729,0], [0.06,0.03,0.026,0.083,0.742,0.729,0],
+  [0.03,0.135,0.026,0.165,0.795,0.729,0], [0.06,0.075,0.026,0.21,0.825,0.729,0],
+  [0.037,0.06,0.026,0.214,0.757,0.729,0], [0.03,0.06,0.026,0.315,0.757,0.729,0],
+  [0.03,0.075,0.026,0.285,0.825,0.729,0], [0.03,0.075,0.026,0.345,0.825,0.729,0],
+  [0.225,0.045,0.06,-0.39,1.027,0.675,2], [0.21,0.037,0.068,-0.39,1.069,0.683,0],
+  [0.045,0.232,0.052,-0.472,1.204,0.671,2], [0.045,0.232,0.052,-0.307,1.204,0.671,2],
+  [0.15,0.075,0.056,-0.39,1.358,0.673,2], [0.12,0.232,0.026,-0.39,1.204,0.658,1],
+  [0.12,0.022,0.011,-0.39,1.211,0.675,7], [0.225,0.045,0.06,0,1.027,0.675,2],
+  [0.21,0.037,0.068,0,1.069,0.683,0], [0.045,0.232,0.052,-0.083,1.204,0.671,2],
+  [0.045,0.232,0.052,0.083,1.204,0.671,2], [0.15,0.075,0.056,0,1.358,0.673,2],
+  [0.12,0.232,0.026,0,1.204,0.658,1], [0.12,0.022,0.011,0,1.211,0.675,7],
+  [0.225,0.045,0.06,0.39,1.027,0.675,2], [0.21,0.037,0.068,0.39,1.069,0.683,0],
+  [0.045,0.232,0.052,0.307,1.204,0.671,2], [0.045,0.232,0.052,0.472,1.204,0.671,2],
+  [0.15,0.075,0.056,0.39,1.358,0.673,2], [0.12,0.232,0.026,0.39,1.204,0.658,1],
+  [0.12,0.022,0.011,0.39,1.211,0.675,7], [0.225,0.045,0.06,-0.39,1.508,0.675,2],
+  [0.21,0.037,0.068,-0.39,1.549,0.683,0], [0.045,0.232,0.052,-0.472,1.684,0.671,2],
+  [0.045,0.232,0.052,-0.307,1.684,0.671,2], [0.15,0.075,0.056,-0.39,1.837,0.673,2],
+  [0.12,0.232,0.026,-0.39,1.684,0.658,1], [0.12,0.022,0.011,-0.39,1.691,0.675,7],
+  [0.225,0.045,0.06,0,1.508,0.675,2], [0.21,0.037,0.068,0,1.549,0.683,0],
+  [0.045,0.232,0.052,-0.083,1.684,0.671,2], [0.045,0.232,0.052,0.083,1.684,0.671,2],
+  [0.15,0.075,0.056,0,1.837,0.673,2], [0.12,0.232,0.026,0,1.684,0.658,1],
+  [0.12,0.022,0.011,0,1.691,0.675,7], [0.225,0.045,0.06,0.39,1.508,0.675,2],
+  [0.21,0.037,0.068,0.39,1.549,0.683,0], [0.045,0.232,0.052,0.307,1.684,0.671,2],
+  [0.045,0.232,0.052,0.472,1.684,0.671,2], [0.15,0.075,0.056,0.39,1.837,0.673,2],
+  [0.12,0.232,0.026,0.39,1.684,0.658,1], [0.12,0.022,0.011,0.39,1.691,0.675,7],
+  [0.109,0.045,0.056,-0.763,1.958,0.688,8], [0.135,0.045,0.056,-0.232,1.958,0.688,8],
+  [0.135,0.045,0.056,0.232,1.958,0.688,8], [0.109,0.045,0.056,0.763,1.958,0.688,8],
+  [0.412,0.045,0.056,-0.506,1.867,0.688,8], [0.33,0.045,0.056,0,1.867,0.688,8],
+  [0.412,0.045,0.056,0.506,1.867,0.688,8], [0.045,0.045,0.045,-0.457,1.811,0.705,12],
+  [0.045,0.045,0.045,0,1.811,0.705,12], [0.045,0.045,0.045,0.457,1.811,0.705,10],
+  [0.045,0.06,0.135,-0.836,1.95,0.457,8], [0.045,0.045,0.21,-0.836,1.867,0.3,8],
   [0.045,0.06,0.39,-0.836,1.95,0,8], [0.045,0.045,0.21,-0.836,1.867,-0.3,8],
-  [0.045,0.045,0.045,-0.84,1.823,-0.3,12], [0.045,0.06,0.135,-0.836,1.95,-0.457,8],
-  [0.045,0.045,0.435,0.836,1.867,0.307,8], [0.045,0.045,0.18,0.836,1.958,0,8],
-  [0.045,0.045,0.435,0.836,1.867,-0.307,8], [0.105,0.045,0.056,-0.765,0.862,0.688,8],
-  [0.105,0.045,0.056,0.765,0.862,0.688,8], [0.307,0.045,0.056,-0.559,0.773,0.688,8],
-  [0.045,0.045,0.045,-0.532,0.727,0.705,13], [0.12,0.075,0.052,-0.225,0.682,0.701,8],
-  [0.33,0.06,0.052,0,0.585,0.701,8], [0.12,0.075,0.052,0.225,0.682,0.701,8],
-  [0.307,0.045,0.056,0.559,0.773,0.688,8], [0.045,0.045,0.045,0.532,0.727,0.705,10],
-  [0.045,0.06,0.135,-0.836,0.855,0.457,8], [0.045,0.045,0.21,-0.836,0.773,0.3,8],
-  [0.045,0.045,0.045,-0.84,0.727,0.3,10], [0.045,0.06,0.39,-0.836,0.855,0,8],
-  [0.045,0.045,0.21,-0.836,0.773,-0.3,8], [0.045,0.045,0.045,-0.84,0.727,-0.3,12],
-  [0.045,0.06,0.135,-0.836,0.855,-0.457,8], [0.045,0.045,0.435,0.836,0.773,0.307,8],
-  [0.045,0.045,0.18,0.836,0.862,0,8], [0.045,0.045,0.435,0.836,0.773,-0.307,8],
-  [1.44,0.142,1.17,0,2.141,0,0], [0.3,0.165,0.09,-0.675,2.153,0.645,4],
-  [0.33,0.09,0.12,-0.675,2.28,0.645,0], [0.24,0.165,0.09,-0.225,2.153,0.645,4],
-  [0.27,0.09,0.12,-0.225,2.28,0.645,0], [0.24,0.165,0.09,0.225,2.153,0.645,4],
-  [0.27,0.09,0.12,0.225,2.28,0.645,0], [0.3,0.165,0.09,0.675,2.153,0.645,4],
-  [0.33,0.09,0.12,0.675,2.28,0.645,0], [0.3,0.165,0.09,-0.675,2.153,-0.645,4],
-  [0.33,0.09,0.12,-0.675,2.28,-0.645,0], [0.24,0.165,0.09,-0.225,2.153,-0.645,4],
-  [0.27,0.09,0.12,-0.225,2.28,-0.645,0], [0.09,0.165,0.24,-0.78,2.153,0.225,4],
-  [0.12,0.09,0.27,-0.78,2.28,0.225,0], [0.09,0.165,0.24,0.78,2.153,0.225,4],
-  [0.12,0.09,0.27,0.78,2.28,0.225,0], [0.3,0.382,0.3,0.42,2.329,-0.39,4],
-  [0.36,0.09,0.36,0.42,2.565,-0.39,0], [0.12,0.075,0.12,0.42,2.647,-0.39,16],
-  [0.105,0.105,0.105,0.427,2.752,-0.39,0], [0.12,0.135,0.12,0.48,2.887,-0.367,0],
+  [0.045,0.06,0.135,-0.836,1.95,-0.457,8], [0.045,0.045,0.435,0.836,1.867,0.307,8],
+  [0.045,0.045,0.18,0.836,1.958,0,8], [0.045,0.045,0.435,0.836,1.867,-0.307,8],
+  [0.105,0.045,0.056,-0.765,0.862,0.688,8], [0.105,0.045,0.056,0.765,0.862,0.688,8],
+  [0.307,0.045,0.064,-0.559,0.773,0.692,8], [0.045,0.045,0.045,-0.532,0.727,0.705,13],
+  [0.12,0.075,0.026,-0.225,0.652,0.718,8], [0.33,0.052,0.026,0,0.589,0.718,8],
+  [0.12,0.075,0.026,0.225,0.652,0.718,8], [0.307,0.045,0.064,0.559,0.773,0.692,8],
+  [0.045,0.045,0.045,0.532,0.727,0.705,10], [0.045,0.06,0.135,-0.836,0.855,0.457,8],
+  [0.045,0.045,0.21,-0.836,0.773,0.3,8], [0.045,0.06,0.39,-0.836,0.855,0,8],
+  [0.045,0.045,0.21,-0.836,0.773,-0.3,8], [0.045,0.06,0.135,-0.836,0.855,-0.457,8],
+  [0.045,0.045,0.435,0.836,0.773,0.307,8], [0.045,0.045,0.18,0.836,0.862,0,8],
+  [0.045,0.045,0.435,0.836,0.773,-0.307,8], [1.627,0.075,1.298,0,2.1,0,0],
+  [0.3,0.12,0.09,-0.675,2.13,0.645,4], [0.33,0.075,0.12,-0.675,2.228,0.645,0],
+  [0.24,0.12,0.09,-0.225,2.13,0.645,4], [0.27,0.075,0.12,-0.225,2.228,0.645,0],
+  [0.24,0.12,0.09,0.225,2.13,0.645,4], [0.27,0.075,0.12,0.225,2.228,0.645,0],
+  [0.3,0.12,0.09,0.675,2.13,0.645,4], [0.33,0.075,0.12,0.675,2.228,0.645,0],
+  [0.3,0.12,0.09,-0.675,2.13,-0.645,4], [0.33,0.075,0.12,-0.675,2.228,-0.645,0],
+  [0.24,0.12,0.09,-0.225,2.13,-0.645,4], [0.27,0.075,0.12,-0.225,2.228,-0.645,0],
+  [0.09,0.12,0.24,-0.78,2.13,0.225,4], [0.12,0.075,0.27,-0.78,2.228,0.225,0],
+  [0.09,0.12,0.24,0.78,2.13,0.225,4], [0.12,0.075,0.27,0.78,2.228,0.225,0],
+  [0.225,0.315,0.225,0.623,2.228,-0.427,4], [0.285,0.075,0.285,0.623,2.422,-0.427,0],
+  [0.075,0.06,0.075,0.623,2.49,-0.427,16], [0.075,0.075,0.075,0.623,2.572,-0.427,0],
+  [0.105,0.105,0.105,0.667,2.678,-0.412,0], [0.09,0.12,0.24,-0.78,2.13,-0.225,4],
+  [0.12,0.075,0.27,-0.78,2.228,-0.225,0], [0.09,0.12,0.24,0.78,2.13,-0.225,4],
+  [0.12,0.075,0.27,0.78,2.228,-0.225,0], [0.3,0.12,0.09,0.675,2.13,-0.645,4],
+  [0.33,0.075,0.12,0.675,2.228,-0.645,0], [0.135,0.135,0.135,0.713,2.813,-0.398,0],
 ];
 function populateBakeryBuilder(b                  , biome            = 'winter')       {
   let pal = BAKERY_PALETTE_WINTER;
@@ -2966,12 +2855,6 @@ function populateBakeryBuilder(b                  , biome            = 'winter')
 }
 
 // --- Module: src/view/urbanBuildings.ts ---
-function populateBooksBuilder(builder                  , isWinter         )       {
-  buildBooksShopfront(builder, isWinter);
-  buildBooksUpperFloors(builder, isWinter);
-  buildBooksRoof(builder, isWinter);
-}
-
 /** Townhouse A: Parisian Blue Cafe / Desert Cantina / Cyber Diner (Ref: 11_townhouse_cafe_turnaround.jpg) */
 function createTownhouseA(biomeOrWinter                      = 'forest')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
@@ -2996,14 +2879,13 @@ function createTownhouseB(biomeOrWinter                      = 'winter')        
   return group;
 }
 
-/** Townhouse C: Green Books Store (Ref: 13_townhouse_books_turnaround.jpg) */
+/** Townhouse C: Green Books Store / Alpine Bookstore / Desert Scrolls / Synth-Library (Ref: 13_townhouse_books_turnaround.jpg) */
 function createTownhouseC(biomeOrWinter                      = 'forest')              {
-  const isWinter = biomeOrWinter === 'winter' || biomeOrWinter === true;
-  const biomeKey = typeof biomeOrWinter === 'string' ? biomeOrWinter : isWinter ? 'winter' : 'forest';
+  const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
-  const key = `townhouse_c_${biomeKey}`;
+  const key = `townhouse_c_${biome}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (b) => {
-    populateBooksBuilder(b, isWinter);
+    populateBooksBuilder(b, biome);
   });
   group.add(mesh);
   return group;
@@ -3013,13 +2895,9 @@ function createUrbanTownhouse(seed        , biome            = 'forest')        
   root.name = 'urbanTownhouse';
   const variant = Math.abs(seed) % 3;
   let bldg             ;
-  if (biome === 'desert' || biome === 'neon') {
-    bldg = variant % 2 === 0 ? createTownhouseA(biome) : createTownhouseB(biome);
-  } else {
-    if (variant === 0) bldg = createTownhouseA(biome);
-    else if (variant === 1) bldg = createTownhouseB(biome);
-    else bldg = createTownhouseC(biome);
-  }
+  if (variant === 0) bldg = createTownhouseA(biome);
+  else if (variant === 1) bldg = createTownhouseB(biome);
+  else bldg = createTownhouseC(biome);
 
   bldg.position.z = -0.1325;
   root.add(bldg);

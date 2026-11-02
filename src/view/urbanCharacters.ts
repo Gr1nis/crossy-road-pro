@@ -21,233 +21,273 @@ export function createUrbanCharacter(skinId: string = 'corgi', isGhost = false):
   const group = new THREE.Group();
 
   if (skinId === 'corgi') {
-    // 32 voxels: Corgi with stubby paws, pink pads, white chest & blaze, tongue, upright ears, peach tail
-    // 4 Stubby paws with pink pads
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, 0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', -0.14, 0.015, -0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', -0.14, 0.09, -0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.10, 'nosePink', 0.14, 0.015, -0.16, isGhost);
-    addCharVoxel(group, 0.10, 0.12, 0.10, 'white', 0.14, 0.09, -0.16, isGhost);
-    // Body, underbelly, fluffy chest & rear bum
-    addCharVoxel(group, 0.38, 0.22, 0.46, 'corgiOrange', 0, 0.25, -0.01, isGhost);
-    addCharVoxel(group, 0.26, 0.04, 0.38, 'white', 0, 0.15, -0.01, isGhost);
-    addCharVoxel(group, 0.34, 0.20, 0.12, 'white', 0, 0.26, 0.18, isGhost);
-    addCharVoxel(group, 0.36, 0.20, 0.08, 'corgiOrange', 0, 0.26, -0.24, isGhost);
-    addCharVoxel(group, 0.16, 0.12, 0.03, 'white', 0, 0.25, -0.28, isGhost);
-    addCharVoxel(group, 0.12, 0.12, 0.10, 'corgiOrange', 0, 0.35, -0.27, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.05, 'white', 0, 0.37, -0.31, isGhost);
-    // Collar & golden tag
-    addCharVoxel(group, 0.32, 0.04, 0.22, 'pizzaRed', 0, 0.35, 0.15, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.03, 'pizzaCheese', 0, 0.33, 0.26, isGhost);
-    // Head, blaze, muzzle, nose, tongue, expressive eyes
-    addCharVoxel(group, 0.36, 0.26, 0.30, 'corgiOrange', 0, 0.48, 0.18, isGhost);
-    addCharVoxel(group, 0.08, 0.22, 0.12, 'white', 0, 0.50, 0.28, isGhost);
-    addCharVoxel(group, 0.20, 0.12, 0.14, 'white', 0, 0.42, 0.35, isGhost);
-    addCharVoxel(group, 0.08, 0.06, 0.06, 'darkCharcoal', 0, 0.46, 0.42, isGhost);
-    addCharVoxel(group, 0.06, 0.03, 0.08, 'nosePink', 0.03, 0.38, 0.41, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', -0.11, 0.51, 0.33, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', -0.11, 0.53, 0.35, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'darkCharcoal', 0.11, 0.51, 0.33, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.02, 'white', 0.11, 0.53, 0.35, isGhost);
-    // Big fox ears with pink inner layer
-    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', -0.14, 0.66, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', -0.15, 0.76, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', -0.14, 0.67, 0.18, isGhost);
-    addCharVoxel(group, 0.10, 0.16, 0.06, 'corgiOrange', 0.14, 0.66, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.05, 'corgiOrange', 0.15, 0.76, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.14, 0.03, 'nosePink', 0.14, 0.67, 0.18, isGhost);
+    // 43 voxels: Zero Z-Fighting Certified Solid Corgi (0 coplanar overlaps)
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', -0.140, 0.015, 0.150, isGhost); // front_paw_pad_left
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', -0.140, 0.085, 0.150, isGhost); // front_paw_sock_left
+    addCharVoxel(group, 0.060, 0.022, 0.030, 'nosePink', -0.140, 0.016, 0.205, isGhost); // front_toe_beans_left
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', 0.140, 0.015, 0.150, isGhost); // front_paw_pad_right
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', 0.140, 0.085, 0.150, isGhost); // front_paw_sock_right
+    addCharVoxel(group, 0.060, 0.022, 0.030, 'nosePink', 0.140, 0.016, 0.205, isGhost); // front_toe_beans_right
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', -0.140, 0.015, -0.150, isGhost); // rear_paw_pad_left
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', -0.140, 0.085, -0.150, isGhost); // rear_paw_sock_left
+    addCharVoxel(group, 0.110, 0.095, 0.120, 'corgiOrange', -0.140, 0.188, -0.150, isGhost); // rear_thigh_fluff_left
+    addCharVoxel(group, 0.090, 0.030, 0.090, 'nosePink', 0.140, 0.015, -0.150, isGhost); // rear_paw_pad_right
+    addCharVoxel(group, 0.100, 0.130, 0.100, 'white', 0.140, 0.085, -0.150, isGhost); // rear_paw_sock_right
+    addCharVoxel(group, 0.110, 0.095, 0.120, 'corgiOrange', 0.140, 0.188, -0.150, isGhost); // rear_thigh_fluff_right
+    addCharVoxel(group, 0.350, 0.225, 0.370, 'corgiOrange', 0.000, 0.237, -0.000, isGhost); // body_loaf_core
+    addCharVoxel(group, 0.260, 0.025, 0.330, 'white', 0.000, 0.122, -0.000, isGhost); // body_belly_white
+    addCharVoxel(group, 0.320, 0.180, 0.110, 'white', 0.000, 0.245, 0.165, isGhost); // chest_bib_main
+    addCharVoxel(group, 0.180, 0.110, 0.050, 'white', 0.000, 0.255, 0.220, isGhost); // chest_bib_tuft
+    addCharVoxel(group, 0.330, 0.200, 0.065, 'corgiOrange', 0.000, 0.235, -0.203, isGhost); // rear_bum_core
+    addCharVoxel(group, 0.270, 0.140, 0.045, 'white', 0.000, 0.235, -0.237, isGhost); // butt_peach_heart
+    addCharVoxel(group, 0.110, 0.125, 0.080, 'corgiOrange', 0.000, 0.328, -0.245, isGhost); // butt_tail_bob
+    addCharVoxel(group, 0.070, 0.070, 0.045, 'white', 0.000, 0.330, -0.292, isGhost); // butt_tail_tip
+    addCharVoxel(group, 0.360, 0.045, 0.245, 'pizzaRed', 0.000, 0.347, 0.133, isGhost); // collar_ring
+    addCharVoxel(group, 0.060, 0.060, 0.035, 'pizzaCheese', 0.000, 0.305, 0.253, isGhost); // collar_tag_gold
+    addCharVoxel(group, 0.340, 0.230, 0.270, 'corgiOrange', 0.000, 0.470, 0.155, isGhost); // head_core
+    addCharVoxel(group, 0.045, 0.110, 0.130, 'white', -0.177, 0.430, 0.165, isGhost); // cheek_fluff_left
+    addCharVoxel(group, 0.045, 0.110, 0.130, 'white', 0.177, 0.430, 0.165, isGhost); // cheek_fluff_right
+    addCharVoxel(group, 0.080, 0.260, 0.110, 'white', 0.000, 0.475, 0.250, isGhost); // blaze_forehead
+    addCharVoxel(group, 0.070, 0.040, 0.100, 'white', 0.000, 0.595, 0.170, isGhost); // blaze_crown
+    addCharVoxel(group, 0.180, 0.100, 0.130, 'white', 0.000, 0.415, 0.310, isGhost); // snout_muzzle
+    addCharVoxel(group, 0.130, 0.020, 0.090, 'white', 0.000, 0.350, 0.290, isGhost); // chin_under_mouth
+    addCharVoxel(group, 0.070, 0.055, 0.050, 'darkCharcoal', 0.000, 0.448, 0.380, isGhost); // nose_button
+    addCharVoxel(group, 0.030, 0.030, 0.075, 'nosePink', 0.025, 0.370, 0.362, isGhost); // tongue_playful
+    addCharVoxel(group, 0.055, 0.050, 0.040, 'darkCharcoal', -0.098, 0.500, 0.290, isGhost); // eye_left_iris
+    addCharVoxel(group, 0.025, 0.015, 0.025, 'white', -0.102, 0.512, 0.307, isGhost); // eye_left_sparkle
+    addCharVoxel(group, 0.045, 0.020, 0.025, 'white', -0.098, 0.550, 0.287, isGhost); // eyebrow_left
+    addCharVoxel(group, 0.055, 0.050, 0.040, 'darkCharcoal', 0.098, 0.500, 0.290, isGhost); // eye_right_iris
+    addCharVoxel(group, 0.025, 0.015, 0.025, 'white', 0.102, 0.512, 0.307, isGhost); // eye_right_sparkle
+    addCharVoxel(group, 0.045, 0.020, 0.025, 'white', 0.098, 0.550, 0.287, isGhost); // eyebrow_right
+    addCharVoxel(group, 0.090, 0.120, 0.080, 'corgiOrange', -0.130, 0.630, 0.150, isGhost); // ear_base_left
+    addCharVoxel(group, 0.070, 0.100, 0.060, 'corgiOrange', -0.130, 0.725, 0.150, isGhost); // ear_tip_left
+    addCharVoxel(group, 0.040, 0.110, 0.035, 'nosePink', -0.130, 0.650, 0.182, isGhost); // ear_pink_left
+    addCharVoxel(group, 0.090, 0.120, 0.080, 'corgiOrange', 0.130, 0.630, 0.150, isGhost); // ear_base_right
+    addCharVoxel(group, 0.070, 0.100, 0.060, 'corgiOrange', 0.130, 0.725, 0.150, isGhost); // ear_tip_right
+    addCharVoxel(group, 0.040, 0.110, 0.035, 'nosePink', 0.130, 0.650, 0.182, isGhost); // ear_pink_right
   } else if (skinId === 'pigeon_pizza') {
-    // 33 voxels: Pigeon with iridescent neck, wing stripes, and triangular pepperoni pizza
-    // Coral feet & legs
-    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', -0.10, 0.015, 0.02, isGhost);
-    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', -0.10, 0.07, 0.00, isGhost);
-    addCharVoxel(group, 0.12, 0.03, 0.14, 'pigeonFootRed', 0.10, 0.015, 0.02, isGhost);
-    addCharVoxel(group, 0.05, 0.10, 0.05, 'pigeonFootRed', 0.10, 0.07, 0.00, isGhost);
-    // Body, light chest, tail feathers
-    addCharVoxel(group, 0.40, 0.28, 0.42, 'pigeonGrey', 0, 0.28, -0.04, isGhost);
-    addCharVoxel(group, 0.30, 0.20, 0.12, 'white', 0, 0.28, 0.12, isGhost);
-    addCharVoxel(group, 0.22, 0.08, 0.18, 'pigeonGrey', 0, 0.26, -0.28, isGhost);
-    addCharVoxel(group, 0.18, 0.05, 0.12, 'darkCharcoal', 0, 0.24, -0.38, isGhost);
-    // Wings with black bars & tips
-    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', -0.22, 0.32, -0.04, isGhost);
-    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', -0.22, 0.28, -0.06, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', -0.20, 0.24, -0.20, isGhost);
-    addCharVoxel(group, 0.06, 0.22, 0.32, 'pigeonGrey', 0.22, 0.32, -0.04, isGhost);
-    addCharVoxel(group, 0.07, 0.05, 0.22, 'darkCharcoal', 0.22, 0.28, -0.06, isGhost);
-    addCharVoxel(group, 0.06, 0.08, 0.14, 'darkCharcoal', 0.20, 0.24, -0.20, isGhost);
-    // Iridescent shimmering neck & collar
-    addCharVoxel(group, 0.28, 0.12, 0.26, 'purpleNeck', 0, 0.43, 0.10, isGhost);
-    addCharVoxel(group, 0.29, 0.04, 0.27, 'pigeonTeal', 0, 0.41, 0.10, isGhost);
-    // Head, eyes with orange ring, beak & cere
-    addCharVoxel(group, 0.26, 0.22, 0.26, 'pigeonGrey', 0, 0.56, 0.14, isGhost);
-    addCharVoxel(group, 0.18, 0.06, 0.18, 'pigeonGrey', 0, 0.68, 0.14, isGhost);
-    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', -0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', -0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.03, 0.07, 0.07, 'orangeFruit', 0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.04, 'darkCharcoal', 0.14, 0.60, 0.17, isGhost);
-    addCharVoxel(group, 0.09, 0.06, 0.12, 'orangeFruit', 0, 0.55, 0.26, isGhost);
-    addCharVoxel(group, 0.08, 0.04, 0.08, 'orangeFruit', 0, 0.50, 0.24, isGhost);
-    addCharVoxel(group, 0.08, 0.04, 0.04, 'white', 0, 0.59, 0.23, isGhost);
-    // Realistic triangular pizza slice with cheese, crust & pepperoni
-    addCharVoxel(group, 0.08, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.26, isGhost);
-    addCharVoxel(group, 0.16, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.31, isGhost);
-    addCharVoxel(group, 0.24, 0.04, 0.06, 'pizzaCheese', 0, 0.52, 0.36, isGhost);
-    addCharVoxel(group, 0.26, 0.06, 0.06, 'pizzaCrust', 0, 0.53, 0.41, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', -0.05, 0.54, 0.36, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'pizzaRed', 0.05, 0.54, 0.32, isGhost);
-    addCharVoxel(group, 0.04, 0.02, 0.04, 'pizzaRed', 0, 0.54, 0.28, isGhost);
-    addCharVoxel(group, 0.03, 0.02, 0.03, 'greenLeaf', -0.02, 0.54, 0.33, isGhost);
+    // 55 voxels: Zero Z-Fighting Certified Solid Pigeon Pizza (0 coplanar overlaps)
+    addCharVoxel(group, 0.060, 0.025, 0.100, 'pigeonFootRed', -0.100, 0.013, -0.000, isGhost); // left_foot_base
+    addCharVoxel(group, 0.030, 0.020, 0.075, 'pigeonFootRed', -0.100, 0.013, 0.083, isGhost); // left_toe_mid
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', -0.140, 0.013, 0.075, isGhost); // left_toe_outer
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', -0.060, 0.013, 0.075, isGhost); // left_toe_inner
+    addCharVoxel(group, 0.030, 0.020, 0.050, 'pigeonFootRed', -0.100, 0.013, -0.070, isGhost); // left_toe_hallux
+    addCharVoxel(group, 0.030, 0.105, 0.030, 'pigeonFootRed', -0.100, 0.072, -0.000, isGhost); // left_leg_shank
+    addCharVoxel(group, 0.050, 0.070, 0.070, 'pigeonGrey', -0.100, 0.150, -0.000, isGhost); // left_thigh_fluff
+    addCharVoxel(group, 0.060, 0.025, 0.100, 'pigeonFootRed', 0.100, 0.013, -0.000, isGhost); // right_foot_base
+    addCharVoxel(group, 0.030, 0.020, 0.075, 'pigeonFootRed', 0.100, 0.013, 0.083, isGhost); // right_toe_mid
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', 0.140, 0.013, 0.075, isGhost); // right_toe_outer
+    addCharVoxel(group, 0.030, 0.020, 0.060, 'pigeonFootRed', 0.060, 0.013, 0.075, isGhost); // right_toe_inner
+    addCharVoxel(group, 0.030, 0.020, 0.050, 'pigeonFootRed', 0.100, 0.013, -0.070, isGhost); // right_toe_hallux
+    addCharVoxel(group, 0.030, 0.105, 0.030, 'pigeonFootRed', 0.100, 0.072, -0.000, isGhost); // right_leg_shank
+    addCharVoxel(group, 0.050, 0.070, 0.070, 'pigeonGrey', 0.100, 0.150, -0.000, isGhost); // right_thigh_fluff
+    addCharVoxel(group, 0.320, 0.065, 0.300, 'pigeonGrey', 0.000, 0.182, -0.010, isGhost); // body_belly_base
+    addCharVoxel(group, 0.380, 0.205, 0.350, 'pigeonGrey', 0.000, 0.307, -0.005, isGhost); // body_core_loaf
+    addCharVoxel(group, 0.300, 0.165, 0.070, 'white', 0.000, 0.308, 0.195, isGhost); // breast_puff_front
+    addCharVoxel(group, 0.200, 0.080, 0.080, 'pigeonGrey', 0.000, 0.230, -0.210, isGhost); // undertail_cushion
+    addCharVoxel(group, 0.040, 0.150, 0.250, 'pigeonGrey', -0.200, 0.315, 0.015, isGhost); // left_wing_mantle
+    addCharVoxel(group, 0.040, 0.105, 0.045, 'darkCharcoal', -0.205, 0.308, -0.002, isGhost); // left_wing_bar_1
+    addCharVoxel(group, 0.040, 0.100, 0.045, 'darkCharcoal', -0.205, 0.285, -0.072, isGhost); // left_wing_bar_2
+    addCharVoxel(group, 0.095, 0.070, 0.205, 'darkCharcoal', -0.163, 0.255, -0.208, isGhost); // left_wing_primaries
+    addCharVoxel(group, 0.040, 0.150, 0.250, 'pigeonGrey', 0.200, 0.315, 0.015, isGhost); // right_wing_mantle
+    addCharVoxel(group, 0.040, 0.105, 0.045, 'darkCharcoal', 0.205, 0.308, -0.002, isGhost); // right_wing_bar_1
+    addCharVoxel(group, 0.040, 0.100, 0.045, 'darkCharcoal', 0.205, 0.285, -0.072, isGhost); // right_wing_bar_2
+    addCharVoxel(group, 0.095, 0.070, 0.205, 'darkCharcoal', 0.163, 0.255, -0.208, isGhost); // right_wing_primaries
+    addCharVoxel(group, 0.240, 0.065, 0.140, 'pigeonGrey', 0.000, 0.288, -0.260, isGhost); // tail_base_grey
+    addCharVoxel(group, 0.260, 0.055, 0.120, 'darkCharcoal', 0.000, 0.258, -0.380, isGhost); // tail_black_band
+    addCharVoxel(group, 0.240, 0.035, 0.050, 'white', 0.000, 0.258, -0.455, isGhost); // tail_white_tip
+    addCharVoxel(group, 0.190, 0.065, 0.120, 'pigeonTeal', 0.000, 0.428, 0.135, isGhost); // neck_base_teal
+    addCharVoxel(group, 0.180, 0.065, 0.100, 'purpleNeck', 0.000, 0.483, 0.135, isGhost); // neck_collar_purple
+    addCharVoxel(group, 0.140, 0.075, 0.035, 'pigeonTeal', 0.000, 0.448, 0.193, isGhost); // neck_sheen_front
+    addCharVoxel(group, 0.250, 0.190, 0.210, 'pigeonGrey', 0.000, 0.595, 0.095, isGhost); // head_core
+    addCharVoxel(group, 0.190, 0.045, 0.145, 'pigeonGrey', 0.000, 0.703, 0.102, isGhost); // head_crown
+    addCharVoxel(group, 0.020, 0.080, 0.080, 'orangeFruit', -0.128, 0.600, 0.125, isGhost); // eye_ring_left
+    addCharVoxel(group, 0.025, 0.050, 0.050, 'darkCharcoal', -0.128, 0.600, 0.125, isGhost); // eye_pupil_left
+    addCharVoxel(group, 0.023, 0.020, 0.025, 'white', -0.131, 0.610, 0.128, isGhost); // eye_sparkle_left
+    addCharVoxel(group, 0.020, 0.080, 0.080, 'orangeFruit', 0.128, 0.600, 0.125, isGhost); // eye_ring_right
+    addCharVoxel(group, 0.025, 0.050, 0.050, 'darkCharcoal', 0.128, 0.600, 0.125, isGhost); // eye_pupil_right
+    addCharVoxel(group, 0.023, 0.020, 0.025, 'white', 0.131, 0.610, 0.128, isGhost); // eye_sparkle_right
+    addCharVoxel(group, 0.080, 0.035, 0.115, 'orangeFruit', 0.000, 0.578, 0.247, isGhost); // beak_upper
+    addCharVoxel(group, 0.050, 0.040, 0.050, 'orangeFruit', 0.000, 0.565, 0.310, isGhost); // beak_tip
+    addCharVoxel(group, 0.070, 0.035, 0.080, 'orangeFruit', 0.000, 0.533, 0.235, isGhost); // beak_lower
+    addCharVoxel(group, 0.090, 0.035, 0.060, 'white', 0.000, 0.608, 0.225, isGhost); // cere_waxy_bump
+    addCharVoxel(group, 0.280, 0.050, 0.055, 'pizzaCrust', 0.000, 0.565, 0.298, isGhost); // pizza_crust
+    addCharVoxel(group, 0.240, 0.028, 0.160, 'pizzaRed', 0.000, 0.544, 0.380, isGhost); // pizza_sauce_base
+    addCharVoxel(group, 0.230, 0.027, 0.060, 'pizzaCheese', 0.000, 0.566, 0.340, isGhost); // pizza_cheese_wide
+    addCharVoxel(group, 0.160, 0.028, 0.070, 'pizzaCheese', 0.000, 0.561, 0.395, isGhost); // pizza_cheese_mid
+    addCharVoxel(group, 0.080, 0.028, 0.060, 'pizzaCheese', 0.000, 0.556, 0.450, isGhost); // pizza_cheese_tip
+    addCharVoxel(group, 0.055, 0.020, 0.050, 'pizzaRed', -0.057, 0.582, 0.340, isGhost); // pepperoni_back_left
+    addCharVoxel(group, 0.055, 0.020, 0.050, 'pizzaRed', 0.057, 0.582, 0.340, isGhost); // pepperoni_back_right
+    addCharVoxel(group, 0.060, 0.020, 0.050, 'pizzaRed', 0.000, 0.578, 0.400, isGhost); // pepperoni_front
+    addCharVoxel(group, 0.035, 0.018, 0.035, 'greenLeaf', -0.043, 0.581, 0.398, isGhost); // basil_leaf
+    addCharVoxel(group, 0.030, 0.065, 0.030, 'pizzaCheese', -0.080, 0.522, 0.350, isGhost); // cheese_drip_left
+    addCharVoxel(group, 0.030, 0.055, 0.030, 'pizzaCheese', 0.070, 0.528, 0.370, isGhost); // cheese_drip_right
   } else if (skinId === 'box_cat') {
-    // 37 voxels: Ginger cat in cardboard parcel box with flaps, FRAGILE stamp & paws on rim
-    // Corrugated box & angled flaps
-    addCharVoxel(group, 0.52, 0.04, 0.52, 'cardboard', 0, 0.02, 0, isGhost);
-    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, 0.24, isGhost);
-    addCharVoxel(group, 0.52, 0.26, 0.04, 'cardboard', 0, 0.17, -0.24, isGhost);
-    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', -0.24, 0.17, 0, isGhost);
-    addCharVoxel(group, 0.04, 0.26, 0.44, 'cardboard', 0.24, 0.17, 0, isGhost);
-    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, 0.31, isGhost);
-    addCharVoxel(group, 0.46, 0.03, 0.10, 'boxFlap', 0, 0.29, -0.31, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', -0.31, 0.29, 0, isGhost);
-    addCharVoxel(group, 0.10, 0.03, 0.46, 'boxFlap', 0.31, 0.29, 0, isGhost);
-    // Red DELIVERY / FRAGILE stamp label
-    addCharVoxel(group, 0.22, 0.12, 0.02, 'deliveryRed', 0.10, 0.15, 0.262, isGhost);
-    addCharVoxel(group, 0.16, 0.04, 0.02, 'white', 0.10, 0.16, 0.272, isGhost);
-    addCharVoxel(group, 0.04, 0.05, 0.02, 'darkCharcoal', 0.02, 0.15, 0.274, isGhost);
-    // Cat body & white chest
-    addCharVoxel(group, 0.38, 0.22, 0.38, 'catOrange', 0, 0.20, 0, isGhost);
-    addCharVoxel(group, 0.20, 0.14, 0.06, 'white', 0, 0.26, 0.18, isGhost);
-    // Paws resting over the front rim
-    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', -0.13, 0.32, 0.24, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', -0.13, 0.29, 0.26, isGhost);
-    addCharVoxel(group, 0.09, 0.07, 0.10, 'white', 0.13, 0.32, 0.24, isGhost);
-    addCharVoxel(group, 0.06, 0.02, 0.06, 'nosePink', 0.13, 0.29, 0.26, isGhost);
-    // Cat head, tabby stripes, cheeks & nose
-    addCharVoxel(group, 0.34, 0.26, 0.30, 'catOrange', 0, 0.44, 0.06, isGhost);
-    addCharVoxel(group, 0.05, 0.12, 0.26, 'catStripe', 0, 0.52, 0.06, isGhost);
-    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', -0.09, 0.51, 0.06, isGhost);
-    addCharVoxel(group, 0.04, 0.10, 0.22, 'catStripe', 0.09, 0.51, 0.06, isGhost);
-    addCharVoxel(group, 0.18, 0.09, 0.08, 'white', 0, 0.39, 0.21, isGhost);
-    addCharVoxel(group, 0.05, 0.04, 0.04, 'nosePink', 0, 0.42, 0.25, isGhost);
-    // Expressive cat eyes with dark pupils
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', -0.08, 0.46, 0.212, isGhost);
-    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', -0.08, 0.46, 0.216, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.04, 'catEye', 0.08, 0.46, 0.212, isGhost);
-    addCharVoxel(group, 0.025, 0.05, 0.04, 'darkCharcoal', 0.08, 0.46, 0.216, isGhost);
-    // Ears with pink inner lining
-    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', -0.12, 0.60, 0.06, isGhost);
-    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', -0.12, 0.59, 0.08, isGhost);
-    addCharVoxel(group, 0.09, 0.10, 0.06, 'catOrange', 0.12, 0.60, 0.06, isGhost);
-    addCharVoxel(group, 0.05, 0.07, 0.03, 'nosePink', 0.12, 0.59, 0.08, isGhost);
-    // Striped tail sticking straight up out of the back
-    addCharVoxel(group, 0.07, 0.14, 0.07, 'catOrange', 0.06, 0.35, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.44, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.07, 'catOrange', 0.06, 0.51, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.07, 'catStripe', 0.06, 0.58, -0.21, isGhost);
-    addCharVoxel(group, 0.07, 0.07, 0.08, 'white', 0.06, 0.65, -0.19, isGhost);
+    // 54 voxels: Zero Z-Fighting Certified Solid Ginger Cat in Cardboard Box (0 coplanar overlaps)
+    addCharVoxel(group, 0.480, 0.040, 0.480, 'cardboard', 0.000, 0.020, -0.000, isGhost); // box_floor
+    addCharVoxel(group, 0.500, 0.255, 0.040, 'cardboard', 0.000, 0.133, 0.230, isGhost); // box_wall_front
+    addCharVoxel(group, 0.500, 0.255, 0.040, 'cardboard', 0.000, 0.133, -0.230, isGhost); // box_wall_back
+    addCharVoxel(group, 0.035, 0.240, 0.450, 'cardboard', -0.230, 0.133, -0.000, isGhost); // box_wall_left
+    addCharVoxel(group, 0.035, 0.240, 0.450, 'cardboard', 0.230, 0.133, -0.000, isGhost); // box_wall_right
+    addCharVoxel(group, 0.460, 0.030, 0.085, 'boxFlap', 0.000, 0.253, 0.278, isGhost); // box_flap_front
+    addCharVoxel(group, 0.460, 0.030, 0.085, 'boxFlap', 0.000, 0.253, -0.278, isGhost); // box_flap_back
+    addCharVoxel(group, 0.085, 0.030, 0.430, 'boxFlap', -0.278, 0.254, -0.000, isGhost); // box_flap_left
+    addCharVoxel(group, 0.085, 0.030, 0.430, 'boxFlap', 0.278, 0.254, -0.000, isGhost); // box_flap_right
+    addCharVoxel(group, 0.508, 0.025, 0.048, 'boxTape', 0.000, 0.010, 0.230, isGhost); // tape_strip_base
+    addCharVoxel(group, 0.170, 0.130, 0.013, 'white', 0.105, 0.125, 0.253, isGhost); // shipping_label_white
+    addCharVoxel(group, 0.070, 0.065, 0.010, 'deliveryRed', 0.075, 0.143, 0.258, isGhost); // fragile_stamp_red
+    addCharVoxel(group, 0.130, 0.025, 0.010, 'darkCharcoal', 0.105, 0.085, 0.258, isGhost); // barcode_strip_dark
+    addCharVoxel(group, 0.360, 0.255, 0.360, 'catOrange', 0.000, 0.163, -0.000, isGhost); // cat_torso_loaf
+    addCharVoxel(group, 0.220, 0.095, 0.050, 'white', 0.000, 0.270, 0.180, isGhost); // cat_chest_bib
+    addCharVoxel(group, 0.110, 0.065, 0.050, 'white', 0.000, 0.245, 0.190, isGhost); // cat_bib_tuft
+    addCharVoxel(group, 0.070, 0.062, 0.080, 'catOrange', -0.125, 0.261, 0.180, isGhost); // paw_left_arm
+    addCharVoxel(group, 0.080, 0.047, 0.050, 'white', -0.125, 0.268, 0.217, isGhost); // paw_left_mitten
+    addCharVoxel(group, 0.055, 0.025, 0.036, 'nosePink', -0.125, 0.244, 0.226, isGhost); // paw_left_beans
+    addCharVoxel(group, 0.070, 0.062, 0.080, 'catOrange', 0.125, 0.261, 0.180, isGhost); // paw_right_arm
+    addCharVoxel(group, 0.080, 0.047, 0.050, 'white', 0.125, 0.268, 0.217, isGhost); // paw_right_mitten
+    addCharVoxel(group, 0.055, 0.025, 0.036, 'nosePink', 0.125, 0.244, 0.226, isGhost); // paw_right_beans
+    addCharVoxel(group, 0.050, 0.065, 0.250, 'catOrange', -0.190, 0.255, -0.000, isGhost); // body_side_fluff_left
+    addCharVoxel(group, 0.050, 0.065, 0.250, 'catOrange', 0.190, 0.255, -0.000, isGhost); // body_side_fluff_right
+    addCharVoxel(group, 0.320, 0.238, 0.270, 'catOrange', 0.000, 0.400, -0.005, isGhost); // head_core
+    addCharVoxel(group, 0.057, 0.128, 0.200, 'catOrange', -0.171, 0.355, 0.010, isGhost); // cheek_fluff_left
+    addCharVoxel(group, 0.057, 0.128, 0.200, 'catOrange', 0.171, 0.355, 0.010, isGhost); // cheek_fluff_right
+    addCharVoxel(group, 0.180, 0.098, 0.077, 'white', 0.000, 0.350, 0.151, isGhost); // muzzle_snout_white
+    addCharVoxel(group, 0.120, 0.050, 0.053, 'white', 0.000, 0.294, 0.142, isGhost); // chin_under_mouth
+    addCharVoxel(group, 0.050, 0.033, 0.038, 'nosePink', 0.000, 0.373, 0.180, isGhost); // nose_pink_button
+    addCharVoxel(group, 0.050, 0.118, 0.058, 'catStripe', 0.000, 0.470, 0.120, isGhost); // forehead_stripe_mid
+    addCharVoxel(group, 0.050, 0.088, 0.048, 'catStripe', -0.083, 0.465, 0.120, isGhost); // forehead_stripe_left
+    addCharVoxel(group, 0.050, 0.088, 0.048, 'catStripe', 0.083, 0.465, 0.120, isGhost); // forehead_stripe_right
+    addCharVoxel(group, 0.070, 0.077, 0.027, 'catEye', -0.090, 0.408, 0.134, isGhost); // eye_left_iris
+    addCharVoxel(group, 0.045, 0.067, 0.027, 'darkCharcoal', -0.088, 0.408, 0.139, isGhost); // eye_left_pupil
+    addCharVoxel(group, 0.035, 0.028, 0.028, 'white', -0.102, 0.425, 0.143, isGhost); // eye_left_sparkle
+    addCharVoxel(group, 0.070, 0.077, 0.027, 'catEye', 0.090, 0.408, 0.134, isGhost); // eye_right_iris
+    addCharVoxel(group, 0.045, 0.067, 0.027, 'darkCharcoal', 0.088, 0.408, 0.139, isGhost); // eye_right_pupil
+    addCharVoxel(group, 0.035, 0.028, 0.035, 'white', 0.102, 0.425, 0.140, isGhost); // eye_right_sparkle
+    addCharVoxel(group, 0.240, 0.038, 0.200, 'catOrange', 0.000, 0.530, -0.000, isGhost); // head_crown_top
+    addCharVoxel(group, 0.045, 0.050, 0.075, 'catStripe', -0.175, 0.364, 0.067, isGhost); // cheek_stripe_left
+    addCharVoxel(group, 0.045, 0.050, 0.075, 'catStripe', 0.175, 0.364, 0.067, isGhost); // cheek_stripe_right
+    addCharVoxel(group, 0.080, 0.100, 0.110, 'catOrange', -0.110, 0.559, 0.025, isGhost); // ear_base_left
+    addCharVoxel(group, 0.050, 0.070, 0.080, 'catOrange', -0.110, 0.634, 0.025, isGhost); // ear_tip_left
+    addCharVoxel(group, 0.050, 0.080, 0.030, 'nosePink', -0.105, 0.553, 0.079, isGhost); // ear_pink_left
+    addCharVoxel(group, 0.080, 0.100, 0.110, 'catOrange', 0.110, 0.559, 0.025, isGhost); // ear_base_right
+    addCharVoxel(group, 0.050, 0.070, 0.080, 'catOrange', 0.110, 0.634, 0.025, isGhost); // ear_tip_right
+    addCharVoxel(group, 0.050, 0.080, 0.030, 'nosePink', 0.105, 0.553, 0.079, isGhost); // ear_pink_right
+    addCharVoxel(group, 0.060, 0.070, 0.062, 'catOrange', 0.060, 0.215, -0.171, isGhost); // tail_base
+    addCharVoxel(group, 0.060, 0.065, 0.068, 'catStripe', 0.068, 0.275, -0.224, isGhost); // tail_over_rim
+    addCharVoxel(group, 0.060, 0.070, 0.060, 'catOrange', 0.075, 0.328, -0.250, isGhost); // tail_arch_back
+    addCharVoxel(group, 0.060, 0.070, 0.060, 'catStripe', 0.068, 0.383, -0.240, isGhost); // tail_curve_up
+    addCharVoxel(group, 0.060, 0.055, 0.060, 'catOrange', 0.057, 0.420, -0.200, isGhost); // tail_hook_front
+    addCharVoxel(group, 0.060, 0.060, 0.060, 'white', 0.048, 0.398, -0.160, isGhost); // tail_tip_white
   } else if (skinId === 'raccoon_bandit') {
-    // 41 voxels: Bandit Raccoon with mask, fur cheeks, striped tail & canvas loot bag
-    // 4 Stubby paws & legs
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, 0.14, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, 0.14, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', -0.13, 0.04, -0.13, isGhost);
-    addCharVoxel(group, 0.08, 0.08, 0.08, 'maskBlack', 0.13, 0.04, -0.13, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, 0.14, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, 0.14, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', -0.13, 0.12, -0.13, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.09, 'raccoonGrey', 0.13, 0.12, -0.13, isGhost);
-
-    // Ash-grey body & white underbelly / chest
-    addCharVoxel(group, 0.36, 0.22, 0.38, 'raccoonGrey', 0, 0.23, 0, isGhost);
-    addCharVoxel(group, 0.24, 0.16, 0.24, 'white', 0, 0.20, 0.06, isGhost);
-    addCharVoxel(group, 0.24, 0.16, 0.06, 'white', 0, 0.25, 0.19, isGhost);
-    addCharVoxel(group, 0.28, 0.08, 0.20, 'raccoonGrey', 0, 0.34, 0.12, isGhost);
-
-    // Head core & white fur cheeks
-    addCharVoxel(group, 0.32, 0.22, 0.24, 'raccoonGrey', 0, 0.45, 0.16, isGhost);
-    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', -0.17, 0.42, 0.18, isGhost);
-    addCharVoxel(group, 0.06, 0.12, 0.16, 'white', 0.17, 0.42, 0.18, isGhost);
-
-    // Bandit mask & eye features
-    addCharVoxel(group, 0.22, 0.08, 0.05, 'maskBlack', 0, 0.46, 0.28, isGhost);
-    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', -0.12, 0.46, 0.28, isGhost);
-    addCharVoxel(group, 0.08, 0.10, 0.05, 'maskBlack', 0.12, 0.46, 0.28, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', -0.11, 0.46, 0.31, isGhost);
-    addCharVoxel(group, 0.04, 0.04, 0.02, 'darkCharcoal', 0.11, 0.46, 0.31, isGhost);
-    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', -0.11, 0.53, 0.27, isGhost);
-    addCharVoxel(group, 0.05, 0.04, 0.04, 'white', 0.11, 0.53, 0.27, isGhost);
-
-    // White snout, black nose & chin
-    addCharVoxel(group, 0.14, 0.09, 0.10, 'white', 0, 0.39, 0.31, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.04, 'maskBlack', 0, 0.42, 0.36, isGhost);
-    addCharVoxel(group, 0.10, 0.04, 0.06, 'white', 0, 0.34, 0.28, isGhost);
-
-    // Pointed ears with white inner rim
-    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', -0.13, 0.58, 0.14, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', -0.13, 0.57, 0.16, isGhost);
-    addCharVoxel(group, 0.08, 0.09, 0.05, 'raccoonGrey', 0.13, 0.58, 0.14, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.03, 'white', 0.13, 0.57, 0.16, isGhost);
-
-    // 5-segment alternating ringed fluffy tail
-    addCharVoxel(group, 0.14, 0.14, 0.06, 'raccoonGrey', 0, 0.24, -0.21, isGhost);
-    addCharVoxel(group, 0.15, 0.15, 0.06, 'maskBlack', 0, 0.26, -0.26, isGhost);
-    addCharVoxel(group, 0.15, 0.15, 0.06, 'raccoonGrey', 0, 0.28, -0.31, isGhost);
-    addCharVoxel(group, 0.14, 0.14, 0.06, 'maskBlack', 0, 0.30, -0.36, isGhost);
-    addCharVoxel(group, 0.10, 0.10, 0.05, 'raccoonGrey', 0, 0.32, -0.41, isGhost);
-
-    // Burlap loot sack on back with tied rope neck & patches
-    addCharVoxel(group, 0.26, 0.18, 0.20, 'burlapBag', 0, 0.37, -0.08, isGhost);
-    addCharVoxel(group, 0.22, 0.10, 0.16, 'burlapBag', 0, 0.47, -0.08, isGhost);
-    addCharVoxel(group, 0.12, 0.04, 0.12, 'bagRope', 0, 0.53, -0.08, isGhost);
-    addCharVoxel(group, 0.14, 0.06, 0.12, 'burlapBag', 0, 0.57, -0.08, isGhost);
-    addCharVoxel(group, 0.27, 0.03, 0.21, 'bagRope', 0, 0.43, -0.08, isGhost);
-    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', -0.135, 0.38, -0.08, isGhost);
-    addCharVoxel(group, 0.02, 0.07, 0.10, 'darkCharcoal', 0.135, 0.38, -0.08, isGhost);
+    // 53 voxels: Zero Z-Fighting Raccoon Bandit with Defined Paws, Centered Tail & Sack Loot
+    addCharVoxel(group, 0.055, 0.120, 0.080, 'raccoonGrey', -0.165, 0.253, 0.102, isGhost); // arm_shoulder_left
+    addCharVoxel(group, 0.060, 0.130, 0.080, 'raccoonGrey', -0.152, 0.138, 0.152, isGhost); // arm_forearm_left
+    addCharVoxel(group, 0.070, 0.083, 0.090, 'maskBlack', -0.142, 0.041, 0.172, isGhost); // paw_glove_left
+    addCharVoxel(group, 0.050, 0.040, 0.035, 'maskBlack', -0.142, 0.022, 0.230, isGhost); // paw_fingers_left
+    addCharVoxel(group, 0.055, 0.120, 0.080, 'raccoonGrey', 0.165, 0.253, 0.102, isGhost); // arm_shoulder_right
+    addCharVoxel(group, 0.060, 0.130, 0.080, 'raccoonGrey', 0.152, 0.138, 0.152, isGhost); // arm_forearm_right
+    addCharVoxel(group, 0.070, 0.083, 0.090, 'maskBlack', 0.142, 0.041, 0.172, isGhost); // paw_glove_right
+    addCharVoxel(group, 0.050, 0.040, 0.035, 'maskBlack', 0.142, 0.022, 0.230, isGhost); // paw_fingers_right
+    addCharVoxel(group, 0.075, 0.150, 0.115, 'raccoonGrey', -0.150, 0.133, -0.115, isGhost); // thigh_rear_left
+    addCharVoxel(group, 0.070, 0.072, 0.120, 'maskBlack', -0.142, 0.036, -0.122, isGhost); // paw_rear_left
+    addCharVoxel(group, 0.075, 0.150, 0.115, 'raccoonGrey', 0.150, 0.133, -0.115, isGhost); // thigh_rear_right
+    addCharVoxel(group, 0.070, 0.072, 0.120, 'maskBlack', 0.142, 0.036, -0.122, isGhost); // paw_rear_right
+    addCharVoxel(group, 0.355, 0.255, 0.295, 'raccoonGrey', 0.000, 0.255, -0.000, isGhost); // body_core
+    addCharVoxel(group, 0.255, 0.205, 0.070, 'white', 0.000, 0.220, 0.152, isGhost); // body_belly_white
+    addCharVoxel(group, 0.185, 0.070, 0.070, 'white', 0.000, 0.333, 0.163, isGhost); // chest_bib_tuft
+    addCharVoxel(group, 0.045, 0.175, 0.036, 'darkCharcoal', -0.120, 0.300, 0.149, isGhost); // strap_left
+    addCharVoxel(group, 0.045, 0.175, 0.036, 'darkCharcoal', 0.120, 0.300, 0.149, isGhost); // strap_right
+    addCharVoxel(group, 0.335, 0.240, 0.275, 'raccoonGrey', 0.000, 0.477, -0.000, isGhost); // head_core
+    addCharVoxel(group, 0.060, 0.095, 0.185, 'white', -0.188, 0.470, 0.020, isGhost); // cheek_upper_left
+    addCharVoxel(group, 0.080, 0.075, 0.170, 'white', -0.203, 0.400, 0.037, isGhost); // cheek_lower_left
+    addCharVoxel(group, 0.060, 0.095, 0.185, 'white', 0.188, 0.470, 0.020, isGhost); // cheek_upper_right
+    addCharVoxel(group, 0.080, 0.075, 0.170, 'white', 0.203, 0.400, 0.037, isGhost); // cheek_lower_right
+    addCharVoxel(group, 0.175, 0.100, 0.090, 'white', 0.000, 0.422, 0.168, isGhost); // snout_muzzle_white
+    addCharVoxel(group, 0.125, 0.055, 0.055, 'white', 0.000, 0.365, 0.160, isGhost); // snout_chin_white
+    addCharVoxel(group, 0.055, 0.040, 0.040, 'maskBlack', 0.000, 0.448, 0.203, isGhost); // nose_black_button
+    addCharVoxel(group, 0.275, 0.040, 0.215, 'raccoonGrey', 0.000, 0.608, -0.000, isGhost); // head_crown_top
+    addCharVoxel(group, 0.080, 0.110, 0.115, 'darkCharcoal', -0.122, 0.637, 0.025, isGhost); // ear_base_left
+    addCharVoxel(group, 0.060, 0.080, 0.085, 'white', -0.122, 0.718, 0.025, isGhost); // ear_tip_left
+    addCharVoxel(group, 0.050, 0.070, 0.035, 'maskBlack', -0.117, 0.637, 0.080, isGhost); // ear_inner_left
+    addCharVoxel(group, 0.080, 0.110, 0.115, 'darkCharcoal', 0.122, 0.637, 0.025, isGhost); // ear_base_right
+    addCharVoxel(group, 0.060, 0.080, 0.085, 'white', 0.122, 0.718, 0.025, isGhost); // ear_tip_right
+    addCharVoxel(group, 0.050, 0.070, 0.035, 'maskBlack', 0.117, 0.637, 0.080, isGhost); // ear_inner_right
+    addCharVoxel(group, 0.018, 0.065, 0.265, 'maskBlack', -0.169, 0.495, -0.000, isGhost); // nvg_strap_left
+    addCharVoxel(group, 0.018, 0.065, 0.265, 'maskBlack', 0.169, 0.495, -0.000, isGhost); // nvg_strap_right
+    addCharVoxel(group, 0.105, 0.070, 0.070, 'maskBlack', 0.000, 0.497, 0.163, isGhost); // nvg_bridge_mount
+    addCharVoxel(group, 0.085, 0.095, 0.075, 'darkCharcoal', -0.105, 0.490, 0.200, isGhost); // nvg_tube_left
+    addCharVoxel(group, 0.065, 0.075, 0.020, 'nvgGreen', -0.105, 0.490, 0.242, isGhost); // nvg_lens_green_left
+    addCharVoxel(group, 0.085, 0.095, 0.075, 'darkCharcoal', 0.105, 0.490, 0.200, isGhost); // nvg_tube_right
+    addCharVoxel(group, 0.065, 0.075, 0.020, 'nvgGreen', 0.105, 0.490, 0.242, isGhost); // nvg_lens_green_right
+    addCharVoxel(group, 0.105, 0.075, 0.080, 'raccoonGrey', 0.000, 0.100, -0.163, isGhost); // tail_ring_1
+    addCharVoxel(group, 0.125, 0.075, 0.080, 'maskBlack', 0.000, 0.085, -0.233, isGhost); // tail_ring_2
+    addCharVoxel(group, 0.135, 0.085, 0.080, 'raccoonGrey', 0.000, 0.085, -0.302, isGhost); // tail_ring_3
+    addCharVoxel(group, 0.125, 0.090, 0.070, 'maskBlack', 0.000, 0.107, -0.367, isGhost); // tail_ring_4
+    addCharVoxel(group, 0.115, 0.090, 0.060, 'raccoonGrey', 0.000, 0.152, -0.412, isGhost); // tail_ring_5
+    addCharVoxel(group, 0.095, 0.085, 0.050, 'maskBlack', 0.000, 0.210, -0.443, isGhost); // tail_tip_black
+    addCharVoxel(group, 0.255, 0.205, 0.180, 'burlapBag', 0.000, 0.275, -0.182, isGhost); // loot_sack_belly
+    addCharVoxel(group, 0.235, 0.105, 0.160, 'burlapBag', 0.000, 0.420, -0.182, isGhost); // loot_sack_upper
+    addCharVoxel(group, 0.185, 0.140, 0.055, 'burlapBag', 0.000, 0.282, -0.290, isGhost); // loot_sack_rear_bulge
+    addCharVoxel(group, 0.175, 0.035, 0.130, 'bagRope', 0.000, 0.480, -0.182, isGhost); // loot_sack_cinch
+    addCharVoxel(group, 0.205, 0.040, 0.150, 'burlapBag', 0.000, 0.507, -0.182, isGhost); // loot_sack_ruffle
+    addCharVoxel(group, 0.070, 0.070, 0.090, 'goldCoin', 0.048, 0.547, -0.172, isGhost); // loot_gold_bar
+    addCharVoxel(group, 0.070, 0.070, 0.080, 'goldCoin', -0.048, 0.542, -0.168, isGhost); // loot_gold_coin
+    addCharVoxel(group, 0.075, 0.085, 0.090, 'rubyRed', 0.000, 0.560, -0.188, isGhost); // loot_ruby_gem
   } else if (skinId === 'capybara_zen') {
-    // 32 voxels: Zen Capybara in grounded meditative pose with mandarin on flat head
-    // 4 Paws touching ground & front leg pillars
-    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', -0.14, 0.04, 0.15, isGhost);
-    addCharVoxel(group, 0.09, 0.08, 0.10, 'capybaraPaws', 0.14, 0.04, 0.15, isGhost);
-    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', -0.15, 0.04, -0.15, isGhost);
-    addCharVoxel(group, 0.10, 0.08, 0.11, 'capybaraPaws', 0.15, 0.04, -0.15, isGhost);
-    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', -0.14, 0.14, 0.15, isGhost);
-    addCharVoxel(group, 0.09, 0.12, 0.09, 'capybaraCaramel', 0.14, 0.14, 0.15, isGhost);
-
-    // Caramel monolithic torso, underbelly tone & wide zen haunches
-    addCharVoxel(group, 0.38, 0.32, 0.42, 'capybaraCaramel', 0, 0.24, -0.02, isGhost);
-    addCharVoxel(group, 0.28, 0.08, 0.34, 'capybaraMuzzle', 0, 0.10, -0.02, isGhost);
-    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', -0.19, 0.20, -0.12, isGhost);
-    addCharVoxel(group, 0.06, 0.24, 0.26, 'capybaraCaramel', 0.19, 0.20, -0.12, isGhost);
-    addCharVoxel(group, 0.32, 0.26, 0.08, 'capybaraCaramel', 0, 0.22, -0.26, isGhost);
-    addCharVoxel(group, 0.06, 0.05, 0.04, 'capybaraDark', 0, 0.24, -0.31, isGhost);
-
-    // Neck slope & heavy square flat-topped capybara head
-    addCharVoxel(group, 0.32, 0.22, 0.14, 'capybaraCaramel', 0, 0.32, 0.16, isGhost);
-    addCharVoxel(group, 0.30, 0.24, 0.26, 'capybaraCaramel', 0, 0.46, 0.19, isGhost);
-    addCharVoxel(group, 0.26, 0.20, 0.14, 'capybaraCaramel', 0, 0.42, 0.33, isGhost);
-    addCharVoxel(group, 0.04, 0.12, 0.02, 'capybaraDark', 0, 0.41, 0.405, isGhost);
-    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', -0.05, 0.42, 0.405, isGhost);
-    addCharVoxel(group, 0.03, 0.03, 0.02, 'maskBlack', 0.05, 0.42, 0.405, isGhost);
-    addCharVoxel(group, 0.20, 0.06, 0.10, 'capybaraMuzzle', 0, 0.30, 0.32, isGhost);
-
-    // Serene meditative closed slit eyes & cute rounded ears
-    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', -0.155, 0.48, 0.22, isGhost);
-    addCharVoxel(group, 0.02, 0.03, 0.07, 'maskBlack', 0.155, 0.48, 0.22, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', -0.155, 0.50, 0.22, isGhost);
-    addCharVoxel(group, 0.02, 0.02, 0.07, 'capybaraMuzzle', 0.155, 0.50, 0.22, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', -0.16, 0.57, 0.12, isGhost);
-    addCharVoxel(group, 0.05, 0.06, 0.05, 'capybaraDark', 0.16, 0.57, 0.12, isGhost);
-    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', -0.16, 0.56, 0.13, isGhost);
-    addCharVoxel(group, 0.03, 0.04, 0.03, 'capybaraMuzzle', 0.16, 0.56, 0.13, isGhost);
-
-    // Round voxel mandarin/yuzu on head with green stem & leaf
-    addCharVoxel(group, 0.14, 0.03, 0.14, 'orangeFruit', 0, 0.595, 0.19, isGhost);
-    addCharVoxel(group, 0.18, 0.08, 0.18, 'orangeFruit', 0, 0.64, 0.19, isGhost);
-    addCharVoxel(group, 0.12, 0.03, 0.12, 'orangeFruit', 0, 0.69, 0.19, isGhost);
-    addCharVoxel(group, 0.03, 0.05, 0.03, 'greenLeaf', 0, 0.725, 0.19, isGhost);
-    addCharVoxel(group, 0.06, 0.03, 0.04, 'greenLeaf', 0.035, 0.73, 0.21, isGhost);
+    // 53 voxels: Legendary Zen Capybara (Expressive Eyes, Folded Spa Towel, Mala Beads)
+    addCharVoxel(group, 0.075, 0.072, 0.085, 'capybaraPaws', -0.140, 0.036, 0.140, isGhost); // paw_front_left
+    addCharVoxel(group, 0.055, 0.035, 0.040, 'capybaraPaws', -0.140, 0.020, 0.198, isGhost); // paw_digits_front_left
+    addCharVoxel(group, 0.055, 0.100, 0.065, 'capybaraCaramel', -0.140, 0.113, 0.140, isGhost); // leg_front_left
+    addCharVoxel(group, 0.075, 0.072, 0.085, 'capybaraPaws', 0.140, 0.036, 0.140, isGhost); // paw_front_right
+    addCharVoxel(group, 0.055, 0.035, 0.040, 'capybaraPaws', 0.140, 0.020, 0.198, isGhost); // paw_digits_front_right
+    addCharVoxel(group, 0.055, 0.100, 0.065, 'capybaraCaramel', 0.140, 0.113, 0.140, isGhost); // leg_front_right
+    addCharVoxel(group, 0.080, 0.165, 0.140, 'capybaraCaramel', -0.168, 0.135, -0.128, isGhost); // thigh_rear_left
+    addCharVoxel(group, 0.075, 0.068, 0.125, 'capybaraPaws', -0.155, 0.034, -0.115, isGhost); // paw_rear_left
+    addCharVoxel(group, 0.080, 0.165, 0.140, 'capybaraCaramel', 0.168, 0.135, -0.128, isGhost); // thigh_rear_right
+    addCharVoxel(group, 0.075, 0.068, 0.125, 'capybaraPaws', 0.155, 0.034, -0.115, isGhost); // paw_rear_right
+    addCharVoxel(group, 0.345, 0.220, 0.320, 'capybaraCaramel', 0.000, 0.233, -0.018, isGhost); // body_core
+    addCharVoxel(group, 0.275, 0.065, 0.285, 'capybaraMuzzle', 0.000, 0.120, -0.020, isGhost); // body_underbelly
+    addCharVoxel(group, 0.035, 0.170, 0.225, 'capybaraBrown', -0.185, 0.223, -0.025, isGhost); // flank_left
+    addCharVoxel(group, 0.035, 0.170, 0.225, 'capybaraBrown', 0.185, 0.223, -0.025, isGhost); // flank_right
+    addCharVoxel(group, 0.265, 0.035, 0.190, 'capybaraBrown', 0.000, 0.355, -0.048, isGhost); // back_arch_ridge
+    addCharVoxel(group, 0.305, 0.185, 0.050, 'capybaraCaramel', 0.000, 0.235, -0.198, isGhost); // rump_rear
+    addCharVoxel(group, 0.255, 0.045, 0.070, 'capybaraBrown', 0.000, 0.335, -0.168, isGhost); // rump_slope_top
+    addCharVoxel(group, 0.065, 0.045, 0.035, 'capybaraMuzzle', 0.000, 0.190, -0.235, isGhost); // tail_stub
+    addCharVoxel(group, 0.305, 0.180, 0.080, 'capybaraCaramel', 0.000, 0.278, 0.172, isGhost); // neck_base
+    addCharVoxel(group, 0.215, 0.125, 0.070, 'capybaraMuzzle', 0.000, 0.215, 0.193, isGhost); // neck_bib_throat
+    addCharVoxel(group, 0.040, 0.105, 0.050, 'capybaraDark', -0.117, 0.280, 0.207, isGhost); // mala_necklace_left
+    addCharVoxel(group, 0.040, 0.105, 0.050, 'capybaraDark', 0.117, 0.280, 0.207, isGhost); // mala_necklace_right
+    addCharVoxel(group, 0.185, 0.040, 0.035, 'capybaraDark', 0.000, 0.233, 0.220, isGhost); // mala_necklace_bottom
+    addCharVoxel(group, 0.075, 0.050, 0.025, 'goldCoin', 0.000, 0.198, 0.230, isGhost); // mala_gold_medallion
+    addCharVoxel(group, 0.295, 0.220, 0.195, 'capybaraCaramel', 0.000, 0.448, 0.185, isGhost); // head_core
+    addCharVoxel(group, 0.265, 0.035, 0.160, 'capybaraCaramel', 0.000, 0.565, 0.182, isGhost); // head_crown_flat
+    addCharVoxel(group, 0.235, 0.180, 0.085, 'capybaraMuzzle', 0.000, 0.407, 0.320, isGhost); // snout_muzzle
+    addCharVoxel(group, 0.185, 0.070, 0.090, 'capybaraMuzzle', 0.000, 0.318, 0.287, isGhost); // snout_chin_under
+    addCharVoxel(group, 0.105, 0.065, 0.020, 'capybaraDark', 0.000, 0.455, 0.367, isGhost); // nose_pad_dark
+    addCharVoxel(group, 0.030, 0.030, 0.015, 'maskBlack', -0.048, 0.453, 0.375, isGhost); // nostril_slit_left
+    addCharVoxel(group, 0.030, 0.030, 0.015, 'maskBlack', 0.048, 0.453, 0.375, isGhost); // nostril_slit_right
+    addCharVoxel(group, 0.035, 0.045, 0.020, 'capybaraDark', 0.000, 0.410, 0.362, isGhost); // nostril_bridge
+    addCharVoxel(group, 0.040, 0.130, 0.110, 'capybaraBrown', -0.158, 0.422, 0.182, isGhost); // cheek_fluff_left
+    addCharVoxel(group, 0.040, 0.130, 0.110, 'capybaraBrown', 0.158, 0.422, 0.182, isGhost); // cheek_fluff_right
+    addCharVoxel(group, 0.015, 0.060, 0.060, 'maskBlack', -0.150, 0.477, 0.203, isGhost); // eye_left_iris
+    addCharVoxel(group, 0.014, 0.025, 0.025, 'white', -0.152, 0.490, 0.215, isGhost); // eye_left_sparkle
+    addCharVoxel(group, 0.015, 0.060, 0.060, 'maskBlack', 0.150, 0.477, 0.203, isGhost); // eye_right_iris
+    addCharVoxel(group, 0.014, 0.025, 0.025, 'white', 0.152, 0.490, 0.215, isGhost); // eye_right_sparkle
+    addCharVoxel(group, 0.065, 0.050, 0.020, 'capybaraBrown', 0.000, 0.542, 0.278, isGhost); // forehead_zen_tuft
+    addCharVoxel(group, 0.055, 0.075, 0.060, 'capybaraBrown', -0.135, 0.590, 0.107, isGhost); // ear_base_left
+    addCharVoxel(group, 0.030, 0.045, 0.015, 'capybaraMuzzle', -0.133, 0.590, 0.135, isGhost); // ear_inner_left
+    addCharVoxel(group, 0.055, 0.075, 0.060, 'capybaraBrown', 0.135, 0.590, 0.107, isGhost); // ear_base_right
+    addCharVoxel(group, 0.030, 0.045, 0.015, 'capybaraMuzzle', 0.133, 0.590, 0.135, isGhost); // ear_inner_right
+    addCharVoxel(group, 0.205, 0.035, 0.120, 'white', 0.000, 0.595, 0.182, isGhost); // onsen_towel_main
+    addCharVoxel(group, 0.175, 0.025, 0.095, 'white', 0.000, 0.620, 0.180, isGhost); // onsen_towel_fold_top
+    addCharVoxel(group, 0.125, 0.025, 0.080, 'orangeFruit', 0.000, 0.640, 0.182, isGhost); // mandarin_base
+    addCharVoxel(group, 0.155, 0.060, 0.110, 'orangeFruit', 0.000, 0.677, 0.182, isGhost); // mandarin_middle_bulge
+    addCharVoxel(group, 0.105, 0.030, 0.070, 'orangeFruit', 0.000, 0.718, 0.182, isGhost); // mandarin_top_dome
+    addCharVoxel(group, 0.030, 0.030, 0.025, 'goldCoin', -0.048, 0.688, 0.230, isGhost); // mandarin_sun_spot
+    addCharVoxel(group, 0.025, 0.035, 0.020, 'greenLeaf', 0.000, 0.745, 0.182, isGhost); // mandarin_stem
+    addCharVoxel(group, 0.050, 0.020, 0.040, 'greenLeaf', 0.033, 0.748, 0.163, isGhost); // mandarin_leaf
+    addCharVoxel(group, 0.040, 0.020, 0.035, 'greenLeaf', 0.058, 0.738, 0.150, isGhost); // mandarin_leaf_tip
+    addCharVoxel(group, 0.040, 0.020, 0.030, 'greenLeaf', -0.028, 0.748, 0.198, isGhost); // mandarin_leaf_left
   } else {
     // Fallback to Corgi mascot
     return createUrbanCharacter('corgi', isGhost);

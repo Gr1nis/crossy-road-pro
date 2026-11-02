@@ -17,6 +17,7 @@ export const VOXEL_PALETTE = {
   darkCharcoal: 0x1e293b,
   nosePink: 0xf472b6,
   greenLeaf: 0x16a34a,
+  nvgGreen: 0x22c55e,
   ghostYellow: 0xfbbf24,
   burlapBag: 0xd4b285,
   bagRope: 0x854d0e,
@@ -37,7 +38,7 @@ export const VOXEL_PALETTE = {
   corgiGold: 0xfacc15,
   pigeonDark: 0x1e293b,
   pigeonBeak: 0xf97316,
-  pigeonTeal: 0x8b5cf6,
+  pigeonTeal: 0x0d9488, // Emerald teal sheen for street pigeon neck
   pizzaCrust: 0xb45309,
   pizzaPepperoni: 0xb91c1c,
   boxTan: 0xb45309,
