@@ -33,6 +33,18 @@ export const SKIN_RARITY_WEIGHTS: Record<SkinRarityValue, number> = {
   [SkinRarity.LEGENDARY]: 5,
 };
 
+export const GACHA_SKINS_BY_RARITY: Record<SkinRarityValue, SkinId[]> = {
+  [SkinRarity.COMMON]: [],
+  [SkinRarity.RARE]: [],
+  [SkinRarity.EPIC]: [],
+  [SkinRarity.LEGENDARY]: [],
+};
+
+for (const skin of ALL_SKINS) {
+  const rarity = SKIN_RARITY_MAP[skin.id] ?? SkinRarity.COMMON;
+  GACHA_SKINS_BY_RARITY[rarity].push(skin.id);
+}
+
 export interface GachaRollResult {
   success: boolean;
   skinId?: SkinId;
@@ -91,15 +103,24 @@ export class GachaMachine {
       : mulberry32(seedOrNonce);
 
     const rollPct = rand * 100;
-    if (rollPct < 50) {
+    const selectFromList = (list: SkinId[], minPct: number, maxPct: number): SkinId => {
+      if (list.length === 0) return 'corgi';
+      if (list.length === 1) return list[0];
       if (Number.isInteger(seedOrNonce)) {
-        return Math.abs(seedOrNonce) % 2 === 0 ? 'corgi' : 'pigeon_pizza';
+        return list[Math.abs(seedOrNonce) % list.length];
       }
-      return rollPct < 25 ? 'corgi' : 'pigeon_pizza';
-    }
-    if (rollPct < 80) return 'box_cat';
-    if (rollPct < 95) return 'raccoon_bandit';
-    return 'capybara_zen';
+      const range = maxPct - minPct;
+      const idx = Math.min(
+        list.length - 1,
+        Math.floor(((rollPct - minPct) / range) * list.length)
+      );
+      return list[idx];
+    };
+
+    if (rollPct < 50) return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.COMMON], 0, 50);
+    if (rollPct < 80) return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.RARE], 50, 80);
+    if (rollPct < 95) return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.EPIC], 80, 95);
+    return selectFromList(GACHA_SKINS_BY_RARITY[SkinRarity.LEGENDARY], 95, 100);
   }
 
   roll(

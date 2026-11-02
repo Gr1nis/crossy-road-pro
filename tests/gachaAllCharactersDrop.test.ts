@@ -1,0 +1,124 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { ALL_SKINS, type SkinId, type StorageAdapter } from '../src/core/types.ts';
+import { GachaMachine, SkinRarity } from '../src/core/gachaMachine.ts';
+import { ScoreTracker } from '../src/core/scoreTracker.ts';
+import { preloadGachaCardThumbnails, GACHA_CARD_THUMB_CACHE } from '../src/view/gachaCardArt.ts';
+
+class MemoryStorage implements StorageAdapter {
+  private data = new Map<string, string>();
+  getItem(key: string): string | null {
+    return this.data.get(key) ?? null;
+  }
+  setItem(key: string, value: string): void {
+    this.data.set(key, value);
+  }
+  removeItem(key: string): void {
+    this.data.delete(key);
+  }
+}
+
+describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
+  it('Property 1 (All 10 skins can drop): pickSkin yields all 10 characters over multiple nonce rolls', () => {
+    const gacha = new GachaMachine();
+    const droppedSkins = new Set<SkinId>();
+
+    // Roll across 200 nonces (simulating player rolls in gameplay)
+    for (let nonce = 1; nonce <= 300; nonce++) {
+      const skin = gacha.pickSkin(nonce);
+      droppedSkins.add(skin);
+    }
+
+    assert.equal(ALL_SKINS.length, 10, 'ALL_SKINS must define exactly 10 characters');
+
+    for (const skin of ALL_SKINS) {
+      assert.ok(
+        droppedSkins.has(skin.id),
+        `Character "${skin.id}" (${skin.name}) must be able to drop from gacha machine!`
+      );
+    }
+
+    // Explicitly verify the 5 newly added characters
+    const newCharacters: SkinId[] = [
+      'barista_pug',
+      'skater_ferret',
+      'subway_rat',
+      'raincoat_duck',
+      'pigeon_king',
+    ];
+
+    for (const id of newCharacters) {
+      assert.ok(
+        droppedSkins.has(id),
+        `Newly added character "${id}" must drop from gacha rolls`
+      );
+    }
+  });
+
+  it('Property 2 (Rarity distribution consistency): all rarities are represented and have proper proportions', () => {
+    const gacha = new GachaMachine();
+    const rarityCounts: Record<string, number> = {
+      [SkinRarity.COMMON]: 0,
+      [SkinRarity.RARE]: 0,
+      [SkinRarity.EPIC]: 0,
+      [SkinRarity.LEGENDARY]: 0,
+    };
+
+    const totalRolls = 2000;
+    for (let nonce = 1; nonce <= totalRolls; nonce++) {
+      const skin = gacha.pickSkin(nonce);
+      const rarity = gacha.getSkinRarity(skin);
+      rarityCounts[rarity] = (rarityCounts[rarity] || 0) + 1;
+    }
+
+    // Common ~50% (40% - 60% tolerance)
+    const commonPct = (rarityCounts[SkinRarity.COMMON] / totalRolls) * 100;
+    assert.ok(commonPct >= 40 && commonPct <= 60, `Common drops should be ~50%, got ${commonPct}%`);
+
+    // Rare ~30% (22% - 38% tolerance)
+    const rarePct = (rarityCounts[SkinRarity.RARE] / totalRolls) * 100;
+    assert.ok(rarePct >= 22 && rarePct <= 38, `Rare drops should be ~30%, got ${rarePct}%`);
+
+    // Epic ~15% (10% - 22% tolerance)
+    const epicPct = (rarityCounts[SkinRarity.EPIC] / totalRolls) * 100;
+    assert.ok(epicPct >= 10 && epicPct <= 22, `Epic drops should be ~15%, got ${epicPct}%`);
+
+    // Legendary ~5% (2% - 10% tolerance)
+    const legPct = (rarityCounts[SkinRarity.LEGENDARY] / totalRolls) * 100;
+    assert.ok(legPct >= 2 && legPct <= 10, `Legendary drops should be ~5%, got ${legPct}%`);
+  });
+
+  it('Property 3 (ScoreTracker gameplay roll progression): naturally rolls and unlocks all 10 skins', () => {
+    const storage = new MemoryStorage();
+    const tracker = new ScoreTracker(storage);
+
+    // Initial state: only corgi is unlocked
+    assert.deepEqual(tracker.getUnlockedSkins(), ['corgi']);
+
+    // Provide enough coins to roll until all skins are unlocked
+    let rolls = 0;
+    const maxRolls = 500;
+    while (!tracker.isAllSkinsUnlocked() && rolls < maxRolls) {
+      tracker.addCoins(100);
+      rolls++;
+      const res = tracker.rollGacha(rolls);
+      assert.equal(res.success, true);
+      if (res.isDuplicate) {
+        tracker.claimDuplicateCashback(res.cashback ?? 40);
+      }
+    }
+
+    assert.equal(tracker.isAllSkinsUnlocked(), true, 'Player must be able to unlock all 10 characters');
+    assert.equal(tracker.getUnlockedSkins().length, 10, 'All 10 characters unlocked');
+  });
+
+  it('Property 4 (Thumbnail preloading): preloadGachaCardThumbnails caches all 10 character thumbnails', () => {
+    preloadGachaCardThumbnails();
+    for (const skin of ALL_SKINS) {
+      assert.ok(
+        GACHA_CARD_THUMB_CACHE.has(skin.id),
+        `Thumbnail cache must include character "${skin.id}"`
+      );
+    }
+  });
+});

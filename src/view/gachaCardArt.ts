@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { type SkinId } from '../core/types.ts';
+import { ALL_SKINS, type SkinId } from '../core/types.ts';
 import { SKIN_RARITY_MAP, type SkinRarityValue } from '../core/gachaMachine.ts';
 import { createUrbanCharacter } from './urbanCharacters.ts';
 import { GACHA_CHARACTER_SKIN_BASE64 } from './gachaSkinsBase64.ts';
@@ -168,8 +168,8 @@ export function createFallbackVoxelDataUrl(skinId: string): string {
 }
 
 export function preloadGachaCardThumbnails(): void {
-  const skins: SkinId[] = ['corgi', 'pigeon_pizza', 'box_cat', 'raccoon_bandit', 'capybara_zen'];
-  for (const id of skins) {
+  for (const skin of ALL_SKINS) {
+    const id = skin.id;
     if (!GACHA_CARD_THUMB_CACHE.has(id)) {
       const b64 = GACHA_CHARACTER_SKIN_BASE64[id];
       GACHA_CARD_THUMB_CACHE.set(id, b64 || createFallbackVoxelDataUrl(id));
