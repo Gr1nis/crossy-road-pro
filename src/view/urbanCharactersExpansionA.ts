@@ -17,8 +17,12 @@ function addExpAVoxel(
   group.add(mesh);
 }
 
-export function createUrbanCharacterExpA(skinId: string, isGhost = false): THREE.Group {
-  const group = new THREE.Group();
+export function createUrbanCharacterExpA(
+  skinId: string,
+  isGhost = false,
+  targetGroup?: THREE.Group
+): THREE.Group {
+  const group = targetGroup ?? new THREE.Group();
 
   if (skinId === 'barista_pug') {
     // 47 voxels: Zero Z-Fighting Certified Solid barista_pug

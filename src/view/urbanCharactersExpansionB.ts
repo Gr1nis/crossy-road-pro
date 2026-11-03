@@ -17,10 +17,69 @@ function addExpBVoxel(
   group.add(mesh);
 }
 
-export function createUrbanCharacterExpB(skinId: string, isGhost = false): THREE.Group {
-  const group = new THREE.Group();
+export function createUrbanCharacterExpB(
+  skinId: string,
+  isGhost = false,
+  targetGroup?: THREE.Group
+): THREE.Group {
+  const group = targetGroup ?? new THREE.Group();
 
-  if (skinId === 'raincoat_duck') {
+  if (skinId === 'capybara_zen') {
+    // 53 voxels: Legendary Zen Capybara (Expressive Eyes, Folded Spa Towel, Mala Beads)
+    addExpBVoxel(group, 0.075, 0.072, 0.085, 'capybaraPaws', -0.140, 0.036, 0.140, isGhost); // paw_front_left
+    addExpBVoxel(group, 0.055, 0.035, 0.040, 'capybaraPaws', -0.140, 0.020, 0.198, isGhost); // paw_digits_front_left
+    addExpBVoxel(group, 0.055, 0.100, 0.065, 'capybaraCaramel', -0.140, 0.113, 0.140, isGhost); // leg_front_left
+    addExpBVoxel(group, 0.075, 0.072, 0.085, 'capybaraPaws', 0.140, 0.036, 0.140, isGhost); // paw_front_right
+    addExpBVoxel(group, 0.055, 0.035, 0.040, 'capybaraPaws', 0.140, 0.020, 0.198, isGhost); // paw_digits_front_right
+    addExpBVoxel(group, 0.055, 0.100, 0.065, 'capybaraCaramel', 0.140, 0.113, 0.140, isGhost); // leg_front_right
+    addExpBVoxel(group, 0.080, 0.165, 0.140, 'capybaraCaramel', -0.168, 0.135, -0.128, isGhost); // thigh_rear_left
+    addExpBVoxel(group, 0.075, 0.068, 0.125, 'capybaraPaws', -0.155, 0.034, -0.115, isGhost); // paw_rear_left
+    addExpBVoxel(group, 0.080, 0.165, 0.140, 'capybaraCaramel', 0.168, 0.135, -0.128, isGhost); // thigh_rear_right
+    addExpBVoxel(group, 0.075, 0.068, 0.125, 'capybaraPaws', 0.155, 0.034, -0.115, isGhost); // paw_rear_right
+    addExpBVoxel(group, 0.345, 0.220, 0.320, 'capybaraCaramel', 0.000, 0.233, -0.018, isGhost); // body_core
+    addExpBVoxel(group, 0.275, 0.065, 0.285, 'capybaraMuzzle', 0.000, 0.120, -0.020, isGhost); // body_underbelly
+    addExpBVoxel(group, 0.035, 0.170, 0.225, 'capybaraBrown', -0.185, 0.223, -0.025, isGhost); // flank_left
+    addExpBVoxel(group, 0.035, 0.170, 0.225, 'capybaraBrown', 0.185, 0.223, -0.025, isGhost); // flank_right
+    addExpBVoxel(group, 0.265, 0.035, 0.190, 'capybaraBrown', 0.000, 0.355, -0.048, isGhost); // back_arch_ridge
+    addExpBVoxel(group, 0.305, 0.185, 0.050, 'capybaraCaramel', 0.000, 0.235, -0.198, isGhost); // rump_rear
+    addExpBVoxel(group, 0.255, 0.045, 0.070, 'capybaraBrown', 0.000, 0.335, -0.168, isGhost); // rump_slope_top
+    addExpBVoxel(group, 0.065, 0.045, 0.035, 'capybaraMuzzle', 0.000, 0.190, -0.235, isGhost); // tail_stub
+    addExpBVoxel(group, 0.305, 0.180, 0.080, 'capybaraCaramel', 0.000, 0.278, 0.172, isGhost); // neck_base
+    addExpBVoxel(group, 0.215, 0.125, 0.070, 'capybaraMuzzle', 0.000, 0.215, 0.193, isGhost); // neck_bib_throat
+    addExpBVoxel(group, 0.040, 0.105, 0.050, 'capybaraDark', -0.117, 0.280, 0.207, isGhost); // mala_necklace_left
+    addExpBVoxel(group, 0.040, 0.105, 0.050, 'capybaraDark', 0.117, 0.280, 0.207, isGhost); // mala_necklace_right
+    addExpBVoxel(group, 0.185, 0.040, 0.035, 'capybaraDark', 0.000, 0.233, 0.220, isGhost); // mala_necklace_bottom
+    addExpBVoxel(group, 0.075, 0.050, 0.025, 'goldCoin', 0.000, 0.198, 0.230, isGhost); // mala_gold_medallion
+    addExpBVoxel(group, 0.295, 0.220, 0.195, 'capybaraCaramel', 0.000, 0.448, 0.185, isGhost); // head_core
+    addExpBVoxel(group, 0.265, 0.035, 0.160, 'capybaraCaramel', 0.000, 0.565, 0.182, isGhost); // head_crown_flat
+    addExpBVoxel(group, 0.235, 0.180, 0.085, 'capybaraMuzzle', 0.000, 0.407, 0.320, isGhost); // snout_muzzle
+    addExpBVoxel(group, 0.185, 0.070, 0.090, 'capybaraMuzzle', 0.000, 0.318, 0.287, isGhost); // snout_chin_under
+    addExpBVoxel(group, 0.105, 0.065, 0.020, 'capybaraDark', 0.000, 0.455, 0.367, isGhost); // nose_pad_dark
+    addExpBVoxel(group, 0.030, 0.030, 0.015, 'maskBlack', -0.048, 0.453, 0.375, isGhost); // nostril_slit_left
+    addExpBVoxel(group, 0.030, 0.030, 0.015, 'maskBlack', 0.048, 0.453, 0.375, isGhost); // nostril_slit_right
+    addExpBVoxel(group, 0.035, 0.045, 0.020, 'capybaraDark', 0.000, 0.410, 0.362, isGhost); // nostril_bridge
+    addExpBVoxel(group, 0.040, 0.130, 0.110, 'capybaraBrown', -0.158, 0.422, 0.182, isGhost); // cheek_fluff_left
+    addExpBVoxel(group, 0.040, 0.130, 0.110, 'capybaraBrown', 0.158, 0.422, 0.182, isGhost); // cheek_fluff_right
+    addExpBVoxel(group, 0.015, 0.060, 0.060, 'maskBlack', -0.150, 0.477, 0.203, isGhost); // eye_left_iris
+    addExpBVoxel(group, 0.014, 0.025, 0.025, 'white', -0.152, 0.490, 0.215, isGhost); // eye_left_sparkle
+    addExpBVoxel(group, 0.015, 0.060, 0.060, 'maskBlack', 0.150, 0.477, 0.203, isGhost); // eye_right_iris
+    addExpBVoxel(group, 0.014, 0.025, 0.025, 'white', 0.152, 0.490, 0.215, isGhost); // eye_right_sparkle
+    addExpBVoxel(group, 0.065, 0.050, 0.020, 'capybaraBrown', 0.000, 0.542, 0.278, isGhost); // forehead_zen_tuft
+    addExpBVoxel(group, 0.055, 0.075, 0.060, 'capybaraBrown', -0.135, 0.590, 0.107, isGhost); // ear_base_left
+    addExpBVoxel(group, 0.030, 0.045, 0.015, 'capybaraMuzzle', -0.133, 0.590, 0.135, isGhost); // ear_inner_left
+    addExpBVoxel(group, 0.055, 0.075, 0.060, 'capybaraBrown', 0.135, 0.590, 0.107, isGhost); // ear_base_right
+    addExpBVoxel(group, 0.030, 0.045, 0.015, 'capybaraMuzzle', 0.133, 0.590, 0.135, isGhost); // ear_inner_right
+    addExpBVoxel(group, 0.205, 0.035, 0.120, 'white', 0.000, 0.595, 0.182, isGhost); // onsen_towel_main
+    addExpBVoxel(group, 0.175, 0.025, 0.095, 'white', 0.000, 0.620, 0.180, isGhost); // onsen_towel_fold_top
+    addExpBVoxel(group, 0.125, 0.025, 0.080, 'orangeFruit', 0.000, 0.640, 0.182, isGhost); // mandarin_base
+    addExpBVoxel(group, 0.155, 0.060, 0.110, 'orangeFruit', 0.000, 0.677, 0.182, isGhost); // mandarin_middle_bulge
+    addExpBVoxel(group, 0.105, 0.030, 0.070, 'orangeFruit', 0.000, 0.718, 0.182, isGhost); // mandarin_top_dome
+    addExpBVoxel(group, 0.030, 0.030, 0.025, 'goldCoin', -0.048, 0.688, 0.230, isGhost); // mandarin_sun_spot
+    addExpBVoxel(group, 0.025, 0.035, 0.020, 'greenLeaf', 0.000, 0.745, 0.182, isGhost); // mandarin_stem
+    addExpBVoxel(group, 0.050, 0.020, 0.040, 'greenLeaf', 0.033, 0.748, 0.163, isGhost); // mandarin_leaf
+    addExpBVoxel(group, 0.040, 0.020, 0.035, 'greenLeaf', 0.058, 0.738, 0.150, isGhost); // mandarin_leaf_tip
+    addExpBVoxel(group, 0.040, 0.020, 0.030, 'greenLeaf', -0.028, 0.748, 0.198, isGhost); // mandarin_leaf_left
+  } else if (skinId === 'raincoat_duck') {
     // 48 voxels: Zero Z-Fighting Certified Solid raincoat_duck
     addExpBVoxel(group, 0.075, 0.033, 0.160, 'bootSole', -0.085, 0.016, 0.017, isGhost); // boot_sole_left
     addExpBVoxel(group, 0.075, 0.033, 0.160, 'bootSole', 0.085, 0.016, 0.017, isGhost); // boot_sole_right

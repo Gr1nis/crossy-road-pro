@@ -55,16 +55,47 @@ function renderVoxelIsometricSvg(skinId: string): string {
     let minPy = Infinity;
     let maxPy = -Infinity;
 
-    for (const child of group.children) {
-      const m = child as THREE.Mesh;
-      const geom = m.geometry as THREE.BoxGeometry;
-      const p = geom.parameters;
-      const x = m.position.x;
-      const y = m.position.y;
-      const z = m.position.z;
-      const w = p.width;
-      const h = p.height;
-      const d = p.depth;
+    const voxelMeshes: {
+      x: number;
+      y: number;
+      z: number;
+      w: number;
+      h: number;
+      d: number;
+      colorHex: string;
+    }[] = [];
+    group.updateMatrixWorld(true);
+    group.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const m = child as THREE.Mesh;
+        const geom = m.geometry as THREE.BoxGeometry;
+        if (!geom?.parameters) return;
+        const p = geom.parameters;
+        const mat = m.material as THREE.MeshLambertMaterial;
+        const colorHex = mat?.color ? mat.color.getHexString() : 'ffffff';
+        const wp = new THREE.Vector3();
+        const ws = new THREE.Vector3();
+        m.getWorldPosition(wp);
+        m.getWorldScale(ws);
+        voxelMeshes.push({
+          x: wp.x,
+          y: wp.y,
+          z: wp.z,
+          w: p.width * ws.x,
+          h: p.height * ws.y,
+          d: p.depth * ws.z,
+          colorHex,
+        });
+      }
+    });
+
+    for (const m of voxelMeshes) {
+      const x = m.x;
+      const y = m.y;
+      const z = m.z;
+      const w = m.w;
+      const h = m.h;
+      const d = m.d;
       const x0 = x - w / 2;
       const x1 = x + w / 2;
       const y0 = y - h / 2;
@@ -106,18 +137,14 @@ function renderVoxelIsometricSvg(skinId: string): string {
     }
 
     const faces: FacePolygon[] = [];
-    for (const child of group.children) {
-      const m = child as THREE.Mesh;
-      const geom = m.geometry as THREE.BoxGeometry;
-      const p = geom.parameters;
-      const mat = m.material as THREE.MeshLambertMaterial;
-      const colorHex = mat.color.getHexString();
-      const x = m.position.x;
-      const y = m.position.y;
-      const z = m.position.z;
-      const w = p.width;
-      const h = p.height;
-      const d = p.depth;
+    for (const m of voxelMeshes) {
+      const colorHex = m.colorHex;
+      const x = m.x;
+      const y = m.y;
+      const z = m.z;
+      const w = m.w;
+      const h = m.h;
+      const d = m.d;
       const x0 = x - w / 2;
       const x1 = x + w / 2;
       const y0 = y - h / 2;

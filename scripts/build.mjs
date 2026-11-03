@@ -3183,7 +3183,10 @@ function auditDeployModels() {
   console.log('🔍 [3D Model Viewer Deploy Check] Auditing models in game codebase...');
 
   const typesSource = fs.readFileSync(path.join(ROOT, 'src/core/types.ts'), 'utf8');
-  const charsSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanCharacters.ts'), 'utf8');
+  const charsSource =
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanCharacters.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanCharactersExpansionA.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanCharactersExpansionB.ts'), 'utf8');
   const vehSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanVehicles.ts'), 'utf8');
   const envSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanEnvironment.ts'), 'utf8');
   const bldgSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanBuildings.ts'), 'utf8');

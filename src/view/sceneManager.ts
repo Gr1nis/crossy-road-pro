@@ -119,6 +119,9 @@ const BIOME_ATMOSPHERES: Record<
   },
 };
 
+const GAMEPLAY_CAMERA_ZOOM = 1.32;
+const MENU_CAMERA_ZOOM = 1.68;
+
 export class SceneManager {
   private static readonly puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
   private readonly container: HTMLElement;
@@ -220,6 +223,8 @@ export class SceneManager {
       -30,
       80
     );
+    this.camera.zoom = GAMEPLAY_CAMERA_ZOOM;
+    this.camera.updateProjectionMatrix();
     this.camera.position.set(-7.5, 13.5, -8.0);
     this.camera.lookAt(0, 0, 3.0);
 
@@ -263,14 +268,14 @@ export class SceneManager {
       if (isMenu) {
         this.camera.position.set(-5.625, 10.525, -8.25);
         this.camera.lookAt(0, 0.4, 0.0);
-        this.camera.zoom = 1.45;
+        this.camera.zoom = MENU_CAMERA_ZOOM;
         this.camera.top = this.currentViewHeight / 2;
         this.camera.bottom = -this.currentViewHeight / 2;
         this.camera.updateProjectionMatrix();
       } else {
         this.camera.position.set(-7.5, 13.5, -8.0);
         this.camera.lookAt(0, 0, 3.0);
-        this.camera.zoom = 1.0;
+        this.camera.zoom = GAMEPLAY_CAMERA_ZOOM;
         this.camera.top = this.gameplayTop;
         this.camera.bottom = this.gameplayBottom;
         this.camera.updateProjectionMatrix();
@@ -527,6 +532,7 @@ export class SceneManager {
     this.camera.right = halfWidth;
     this.camera.top = top;
     this.camera.bottom = bottom;
+    this.camera.zoom = this.isMenuMode ? MENU_CAMERA_ZOOM : GAMEPLAY_CAMERA_ZOOM;
     this.camera.updateProjectionMatrix();
     const ratio = this.renderQuality === 'high'
       ? (typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1)
@@ -1011,7 +1017,7 @@ export class SceneManager {
     const symmetricBottom = -this.currentViewHeight / 2;
     const curTop = THREE.MathUtils.lerp(this.gameplayTop, symmetricTop, this.menuFactor);
     const curBottom = THREE.MathUtils.lerp(this.gameplayBottom, symmetricBottom, this.menuFactor);
-    const targetZoom = THREE.MathUtils.lerp(1.0, 1.45, this.menuFactor);
+    const targetZoom = THREE.MathUtils.lerp(GAMEPLAY_CAMERA_ZOOM, MENU_CAMERA_ZOOM, this.menuFactor);
     if (
       Math.abs(this.camera.top - curTop) > 0.001 ||
       Math.abs(this.camera.bottom - curBottom) > 0.001 ||
