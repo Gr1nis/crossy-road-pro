@@ -119,8 +119,8 @@ const BIOME_ATMOSPHERES: Record<
   },
 };
 
-const GAMEPLAY_CAMERA_ZOOM = 1.32;
-const MENU_CAMERA_ZOOM = 1.68;
+const GAMEPLAY_CAMERA_ZOOM = 1.65;
+const MENU_CAMERA_ZOOM = 2.05;
 
 export class SceneManager {
   private static readonly puffGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
