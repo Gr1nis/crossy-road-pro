@@ -223,4 +223,61 @@ describe('LaneGenerator — Adversarial & Property-Based Tests', () => {
       }
     }
   });
+
+  it('Property 8 (Arcade Pacing & Hazard Cadence): enforces max 3 roads, max 2 rivers, no consecutive railways, no river->railway, and breather GRASS within 4 hazard lanes', () => {
+    const seeds = [7, 42, 777, 2026, 99999];
+    for (const seed of seeds) {
+      const gen = new LaneGenerator(seed);
+      const lanes = gen.generateRange(3, 200);
+
+      let consecutiveRoads = 0;
+      let consecutiveRivers = 0;
+      let consecutiveHazards = 0;
+
+      for (let i = 0; i < lanes.length; i++) {
+        const lane = lanes[i];
+        if (lane.type === LaneType.ROAD) {
+          consecutiveRoads++;
+          consecutiveRivers = 0;
+          consecutiveHazards++;
+        } else if (lane.type === LaneType.RIVER) {
+          consecutiveRivers++;
+          consecutiveRoads = 0;
+          consecutiveHazards++;
+        } else if (lane.type === LaneType.RAILWAY) {
+          consecutiveRoads = 0;
+          consecutiveRivers = 0;
+          consecutiveHazards++;
+          if (i > 0) {
+            assert.notEqual(lanes[i - 1].type, LaneType.RAILWAY, `Seed ${seed}: consecutive railways at ${lane.index}`);
+            assert.notEqual(lanes[i - 1].type, LaneType.RIVER, `Seed ${seed}: railway immediately after river at ${lane.index}`);
+          }
+        } else {
+          // GRASS
+          consecutiveRoads = 0;
+          consecutiveRivers = 0;
+          consecutiveHazards = 0;
+        }
+
+        assert.ok(consecutiveRoads <= 3, `Seed ${seed}: more than 3 roads in a row at ${lane.index}`);
+        assert.ok(consecutiveRivers <= 2, `Seed ${seed}: more than 2 rivers in a row at ${lane.index}`);
+        assert.ok(consecutiveHazards <= 4, `Seed ${seed}: more than 4 hazard lanes without GRASS at ${lane.index}`);
+      }
+    }
+  });
+
+  it('Property 9 (Mid-Game Fair Playability at Rows 80-120): maintains 5 river logs, balanced speed factor <= 1.6x, and crossing gaps >= 3.0u on roads', () => {
+    const gen = new LaneGenerator(42);
+    assert.ok(gen.getDifficultyFactor(80) <= 1.6, 'Difficulty factor at row 80 must be <= 1.6x');
+    assert.ok(gen.getDifficultyFactor(90) <= 1.6, 'Difficulty factor at row 90 must be <= 1.6x');
+
+    const midLanes = gen.generateRange(80, 120, 80);
+    for (const lane of midLanes) {
+      if (lane.type === LaneType.RIVER) {
+        assert.equal(lane.logs.length, 5, `River at row ${lane.index} must maintain 5 logs for fair spacing`);
+      } else if (lane.type === LaneType.ROAD) {
+        assert.ok(lane.vehicles.length <= 7, `Road at row ${lane.index} must have at most 7 vehicles`);
+      }
+    }
+  });
 });

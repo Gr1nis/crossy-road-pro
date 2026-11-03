@@ -20,9 +20,11 @@ export { Biome, BIOME_INTERVAL, BIOME_ORDER, getBiomeForScore, type BiomeType };
 
 const VEHICLE_COLORS = [0xef4444, 0x3b82f6, 0xf59e0b, 0x10b981, 0xa855f7, 0xec4899];
 const OBSTACLE_KINDS: ObstacleKind[] = ['tree', 'rock', 'bush'];
+const DEFAULT_RIVER_LOG_COUNT = 5;
 
 export class LaneGenerator {
   private readonly baseSeed: number;
+  private readonly laneTypeCache = new Map<number, LaneTypeValue>();
 
   constructor(seed: number = 42) {
     this.baseSeed = seed >>> 0;
@@ -45,27 +47,77 @@ export class LaneGenerator {
 
   getDifficultyFactor(scoreOrIndex: number): number {
     const effective = Math.max(0, scoreOrIndex);
-    return 1 + Math.min(effective * 0.015, 1.8);
+    return 1 + Math.min(effective * 0.006, 0.9);
+  }
+
+  getLaneType(index: number): LaneTypeValue {
+    if (index <= 2) return LaneType.GRASS;
+    const cached = this.laneTypeCache.get(index);
+    if (cached) return cached;
+
+    // Populate deterministically in sequential order
+    for (let i = 3; i <= index; i++) {
+      if (this.laneTypeCache.has(i)) continue;
+      const prev1 = this.getLaneType(i - 1);
+      const prev2 = this.getLaneType(i - 2);
+      const prev3 = this.getLaneType(i - 3);
+      const prev4 = this.getLaneType(i - 4);
+
+      let type: LaneTypeValue;
+      if (prev1 === LaneType.ROAD && prev2 === LaneType.ROAD && prev3 === LaneType.ROAD) {
+        // Enforce safe rest strip after 3 consecutive roads
+        type = LaneType.GRASS;
+      } else if (prev1 === LaneType.RIVER && prev2 === LaneType.RIVER) {
+        // Enforce safe ground after 2 consecutive rivers
+        type = LaneType.GRASS;
+      } else if (
+        prev1 !== LaneType.GRASS &&
+        prev2 !== LaneType.GRASS &&
+        prev3 !== LaneType.GRASS &&
+        prev4 !== LaneType.GRASS
+      ) {
+        // Enforce pacing: no more than 4 consecutive hazard lanes
+        type = LaneType.GRASS;
+      } else {
+        const rng = this.rowPrng(i);
+        const roll = rng.next();
+        const canRailway = prev1 !== LaneType.RAILWAY && prev1 !== LaneType.RIVER;
+
+        if (canRailway) {
+          if (roll < 0.36) {
+            type = LaneType.GRASS;
+          } else if (roll < 0.68) {
+            type = LaneType.ROAD;
+          } else if (roll < 0.86) {
+            type = LaneType.RIVER;
+          } else {
+            type = LaneType.RAILWAY;
+          }
+        } else {
+          // Railway barred; redistribute remaining probability cleanly
+          if (roll < 0.42) {
+            type = LaneType.GRASS;
+          } else if (roll < 0.78) {
+            type = LaneType.ROAD;
+          } else {
+            type = LaneType.RIVER;
+          }
+        }
+      }
+      this.laneTypeCache.set(i, type);
+    }
+
+    return this.laneTypeCache.get(index) ?? LaneType.GRASS;
   }
 
   generateLane(index: number, score?: number): Lane {
     const rng = this.rowPrng(index);
     const effectiveScore = score !== undefined ? Math.max(0, score) : Math.max(0, index);
     const biome = getBiomeForScore(effectiveScore);
-    const tier = Math.floor(effectiveScore / BIOME_INTERVAL);
 
-    let type: LaneTypeValue = LaneType.GRASS;
+    const type = this.getLaneType(index);
     if (index > 2) {
-      const roll = rng.next();
-      if (roll < 0.36) {
-        type = LaneType.GRASS;
-      } else if (roll < 0.68) {
-        type = LaneType.ROAD;
-      } else if (roll < 0.88) {
-        type = LaneType.RIVER;
-      } else {
-        type = LaneType.RAILWAY;
-      }
+      rng.next(); // Align PRNG sequence for deterministic per-lane entity generation
     }
 
     const direction: 1 | -1 = index % 2 === 0 ? 1 : -1;
@@ -100,12 +152,11 @@ export class LaneGenerator {
       }
     } else if (type === LaneType.ROAD) {
       const isTruckLane = rng.next() < 0.32;
-      const densityTier = Math.min(4, tier);
       const baseCount = isTruckLane ? rng.nextInt(2, 3) : rng.nextInt(3, 4);
-      const bonusCount = isTruckLane ? densityTier : Math.round(densityTier * 1.5);
+      const densityBonus = Math.min(isTruckLane ? 2 : 3, Math.floor(effectiveScore / 35));
       const count = isTruckLane
-        ? Math.min(7, baseCount + bonusCount)
-        : Math.min(10, baseCount + bonusCount);
+        ? Math.min(5, baseCount + densityBonus)
+        : Math.min(7, baseCount + densityBonus);
       const vehicleLen = isTruckLane ? 2.3 : 1.35;
       const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
       const spacing = ringSpan / count;
@@ -125,11 +176,12 @@ export class LaneGenerator {
         });
       }
     } else if (type === LaneType.RIVER) {
-      const logCount = effectiveScore >= 75 ? 4 : 5;
+      const logCount = DEFAULT_RIVER_LOG_COUNT;
       const logLen = rng.nextFloat(2.8, 3.8);
       const ringSpan = WORLD_CONFIG.WRAP_LIMIT * 2;
       const spacing = ringSpan / logCount;
-      const riverSpeed = rng.nextFloat(1.3, 2.3) * (1 + Math.min(effectiveScore * 0.008, 0.8)) * direction;
+      const riverSpeed =
+        rng.nextFloat(1.2, 2.0) * (1 + Math.min(effectiveScore * 0.004, 0.45)) * direction;
 
       for (let i = 0; i < logCount; i++) {
         const offset = -WORLD_CONFIG.WRAP_LIMIT + (i + 0.5) * spacing + rng.nextFloat(-0.6, 0.6);
@@ -141,9 +193,9 @@ export class LaneGenerator {
         });
       }
     } else if (type === LaneType.RAILWAY) {
-      const trainSpeedFactor = 1 + Math.min(effectiveScore * 0.01, 1.0);
-      const periodScale = 1 + Math.min(effectiveScore * 0.008, 0.6);
-      const period = Math.max(3.0, rng.nextFloat(5.4, 7.2) / periodScale);
+      const trainSpeedFactor = 1 + Math.min(effectiveScore * 0.005, 0.6);
+      const periodScale = 1 + Math.min(effectiveScore * 0.004, 0.4);
+      const period = Math.max(3.5, rng.nextFloat(5.4, 7.2) / periodScale);
       const trainSpeed = 32.0 * trainSpeedFactor * direction;
       train = {
         timer: rng.nextFloat(0, period * 0.7),
