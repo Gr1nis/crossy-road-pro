@@ -48,7 +48,20 @@ def load_palette():
     return palette
 
 
-def load_skin_voxels(skin_id, palette):
+def load_calibrations():
+    urban_file = os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharacters.ts')
+    with open(urban_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    calibs = {}
+    for m in re.finditer(r'(\w+):\s*\{\s*scale:\s*([0-9.]+),\s*offsetY:\s*([0-9.-]+)\s*\}', content):
+        calibs[m.group(1)] = {
+            'scale': float(m.group(2)),
+            'offsetY': float(m.group(3))
+        }
+    return calibs
+
+
+def load_skin_voxels(skin_id, palette, calib=None):
     content = ""
     for path in SOURCE_FILES:
         if os.path.exists(path):
@@ -67,17 +80,20 @@ def load_skin_voxels(skin_id, palette):
         block
     )
 
+    sc = calib['scale'] if calib and 'scale' in calib else 1.0
+    oy = calib['offsetY'] if calib and 'offsetY' in calib else 0.0
+
     voxels = []
     for w, h, d, col_key, x, y, z in raw_calls:
         color_val = palette.get(col_key, 0xffffff)
         voxels.append((
-            float(w.strip()),
-            float(h.strip()),
-            float(d.strip()),
+            float(w.strip()) * sc,
+            float(h.strip()) * sc,
+            float(d.strip()) * sc,
             color_val,
-            float(x.strip()),
-            float(y.strip()),
-            float(z.strip())
+            float(x.strip()) * sc,
+            float(y.strip()) * sc + oy,
+            float(z.strip()) * sc
         ))
     return voxels
 
@@ -99,7 +115,7 @@ def cross(a, b):
     )
 
 
-def render_voxel_character(voxels, yaw_deg=45.0, pitch_deg=35.264, size=160, supersample=3):
+def render_voxel_character(voxels, yaw_deg=45.0, pitch_deg=35.264, size=160, supersample=3, fixed_scale=None):
     W = size * supersample
     H = size * supersample
 
@@ -179,14 +195,15 @@ def render_voxel_character(voxels, yaw_deg=45.0, pitch_deg=35.264, size=160, sup
     min_u, max_u = min(all_u), max(all_u)
     min_v, max_v = min(all_v), max(all_v)
 
-    span_u = max_u - min_u
-    span_v = max_v - min_v
     mid_u = (min_u + max_u) / 2
     mid_v = (min_v + max_v) / 2
 
-    # Fit into 84% of bounds for expressive character presentation in card frame
-    target_px = W * 0.84
-    scale = min(target_px / span_u, target_px / span_v)
+    # Proportional camera scale across all characters so heights match
+    if fixed_scale is not None:
+        scale = fixed_scale
+    else:
+        target_px = W * 0.82
+        scale = target_px / 0.96
 
     depth_buffer = [-1e9] * (W * H)
     color_buffer = [(0, 0, 0, 0)] * (W * H)
@@ -239,11 +256,13 @@ def render_voxel_character(voxels, yaw_deg=45.0, pitch_deg=35.264, size=160, sup
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     palette = load_palette()
+    calibrations = load_calibrations()
     base64_entries = {}
 
     for skin_id in SKIN_IDS:
-        voxels = load_skin_voxels(skin_id, palette)
-        print(f"Rendering {skin_id} ({len(voxels)} voxels)...")
+        calib = calibrations.get(skin_id, {'scale': 1.0, 'offsetY': 0.0})
+        voxels = load_skin_voxels(skin_id, palette, calib)
+        print(f"Rendering {skin_id} ({len(voxels)} voxels, calib scale {calib['scale']})...")
         img = render_voxel_character(voxels, yaw_deg=45.0, pitch_deg=35.264, size=160, supersample=3)
 
         out_path = os.path.join(OUT_DIR, f"char_{skin_id}.webp")

@@ -14,15 +14,15 @@ import { getModelDiagnostics } from '../src/view/modelRegistry.ts';
 describe('Urban Gang (Pack 1) Character Calibration & Pivot Architecture Suite', () => {
   const EXPECTED_CALIBRATIONS: Record<SkinId, UrbanCharacterCalibration> = {
     corgi: { scale: 1.0, offsetY: 0 },
-    pigeon_pizza: { scale: 0.96, offsetY: 0 },
-    barista_pug: { scale: 1.28, offsetY: 0 },
-    skater_ferret: { scale: 1.3, offsetY: 0 },
-    box_cat: { scale: 0.95, offsetY: 0 },
-    subway_rat: { scale: 1.35, offsetY: 0 },
+    pigeon_pizza: { scale: 1.05, offsetY: 0 },
+    barista_pug: { scale: 1.38, offsetY: 0 },
+    skater_ferret: { scale: 1.42, offsetY: 0 },
+    box_cat: { scale: 1.08, offsetY: 0 },
+    subway_rat: { scale: 1.48, offsetY: 0 },
     raccoon_bandit: { scale: 1.0, offsetY: 0 },
-    raincoat_duck: { scale: 1.25, offsetY: 0 },
+    raincoat_duck: { scale: 1.3, offsetY: 0 },
     capybara_zen: { scale: 1.0, offsetY: 0 },
-    pigeon_king: { scale: 1.1, offsetY: 0 },
+    pigeon_king: { scale: 1.14, offsetY: 0 },
   };
 
   it('Requirement 1 (Pivot Hierarchy & Calibration Values): all 10 characters have root -> innerPivot container', () => {
