@@ -1,0 +1,2202 @@
+[
+  {
+    "name": "chassis_rail_left",
+    "group": "chassis_wheels",
+    "from": [
+      -4.65,
+      2.45,
+      -17.45
+    ],
+    "to": [
+      -2.35,
+      3.95,
+      18.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "chassis_rail_right",
+    "group": "chassis_wheels",
+    "from": [
+      2.35,
+      2.45,
+      -17.45
+    ],
+    "to": [
+      4.65,
+      3.95,
+      18.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "chassis_cross_front",
+    "group": "chassis_wheels",
+    "from": [
+      -2.65,
+      2.65,
+      -12.45
+    ],
+    "to": [
+      2.65,
+      3.65,
+      -11.25
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "chassis_cross_mid",
+    "group": "chassis_wheels",
+    "from": [
+      -2.65,
+      2.65,
+      -1.45
+    ],
+    "to": [
+      2.65,
+      3.65,
+      -0.25
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "chassis_cross_rear",
+    "group": "chassis_wheels",
+    "from": [
+      -2.65,
+      2.65,
+      6.25
+    ],
+    "to": [
+      2.65,
+      3.65,
+      7.45
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "front_axle",
+    "group": "chassis_wheels",
+    "from": [
+      -6.85,
+      2.25,
+      -14.45
+    ],
+    "to": [
+      6.85,
+      3.45,
+      -13.25
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "rear_axle",
+    "group": "chassis_wheels",
+    "from": [
+      -6.85,
+      2.25,
+      9.25
+    ],
+    "to": [
+      6.85,
+      3.45,
+      10.45
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fl_tread_main",
+    "group": "chassis_wheels",
+    "from": [
+      -7.75,
+      0.0,
+      -15.85
+    ],
+    "to": [
+      -5.15,
+      4.65,
+      -11.85
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fl_tread_front",
+    "group": "chassis_wheels",
+    "from": [
+      -7.55,
+      0.85,
+      -16.75
+    ],
+    "to": [
+      -5.35,
+      4.05,
+      -15.75
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fl_tread_rear",
+    "group": "chassis_wheels",
+    "from": [
+      -7.55,
+      0.85,
+      -11.95
+    ],
+    "to": [
+      -5.35,
+      4.05,
+      -10.95
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fl_rim",
+    "group": "chassis_wheels",
+    "from": [
+      -7.95,
+      1.25,
+      -15.05
+    ],
+    "to": [
+      -7.65,
+      3.65,
+      -12.65
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fr_tread_main",
+    "group": "chassis_wheels",
+    "from": [
+      5.15,
+      0.0,
+      -15.85
+    ],
+    "to": [
+      7.75,
+      4.65,
+      -11.85
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fr_tread_front",
+    "group": "chassis_wheels",
+    "from": [
+      5.35,
+      0.85,
+      -16.75
+    ],
+    "to": [
+      7.55,
+      4.05,
+      -15.75
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fr_tread_rear",
+    "group": "chassis_wheels",
+    "from": [
+      5.35,
+      0.85,
+      -11.95
+    ],
+    "to": [
+      7.55,
+      4.05,
+      -10.95
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_fr_rim",
+    "group": "chassis_wheels",
+    "from": [
+      7.65,
+      1.25,
+      -15.05
+    ],
+    "to": [
+      7.95,
+      3.65,
+      -12.65
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rl_tread_main",
+    "group": "chassis_wheels",
+    "from": [
+      -7.95,
+      0.0,
+      7.85
+    ],
+    "to": [
+      -4.95,
+      4.65,
+      11.85
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rl_tread_front",
+    "group": "chassis_wheels",
+    "from": [
+      -7.75,
+      0.85,
+      6.95
+    ],
+    "to": [
+      -5.15,
+      4.05,
+      7.95
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rl_tread_rear",
+    "group": "chassis_wheels",
+    "from": [
+      -7.75,
+      0.85,
+      11.75
+    ],
+    "to": [
+      -5.15,
+      4.05,
+      12.75
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rl_rim",
+    "group": "chassis_wheels",
+    "from": [
+      -8.25,
+      1.25,
+      8.65
+    ],
+    "to": [
+      -7.85,
+      3.65,
+      11.05
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rr_tread_main",
+    "group": "chassis_wheels",
+    "from": [
+      4.95,
+      0.0,
+      7.85
+    ],
+    "to": [
+      7.95,
+      4.65,
+      11.85
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rr_tread_front",
+    "group": "chassis_wheels",
+    "from": [
+      5.15,
+      0.85,
+      6.95
+    ],
+    "to": [
+      7.75,
+      4.05,
+      7.95
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rr_tread_rear",
+    "group": "chassis_wheels",
+    "from": [
+      5.15,
+      0.85,
+      11.75
+    ],
+    "to": [
+      7.75,
+      4.05,
+      12.75
+    ],
+    "color": "tireBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "wheel_rr_rim",
+    "group": "chassis_wheels",
+    "from": [
+      7.85,
+      1.25,
+      8.65
+    ],
+    "to": [
+      8.25,
+      3.65,
+      11.05
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "fuel_tank_left",
+    "group": "chassis_wheels",
+    "from": [
+      -7.85,
+      2.05,
+      -7.25
+    ],
+    "to": [
+      -4.75,
+      3.75,
+      4.25
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "battery_box_right",
+    "group": "chassis_wheels",
+    "from": [
+      4.75,
+      2.05,
+      -6.85
+    ],
+    "to": [
+      7.85,
+      3.75,
+      -1.25
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "toolbox_right",
+    "group": "chassis_wheels",
+    "from": [
+      4.75,
+      2.05,
+      0.25
+    ],
+    "to": [
+      7.85,
+      3.75,
+      4.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "mudflap_rear_l",
+    "group": "chassis_wheels",
+    "from": [
+      -8.05,
+      1.15,
+      12.85
+    ],
+    "to": [
+      -4.85,
+      3.95,
+      13.45
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "mudflap_rear_r",
+    "group": "chassis_wheels",
+    "from": [
+      4.85,
+      1.15,
+      12.85
+    ],
+    "to": [
+      8.05,
+      3.95,
+      13.45
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "cab_floor",
+    "group": "cab_lower",
+    "from": [
+      -7.15,
+      3.75,
+      -17.85
+    ],
+    "to": [
+      7.15,
+      4.75,
+      -9.05
+    ],
+    "color": "truckGreenDark",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "fender_fl",
+    "group": "cab_lower",
+    "from": [
+      -7.55,
+      4.45,
+      -16.45
+    ],
+    "to": [
+      -4.95,
+      7.45,
+      -13.45
+    ],
+    "color": "truckGreenDark",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "fender_fr",
+    "group": "cab_lower",
+    "from": [
+      4.95,
+      4.45,
+      -16.45
+    ],
+    "to": [
+      7.55,
+      7.45,
+      -13.45
+    ],
+    "color": "truckGreenDark",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "cab_side_step_l",
+    "group": "cab_lower",
+    "from": [
+      -7.85,
+      2.35,
+      -11.55
+    ],
+    "to": [
+      -6.85,
+      3.25,
+      -9.65
+    ],
+    "color": "bumperSilver",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "cab_side_step_r",
+    "group": "cab_lower",
+    "from": [
+      6.85,
+      2.35,
+      -11.55
+    ],
+    "to": [
+      7.85,
+      3.25,
+      -9.65
+    ],
+    "color": "bumperSilver",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "door_cab_l",
+    "group": "cab_lower",
+    "from": [
+      -7.35,
+      4.55,
+      -13.55
+    ],
+    "to": [
+      -5.25,
+      7.85,
+      -9.15
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "door_cab_r",
+    "group": "cab_lower",
+    "from": [
+      5.25,
+      4.55,
+      -13.55
+    ],
+    "to": [
+      7.35,
+      7.85,
+      -9.15
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "door_handle_l",
+    "group": "cab_lower",
+    "from": [
+      -7.55,
+      6.85,
+      -10.45
+    ],
+    "to": [
+      -7.25,
+      7.45,
+      -9.65
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "door_handle_r",
+    "group": "cab_lower",
+    "from": [
+      7.25,
+      6.85,
+      -10.45
+    ],
+    "to": [
+      7.55,
+      7.45,
+      -9.65
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "hood_cab_slab",
+    "group": "cab_lower",
+    "from": [
+      -5.05,
+      4.65,
+      -18.25
+    ],
+    "to": [
+      5.05,
+      7.85,
+      -14.65
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hood_center_cowl",
+    "group": "cab_lower",
+    "from": [
+      -3.25,
+      7.55,
+      -17.85
+    ],
+    "to": [
+      3.25,
+      8.25,
+      -14.85
+    ],
+    "color": "truckGreenDark",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "front_bumper_beam",
+    "group": "cab_lower",
+    "from": [
+      -7.75,
+      2.35,
+      -19.45
+    ],
+    "to": [
+      7.75,
+      4.45,
+      -18.15
+    ],
+    "color": "bumperSilver",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "front_bumper_skid",
+    "group": "cab_lower",
+    "from": [
+      -5.25,
+      1.85,
+      -19.25
+    ],
+    "to": [
+      5.25,
+      2.45,
+      -18.05
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "front_bumper_guard_l",
+    "group": "cab_lower",
+    "from": [
+      -7.85,
+      2.15,
+      -19.65
+    ],
+    "to": [
+      -5.45,
+      4.65,
+      -18.65
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "front_bumper_guard_r",
+    "group": "cab_lower",
+    "from": [
+      5.45,
+      2.15,
+      -19.65
+    ],
+    "to": [
+      7.85,
+      4.65,
+      -18.65
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "license_plate_front_blue",
+    "group": "cab_lower",
+    "from": [
+      -2.55,
+      2.65,
+      -19.75
+    ],
+    "to": [
+      2.55,
+      3.95,
+      -19.15
+    ],
+    "color": "plateBlue",
+    "col_idx": 14,
+    "uv": [
+      14,
+      0,
+      15,
+      1
+    ]
+  },
+  {
+    "name": "license_plate_front_text",
+    "group": "cab_lower",
+    "from": [
+      -1.95,
+      2.85,
+      -19.95
+    ],
+    "to": [
+      1.95,
+      3.75,
+      -19.65
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "front_grille_mesh",
+    "group": "cab_lower",
+    "from": [
+      -3.85,
+      4.35,
+      -18.85
+    ],
+    "to": [
+      3.85,
+      6.95,
+      -17.95
+    ],
+    "color": "grilleMesh",
+    "col_idx": 15,
+    "uv": [
+      15,
+      0,
+      16,
+      1
+    ]
+  },
+  {
+    "name": "front_grille_slats",
+    "group": "cab_lower",
+    "from": [
+      -3.45,
+      4.65,
+      -19.05
+    ],
+    "to": [
+      3.45,
+      6.65,
+      -18.45
+    ],
+    "color": "bumperSilver",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "headlight_l",
+    "group": "cab_lower",
+    "from": [
+      -6.45,
+      4.75,
+      -18.75
+    ],
+    "to": [
+      -4.15,
+      6.55,
+      -17.95
+    ],
+    "color": "headlightIce",
+    "col_idx": 11,
+    "uv": [
+      11,
+      0,
+      12,
+      1
+    ]
+  },
+  {
+    "name": "headlight_r",
+    "group": "cab_lower",
+    "from": [
+      4.15,
+      4.75,
+      -18.75
+    ],
+    "to": [
+      6.45,
+      6.55,
+      -17.95
+    ],
+    "color": "headlightIce",
+    "col_idx": 11,
+    "uv": [
+      11,
+      0,
+      12,
+      1
+    ]
+  },
+  {
+    "name": "windshield_cab",
+    "group": "cab_upper_glass",
+    "from": [
+      -4.95,
+      7.65,
+      -15.15
+    ],
+    "to": [
+      4.95,
+      12.85,
+      -13.25
+    ],
+    "color": "glassSky",
+    "col_idx": 10,
+    "uv": [
+      10,
+      0,
+      11,
+      1
+    ]
+  },
+  {
+    "name": "side_window_l",
+    "group": "cab_upper_glass",
+    "from": [
+      -6.85,
+      7.75,
+      -13.45
+    ],
+    "to": [
+      -5.05,
+      12.75,
+      -9.25
+    ],
+    "color": "glassSky",
+    "col_idx": 10,
+    "uv": [
+      10,
+      0,
+      11,
+      1
+    ]
+  },
+  {
+    "name": "side_window_r",
+    "group": "cab_upper_glass",
+    "from": [
+      5.05,
+      7.75,
+      -13.45
+    ],
+    "to": [
+      6.85,
+      12.75,
+      -9.25
+    ],
+    "color": "glassSky",
+    "col_idx": 10,
+    "uv": [
+      10,
+      0,
+      11,
+      1
+    ]
+  },
+  {
+    "name": "pillar_a_l",
+    "group": "cab_upper_glass",
+    "from": [
+      -7.15,
+      7.55,
+      -15.35
+    ],
+    "to": [
+      -4.85,
+      12.95,
+      -13.15
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "pillar_a_r",
+    "group": "cab_upper_glass",
+    "from": [
+      4.85,
+      7.55,
+      -15.35
+    ],
+    "to": [
+      7.15,
+      12.95,
+      -13.15
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "pillar_b_l",
+    "group": "cab_upper_glass",
+    "from": [
+      -7.15,
+      7.55,
+      -9.75
+    ],
+    "to": [
+      -4.85,
+      12.95,
+      -9.05
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "pillar_b_r",
+    "group": "cab_upper_glass",
+    "from": [
+      4.85,
+      7.55,
+      -9.75
+    ],
+    "to": [
+      7.15,
+      12.95,
+      -9.05
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "cab_roof_slab",
+    "group": "cab_upper_glass",
+    "from": [
+      -7.25,
+      12.65,
+      -14.85
+    ],
+    "to": [
+      7.25,
+      13.95,
+      -9.15
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "cab_roof_brow",
+    "group": "cab_upper_glass",
+    "from": [
+      -7.05,
+      12.75,
+      -15.45
+    ],
+    "to": [
+      7.05,
+      13.75,
+      -14.65
+    ],
+    "color": "truckGreenDark",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "marker_light_l",
+    "group": "cab_upper_glass",
+    "from": [
+      -4.25,
+      13.85,
+      -15.15
+    ],
+    "to": [
+      -2.65,
+      14.35,
+      -14.25
+    ],
+    "color": "turnSignalAmber",
+    "col_idx": 12,
+    "uv": [
+      12,
+      0,
+      13,
+      1
+    ]
+  },
+  {
+    "name": "marker_light_c",
+    "group": "cab_upper_glass",
+    "from": [
+      -0.85,
+      13.85,
+      -15.15
+    ],
+    "to": [
+      0.85,
+      14.35,
+      -14.25
+    ],
+    "color": "turnSignalAmber",
+    "col_idx": 12,
+    "uv": [
+      12,
+      0,
+      13,
+      1
+    ]
+  },
+  {
+    "name": "marker_light_r",
+    "group": "cab_upper_glass",
+    "from": [
+      2.65,
+      13.85,
+      -15.15
+    ],
+    "to": [
+      4.25,
+      14.35,
+      -14.25
+    ],
+    "color": "turnSignalAmber",
+    "col_idx": 12,
+    "uv": [
+      12,
+      0,
+      13,
+      1
+    ]
+  },
+  {
+    "name": "aero_deflector_base",
+    "group": "cab_upper_glass",
+    "from": [
+      -6.85,
+      13.85,
+      -12.85
+    ],
+    "to": [
+      6.85,
+      16.45,
+      -9.05
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "aero_deflector_top",
+    "group": "cab_upper_glass",
+    "from": [
+      -6.45,
+      16.35,
+      -11.25
+    ],
+    "to": [
+      6.45,
+      19.85,
+      -8.95
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "mirror_bracket_l",
+    "group": "cab_upper_glass",
+    "from": [
+      -8.35,
+      8.85,
+      -14.15
+    ],
+    "to": [
+      -7.05,
+      9.65,
+      -13.25
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "mirror_body_l",
+    "group": "cab_upper_glass",
+    "from": [
+      -8.45,
+      8.25,
+      -14.35
+    ],
+    "to": [
+      -7.45,
+      11.85,
+      -12.95
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "mirror_glass_l",
+    "group": "cab_upper_glass",
+    "from": [
+      -8.35,
+      8.45,
+      -13.05
+    ],
+    "to": [
+      -7.55,
+      11.65,
+      -12.75
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "mirror_bracket_r",
+    "group": "cab_upper_glass",
+    "from": [
+      7.05,
+      8.85,
+      -14.15
+    ],
+    "to": [
+      8.35,
+      9.65,
+      -13.25
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "mirror_body_r",
+    "group": "cab_upper_glass",
+    "from": [
+      7.45,
+      8.25,
+      -14.35
+    ],
+    "to": [
+      8.45,
+      11.85,
+      -12.95
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "mirror_glass_r",
+    "group": "cab_upper_glass",
+    "from": [
+      7.55,
+      8.45,
+      -13.05
+    ],
+    "to": [
+      8.35,
+      11.65,
+      -12.75
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "box_main_body",
+    "group": "cargo_box",
+    "from": [
+      -8.15,
+      3.85,
+      -9.35
+    ],
+    "to": [
+      8.15,
+      21.65,
+      18.25
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "box_roof_cap",
+    "group": "cargo_box",
+    "from": [
+      -8.05,
+      21.55,
+      -9.15
+    ],
+    "to": [
+      8.05,
+      21.95,
+      18.15
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "rub_rail_bottom_l",
+    "group": "cargo_box",
+    "from": [
+      -8.35,
+      4.45,
+      -8.95
+    ],
+    "to": [
+      -8.05,
+      5.45,
+      17.95
+    ],
+    "color": "bumperSilver",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "rub_rail_bottom_r",
+    "group": "cargo_box",
+    "from": [
+      8.05,
+      4.45,
+      -8.95
+    ],
+    "to": [
+      8.35,
+      5.45,
+      17.95
+    ],
+    "color": "bumperSilver",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "rub_rail_top_l",
+    "group": "cargo_box",
+    "from": [
+      -8.35,
+      21.15,
+      -9.05
+    ],
+    "to": [
+      -7.85,
+      21.85,
+      18.05
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "rub_rail_top_r",
+    "group": "cargo_box",
+    "from": [
+      7.85,
+      21.15,
+      -9.05
+    ],
+    "to": [
+      8.35,
+      21.85,
+      18.05
+    ],
+    "color": "bumperGuard",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "brand_stripe_l",
+    "group": "cargo_box",
+    "from": [
+      -8.25,
+      12.25,
+      -7.45
+    ],
+    "to": [
+      -8.05,
+      13.85,
+      16.85
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "brand_stripe_r",
+    "group": "cargo_box",
+    "from": [
+      8.05,
+      12.25,
+      -7.45
+    ],
+    "to": [
+      8.25,
+      13.85,
+      16.85
+    ],
+    "color": "truckGreen",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "door_panel_l",
+    "group": "cargo_box",
+    "from": [
+      -7.75,
+      4.55,
+      18.15
+    ],
+    "to": [
+      -0.15,
+      20.85,
+      18.65
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "door_panel_r",
+    "group": "cargo_box",
+    "from": [
+      0.15,
+      4.55,
+      18.15
+    ],
+    "to": [
+      7.75,
+      20.85,
+      18.65
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "door_center_gasket",
+    "group": "cargo_box",
+    "from": [
+      -0.25,
+      4.45,
+      18.55
+    ],
+    "to": [
+      0.25,
+      21.05,
+      18.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "door_rod_l",
+    "group": "cargo_box",
+    "from": [
+      -4.45,
+      4.85,
+      18.55
+    ],
+    "to": [
+      -3.85,
+      20.65,
+      19.05
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "door_rod_r",
+    "group": "cargo_box",
+    "from": [
+      3.85,
+      4.85,
+      18.55
+    ],
+    "to": [
+      4.45,
+      20.65,
+      19.05
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "door_handle_cam_l",
+    "group": "cargo_box",
+    "from": [
+      -4.65,
+      10.25,
+      18.95
+    ],
+    "to": [
+      -3.25,
+      11.25,
+      19.35
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "door_handle_cam_r",
+    "group": "cargo_box",
+    "from": [
+      3.25,
+      10.25,
+      18.95
+    ],
+    "to": [
+      4.65,
+      11.25,
+      19.35
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "door_hinge_top_l",
+    "group": "cargo_box",
+    "from": [
+      -8.05,
+      18.45,
+      18.35
+    ],
+    "to": [
+      -7.45,
+      19.45,
+      18.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "door_hinge_bot_l",
+    "group": "cargo_box",
+    "from": [
+      -8.05,
+      6.25,
+      18.35
+    ],
+    "to": [
+      -7.45,
+      7.25,
+      18.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "door_hinge_top_r",
+    "group": "cargo_box",
+    "from": [
+      7.45,
+      18.45,
+      18.35
+    ],
+    "to": [
+      8.05,
+      19.45,
+      18.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "door_hinge_bot_r",
+    "group": "cargo_box",
+    "from": [
+      7.45,
+      6.25,
+      18.35
+    ],
+    "to": [
+      8.05,
+      7.25,
+      18.85
+    ],
+    "color": "trimBlack",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "rear_underrun_bar",
+    "group": "rear_bumper_lights",
+    "from": [
+      -7.65,
+      2.25,
+      18.65
+    ],
+    "to": [
+      7.65,
+      3.45,
+      19.65
+    ],
+    "color": "bumperSilver",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "rear_plate_blue",
+    "group": "rear_bumper_lights",
+    "from": [
+      -2.55,
+      2.45,
+      19.55
+    ],
+    "to": [
+      2.55,
+      3.65,
+      19.85
+    ],
+    "color": "plateBlue",
+    "col_idx": 14,
+    "uv": [
+      14,
+      0,
+      15,
+      1
+    ]
+  },
+  {
+    "name": "rear_plate_text",
+    "group": "rear_bumper_lights",
+    "from": [
+      -1.95,
+      2.65,
+      19.75
+    ],
+    "to": [
+      1.95,
+      3.45,
+      20.05
+    ],
+    "color": "cargoWhite",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "taillight_truck_l",
+    "group": "rear_bumper_lights",
+    "from": [
+      -7.25,
+      2.35,
+      19.55
+    ],
+    "to": [
+      -4.85,
+      3.35,
+      19.85
+    ],
+    "color": "taillightRed",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "taillight_truck_r",
+    "group": "rear_bumper_lights",
+    "from": [
+      4.85,
+      2.35,
+      19.55
+    ],
+    "to": [
+      7.25,
+      3.35,
+      19.85
+    ],
+    "color": "taillightRed",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "marker_upper_rear_l",
+    "group": "rear_bumper_lights",
+    "from": [
+      -7.65,
+      21.25,
+      18.35
+    ],
+    "to": [
+      -6.45,
+      21.85,
+      18.85
+    ],
+    "color": "taillightRed",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "marker_upper_rear_r",
+    "group": "rear_bumper_lights",
+    "from": [
+      6.45,
+      21.25,
+      18.35
+    ],
+    "to": [
+      7.65,
+      21.85,
+      18.85
+    ],
+    "color": "taillightRed",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "side_reflector_fl",
+    "group": "rear_bumper_lights",
+    "from": [
+      -8.25,
+      5.85,
+      -6.85
+    ],
+    "to": [
+      -8.05,
+      6.65,
+      -5.65
+    ],
+    "color": "turnSignalAmber",
+    "col_idx": 12,
+    "uv": [
+      12,
+      0,
+      13,
+      1
+    ]
+  },
+  {
+    "name": "side_reflector_fr",
+    "group": "rear_bumper_lights",
+    "from": [
+      8.05,
+      5.85,
+      -6.85
+    ],
+    "to": [
+      8.25,
+      6.65,
+      -5.65
+    ],
+    "color": "turnSignalAmber",
+    "col_idx": 12,
+    "uv": [
+      12,
+      0,
+      13,
+      1
+    ]
+  },
+  {
+    "name": "side_reflector_rl",
+    "group": "rear_bumper_lights",
+    "from": [
+      -8.25,
+      5.85,
+      15.25
+    ],
+    "to": [
+      -8.05,
+      6.65,
+      16.45
+    ],
+    "color": "taillightRed",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "side_reflector_rr",
+    "group": "rear_bumper_lights",
+    "from": [
+      8.05,
+      5.85,
+      15.25
+    ],
+    "to": [
+      8.25,
+      6.65,
+      16.45
+    ],
+    "color": "taillightRed",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "exhaust_pipe_truck",
+    "group": "rear_bumper_lights",
+    "from": [
+      4.05,
+      1.85,
+      -10.45
+    ],
+    "to": [
+      4.75,
+      2.65,
+      -7.85
+    ],
+    "color": "rimSilver",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  }
+]
