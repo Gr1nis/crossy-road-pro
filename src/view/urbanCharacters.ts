@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createVoxelMesh, VoxelPalette, type VoxelColorKey } from './voxelPalette.ts';
 import { createUrbanCharacterExpA } from './urbanCharactersExpansionA.ts';
 import { createUrbanCharacterExpB } from './urbanCharactersExpansionB.ts';
+import { CHRISTMAS_CHARACTER_CALIBRATIONS, createChristmasCharacter } from './christmasCharacters.ts';
 
 function addCharVoxel(
   group: THREE.Group, w: number, h: number, d: number,
@@ -27,6 +28,7 @@ export const URBAN_CHARACTER_CALIBRATIONS: Record<string, UrbanCharacterCalibrat
   raincoat_duck: { scale: 1.30, offsetY: 0 },
   capybara_zen: { scale: 1.00, offsetY: 0 },
   pigeon_king: { scale: 1.14, offsetY: 0 },
+  ...CHRISTMAS_CHARACTER_CALIBRATIONS,
 };
 
 export function createUrbanCharacter(skinId: string = 'corgi', isGhost = false): THREE.Group {
@@ -259,6 +261,8 @@ export function createUrbanCharacter(skinId: string = 'corgi', isGhost = false):
     createUrbanCharacterExpA(skinId, isGhost, innerPivot);
   } else if (skinId === 'capybara_zen' || skinId === 'raincoat_duck' || skinId === 'pigeon_king') {
     createUrbanCharacterExpB(skinId, isGhost, innerPivot);
+  } else if (skinId in CHRISTMAS_CHARACTER_CALIBRATIONS) {
+    return createChristmasCharacter(skinId, isGhost);
   } else {
     // Fallback to Corgi mascot
     return createUrbanCharacter('corgi', isGhost);

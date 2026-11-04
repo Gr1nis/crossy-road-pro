@@ -23,9 +23,19 @@ describe('Urban Gang (Pack 1) Character Calibration & Pivot Architecture Suite',
     raincoat_duck: { scale: 1.3, offsetY: 0 },
     capybara_zen: { scale: 1.0, offsetY: 0 },
     pigeon_king: { scale: 1.14, offsetY: 0 },
+    penguin_cocoa: { scale: 1.35, offsetY: 0 },
+    snow_hare: { scale: 1.10, offsetY: 0 },
+    husky_sweater: { scale: 1.00, offsetY: 0 },
+    derpy_snowman: { scale: 1.22, offsetY: 0 },
+    arctic_fox: { scale: 1.20, offsetY: 0 },
+    holiday_elf: { scale: 1.28, offsetY: 0 },
+    holiday_owl: { scale: 1.35, offsetY: 0 },
+    gingerbread_man: { scale: 1.35, offsetY: 0 },
+    reindeer_glow: { scale: 1.20, offsetY: 0 },
+    santa_claus: { scale: 1.35, offsetY: 0 },
   };
 
-  it('Requirement 1 (Pivot Hierarchy & Calibration Values): all 10 characters have root -> innerPivot container', () => {
+  it('Requirement 1 (Pivot Hierarchy & Calibration Values): all 20 characters have root -> innerPivot container', () => {
     for (const skin of ALL_SKINS) {
       const skinId = skin.id;
       const expected = EXPECTED_CALIBRATIONS[skinId];

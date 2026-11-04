@@ -209,23 +209,19 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;
-const MoveDirection = {
+}         ;const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;
-const DeathReason = {
+}         ;const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;
-const DEFAULT_SKIN_ID         = 'corgi';
-const ALL_SKINS                                                             = [
+}         ;const DEFAULT_SKIN_ID         = 'corgi';const ALL_SKINS                                                             = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
   { id: 'barista_pug', name: 'Бариста-Мопс', badge: '☕' },
@@ -236,26 +232,31 @@ const ALL_SKINS                                                             = [
   { id: 'raincoat_duck', name: 'Утка в дождевике', badge: '🦆' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
   { id: 'pigeon_king', name: 'Голубиный Барон', badge: '👑' },
-];
-const Biome = {
+  { id: 'penguin_cocoa', name: 'Пингвинёнок с какао', badge: '🐧' },
+  { id: 'snow_hare', name: 'Снежный заяц с морковкой', badge: '🐰' },
+  { id: 'husky_sweater', name: 'Хаски в свитере', badge: '🐕' },
+  { id: 'derpy_snowman', name: 'Снеговик с шарфом', badge: '⛄' },
+  { id: 'arctic_fox', name: 'Песец в наушниках', badge: '🦊' },
+  { id: 'holiday_elf', name: 'Эльф-помощник', badge: '🧝' },
+  { id: 'holiday_owl', name: 'Полярная сова с шишкой', badge: '🦉' },
+  { id: 'gingerbread_man', name: 'Пряничный человечек', badge: '🍪' },
+  { id: 'reindeer_glow', name: 'Олень Рудольф', badge: '🦌' },
+  { id: 'santa_claus', name: 'Дедушка Санта', badge: '🎅' },
+];const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
   DESERT: 'desert',
   NEON: 'neon',
-}         ;
-const BIOME_ORDER                           = [
+}         ;const BIOME_ORDER                           = [
   Biome.FOREST,
   Biome.WINTER,
   Biome.DESERT,
   Biome.NEON,
-];
-const BIOME_INTERVAL = 25;
-function getBiomeForScore(score        )            {
+];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
   const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
   const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
   return BIOME_ORDER[biomeIndex];
-}
-const WORLD_CONFIG = {
+}const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -285,8 +286,7 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}
-function findSupportingLog(playerX        , logs               )                     {
+}function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -299,19 +299,16 @@ function findSupportingLog(playerX        , logs               )                
 /**
  * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
  * relative to the center of the log, so the character cleanly magnets to a log section.
- */
-function snapToLogSlot(landingX        , log             )         {
+ */function snapToLogSlot(landingX        , log             )         {
   const rel = landingX - log.x;
   // Discrete 1.0-spaced slots centered on log
   const snappedRel = Math.round(rel);
   const maxRel = Math.max(0, (log.length - 1.0) / 2);
   const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
   return log.x + clampedRel;
-}
-function isOutOfBoundsX(playerX        )          {
+}function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}
-function quantizeLandX(x        )         {
+}function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -319,15 +316,11 @@ function quantizeLandX(x        )         {
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */
-function worldToScreenX(x        )         {
+ */function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
-}
-function vehicleScreenRotationY(speed        )         {
+}function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
-}
-const RECORD_FLAG_X = 3.8;
-function getRecordFlagPosition(
+}const RECORD_FLAG_X = 3.8;function getRecordFlagPosition(
   highScore        ,
   shoulderX         = RECORD_FLAG_X
 )                            {
@@ -338,16 +331,14 @@ function getRecordFlagPosition(
     x: shoulderX,
     row: Math.floor(highScore),
   };
-}
-const CAMERA_CONFIG = {
+}const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
   DESKTOP_VIEW_HEIGHT: 12.5,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
   FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
-}         ;
-function getCameraFrustumDimensions(aspect         = 9 / 16)   
+}         ;function getCameraFrustumDimensions(aspect         = 9 / 16)   
                      
                     
                  
@@ -369,8 +360,7 @@ function getCameraFrustumDimensions(aspect         = 9 / 16)
  * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
  * of the player character under the isometric orthographic camera.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
- */
-function getCameraFrustumNdcY(
+ */function getCameraFrustumNdcY(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -393,8 +383,7 @@ function getCameraFrustumNdcY(
 /**
  * Returns true when the player touches or crosses below the visible
  * bottom edge of the screen (NDC Y < -0.98).
- */
-function isPlayerBehindCameraFrustum(
+ */function isPlayerBehindCameraFrustum(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -500,8 +489,38 @@ const VOXEL_PALETTE = {
   featherPureWhite: 0xffffff,
   mantleRed: 0x991b1b,
   royalRuby: 0xdc2626,
-}         ;
-class VoxelPalette {
+
+  // Christmas Wonders Pack (10 Holiday Characters)
+  amberGold: 0xf59e0b, antlerBone: 0xe7e5e4, bellGold: 0xfacc15, bellyWhite: 0xf8fafc,
+  beltBlack: 0x0f172a, bibCream: 0xfef3c7, blushPink: 0xfb7185, bootBlack: 0x1c1917,
+  brightAmber: 0xfbbf24, bucketBlue: 0x1d4ed8, buckleGold: 0xfacc15, candyRed: 0xdc2626,
+  carrotOrange: 0xf97316, carrotOrangeBright: 0xfb923c, carrotOrangeDark: 0xea580c,
+  cheekPink: 0xfb7185, coalBlack: 0x18181b, cocoaBrown: 0x451a03, collarRed: 0xdc2626,
+  coneWoodDark: 0x78350f, coneWoodWarm: 0x92400e, doughCrust: 0xb45309, doughWarm: 0xd97706,
+  earPink: 0xf472b6, earPinkLight: 0xfbcfe8, elfBelt: 0x18181b, elfCheek: 0xfca5a5,
+  elfEye: 0x0f172a, elfGold: 0xfacc15, elfGreen: 0x15803d, elfGreenDark: 0x166534,
+  elfHair: 0xb45309, elfRed: 0xdc2626, elfSkin: 0xfed7aa, elfWhite: 0xffffff,
+  foxEye: 0x1e293b, foxNose: 0x0f172a, foxSilver: 0xcbd5e1, foxSilverWhite: 0xf1f5f9,
+  foxWhite: 0xffffff, furWhite: 0xffffff, furWhiteSoft: 0xf1f5f9, giftCyan: 0x0284c7,
+  goldAccent: 0xfbbf24, graphiteBeak: 0x334155, gumdropGreen: 0x10b981, gumdropRuby: 0xef4444,
+  gumdropYellow: 0xf59e0b, hareCream: 0xfef3c7, hareWhite: 0xf8fafc, hareWhiteSoft: 0xe2e8f0,
+  hoofDark: 0x1c1917, huskyBlue: 0x38bdf8, huskyDark: 0x1e293b, huskyGray: 0x475569,
+  huskyWhite: 0xf8fafc, icingWhite: 0xffffff, innerEarPink: 0xfbcfe8, leafGreen: 0x22c55e, leafGreenDark: 0x15803d,
+  leafGreenBright: 0x4ade80, lightCyan: 0x38bdf8, lightEmerald: 0x10b981, lightRuby: 0xf43f5e,
+  marshmallowCream: 0xfef08a, marshmallowWhite: 0xffffff, metalSilver: 0x94a3b8, mittenGreen: 0x15803d,
+  muffEmerald: 0x059669, muffGold: 0xfacc15, mugRim: 0x14b8a6, mugTeal: 0x0d9488,
+  noseBlack: 0x09090b, noseRubyGlow: 0xef4444, owlSnowPure: 0xffffff, owlSpeckleDark: 0x94a3b8,
+  owlSpeckleLight: 0xcbd5e1, owlWhite: 0xf8fafc, peachSkin: 0xfed7aa, penguinBlack: 0x0f172a,
+  penguinOrange: 0xf97316, penguinOrangeLight: 0xfb923c, penguinWhite: 0xf8fafc, pineGreen: 0x15803d,
+  pureWhite: 0xffffff, reindeerCaramel: 0xb45309, reindeerDark: 0x78350f, rosyCheek: 0xf87171,
+  sackDark: 0x14532d, sackEmerald: 0x166534, santaRed: 0xdc2626, santaRedDark: 0xb91c1c,
+  scarfDarkRed: 0x991b1b, scarfGoldTassel: 0xfacc15, scarfRed: 0xdc2626, scarfWhite: 0xf8fafc,
+  scarfWhiteStripe: 0xffffff, silverFrost: 0xe2e8f0, snowBody: 0xe2e8f0, snowWhite: 0xffffff,
+  steamWhite: 0xe2e8f0, sweaterRed: 0xdc2626, sweaterWhite: 0xffffff, tonguePink: 0xf472b6,
+  woodBrown: 0x78350f, gingerbreadBrown: 0xb45309, firGreen: 0x15803d, goldBell: 0xfacc15,
+  boneIvory: 0xe7e5e4, foxEarmuffCyan: 0x059669, rubyGlow: 0xef4444,
+
+}         ;class VoxelPalette {
          static          geoCache = new Map                           ();
          static          matCache = new Map                                   ();
          static          basicMatCache = new Map                                 ();
@@ -603,21 +622,18 @@ for (const [w, h, d] of voxelStandardSizes) {
 for (const key of Object.keys(VOXEL_PALETTE)                   ) {
   VoxelPalette.getMaterial(key, false);
 }
-VoxelPalette.getGhostMaterial();
-function createVoxelMaterial(
+VoxelPalette.getGhostMaterial();function createVoxelMaterial(
   colorKey                        ,
   isGhost = false
 )                            {
   return VoxelPalette.getMaterial(colorKey, isGhost);
-}
-function createVoxelBasicMaterial(
+}function createVoxelBasicMaterial(
   color        ,
   transparent = false,
   opacity = 1.0
 )                          {
   return VoxelPalette.getBasicMaterial(color, transparent, opacity);
-}
-function createVoxelMesh(
+}function createVoxelMesh(
   w        ,
   h        ,
   d        ,
@@ -650,8 +666,7 @@ function addExpAVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}
-function createUrbanCharacterExpA(
+}function createUrbanCharacterExpA(
   skinId        ,
   isGhost = false,
   targetGroup              
@@ -842,8 +857,7 @@ function addExpBVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}
-function createUrbanCharacterExpB(
+}function createUrbanCharacterExpB(
   skinId        ,
   isGhost = false,
   targetGroup              
@@ -1028,6 +1042,428 @@ function createUrbanCharacterExpB(
   return group;
 }
 
+// --- Module: src/view/christmasCharactersExpansion.ts ---
+function addXmasExpVoxel(
+  group             ,
+  w        ,
+  h        ,
+  d        ,
+  color                        ,
+  x        ,
+  y        ,
+  z        ,
+  isGhost         
+)       {
+  const mat = VoxelPalette.getMaterial(color, isGhost);
+  group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
+}function createChristmasCharacterExp(
+  skinId        ,
+  isGhost = false,
+  targetGroup              
+)              {
+  const group = targetGroup ?? new THREE.Group();
+  if (skinId === 'holiday_elf') {
+    // 67 voxels: holiday_elf
+    addXmasExpVoxel(group, 0.050, 0.035, 0.120, 'elfGreen', -0.065, 0.018, 0.030, isGhost); addXmasExpVoxel(group, 0.030, 0.035, 0.040, 'elfGreen', -0.065, 0.025, 0.105, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.028, 0.025, 'elfGreen', -0.065, 0.046, 0.130, isGhost); addXmasExpVoxel(group, 0.015, 0.020, 0.020, 'elfGold', -0.065, 0.062, 0.147, isGhost);
+    addXmasExpVoxel(group, 0.050, 0.035, 0.120, 'elfGreen', 0.065, 0.018, 0.030, isGhost); addXmasExpVoxel(group, 0.030, 0.035, 0.040, 'elfGreen', 0.065, 0.025, 0.105, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.028, 0.025, 'elfGreen', 0.065, 0.046, 0.130, isGhost); addXmasExpVoxel(group, 0.015, 0.020, 0.020, 'elfGold', 0.065, 0.062, 0.147, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.035, 0.045, 'elfRed', -0.065, 0.045, 0.025, isGhost); addXmasExpVoxel(group, 0.030, 0.035, 0.040, 'elfWhite', -0.065, 0.075, 0.025, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.035, 0.045, 'elfRed', -0.065, 0.105, 0.025, isGhost); addXmasExpVoxel(group, 0.030, 0.037, 0.040, 'elfWhite', -0.065, 0.136, 0.025, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.035, 0.045, 'elfRed', 0.065, 0.045, 0.025, isGhost); addXmasExpVoxel(group, 0.030, 0.035, 0.040, 'elfWhite', 0.065, 0.075, 0.025, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.035, 0.045, 'elfRed', 0.065, 0.105, 0.025, isGhost); addXmasExpVoxel(group, 0.030, 0.037, 0.040, 'elfWhite', 0.065, 0.136, 0.025, isGhost);
+    addXmasExpVoxel(group, 0.220, 0.050, 0.130, 'elfGreen', 0.000, 0.168, 0.010, isGhost); addXmasExpVoxel(group, 0.200, 0.015, 0.115, 'elfGreenDark', 0.000, 0.142, 0.010, isGhost);
+    addXmasExpVoxel(group, 0.205, 0.100, 0.115, 'elfGreen', 0.000, 0.233, 0.010, isGhost); addXmasExpVoxel(group, 0.175, 0.060, 0.015, 'elfGreen', 0.000, 0.242, 0.070, isGhost);
+    addXmasExpVoxel(group, 0.215, 0.025, 0.125, 'elfBelt', 0.000, 0.203, 0.010, isGhost); addXmasExpVoxel(group, 0.060, 0.035, 0.018, 'elfGold', 0.000, 0.203, 0.074, isGhost);
+    addXmasExpVoxel(group, 0.025, 0.020, 0.007, 'elfBelt', 0.000, 0.203, 0.081, isGhost); addXmasExpVoxel(group, 0.165, 0.033, 0.022, 'elfRed', 0.000, 0.281, 0.069, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.028, 0.018, 'elfRed', 0.000, 0.256, 0.074, isGhost); addXmasExpVoxel(group, 0.035, 0.020, 0.022, 'elfRed', -0.055, 0.260, 0.071, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.020, 0.022, 'elfRed', 0.055, 0.260, 0.071, isGhost); addXmasExpVoxel(group, 0.190, 0.033, 0.092, 'elfRed', 0.000, 0.284, -0.011, isGhost);
+    addXmasExpVoxel(group, 0.120, 0.045, 0.060, 'elfSkin', 0.000, 0.295, 0.010, isGhost); addXmasExpVoxel(group, 0.210, 0.165, 0.160, 'elfSkin', 0.000, 0.390, 0.010, isGhost);
+    addXmasExpVoxel(group, 0.220, 0.140, 0.058, 'elfHair', 0.000, 0.385, -0.051, isGhost); addXmasExpVoxel(group, 0.015, 0.080, 0.065, 'elfHair', -0.105, 0.400, -0.003, isGhost);
+    addXmasExpVoxel(group, 0.015, 0.080, 0.065, 'elfHair', 0.105, 0.400, -0.003, isGhost); addXmasExpVoxel(group, 0.170, 0.030, 0.007, 'elfHair', 0.000, 0.448, 0.091, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.033, 0.007, 'elfCheek', -0.077, 0.351, 0.091, isGhost); addXmasExpVoxel(group, 0.040, 0.033, 0.007, 'elfCheek', 0.077, 0.351, 0.091, isGhost);
+    addXmasExpVoxel(group, 0.030, 0.020, 0.013, 'elfSkin', 0.000, 0.370, 0.094, isGhost); addXmasExpVoxel(group, 0.040, 0.050, 0.010, 'elfEye', -0.068, 0.398, 0.092, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.020, 0.007, 'elfWhite', -0.072, 0.410, 0.096, isGhost); addXmasExpVoxel(group, 0.040, 0.050, 0.010, 'elfEye', 0.068, 0.398, 0.092, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.020, 0.007, 'elfWhite', 0.072, 0.410, 0.096, isGhost); addXmasExpVoxel(group, 0.035, 0.050, 0.040, 'elfSkin', -0.117, 0.383, -0.000, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.043, 0.030, 'elfSkin', -0.147, 0.401, -0.020, isGhost); addXmasExpVoxel(group, 0.035, 0.050, 0.040, 'elfSkin', 0.117, 0.383, -0.000, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.043, 0.030, 'elfSkin', 0.147, 0.401, -0.020, isGhost); addXmasExpVoxel(group, 0.230, 0.035, 0.180, 'elfWhite', 0.000, 0.475, 0.010, isGhost);
+    addXmasExpVoxel(group, 0.200, 0.060, 0.150, 'elfGreen', 0.000, 0.517, 0.010, isGhost); addXmasExpVoxel(group, 0.160, 0.055, 0.130, 'elfGreen', 0.000, 0.570, -0.005, isGhost);
+    addXmasExpVoxel(group, 0.125, 0.050, 0.110, 'elfGreen', -0.010, 0.613, -0.030, isGhost); addXmasExpVoxel(group, 0.090, 0.050, 0.060, 'elfGreen', -0.015, 0.593, -0.092, isGhost);
+    addXmasExpVoxel(group, 0.065, 0.060, 0.045, 'elfGreen', -0.015, 0.542, -0.115, isGhost); addXmasExpVoxel(group, 0.045, 0.040, 0.033, 'elfWhite', -0.015, 0.497, -0.119, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.040, 0.035, 'elfGold', -0.015, 0.463, -0.125, isGhost); addXmasExpVoxel(group, 0.035, 0.055, 0.070, 'elfGreen', -0.115, 0.245, 0.010, isGhost);
+    addXmasExpVoxel(group, 0.030, 0.040, 0.060, 'elfGreen', -0.107, 0.223, 0.062, isGhost); addXmasExpVoxel(group, 0.030, 0.035, 0.020, 'elfWhite', -0.102, 0.217, 0.098, isGhost);
+    addXmasExpVoxel(group, 0.030, 0.030, 0.025, 'elfSkin', -0.075, 0.217, 0.110, isGhost); addXmasExpVoxel(group, 0.035, 0.055, 0.070, 'elfGreen', 0.115, 0.245, 0.010, isGhost);
+    addXmasExpVoxel(group, 0.030, 0.040, 0.060, 'elfGreen', 0.107, 0.223, 0.062, isGhost); addXmasExpVoxel(group, 0.030, 0.035, 0.020, 'elfWhite', 0.102, 0.217, 0.098, isGhost);
+    addXmasExpVoxel(group, 0.030, 0.030, 0.025, 'elfSkin', 0.075, 0.217, 0.110, isGhost); addXmasExpVoxel(group, 0.030, 0.105, 0.020, 'elfGold', 0.000, 0.215, 0.107, isGhost);
+    addXmasExpVoxel(group, 0.135, 0.020, 0.015, 'elfGold', 0.000, 0.217, 0.107, isGhost); addXmasExpVoxel(group, 0.055, 0.025, 0.025, 'elfGold', 0.000, 0.275, 0.107, isGhost);
+    addXmasExpVoxel(group, 0.058, 0.055, 0.015, 'elfGold', -0.044, 0.310, 0.107, isGhost); addXmasExpVoxel(group, 0.058, 0.055, 0.015, 'elfGold', 0.044, 0.310, 0.107, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.025, 0.010, 'elfGold', 0.000, 0.310, 0.107, isGhost);
+  } else if (skinId === 'holiday_owl') {
+    // 69 voxels: holiday_owl
+    addXmasExpVoxel(group, 0.055, 0.030, 0.085, 'amberGold', -0.060, 0.015, 0.015, isGhost); addXmasExpVoxel(group, 0.020, 0.018, 0.035, 'amberGold', -0.083, 0.014, 0.065, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.020, 0.052, 'amberGold', -0.058, 0.015, 0.071, isGhost); addXmasExpVoxel(group, 0.018, 0.018, 0.040, 'amberGold', -0.034, 0.014, 0.065, isGhost);
+    addXmasExpVoxel(group, 0.055, 0.030, 0.085, 'amberGold', 0.060, 0.015, 0.015, isGhost); addXmasExpVoxel(group, 0.018, 0.018, 0.040, 'amberGold', 0.034, 0.014, 0.065, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.020, 0.052, 'amberGold', 0.058, 0.015, 0.071, isGhost); addXmasExpVoxel(group, 0.020, 0.018, 0.035, 'amberGold', 0.083, 0.014, 0.065, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.048, 0.065, 'owlWhite', -0.060, 0.049, 0.010, isGhost); addXmasExpVoxel(group, 0.045, 0.048, 0.065, 'owlWhite', 0.060, 0.049, 0.010, isGhost);
+    addXmasExpVoxel(group, 0.215, 0.100, 0.140, 'owlWhite', 0.000, 0.113, 0.003, isGhost); addXmasExpVoxel(group, 0.165, 0.077, 0.020, 'owlWhite', 0.000, 0.116, 0.077, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.045, 0.007, 'owlSpeckleLight', 0.000, 0.115, 0.086, isGhost); addXmasExpVoxel(group, 0.235, 0.113, 0.160, 'owlWhite', 0.000, 0.206, 0.003, isGhost);
+    addXmasExpVoxel(group, 0.185, 0.085, 0.020, 'owlWhite', 0.000, 0.210, 0.087, isGhost); addXmasExpVoxel(group, 0.045, 0.040, 0.007, 'owlSpeckleDark', -0.055, 0.203, 0.096, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.040, 0.007, 'owlSpeckleDark', 0.055, 0.203, 0.096, isGhost); addXmasExpVoxel(group, 0.045, 0.030, 0.007, 'owlSpeckleLight', 0.000, 0.228, 0.096, isGhost);
+    addXmasExpVoxel(group, 0.135, 0.050, 0.028, 'owlWhite', 0.000, 0.130, -0.071, isGhost); addXmasExpVoxel(group, 0.155, 0.052, 0.030, 'owlSpeckleDark', 0.000, 0.086, -0.080, isGhost);
+    addXmasExpVoxel(group, 0.120, 0.043, 0.030, 'owlWhite', 0.000, 0.049, -0.087, isGhost); addXmasExpVoxel(group, 0.075, 0.028, 0.028, 'owlSpeckleDark', 0.000, 0.021, -0.091, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.080, 0.125, 'owlWhite', -0.133, 0.217, -0.005, isGhost); addXmasExpVoxel(group, 0.048, 0.075, 0.120, 'owlWhite', -0.134, 0.150, 0.003, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.065, 0.105, 'owlSpeckleDark', -0.128, 0.090, -0.020, isGhost); addXmasExpVoxel(group, 0.035, 0.045, 0.085, 'owlWhite', -0.120, 0.045, -0.050, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.052, 0.045, 'owlWhite', -0.113, 0.134, 0.070, isGhost); addXmasExpVoxel(group, 0.040, 0.080, 0.125, 'owlWhite', 0.133, 0.217, -0.005, isGhost);
+    addXmasExpVoxel(group, 0.048, 0.075, 0.120, 'owlWhite', 0.134, 0.150, 0.003, isGhost); addXmasExpVoxel(group, 0.045, 0.065, 0.105, 'owlSpeckleDark', 0.128, 0.090, -0.020, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.045, 0.085, 'owlWhite', 0.120, 0.045, -0.050, isGhost); addXmasExpVoxel(group, 0.040, 0.052, 0.045, 'owlWhite', 0.113, 0.134, 0.070, isGhost);
+    addXmasExpVoxel(group, 0.175, 0.045, 0.130, 'owlWhite', 0.000, 0.270, 0.003, isGhost); addXmasExpVoxel(group, 0.225, 0.140, 0.150, 'owlWhite', 0.000, 0.352, 0.003, isGhost);
+    addXmasExpVoxel(group, 0.215, 0.120, 0.035, 'owlWhite', 0.000, 0.350, -0.075, isGhost); addXmasExpVoxel(group, 0.235, 0.120, 0.028, 'owlSnowPure', 0.000, 0.347, 0.079, isGhost);
+    addXmasExpVoxel(group, 0.255, 0.100, 0.015, 'owlSpeckleLight', 0.000, 0.347, 0.080, isGhost); addXmasExpVoxel(group, 0.205, 0.030, 0.018, 'owlSnowPure', 0.000, 0.407, 0.091, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.043, 0.045, 'owlWhite', -0.102, 0.436, 0.015, isGhost); addXmasExpVoxel(group, 0.040, 0.043, 0.045, 'owlWhite', 0.102, 0.436, 0.015, isGhost);
+    addXmasExpVoxel(group, 0.065, 0.065, 0.015, 'amberGold', -0.062, 0.350, 0.092, isGhost); addXmasExpVoxel(group, 0.055, 0.055, 0.007, 'brightAmber', -0.062, 0.350, 0.099, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.040, 0.010, 'eyePupil', -0.062, 0.350, 0.102, isGhost); addXmasExpVoxel(group, 0.018, 0.015, 0.005, 'owlSnowPure', -0.069, 0.360, 0.107, isGhost);
+    addXmasExpVoxel(group, 0.065, 0.065, 0.015, 'amberGold', 0.062, 0.350, 0.092, isGhost); addXmasExpVoxel(group, 0.055, 0.055, 0.007, 'brightAmber', 0.062, 0.350, 0.099, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.040, 0.010, 'eyePupil', 0.062, 0.350, 0.102, isGhost); addXmasExpVoxel(group, 0.018, 0.015, 0.005, 'owlSnowPure', 0.056, 0.360, 0.107, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.045, 0.028, 'graphiteBeak', 0.000, 0.335, 0.099, isGhost); addXmasExpVoxel(group, 0.025, 0.035, 0.018, 'graphiteBeak', 0.000, 0.305, 0.111, isGhost);
+    addXmasExpVoxel(group, 0.210, 0.035, 0.155, 'owlSnowPure', 0.000, 0.430, 0.010, isGhost); addXmasExpVoxel(group, 0.175, 0.055, 0.130, 'santaRed', 0.000, 0.470, 0.007, isGhost);
+    addXmasExpVoxel(group, 0.145, 0.050, 0.115, 'santaRed', 0.000, 0.512, -0.005, isGhost); addXmasExpVoxel(group, 0.110, 0.045, 0.100, 'santaRed', -0.007, 0.545, -0.028, isGhost);
+    addXmasExpVoxel(group, 0.080, 0.045, 0.050, 'santaRed', -0.013, 0.520, -0.083, isGhost); addXmasExpVoxel(group, 0.060, 0.060, 0.040, 'santaRed', -0.013, 0.477, -0.102, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.040, 0.033, 'owlSnowPure', -0.013, 0.438, -0.109, isGhost); addXmasExpVoxel(group, 0.030, 0.045, 0.035, 'owlSnowPure', -0.013, 0.405, -0.115, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.028, 0.030, 'coneWoodDark', 0.000, 0.031, 0.098, isGhost); addXmasExpVoxel(group, 0.095, 0.035, 0.045, 'coneWoodWarm', 0.000, 0.058, 0.100, isGhost);
+    addXmasExpVoxel(group, 0.105, 0.018, 0.040, 'silverFrost', 0.000, 0.059, 0.107, isGhost); addXmasExpVoxel(group, 0.125, 0.043, 0.055, 'coneWoodDark', 0.000, 0.094, 0.102, isGhost);
+    addXmasExpVoxel(group, 0.115, 0.028, 0.055, 'coneWoodWarm', 0.000, 0.094, 0.107, isGhost); addXmasExpVoxel(group, 0.055, 0.020, 0.020, 'owlSnowPure', 0.000, 0.095, 0.133, isGhost);
+    addXmasExpVoxel(group, 0.090, 0.035, 0.045, 'coneWoodDark', 0.000, 0.128, 0.100, isGhost); addXmasExpVoxel(group, 0.075, 0.018, 0.043, 'silverFrost', 0.000, 0.131, 0.106, isGhost);
+    addXmasExpVoxel(group, 0.033, 0.028, 0.033, 'pineGreen', -0.021, 0.156, 0.101, isGhost); addXmasExpVoxel(group, 0.033, 0.028, 0.030, 'pineGreen', 0.021, 0.156, 0.100, isGhost);
+    addXmasExpVoxel(group, 0.025, 0.025, 0.028, 'santaRed', 0.000, 0.170, 0.109, isGhost);
+  } else if (skinId === 'gingerbread_man') {
+    // 68 voxels: gingerbread_man
+    addXmasExpVoxel(group, 0.060, 0.035, 0.120, 'doughWarm', -0.065, 0.018, 0.005, isGhost); addXmasExpVoxel(group, 0.045, 0.028, 0.030, 'doughCrust', -0.065, 0.019, 0.068, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.028, 0.028, 'doughCrust', -0.065, 0.019, -0.056, isGhost); addXmasExpVoxel(group, 0.050, 0.113, 0.105, 'doughWarm', -0.065, 0.084, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.035, 0.120, 'doughWarm', 0.065, 0.018, 0.005, isGhost); addXmasExpVoxel(group, 0.045, 0.028, 0.030, 'doughCrust', 0.065, 0.019, 0.068, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.028, 0.028, 'doughCrust', 0.065, 0.019, -0.056, isGhost); addXmasExpVoxel(group, 0.050, 0.113, 0.105, 'doughWarm', 0.065, 0.084, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.130, 0.050, 0.100, 'doughWarm', 0.000, 0.145, 0.005, isGhost); addXmasExpVoxel(group, 0.210, 0.115, 0.105, 'doughWarm', 0.000, 0.215, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.170, 0.085, 0.015, 'doughCrust', 0.000, 0.215, 0.060, isGhost); addXmasExpVoxel(group, 0.170, 0.085, 0.015, 'doughCrust', 0.000, 0.215, -0.050, isGhost);
+    addXmasExpVoxel(group, 0.195, 0.055, 0.100, 'doughWarm', 0.000, 0.290, 0.005, isGhost); addXmasExpVoxel(group, 0.110, 0.035, 0.070, 'doughCrust', 0.000, 0.325, 0.003, isGhost);
+    addXmasExpVoxel(group, 0.043, 0.055, 0.080, 'doughWarm', -0.116, 0.275, 0.005, isGhost); addXmasExpVoxel(group, 0.045, 0.055, 0.075, 'doughWarm', -0.150, 0.235, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.037, 0.055, 0.083, 'doughWarm', -0.176, 0.195, 0.021, isGhost); addXmasExpVoxel(group, 0.040, 0.048, 0.062, 'doughCrust', -0.190, 0.166, 0.041, isGhost);
+    addXmasExpVoxel(group, 0.043, 0.055, 0.080, 'doughWarm', 0.116, 0.275, 0.005, isGhost); addXmasExpVoxel(group, 0.045, 0.055, 0.075, 'doughWarm', 0.150, 0.235, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.037, 0.055, 0.083, 'doughWarm', 0.176, 0.195, 0.021, isGhost); addXmasExpVoxel(group, 0.040, 0.048, 0.062, 'doughCrust', 0.190, 0.166, 0.041, isGhost);
+    addXmasExpVoxel(group, 0.215, 0.160, 0.100, 'doughWarm', 0.000, 0.412, 0.005, isGhost); addXmasExpVoxel(group, 0.165, 0.030, 0.085, 'doughCrust', 0.000, 0.338, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.165, 0.035, 0.085, 'doughCrust', 0.000, 0.500, 0.005, isGhost); addXmasExpVoxel(group, 0.028, 0.100, 0.085, 'doughCrust', -0.111, 0.412, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.028, 0.100, 0.085, 'doughCrust', 0.111, 0.412, 0.005, isGhost); addXmasExpVoxel(group, 0.190, 0.120, 0.015, 'doughCrust', 0.000, 0.415, 0.055, isGhost);
+    addXmasExpVoxel(group, 0.185, 0.115, 0.015, 'doughCrust', 0.000, 0.415, -0.048, isGhost); addXmasExpVoxel(group, 0.065, 0.020, 0.115, 'icingWhite', -0.065, 0.062, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.033, 0.018, 'icingWhite', -0.065, 0.061, 0.061, isGhost); addXmasExpVoxel(group, 0.045, 0.033, 0.018, 'icingWhite', -0.065, 0.061, -0.051, isGhost);
+    addXmasExpVoxel(group, 0.065, 0.020, 0.115, 'icingWhite', 0.065, 0.062, 0.005, isGhost); addXmasExpVoxel(group, 0.045, 0.033, 0.018, 'icingWhite', 0.065, 0.061, 0.061, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.033, 0.018, 'icingWhite', 0.065, 0.061, -0.051, isGhost); addXmasExpVoxel(group, 0.040, 0.020, 0.083, 'icingWhite', -0.182, 0.172, 0.026, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.030, 0.020, 'icingWhite', -0.188, 0.172, 0.065, isGhost); addXmasExpVoxel(group, 0.040, 0.020, 0.083, 'icingWhite', 0.182, 0.172, 0.026, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.030, 0.020, 'icingWhite', 0.188, 0.172, 0.065, isGhost); addXmasExpVoxel(group, 0.040, 0.040, 0.013, 'icingWhite', -0.058, 0.425, 0.064, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.022, 0.013, 'eyePupil', -0.058, 0.424, 0.066, isGhost); addXmasExpVoxel(group, 0.040, 0.040, 0.013, 'icingWhite', 0.058, 0.425, 0.064, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.022, 0.013, 'eyePupil', 0.058, 0.424, 0.066, isGhost); addXmasExpVoxel(group, 0.045, 0.015, 0.007, 'icingWhite', -0.058, 0.460, 0.064, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.015, 0.007, 'icingWhite', 0.058, 0.460, 0.064, isGhost); addXmasExpVoxel(group, 0.070, 0.013, 0.010, 'icingWhite', 0.000, 0.366, 0.065, isGhost);
+    addXmasExpVoxel(group, 0.028, 0.022, 0.010, 'icingWhite', -0.044, 0.376, 0.062, isGhost); addXmasExpVoxel(group, 0.028, 0.022, 0.010, 'icingWhite', 0.044, 0.376, 0.062, isGhost);
+    addXmasExpVoxel(group, 0.028, 0.028, 0.007, 'cheekPink', -0.076, 0.384, 0.064, isGhost); addXmasExpVoxel(group, 0.028, 0.028, 0.007, 'cheekPink', 0.076, 0.384, 0.064, isGhost);
+    addXmasExpVoxel(group, 0.090, 0.025, 0.060, 'icingWhite', 0.000, 0.520, 0.005, isGhost); addXmasExpVoxel(group, 0.050, 0.025, 0.040, 'icingWhite', 0.003, 0.540, 0.005, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.025, 0.028, 'gumdropGreen', 0.000, 0.318, 0.064, isGhost); addXmasExpVoxel(group, 0.055, 0.025, 0.022, 'candyRed', -0.040, 0.315, 0.064, isGhost);
+    addXmasExpVoxel(group, 0.055, 0.025, 0.022, 'candyRed', 0.040, 0.315, 0.064, isGhost); addXmasExpVoxel(group, 0.025, 0.018, 0.010, 'icingWhite', -0.040, 0.316, 0.072, isGhost);
+    addXmasExpVoxel(group, 0.025, 0.018, 0.010, 'icingWhite', 0.040, 0.316, 0.072, isGhost); addXmasExpVoxel(group, 0.040, 0.025, 0.018, 'gumdropRuby', 0.000, 0.258, 0.071, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.013, 0.010, 'icingWhite', 0.000, 0.259, 0.077, isGhost); addXmasExpVoxel(group, 0.040, 0.025, 0.018, 'gumdropGreen', 0.000, 0.220, 0.071, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.013, 0.010, 'icingWhite', 0.000, 0.221, 0.077, isGhost); addXmasExpVoxel(group, 0.040, 0.025, 0.018, 'gumdropYellow', 0.000, 0.182, 0.071, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.013, 0.010, 'icingWhite', 0.000, 0.184, 0.077, isGhost); addXmasExpVoxel(group, 0.020, 0.043, 0.020, 'candyRed', -0.188, 0.111, 0.070, isGhost);
+    addXmasExpVoxel(group, 0.013, 0.058, 0.020, 'icingWhite', -0.186, 0.156, 0.068, isGhost); addXmasExpVoxel(group, 0.020, 0.060, 0.020, 'candyRed', -0.188, 0.210, 0.070, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.030, 0.015, 'icingWhite', -0.170, 0.250, 0.070, isGhost); addXmasExpVoxel(group, 0.020, 0.030, 0.020, 'candyRed', -0.142, 0.228, 0.070, isGhost);
+  } else if (skinId === 'reindeer_glow') {
+    // 66 voxels: reindeer_glow
+    addXmasExpVoxel(group, 0.040, 0.025, 0.040, 'hoofDark', -0.095, 0.013, 0.105, isGhost); addXmasExpVoxel(group, 0.030, 0.115, 0.030, 'reindeerCaramel', -0.095, 0.077, 0.105, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.025, 0.013, 'reindeerDark', -0.095, 0.083, 0.119, isGhost); addXmasExpVoxel(group, 0.045, 0.080, 0.055, 'reindeerCaramel', -0.098, 0.170, 0.102, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.025, 0.040, 'hoofDark', 0.095, 0.013, 0.105, isGhost); addXmasExpVoxel(group, 0.030, 0.115, 0.030, 'reindeerCaramel', 0.095, 0.077, 0.105, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.025, 0.013, 'reindeerDark', 0.095, 0.083, 0.119, isGhost); addXmasExpVoxel(group, 0.045, 0.080, 0.055, 'reindeerCaramel', 0.098, 0.170, 0.102, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.025, 0.040, 'hoofDark', -0.095, 0.013, -0.105, isGhost); addXmasExpVoxel(group, 0.030, 0.110, 0.030, 'reindeerCaramel', -0.095, 0.075, -0.105, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.030, 0.015, 'reindeerDark', -0.095, 0.075, -0.120, isGhost); addXmasExpVoxel(group, 0.048, 0.105, 0.070, 'reindeerCaramel', -0.099, 0.172, -0.100, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.025, 0.040, 'hoofDark', 0.095, 0.013, -0.105, isGhost); addXmasExpVoxel(group, 0.030, 0.110, 0.030, 'reindeerCaramel', 0.095, 0.075, -0.105, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.030, 0.015, 'reindeerDark', 0.095, 0.075, -0.120, isGhost); addXmasExpVoxel(group, 0.048, 0.105, 0.070, 'reindeerCaramel', 0.099, 0.172, -0.100, isGhost);
+    addXmasExpVoxel(group, 0.200, 0.135, 0.220, 'reindeerCaramel', 0.000, 0.207, -0.000, isGhost); addXmasExpVoxel(group, 0.180, 0.040, 0.077, 'reindeerCaramel', 0.000, 0.280, 0.069, isGhost);
+    addXmasExpVoxel(group, 0.120, 0.025, 0.117, 'reindeerDark', 0.000, 0.278, -0.031, isGhost); addXmasExpVoxel(group, 0.140, 0.020, 0.180, 'bellyWhite', 0.000, 0.133, -0.000, isGhost);
+    addXmasExpVoxel(group, 0.018, 0.085, 0.140, 'reindeerCaramel', -0.106, 0.203, -0.000, isGhost); addXmasExpVoxel(group, 0.018, 0.085, 0.140, 'reindeerCaramel', 0.106, 0.203, -0.000, isGhost);
+    addXmasExpVoxel(group, 0.190, 0.120, 0.055, 'reindeerCaramel', 0.000, 0.210, -0.133, isGhost); addXmasExpVoxel(group, 0.150, 0.095, 0.015, 'bellyWhite', 0.000, 0.207, -0.165, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.050, 0.040, 'reindeerCaramel', 0.000, 0.255, -0.185, isGhost); addXmasExpVoxel(group, 0.050, 0.040, 0.043, 'bellyWhite', 0.000, 0.240, -0.191, isGhost);
+    addXmasExpVoxel(group, 0.170, 0.130, 0.055, 'bibCream', 0.000, 0.220, 0.130, isGhost); addXmasExpVoxel(group, 0.125, 0.075, 0.015, 'bibCream', 0.000, 0.203, 0.160, isGhost);
+    addXmasExpVoxel(group, 0.150, 0.135, 0.075, 'reindeerCaramel', 0.000, 0.323, 0.107, isGhost); addXmasExpVoxel(group, 0.110, 0.085, 0.013, 'bibCream', 0.000, 0.323, 0.149, isGhost);
+    addXmasExpVoxel(group, 0.165, 0.035, 0.048, 'collarRed', 0.000, 0.305, 0.159, isGhost); addXmasExpVoxel(group, 0.175, 0.037, 0.062, 'collarRed', 0.000, 0.306, 0.106, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.050, 0.035, 'bellGold', 0.000, 0.295, 0.198, isGhost); addXmasExpVoxel(group, 0.013, 0.028, 0.030, 'bellGold', -0.089, 0.306, 0.110, isGhost);
+    addXmasExpVoxel(group, 0.013, 0.028, 0.030, 'bellGold', 0.089, 0.306, 0.110, isGhost); addXmasExpVoxel(group, 0.170, 0.135, 0.100, 'reindeerCaramel', 0.000, 0.427, 0.140, isGhost);
+    addXmasExpVoxel(group, 0.130, 0.037, 0.070, 'reindeerCaramel', 0.000, 0.504, 0.130, isGhost); addXmasExpVoxel(group, 0.110, 0.068, 0.070, 'reindeerCaramel', 0.000, 0.399, 0.220, isGhost);
+    addXmasExpVoxel(group, 0.100, 0.033, 0.065, 'bibCream', 0.000, 0.354, 0.212, isGhost); addXmasExpVoxel(group, 0.050, 0.020, 0.022, 'hoofDark', 0.000, 0.352, 0.241, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.060, 0.050, 'noseRubyGlow', 0.000, 0.405, 0.270, isGhost); addXmasExpVoxel(group, 0.025, 0.020, 0.007, 'bellyWhite', 0.000, 0.420, 0.296, isGhost);
+    addXmasExpVoxel(group, 0.013, 0.048, 0.040, 'hoofDark', -0.086, 0.429, 0.172, isGhost); addXmasExpVoxel(group, 0.007, 0.018, 0.020, 'bellyWhite', -0.091, 0.439, 0.172, isGhost);
+    addXmasExpVoxel(group, 0.013, 0.048, 0.040, 'hoofDark', 0.086, 0.429, 0.172, isGhost); addXmasExpVoxel(group, 0.007, 0.018, 0.020, 'bellyWhite', 0.091, 0.439, 0.172, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.060, 0.045, 'reindeerCaramel', -0.105, 0.495, 0.107, isGhost); addXmasExpVoxel(group, 0.045, 0.040, 0.025, 'bibCream', -0.105, 0.495, 0.120, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.060, 0.045, 'reindeerCaramel', 0.105, 0.495, 0.107, isGhost); addXmasExpVoxel(group, 0.045, 0.040, 0.025, 'bibCream', 0.105, 0.495, 0.120, isGhost);
+    addXmasExpVoxel(group, 0.025, 0.045, 0.030, 'antlerBone', -0.048, 0.537, 0.115, isGhost); addXmasExpVoxel(group, 0.020, 0.030, 0.043, 'antlerBone', -0.048, 0.560, 0.149, isGhost);
+    addXmasExpVoxel(group, 0.037, 0.095, 0.030, 'antlerBone', -0.074, 0.603, 0.110, isGhost); addXmasExpVoxel(group, 0.035, 0.065, 0.035, 'antlerBone', -0.087, 0.672, 0.080, isGhost);
+    addXmasExpVoxel(group, 0.052, 0.050, 0.030, 'antlerBone', -0.114, 0.655, 0.107, isGhost); addXmasExpVoxel(group, 0.025, 0.045, 0.030, 'antlerBone', 0.048, 0.537, 0.115, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.030, 0.043, 'antlerBone', 0.048, 0.560, 0.149, isGhost); addXmasExpVoxel(group, 0.037, 0.095, 0.030, 'antlerBone', 0.074, 0.603, 0.110, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.065, 0.035, 'antlerBone', 0.087, 0.672, 0.080, isGhost); addXmasExpVoxel(group, 0.052, 0.050, 0.030, 'antlerBone', 0.114, 0.655, 0.107, isGhost);
+    addXmasExpVoxel(group, 0.125, 0.015, 0.010, 'lightEmerald', 0.000, 0.575, 0.107, isGhost); addXmasExpVoxel(group, 0.022, 0.028, 0.020, 'lightEmerald', -0.061, 0.586, 0.128, isGhost);
+    addXmasExpVoxel(group, 0.025, 0.030, 0.020, 'bellGold', 0.000, 0.557, 0.107, isGhost); addXmasExpVoxel(group, 0.022, 0.028, 0.020, 'lightCyan', 0.061, 0.586, 0.128, isGhost);
+    addXmasExpVoxel(group, 0.022, 0.028, 0.020, 'lightRuby', -0.109, 0.624, 0.122, isGhost); addXmasExpVoxel(group, 0.022, 0.028, 0.020, 'bellGold', 0.109, 0.624, 0.122, isGhost);
+  } else if (skinId === 'santa_claus') {
+    // 78 voxels: santa_claus
+    addXmasExpVoxel(group, 0.075, 0.035, 0.150, 'bootBlack', -0.072, 0.018, 0.045, isGhost); addXmasExpVoxel(group, 0.060, 0.028, 0.080, 'bootBlack', -0.072, 0.044, 0.072, isGhost);
+    addXmasExpVoxel(group, 0.090, 0.030, 0.110, 'furWhiteSoft', -0.072, 0.068, 0.033, isGhost); addXmasExpVoxel(group, 0.065, 0.048, 0.085, 'santaRedDark', -0.072, 0.101, 0.030, isGhost);
+    addXmasExpVoxel(group, 0.075, 0.035, 0.150, 'bootBlack', 0.072, 0.018, 0.045, isGhost); addXmasExpVoxel(group, 0.060, 0.028, 0.080, 'bootBlack', 0.072, 0.044, 0.072, isGhost);
+    addXmasExpVoxel(group, 0.090, 0.030, 0.110, 'furWhiteSoft', 0.072, 0.068, 0.033, isGhost); addXmasExpVoxel(group, 0.065, 0.048, 0.085, 'santaRedDark', 0.072, 0.101, 0.030, isGhost);
+    addXmasExpVoxel(group, 0.255, 0.035, 0.045, 'furWhite', 0.000, 0.128, 0.070, isGhost); addXmasExpVoxel(group, 0.250, 0.030, 0.113, 'furWhiteSoft', 0.000, 0.128, -0.006, isGhost);
+    addXmasExpVoxel(group, 0.245, 0.040, 0.145, 'santaRed', 0.000, 0.160, 0.018, isGhost); addXmasExpVoxel(group, 0.235, 0.085, 0.140, 'santaRed', 0.000, 0.220, 0.018, isGhost);
+    addXmasExpVoxel(group, 0.185, 0.068, 0.030, 'santaRed', 0.000, 0.216, 0.092, isGhost); addXmasExpVoxel(group, 0.220, 0.052, 0.125, 'santaRed', 0.000, 0.284, 0.015, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.050, 0.030, 'furWhite', 0.000, 0.168, 0.098, isGhost); addXmasExpVoxel(group, 0.045, 0.050, 0.040, 'furWhite', 0.000, 0.260, 0.092, isGhost);
+    addXmasExpVoxel(group, 0.250, 0.048, 0.145, 'beltBlack', 0.000, 0.214, 0.018, isGhost); addXmasExpVoxel(group, 0.100, 0.055, 0.033, 'buckleGold', 0.000, 0.212, 0.101, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.037, 0.007, 'beltBlack', 0.000, 0.214, 0.116, isGhost); addXmasExpVoxel(group, 0.015, 0.043, 0.007, 'goldAccent', 0.000, 0.214, 0.119, isGhost);
+    addXmasExpVoxel(group, 0.210, 0.030, 0.098, 'furWhiteSoft', 0.000, 0.312, -0.006, isGhost); addXmasExpVoxel(group, 0.185, 0.030, 0.055, 'furWhite', 0.000, 0.305, 0.065, isGhost);
+    addXmasExpVoxel(group, 0.120, 0.035, 0.075, 'peachSkin', 0.000, 0.325, 0.010, isGhost); addXmasExpVoxel(group, 0.050, 0.080, 0.095, 'santaRed', -0.133, 0.263, 0.015, isGhost);
+    addXmasExpVoxel(group, 0.050, 0.052, 0.070, 'santaRed', -0.140, 0.209, 0.058, isGhost); addXmasExpVoxel(group, 0.062, 0.035, 0.065, 'furWhiteSoft', -0.141, 0.175, 0.075, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.050, 0.060, 'mittenGreen', -0.140, 0.142, 0.087, isGhost); addXmasExpVoxel(group, 0.025, 0.025, 0.025, 'mittenGreen', -0.110, 0.147, 0.115, isGhost);
+    addXmasExpVoxel(group, 0.055, 0.013, 0.060, 'mittenGreen', -0.140, 0.156, 0.083, isGhost); addXmasExpVoxel(group, 0.050, 0.080, 0.095, 'santaRed', 0.133, 0.263, 0.015, isGhost);
+    addXmasExpVoxel(group, 0.050, 0.052, 0.070, 'santaRed', 0.140, 0.209, 0.058, isGhost); addXmasExpVoxel(group, 0.062, 0.035, 0.065, 'furWhiteSoft', 0.141, 0.175, 0.075, isGhost);
+    addXmasExpVoxel(group, 0.045, 0.050, 0.060, 'mittenGreen', 0.140, 0.142, 0.087, isGhost); addXmasExpVoxel(group, 0.025, 0.025, 0.025, 'mittenGreen', 0.110, 0.147, 0.115, isGhost);
+    addXmasExpVoxel(group, 0.055, 0.013, 0.060, 'mittenGreen', 0.140, 0.156, 0.083, isGhost); addXmasExpVoxel(group, 0.175, 0.090, 0.110, 'peachSkin', 0.000, 0.367, 0.013, isGhost);
+    addXmasExpVoxel(group, 0.165, 0.037, 0.015, 'peachSkin', 0.000, 0.389, 0.070, isGhost); addXmasExpVoxel(group, 0.035, 0.030, 0.020, 'rosyCheek', -0.075, 0.352, 0.075, isGhost);
+    addXmasExpVoxel(group, 0.035, 0.030, 0.020, 'rosyCheek', 0.075, 0.352, 0.075, isGhost); addXmasExpVoxel(group, 0.045, 0.030, 0.033, 'rosyCheek', 0.000, 0.357, 0.094, isGhost);
+    addXmasExpVoxel(group, 0.028, 0.022, 0.013, 'beltBlack', -0.041, 0.376, 0.081, isGhost); addXmasExpVoxel(group, 0.028, 0.022, 0.013, 'beltBlack', 0.041, 0.376, 0.081, isGhost);
+    addXmasExpVoxel(group, 0.015, 0.010, 0.007, 'furWhite', -0.040, 0.380, 0.086, isGhost); addXmasExpVoxel(group, 0.015, 0.010, 0.007, 'furWhite', 0.040, 0.380, 0.086, isGhost);
+    addXmasExpVoxel(group, 0.043, 0.022, 0.020, 'furWhite', -0.044, 0.401, 0.083, isGhost); addXmasExpVoxel(group, 0.043, 0.022, 0.020, 'furWhite', 0.044, 0.401, 0.083, isGhost);
+    addXmasExpVoxel(group, 0.040, 0.025, 0.022, 'furWhite', 0.000, 0.340, 0.101, isGhost); addXmasExpVoxel(group, 0.060, 0.025, 0.020, 'furWhite', -0.048, 0.335, 0.098, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.025, 0.020, 'furWhite', 0.048, 0.335, 0.098, isGhost); addXmasExpVoxel(group, 0.025, 0.065, 0.070, 'furWhiteSoft', -0.090, 0.345, 0.045, isGhost);
+    addXmasExpVoxel(group, 0.025, 0.065, 0.070, 'furWhiteSoft', 0.090, 0.345, 0.045, isGhost); addXmasExpVoxel(group, 0.190, 0.045, 0.065, 'furWhite', 0.000, 0.310, 0.072, isGhost);
+    addXmasExpVoxel(group, 0.145, 0.050, 0.035, 'furWhite', 0.000, 0.268, 0.098, isGhost); addXmasExpVoxel(group, 0.085, 0.030, 0.018, 'furWhiteSoft', 0.000, 0.233, 0.101, isGhost);
+    addXmasExpVoxel(group, 0.205, 0.035, 0.043, 'furWhite', 0.000, 0.420, 0.066, isGhost); addXmasExpVoxel(group, 0.215, 0.035, 0.095, 'furWhiteSoft', 0.000, 0.417, -0.000, isGhost);
+    addXmasExpVoxel(group, 0.205, 0.035, 0.022, 'furWhiteSoft', 0.000, 0.420, -0.051, isGhost); addXmasExpVoxel(group, 0.180, 0.040, 0.107, 'santaRed', 0.000, 0.453, 0.009, isGhost);
+    addXmasExpVoxel(group, 0.155, 0.035, 0.083, 'santaRed', 0.000, 0.485, 0.006, isGhost); addXmasExpVoxel(group, 0.125, 0.030, 0.058, 'santaRed', 0.000, 0.512, 0.004, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.030, 0.048, 'santaRed', 0.052, 0.507, -0.044, isGhost); addXmasExpVoxel(group, 0.040, 0.055, 0.035, 'santaRed', 0.077, 0.470, -0.065, isGhost);
+    addXmasExpVoxel(group, 0.055, 0.043, 0.045, 'furWhite', 0.080, 0.426, -0.080, isGhost); addXmasExpVoxel(group, 0.040, 0.030, 0.055, 'furWhiteSoft', 0.080, 0.425, -0.080, isGhost);
+    addXmasExpVoxel(group, 0.225, 0.080, 0.115, 'sackEmerald', 0.000, 0.177, -0.105, isGhost); addXmasExpVoxel(group, 0.245, 0.077, 0.130, 'sackEmerald', 0.000, 0.251, -0.107, isGhost);
+    addXmasExpVoxel(group, 0.025, 0.085, 0.090, 'sackDark', -0.130, 0.220, -0.102, isGhost); addXmasExpVoxel(group, 0.025, 0.085, 0.090, 'sackDark', 0.130, 0.220, -0.102, isGhost);
+    addXmasExpVoxel(group, 0.205, 0.080, 0.025, 'sackDark', 0.000, 0.228, -0.180, isGhost); addXmasExpVoxel(group, 0.165, 0.030, 0.085, 'sackEmerald', 0.000, 0.302, -0.105, isGhost);
+    addXmasExpVoxel(group, 0.175, 0.013, 0.095, 'buckleGold', 0.000, 0.304, -0.105, isGhost); addXmasExpVoxel(group, 0.045, 0.030, 0.020, 'goldAccent', 0.000, 0.307, -0.160, isGhost);
+    addXmasExpVoxel(group, 0.195, 0.035, 0.090, 'sackEmerald', 0.000, 0.330, -0.098, isGhost); addXmasExpVoxel(group, 0.025, 0.050, 0.025, 'santaRed', -0.055, 0.367, -0.090, isGhost);
+    addXmasExpVoxel(group, 0.020, 0.033, 0.020, 'furWhite', -0.055, 0.406, -0.090, isGhost); addXmasExpVoxel(group, 0.040, 0.030, 0.025, 'santaRed', -0.062, 0.427, -0.090, isGhost);
+    addXmasExpVoxel(group, 0.060, 0.060, 0.060, 'giftCyan', 0.048, 0.372, -0.102, isGhost); addXmasExpVoxel(group, 0.030, 0.022, 0.030, 'goldAccent', 0.048, 0.411, -0.102, isGhost);
+  }
+
+  return group;
+}
+
+// --- Module: src/view/christmasCharacters.ts ---
+function addXmasVoxel(
+  group             ,
+  w        ,
+  h        ,
+  d        ,
+  color                        ,
+  x        ,
+  y        ,
+  z        ,
+  isGhost         
+)       {
+  const mat = VoxelPalette.getMaterial(color, isGhost);
+  group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
+}const CHRISTMAS_CHARACTER_CALIBRATIONS                                                = {
+  penguin_cocoa: { scale: 1.35, offsetY: 0 },
+  snow_hare: { scale: 1.10, offsetY: 0 },
+  husky_sweater: { scale: 1.00, offsetY: 0 },
+  derpy_snowman: { scale: 1.22, offsetY: 0 },
+  arctic_fox: { scale: 1.20, offsetY: 0 },
+  holiday_elf: { scale: 1.28, offsetY: 0 },
+  holiday_owl: { scale: 1.35, offsetY: 0 },
+  gingerbread_man: { scale: 1.35, offsetY: 0 },
+  reindeer_glow: { scale: 1.20, offsetY: 0 },
+  santa_claus: { scale: 1.35, offsetY: 0 },
+};function createChristmasCharacter(skinId        , isGhost = false)              {
+  const root = new THREE.Group();
+  root.name = 'char_root';
+
+  const innerPivot = new THREE.Group();
+  innerPivot.name = 'innerPivot';
+
+  const calib = CHRISTMAS_CHARACTER_CALIBRATIONS[skinId] ?? { scale: 1.0, offsetY: 0 };
+  innerPivot.scale.set(calib.scale, calib.scale, calib.scale);
+  innerPivot.position.set(0, calib.offsetY, 0);
+
+  const group = innerPivot;
+  if (skinId === 'penguin_cocoa') {
+    // 55 voxels: penguin_cocoa
+    addXmasVoxel(group, 0.105, 0.035, 0.220, 'penguinOrange', -0.085, 0.018, 0.048, isGhost); addXmasVoxel(group, 0.105, 0.035, 0.220, 'penguinOrange', 0.085, 0.018, 0.048, isGhost);
+    addXmasVoxel(group, 0.075, 0.015, 0.050, 'penguinOrangeLight', -0.085, 0.035, 0.142, isGhost); addXmasVoxel(group, 0.075, 0.015, 0.050, 'penguinOrangeLight', 0.085, 0.035, 0.142, isGhost);
+    addXmasVoxel(group, 0.255, 0.285, 0.220, 'penguinBlack', 0.000, 0.168, -0.005, isGhost); addXmasVoxel(group, 0.220, 0.040, 0.190, 'penguinBlack', 0.000, 0.035, -0.000, isGhost);
+    addXmasVoxel(group, 0.025, 0.210, 0.175, 'penguinBlack', -0.133, 0.165, -0.003, isGhost); addXmasVoxel(group, 0.025, 0.210, 0.175, 'penguinBlack', 0.133, 0.165, -0.003, isGhost);
+    addXmasVoxel(group, 0.205, 0.175, 0.043, 'penguinWhite', 0.000, 0.128, 0.109, isGhost); addXmasVoxel(group, 0.175, 0.113, 0.035, 'penguinWhite', 0.000, 0.261, 0.107, isGhost);
+    addXmasVoxel(group, 0.220, 0.210, 0.028, 'penguinBlack', 0.000, 0.185, -0.121, isGhost); addXmasVoxel(group, 0.075, 0.048, 0.050, 'penguinBlack', 0.000, 0.081, -0.150, isGhost);
+    addXmasVoxel(group, 0.055, 0.028, 0.025, 'penguinWhite', 0.000, 0.076, -0.177, isGhost); addXmasVoxel(group, 0.045, 0.080, 0.125, 'penguinBlack', -0.140, 0.253, -0.000, isGhost);
+    addXmasVoxel(group, 0.048, 0.068, 0.090, 'penguinBlack', -0.134, 0.201, 0.092, isGhost); addXmasVoxel(group, 0.060, 0.050, 0.065, 'penguinBlack', -0.087, 0.195, 0.145, isGhost);
+    addXmasVoxel(group, 0.043, 0.033, 0.035, 'penguinWhite', -0.084, 0.191, 0.165, isGhost); addXmasVoxel(group, 0.045, 0.080, 0.125, 'penguinBlack', 0.140, 0.253, -0.000, isGhost);
+    addXmasVoxel(group, 0.048, 0.068, 0.090, 'penguinBlack', 0.134, 0.201, 0.092, isGhost); addXmasVoxel(group, 0.060, 0.050, 0.065, 'penguinBlack', 0.087, 0.195, 0.145, isGhost);
+    addXmasVoxel(group, 0.043, 0.033, 0.035, 'penguinWhite', 0.084, 0.191, 0.165, isGhost); addXmasVoxel(group, 0.120, 0.102, 0.107, 'mugTeal', 0.000, 0.189, 0.146, isGhost);
+    addXmasVoxel(group, 0.130, 0.025, 0.117, 'mugRim', 0.000, 0.247, 0.146, isGhost); addXmasVoxel(group, 0.048, 0.022, 0.030, 'mugTeal', 0.079, 0.221, 0.147, isGhost);
+    addXmasVoxel(group, 0.022, 0.062, 0.037, 'mugTeal', 0.096, 0.196, 0.146, isGhost); addXmasVoxel(group, 0.048, 0.022, 0.030, 'mugTeal', 0.079, 0.166, 0.147, isGhost);
+    addXmasVoxel(group, 0.110, 0.013, 0.090, 'cocoaBrown', 0.000, 0.249, 0.147, isGhost); addXmasVoxel(group, 0.035, 0.028, 0.033, 'marshmallowWhite', -0.025, 0.266, 0.159, isGhost);
+    addXmasVoxel(group, 0.033, 0.025, 0.035, 'marshmallowCream', 0.024, 0.265, 0.152, isGhost); addXmasVoxel(group, 0.033, 0.020, 0.025, 'marshmallowWhite', -0.004, 0.263, 0.120, isGhost);
+    addXmasVoxel(group, 0.040, 0.030, 0.030, 'steamWhite', -0.003, 0.297, 0.172, isGhost); addXmasVoxel(group, 0.033, 0.033, 0.033, 'steamWhite', -0.021, 0.326, 0.176, isGhost);
+    addXmasVoxel(group, 0.030, 0.033, 0.030, 'steamWhite', -0.003, 0.356, 0.172, isGhost); addXmasVoxel(group, 0.250, 0.060, 0.055, 'scarfRed', 0.000, 0.338, 0.120, isGhost);
+    addXmasVoxel(group, 0.250, 0.058, 0.050, 'scarfRed', 0.000, 0.341, -0.113, isGhost); addXmasVoxel(group, 0.043, 0.075, 0.220, 'scarfRed', -0.126, 0.340, 0.003, isGhost);
+    addXmasVoxel(group, 0.043, 0.075, 0.220, 'scarfRed', 0.126, 0.340, 0.003, isGhost); addXmasVoxel(group, 0.058, 0.055, 0.055, 'scarfDarkRed', -0.144, 0.315, 0.005, isGhost);
+    addXmasVoxel(group, 0.045, 0.098, 0.040, 'scarfRed', -0.155, 0.249, 0.003, isGhost); addXmasVoxel(group, 0.050, 0.018, 0.045, 'scarfWhiteStripe', -0.155, 0.231, 0.003, isGhost);
+    addXmasVoxel(group, 0.040, 0.033, 0.035, 'scarfGoldTassel', -0.155, 0.189, 0.003, isGhost); addXmasVoxel(group, 0.245, 0.160, 0.205, 'penguinBlack', 0.000, 0.440, -0.000, isGhost);
+    addXmasVoxel(group, 0.190, 0.035, 0.165, 'penguinBlack', 0.000, 0.532, -0.000, isGhost); addXmasVoxel(group, 0.215, 0.135, 0.025, 'penguinBlack', 0.000, 0.440, -0.110, isGhost);
+    addXmasVoxel(group, 0.205, 0.130, 0.033, 'penguinWhite', 0.000, 0.430, 0.111, isGhost); addXmasVoxel(group, 0.110, 0.028, 0.025, 'penguinWhite', 0.000, 0.504, 0.110, isGhost);
+    addXmasVoxel(group, 0.075, 0.040, 0.050, 'penguinOrange', 0.000, 0.422, 0.142, isGhost); addXmasVoxel(group, 0.055, 0.030, 0.033, 'penguinOrangeLight', 0.000, 0.412, 0.176, isGhost);
+    addXmasVoxel(group, 0.035, 0.015, 0.028, 'penguinOrange', 0.000, 0.445, 0.134, isGhost); addXmasVoxel(group, 0.037, 0.048, 0.020, 'eyeBlack', -0.076, 0.456, 0.125, isGhost);
+    addXmasVoxel(group, 0.025, 0.018, 0.020, 'white', -0.077, 0.466, 0.130, isGhost); addXmasVoxel(group, 0.037, 0.048, 0.020, 'eyeBlack', 0.076, 0.456, 0.125, isGhost);
+    addXmasVoxel(group, 0.025, 0.018, 0.020, 'white', 0.077, 0.466, 0.130, isGhost); addXmasVoxel(group, 0.033, 0.030, 0.018, 'blushPink', -0.084, 0.403, 0.121, isGhost);
+    addXmasVoxel(group, 0.033, 0.030, 0.018, 'blushPink', 0.084, 0.403, 0.121, isGhost);
+  } else if (skinId === 'snow_hare') {
+    // 61 voxels: snow_hare
+    addXmasVoxel(group, 0.075, 0.045, 0.170, 'hareWhite', -0.085, 0.022, -0.033, isGhost); addXmasVoxel(group, 0.075, 0.045, 0.170, 'hareWhite', 0.085, 0.022, -0.033, isGhost);
+    addXmasVoxel(group, 0.060, 0.030, 0.050, 'hareWhiteSoft', -0.085, 0.022, 0.068, isGhost); addXmasVoxel(group, 0.060, 0.030, 0.050, 'hareWhiteSoft', 0.085, 0.022, 0.068, isGhost);
+    addXmasVoxel(group, 0.070, 0.105, 0.100, 'hareWhite', -0.095, 0.087, -0.072, isGhost); addXmasVoxel(group, 0.070, 0.105, 0.100, 'hareWhite', 0.095, 0.087, -0.072, isGhost);
+    addXmasVoxel(group, 0.020, 0.065, 0.080, 'hareWhiteSoft', -0.133, 0.090, -0.072, isGhost); addXmasVoxel(group, 0.020, 0.065, 0.080, 'hareWhiteSoft', 0.133, 0.090, -0.072, isGhost);
+    addXmasVoxel(group, 0.210, 0.230, 0.190, 'hareWhite', 0.000, 0.175, -0.010, isGhost); addXmasVoxel(group, 0.180, 0.052, 0.163, 'hareWhiteSoft', 0.000, 0.054, -0.009, isGhost);
+    addXmasVoxel(group, 0.175, 0.185, 0.033, 'hareWhite', 0.000, 0.182, 0.094, isGhost); addXmasVoxel(group, 0.135, 0.130, 0.013, 'hareCream', 0.000, 0.168, 0.109, isGhost);
+    addXmasVoxel(group, 0.190, 0.172, 0.035, 'hareWhite', 0.000, 0.174, -0.115, isGhost); addXmasVoxel(group, 0.022, 0.120, 0.140, 'hareWhiteSoft', -0.109, 0.180, -0.013, isGhost);
+    addXmasVoxel(group, 0.022, 0.120, 0.140, 'hareWhiteSoft', 0.109, 0.180, -0.013, isGhost); addXmasVoxel(group, 0.085, 0.080, 0.080, 'hareWhite', 0.000, 0.122, -0.158, isGhost);
+    addXmasVoxel(group, 0.065, 0.028, 0.062, 'hareWhiteSoft', 0.000, 0.169, -0.156, isGhost); addXmasVoxel(group, 0.065, 0.030, 0.062, 'hareWhiteSoft', 0.000, 0.077, -0.156, isGhost);
+    addXmasVoxel(group, 0.022, 0.050, 0.062, 'hareWhiteSoft', -0.046, 0.122, -0.156, isGhost); addXmasVoxel(group, 0.022, 0.050, 0.062, 'hareWhiteSoft', 0.046, 0.122, -0.156, isGhost);
+    addXmasVoxel(group, 0.230, 0.170, 0.190, 'hareWhite', 0.000, 0.355, 0.007, isGhost); addXmasVoxel(group, 0.190, 0.040, 0.155, 'hareWhiteSoft', 0.000, 0.453, 0.005, isGhost);
+    addXmasVoxel(group, 0.205, 0.135, 0.033, 'hareWhite', 0.000, 0.355, -0.096, isGhost); addXmasVoxel(group, 0.028, 0.080, 0.110, 'hareWhiteSoft', -0.121, 0.325, 0.035, isGhost);
+    addXmasVoxel(group, 0.028, 0.080, 0.110, 'hareWhiteSoft', 0.121, 0.325, 0.035, isGhost); addXmasVoxel(group, 0.130, 0.068, 0.040, 'hareWhite', 0.000, 0.326, 0.115, isGhost);
+    addXmasVoxel(group, 0.052, 0.037, 0.015, 'hareWhiteSoft', -0.031, 0.316, 0.138, isGhost); addXmasVoxel(group, 0.052, 0.037, 0.015, 'hareWhiteSoft', 0.031, 0.316, 0.138, isGhost);
+    addXmasVoxel(group, 0.040, 0.028, 0.015, 'earPink', 0.000, 0.354, 0.140, isGhost); addXmasVoxel(group, 0.065, 0.035, 0.020, 'hareWhiteSoft', 0.000, 0.440, 0.102, isGhost);
+    addXmasVoxel(group, 0.035, 0.050, 0.015, 'eyeBlack', -0.085, 0.372, 0.105, isGhost); addXmasVoxel(group, 0.022, 0.020, 0.010, 'pureWhite', -0.084, 0.383, 0.113, isGhost);
+    addXmasVoxel(group, 0.035, 0.050, 0.015, 'eyeBlack', 0.085, 0.372, 0.105, isGhost); addXmasVoxel(group, 0.022, 0.020, 0.010, 'pureWhite', 0.084, 0.383, 0.113, isGhost);
+    addXmasVoxel(group, 0.035, 0.028, 0.013, 'blushPink', -0.090, 0.319, 0.104, isGhost); addXmasVoxel(group, 0.035, 0.028, 0.013, 'blushPink', 0.090, 0.319, 0.104, isGhost);
+    addXmasVoxel(group, 0.055, 0.090, 0.065, 'hareWhite', -0.070, 0.502, -0.010, isGhost); addXmasVoxel(group, 0.035, 0.060, 0.010, 'earPink', -0.070, 0.497, 0.022, isGhost);
+    addXmasVoxel(group, 0.055, 0.098, 0.060, 'hareWhite', -0.080, 0.584, -0.018, isGhost); addXmasVoxel(group, 0.030, 0.105, 0.013, 'earPinkLight', -0.077, 0.573, 0.014, isGhost);
+    addXmasVoxel(group, 0.045, 0.077, 0.055, 'hareWhiteSoft', -0.080, 0.659, -0.025, isGhost); addXmasVoxel(group, 0.055, 0.090, 0.065, 'hareWhite', 0.070, 0.502, -0.010, isGhost);
+    addXmasVoxel(group, 0.035, 0.060, 0.010, 'earPink', 0.070, 0.497, 0.022, isGhost); addXmasVoxel(group, 0.055, 0.098, 0.060, 'hareWhite', 0.080, 0.584, -0.018, isGhost);
+    addXmasVoxel(group, 0.030, 0.105, 0.013, 'earPinkLight', 0.077, 0.573, 0.014, isGhost); addXmasVoxel(group, 0.045, 0.077, 0.055, 'hareWhiteSoft', 0.080, 0.659, -0.025, isGhost);
+    addXmasVoxel(group, 0.040, 0.052, 0.065, 'hareWhite', -0.092, 0.164, 0.075, isGhost); addXmasVoxel(group, 0.050, 0.052, 0.075, 'hareWhiteSoft', -0.058, 0.159, 0.130, isGhost);
+    addXmasVoxel(group, 0.052, 0.035, 0.028, 'hareCream', -0.034, 0.160, 0.174, isGhost); addXmasVoxel(group, 0.040, 0.052, 0.065, 'hareWhite', 0.092, 0.164, 0.075, isGhost);
+    addXmasVoxel(group, 0.050, 0.052, 0.075, 'hareWhiteSoft', 0.058, 0.159, 0.130, isGhost); addXmasVoxel(group, 0.052, 0.035, 0.028, 'hareCream', 0.034, 0.160, 0.174, isGhost);
+    addXmasVoxel(group, 0.035, 0.037, 0.025, 'carrotOrangeDark', 0.000, 0.079, 0.135, isGhost); addXmasVoxel(group, 0.055, 0.058, 0.045, 'carrotOrange', 0.000, 0.119, 0.140, isGhost);
+    addXmasVoxel(group, 0.075, 0.058, 0.065, 'carrotOrange', 0.000, 0.169, 0.145, isGhost); addXmasVoxel(group, 0.065, 0.022, 0.055, 'carrotOrangeBright', 0.000, 0.204, 0.145, isGhost);
+    addXmasVoxel(group, 0.025, 0.028, 0.028, 'leafGreenDark', 0.000, 0.224, 0.141, isGhost); addXmasVoxel(group, 0.035, 0.033, 0.037, 'leafGreen', -0.025, 0.239, 0.149, isGhost);
+    addXmasVoxel(group, 0.035, 0.033, 0.037, 'leafGreen', 0.025, 0.239, 0.149, isGhost); addXmasVoxel(group, 0.035, 0.030, 0.040, 'leafGreenBright', 0.000, 0.242, 0.163, isGhost);
+    addXmasVoxel(group, 0.030, 0.028, 0.028, 'leafGreen', 0.000, 0.231, 0.179, isGhost);
+  } else if (skinId === 'husky_sweater') {
+    // 57 voxels: husky_sweater
+    addXmasVoxel(group, 0.090, 0.030, 0.090, 'huskyWhite', -0.140, 0.015, 0.150, isGhost); addXmasVoxel(group, 0.060, 0.022, 0.030, 'huskyWhite', -0.140, 0.016, 0.205, isGhost);
+    addXmasVoxel(group, 0.100, 0.080, 0.100, 'huskyWhite', -0.140, 0.062, 0.150, isGhost); addXmasVoxel(group, 0.110, 0.052, 0.110, 'sweaterRed', -0.140, 0.124, 0.150, isGhost);
+    addXmasVoxel(group, 0.090, 0.030, 0.090, 'huskyWhite', 0.140, 0.015, 0.150, isGhost); addXmasVoxel(group, 0.060, 0.022, 0.030, 'huskyWhite', 0.140, 0.016, 0.205, isGhost);
+    addXmasVoxel(group, 0.100, 0.080, 0.100, 'huskyWhite', 0.140, 0.062, 0.150, isGhost); addXmasVoxel(group, 0.110, 0.052, 0.110, 'sweaterRed', 0.140, 0.124, 0.150, isGhost);
+    addXmasVoxel(group, 0.090, 0.030, 0.090, 'huskyWhite', -0.140, 0.015, -0.150, isGhost); addXmasVoxel(group, 0.100, 0.120, 0.100, 'huskyWhite', -0.140, 0.083, -0.150, isGhost);
+    addXmasVoxel(group, 0.113, 0.098, 0.120, 'huskyDark', -0.141, 0.186, -0.150, isGhost); addXmasVoxel(group, 0.090, 0.030, 0.090, 'huskyWhite', 0.140, 0.015, -0.150, isGhost);
+    addXmasVoxel(group, 0.100, 0.120, 0.100, 'huskyWhite', 0.140, 0.083, -0.150, isGhost); addXmasVoxel(group, 0.113, 0.098, 0.120, 'huskyDark', 0.141, 0.186, -0.150, isGhost);
+    addXmasVoxel(group, 0.350, 0.225, 0.350, 'sweaterRed', 0.000, 0.237, 0.010, isGhost); addXmasVoxel(group, 0.260, 0.020, 0.315, 'sweaterRed', 0.000, 0.120, 0.007, isGhost);
+    addXmasVoxel(group, 0.360, 0.037, 0.033, 'sweaterWhite', 0.000, 0.136, -0.151, isGhost); addXmasVoxel(group, 0.320, 0.180, 0.040, 'sweaterRed', 0.000, 0.245, 0.200, isGhost);
+    addXmasVoxel(group, 0.170, 0.090, 0.015, 'sweaterWhite', 0.000, 0.250, 0.223, isGhost); addXmasVoxel(group, 0.290, 0.013, 0.070, 'sweaterWhite', 0.000, 0.354, 0.010, isGhost);
+    addXmasVoxel(group, 0.010, 0.060, 0.070, 'sweaterWhite', -0.177, 0.260, 0.010, isGhost); addXmasVoxel(group, 0.010, 0.060, 0.070, 'sweaterWhite', 0.177, 0.260, 0.010, isGhost);
+    addXmasVoxel(group, 0.330, 0.200, 0.070, 'huskyDark', 0.000, 0.235, -0.198, isGhost); addXmasVoxel(group, 0.270, 0.130, 0.028, 'huskyWhite', 0.000, 0.225, -0.241, isGhost);
+    addXmasVoxel(group, 0.150, 0.037, 0.028, 'huskyWhite', 0.000, 0.151, 0.196, isGhost); addXmasVoxel(group, 0.365, 0.045, 0.245, 'sweaterRed', 0.000, 0.345, 0.133, isGhost);
+    addXmasVoxel(group, 0.355, 0.015, 0.235, 'sweaterWhite', 0.000, 0.372, 0.133, isGhost); addXmasVoxel(group, 0.270, 0.060, 0.052, 'huskyDark', 0.000, 0.393, 0.044, isGhost);
+    addXmasVoxel(group, 0.340, 0.230, 0.270, 'huskyDark', 0.000, 0.470, 0.155, isGhost); addXmasVoxel(group, 0.250, 0.030, 0.150, 'huskyDark', 0.000, 0.595, 0.155, isGhost);
+    addXmasVoxel(group, 0.035, 0.092, 0.150, 'huskyWhite', -0.182, 0.421, 0.165, isGhost); addXmasVoxel(group, 0.035, 0.092, 0.150, 'huskyWhite', 0.182, 0.421, 0.165, isGhost);
+    addXmasVoxel(group, 0.290, 0.065, 0.015, 'huskyWhite', 0.000, 0.438, 0.292, isGhost); addXmasVoxel(group, 0.080, 0.138, 0.110, 'huskyWhite', 0.000, 0.536, 0.250, isGhost);
+    addXmasVoxel(group, 0.180, 0.098, 0.092, 'huskyWhite', 0.000, 0.414, 0.329, isGhost); addXmasVoxel(group, 0.130, 0.030, 0.055, 'huskyWhite', 0.000, 0.352, 0.307, isGhost);
+    addXmasVoxel(group, 0.070, 0.052, 0.035, 'noseBlack', 0.000, 0.446, 0.388, isGhost); addXmasVoxel(group, 0.028, 0.025, 0.048, 'tonguePink', 0.024, 0.370, 0.366, isGhost);
+    addXmasVoxel(group, 0.060, 0.052, 0.018, 'huskyBlue', -0.095, 0.501, 0.294, isGhost); addXmasVoxel(group, 0.035, 0.035, 0.010, 'noseBlack', -0.092, 0.505, 0.302, isGhost);
+    addXmasVoxel(group, 0.020, 0.013, 0.007, 'sweaterWhite', -0.095, 0.514, 0.309, isGhost); addXmasVoxel(group, 0.050, 0.022, 0.020, 'huskyWhite', -0.095, 0.551, 0.290, isGhost);
+    addXmasVoxel(group, 0.060, 0.052, 0.018, 'huskyBlue', 0.095, 0.501, 0.294, isGhost); addXmasVoxel(group, 0.035, 0.035, 0.010, 'noseBlack', 0.092, 0.505, 0.302, isGhost);
+    addXmasVoxel(group, 0.020, 0.013, 0.007, 'sweaterWhite', 0.095, 0.514, 0.309, isGhost); addXmasVoxel(group, 0.050, 0.022, 0.020, 'huskyWhite', 0.095, 0.551, 0.290, isGhost);
+    addXmasVoxel(group, 0.085, 0.120, 0.080, 'huskyDark', -0.122, 0.630, 0.150, isGhost); addXmasVoxel(group, 0.065, 0.090, 0.060, 'huskyDark', -0.122, 0.725, 0.150, isGhost);
+    addXmasVoxel(group, 0.045, 0.105, 0.025, 'huskyWhite', -0.122, 0.642, 0.188, isGhost); addXmasVoxel(group, 0.085, 0.120, 0.080, 'huskyDark', 0.122, 0.630, 0.150, isGhost);
+    addXmasVoxel(group, 0.065, 0.090, 0.060, 'huskyDark', 0.122, 0.725, 0.150, isGhost); addXmasVoxel(group, 0.045, 0.105, 0.025, 'huskyWhite', 0.122, 0.642, 0.188, isGhost);
+    addXmasVoxel(group, 0.090, 0.070, 0.060, 'huskyDark', 0.000, 0.310, -0.235, isGhost); addXmasVoxel(group, 0.100, 0.105, 0.070, 'huskyDark', 0.000, 0.390, -0.265, isGhost);
+    addXmasVoxel(group, 0.095, 0.083, 0.070, 'huskyGray', 0.000, 0.476, -0.240, isGhost); addXmasVoxel(group, 0.085, 0.060, 0.070, 'huskyWhite', 0.000, 0.525, -0.195, isGhost);
+    addXmasVoxel(group, 0.070, 0.060, 0.040, 'huskyWhite', 0.000, 0.475, -0.170, isGhost);
+  } else if (skinId === 'derpy_snowman') {
+    // 70 voxels: derpy_snowman
+    addXmasVoxel(group, 0.250, 0.030, 0.250, 'snowBody', 0.000, 0.015, -0.000, isGhost); addXmasVoxel(group, 0.300, 0.190, 0.300, 'snowWhite', 0.000, 0.115, -0.000, isGhost);
+    addXmasVoxel(group, 0.240, 0.160, 0.030, 'snowWhite', 0.000, 0.115, 0.160, isGhost); addXmasVoxel(group, 0.240, 0.160, 0.030, 'snowBody', 0.000, 0.115, -0.160, isGhost);
+    addXmasVoxel(group, 0.030, 0.160, 0.240, 'snowWhite', -0.160, 0.115, -0.000, isGhost); addXmasVoxel(group, 0.030, 0.160, 0.240, 'snowWhite', 0.160, 0.115, -0.000, isGhost);
+    addXmasVoxel(group, 0.260, 0.030, 0.260, 'snowWhite', 0.000, 0.220, -0.000, isGhost); addXmasVoxel(group, 0.230, 0.165, 0.230, 'snowWhite', 0.000, 0.307, -0.000, isGhost);
+    addXmasVoxel(group, 0.180, 0.125, 0.033, 'snowWhite', 0.000, 0.307, 0.126, isGhost); addXmasVoxel(group, 0.180, 0.125, 0.033, 'snowBody', 0.000, 0.307, -0.126, isGhost);
+    addXmasVoxel(group, 0.033, 0.125, 0.180, 'snowWhite', -0.126, 0.307, -0.000, isGhost); addXmasVoxel(group, 0.033, 0.125, 0.180, 'snowWhite', 0.126, 0.307, -0.000, isGhost);
+    addXmasVoxel(group, 0.190, 0.030, 0.190, 'snowWhite', 0.000, 0.400, -0.000, isGhost); addXmasVoxel(group, 0.025, 0.025, 0.015, 'coalBlack', 0.000, 0.360, 0.145, isGhost);
+    addXmasVoxel(group, 0.025, 0.025, 0.015, 'coalBlack', 0.000, 0.318, 0.145, isGhost); addXmasVoxel(group, 0.025, 0.025, 0.015, 'coalBlack', 0.000, 0.275, 0.145, isGhost);
+    addXmasVoxel(group, 0.102, 0.040, 0.033, 'scarfRed', -0.084, 0.407, 0.114, isGhost); addXmasVoxel(group, 0.075, 0.040, 0.033, 'scarfWhite', 0.000, 0.415, 0.116, isGhost);
+    addXmasVoxel(group, 0.102, 0.040, 0.033, 'scarfRed', 0.084, 0.407, 0.114, isGhost); addXmasVoxel(group, 0.040, 0.048, 0.068, 'scarfWhite', 0.120, 0.409, 0.069, isGhost);
+    addXmasVoxel(group, 0.040, 0.043, 0.072, 'scarfRed', 0.122, 0.414, 0.004, isGhost); addXmasVoxel(group, 0.040, 0.048, 0.075, 'scarfWhite', 0.120, 0.409, -0.065, isGhost);
+    addXmasVoxel(group, 0.215, 0.040, 0.033, 'scarfRed', 0.000, 0.415, -0.116, isGhost); addXmasVoxel(group, 0.040, 0.048, 0.075, 'scarfWhite', -0.120, 0.409, -0.065, isGhost);
+    addXmasVoxel(group, 0.040, 0.043, 0.072, 'scarfRed', -0.122, 0.414, 0.004, isGhost); addXmasVoxel(group, 0.040, 0.048, 0.068, 'scarfWhite', -0.120, 0.409, 0.069, isGhost);
+    addXmasVoxel(group, 0.048, 0.040, 0.033, 'scarfRed', -0.081, 0.405, 0.134, isGhost); addXmasVoxel(group, 0.043, 0.060, 0.025, 'scarfWhite', -0.081, 0.362, 0.133, isGhost);
+    addXmasVoxel(group, 0.037, 0.065, 0.030, 'scarfRed', -0.081, 0.305, 0.133, isGhost); addXmasVoxel(group, 0.048, 0.062, 0.022, 'scarfWhite', -0.081, 0.246, 0.134, isGhost);
+    addXmasVoxel(group, 0.180, 0.155, 0.180, 'snowWhite', 0.000, 0.495, -0.000, isGhost); addXmasVoxel(group, 0.145, 0.133, 0.025, 'snowWhite', 0.000, 0.491, 0.100, isGhost);
+    addXmasVoxel(group, 0.145, 0.130, 0.025, 'snowBody', 0.000, 0.492, -0.100, isGhost); addXmasVoxel(group, 0.025, 0.130, 0.145, 'snowWhite', -0.100, 0.492, -0.000, isGhost);
+    addXmasVoxel(group, 0.025, 0.130, 0.145, 'snowWhite', 0.100, 0.492, -0.000, isGhost); addXmasVoxel(group, 0.140, 0.018, 0.140, 'snowWhite', 0.000, 0.579, -0.000, isGhost);
+    addXmasVoxel(group, 0.035, 0.035, 0.035, 'carrotOrange', 0.000, 0.495, 0.128, isGhost); addXmasVoxel(group, 0.025, 0.025, 0.040, 'carrotOrange', 0.000, 0.495, 0.163, isGhost);
+    addXmasVoxel(group, 0.025, 0.025, 0.010, 'coalBlack', -0.040, 0.527, 0.113, isGhost); addXmasVoxel(group, 0.025, 0.025, 0.010, 'coalBlack', 0.040, 0.522, 0.113, isGhost);
+    addXmasVoxel(group, 0.015, 0.015, 0.007, 'coalBlack', -0.037, 0.465, 0.111, isGhost); addXmasVoxel(group, 0.015, 0.015, 0.007, 'coalBlack', -0.018, 0.453, 0.111, isGhost);
+    addXmasVoxel(group, 0.015, 0.015, 0.007, 'coalBlack', 0.015, 0.453, 0.111, isGhost); addXmasVoxel(group, 0.015, 0.015, 0.007, 'coalBlack', 0.035, 0.463, 0.111, isGhost);
+    addXmasVoxel(group, 0.170, 0.015, 0.165, 'metalSilver', 0.003, 0.585, -0.000, isGhost); addXmasVoxel(group, 0.160, 0.040, 0.150, 'bucketBlue', 0.005, 0.610, -0.000, isGhost);
+    addXmasVoxel(group, 0.155, 0.040, 0.140, 'bucketBlue', 0.010, 0.647, -0.003, isGhost); addXmasVoxel(group, 0.140, 0.018, 0.125, 'bucketBlue', 0.010, 0.674, -0.003, isGhost);
+    addXmasVoxel(group, 0.145, 0.010, 0.130, 'metalSilver', 0.010, 0.685, -0.003, isGhost); addXmasVoxel(group, 0.010, 0.018, 0.020, 'metalSilver', -0.077, 0.614, -0.000, isGhost);
+    addXmasVoxel(group, 0.010, 0.018, 0.020, 'metalSilver', 0.087, 0.614, -0.000, isGhost); addXmasVoxel(group, 0.010, 0.040, 0.015, 'metalSilver', -0.083, 0.588, -0.000, isGhost);
+    addXmasVoxel(group, 0.043, 0.020, 0.025, 'woodBrown', -0.139, 0.333, -0.000, isGhost); addXmasVoxel(group, 0.045, 0.020, 0.025, 'woodBrown', -0.180, 0.347, -0.003, isGhost);
+    addXmasVoxel(group, 0.022, 0.033, 0.015, 'woodBrown', -0.211, 0.371, -0.000, isGhost); addXmasVoxel(group, 0.028, 0.020, 0.015, 'woodBrown', -0.214, 0.338, -0.013, isGhost);
+    addXmasVoxel(group, 0.043, 0.020, 0.025, 'woodBrown', 0.139, 0.333, -0.000, isGhost); addXmasVoxel(group, 0.040, 0.020, 0.030, 'woodBrown', 0.177, 0.323, 0.022, isGhost);
+    addXmasVoxel(group, 0.035, 0.025, 0.037, 'woodBrown', 0.195, 0.315, 0.054, isGhost); addXmasVoxel(group, 0.020, 0.060, 0.020, 'scarfRed', 0.198, 0.030, 0.052, isGhost);
+    addXmasVoxel(group, 0.025, 0.058, 0.025, 'scarfWhite', 0.198, 0.086, 0.052, isGhost); addXmasVoxel(group, 0.020, 0.058, 0.020, 'scarfRed', 0.198, 0.141, 0.052, isGhost);
+    addXmasVoxel(group, 0.025, 0.058, 0.025, 'scarfWhite', 0.198, 0.196, 0.052, isGhost); addXmasVoxel(group, 0.020, 0.058, 0.020, 'scarfRed', 0.198, 0.251, 0.052, isGhost);
+    addXmasVoxel(group, 0.025, 0.058, 0.025, 'scarfWhite', 0.198, 0.306, 0.052, isGhost); addXmasVoxel(group, 0.020, 0.055, 0.020, 'scarfRed', 0.198, 0.360, 0.052, isGhost);
+    addXmasVoxel(group, 0.025, 0.037, 0.048, 'scarfWhite', 0.198, 0.404, 0.041, isGhost); addXmasVoxel(group, 0.020, 0.025, 0.043, 'scarfRed', 0.198, 0.420, -0.001, isGhost);
+    addXmasVoxel(group, 0.025, 0.043, 0.025, 'scarfWhite', 0.198, 0.389, -0.030, isGhost); addXmasVoxel(group, 0.020, 0.033, 0.020, 'scarfRed', 0.198, 0.354, -0.030, isGhost);
+  } else if (skinId === 'arctic_fox') {
+    // 67 voxels: arctic_fox
+    addXmasVoxel(group, 0.060, 0.025, 0.070, 'foxSilver', -0.110, 0.013, 0.155, isGhost); addXmasVoxel(group, 0.040, 0.020, 0.025, 'foxWhite', -0.110, 0.013, 0.198, isGhost);
+    addXmasVoxel(group, 0.050, 0.115, 0.060, 'foxSilverWhite', -0.110, 0.077, 0.155, isGhost); addXmasVoxel(group, 0.062, 0.090, 0.075, 'foxSilverWhite', -0.111, 0.175, 0.155, isGhost);
+    addXmasVoxel(group, 0.060, 0.025, 0.070, 'foxSilver', 0.110, 0.013, 0.155, isGhost); addXmasVoxel(group, 0.040, 0.020, 0.025, 'foxWhite', 0.110, 0.013, 0.198, isGhost);
+    addXmasVoxel(group, 0.050, 0.115, 0.060, 'foxSilverWhite', 0.110, 0.077, 0.155, isGhost); addXmasVoxel(group, 0.062, 0.090, 0.075, 'foxSilverWhite', 0.111, 0.175, 0.155, isGhost);
+    addXmasVoxel(group, 0.060, 0.025, 0.070, 'foxSilver', -0.110, 0.013, -0.125, isGhost); addXmasVoxel(group, 0.050, 0.113, 0.060, 'foxSilverWhite', -0.110, 0.076, -0.125, isGhost);
+    addXmasVoxel(group, 0.077, 0.115, 0.105, 'foxSilverWhite', -0.116, 0.182, -0.122, isGhost); addXmasVoxel(group, 0.060, 0.025, 0.070, 'foxSilver', 0.110, 0.013, -0.125, isGhost);
+    addXmasVoxel(group, 0.050, 0.113, 0.060, 'foxSilverWhite', 0.110, 0.076, -0.125, isGhost); addXmasVoxel(group, 0.077, 0.115, 0.105, 'foxSilverWhite', 0.116, 0.182, -0.122, isGhost);
+    addXmasVoxel(group, 0.260, 0.180, 0.300, 'foxSilverWhite', 0.000, 0.210, 0.005, isGhost); addXmasVoxel(group, 0.200, 0.020, 0.260, 'foxWhite', 0.000, 0.113, 0.005, isGhost);
+    addXmasVoxel(group, 0.240, 0.170, 0.060, 'foxWhite', 0.000, 0.225, 0.180, isGhost); addXmasVoxel(group, 0.190, 0.105, 0.025, 'foxWhite', 0.000, 0.233, 0.217, isGhost);
+    addXmasVoxel(group, 0.140, 0.060, 0.033, 'foxWhite', 0.000, 0.305, 0.224, isGhost); addXmasVoxel(group, 0.220, 0.020, 0.220, 'foxSilver', 0.000, 0.305, 0.005, isGhost);
+    addXmasVoxel(group, 0.015, 0.115, 0.170, 'foxSilverWhite', -0.133, 0.212, 0.005, isGhost); addXmasVoxel(group, 0.015, 0.115, 0.170, 'foxSilverWhite', 0.133, 0.212, 0.005, isGhost);
+    addXmasVoxel(group, 0.240, 0.160, 0.055, 'foxSilverWhite', 0.000, 0.210, -0.168, isGhost); addXmasVoxel(group, 0.200, 0.110, 0.025, 'foxWhite', 0.000, 0.205, -0.203, isGhost);
+    addXmasVoxel(group, 0.210, 0.080, 0.090, 'foxSilverWhite', 0.000, 0.325, 0.140, isGhost); addXmasVoxel(group, 0.250, 0.185, 0.190, 'foxSilverWhite', 0.000, 0.432, 0.140, isGhost);
+    addXmasVoxel(group, 0.120, 0.028, 0.085, 'foxSilverWhite', 0.000, 0.534, 0.117, isGhost); addXmasVoxel(group, 0.160, 0.043, 0.065, 'foxSilverWhite', 0.000, 0.509, 0.207, isGhost);
+    addXmasVoxel(group, 0.100, 0.055, 0.022, 'foxWhite', 0.000, 0.458, 0.239, isGhost); addXmasVoxel(group, 0.040, 0.090, 0.125, 'foxWhite', -0.140, 0.400, 0.152, isGhost);
+    addXmasVoxel(group, 0.040, 0.090, 0.125, 'foxWhite', 0.140, 0.400, 0.152, isGhost); addXmasVoxel(group, 0.140, 0.072, 0.075, 'foxWhite', 0.000, 0.391, 0.268, isGhost);
+    addXmasVoxel(group, 0.100, 0.060, 0.060, 'foxWhite', 0.000, 0.390, 0.330, isGhost); addXmasVoxel(group, 0.065, 0.043, 0.035, 'foxWhite', 0.000, 0.391, 0.372, isGhost);
+    addXmasVoxel(group, 0.090, 0.028, 0.070, 'foxWhite', 0.000, 0.346, 0.255, isGhost); addXmasVoxel(group, 0.050, 0.033, 0.028, 'foxNose', 0.000, 0.411, 0.394, isGhost);
+    addXmasVoxel(group, 0.050, 0.052, 0.025, 'foxEye', -0.083, 0.456, 0.245, isGhost); addXmasVoxel(group, 0.028, 0.020, 0.013, 'foxWhite', -0.081, 0.468, 0.256, isGhost);
+    addXmasVoxel(group, 0.050, 0.052, 0.025, 'foxEye', 0.083, 0.456, 0.245, isGhost); addXmasVoxel(group, 0.028, 0.020, 0.013, 'foxWhite', 0.081, 0.468, 0.256, isGhost);
+    addXmasVoxel(group, 0.060, 0.105, 0.065, 'foxSilver', -0.098, 0.568, 0.122, isGhost); addXmasVoxel(group, 0.035, 0.080, 0.050, 'foxSilverWhite', -0.095, 0.655, 0.122, isGhost);
+    addXmasVoxel(group, 0.035, 0.083, 0.013, 'innerEarPink', -0.090, 0.571, 0.151, isGhost); addXmasVoxel(group, 0.060, 0.105, 0.065, 'foxSilver', 0.098, 0.568, 0.122, isGhost);
+    addXmasVoxel(group, 0.035, 0.080, 0.050, 'foxSilverWhite', 0.095, 0.655, 0.122, isGhost); addXmasVoxel(group, 0.035, 0.083, 0.013, 'innerEarPink', 0.090, 0.571, 0.151, isGhost);
+    addXmasVoxel(group, 0.250, 0.030, 0.035, 'muffEmerald', 0.000, 0.552, 0.125, isGhost); addXmasVoxel(group, 0.055, 0.015, 0.045, 'muffGold', 0.000, 0.570, 0.125, isGhost);
+    addXmasVoxel(group, 0.028, 0.052, 0.025, 'muffEmerald', -0.131, 0.521, 0.125, isGhost); addXmasVoxel(group, 0.028, 0.052, 0.025, 'muffEmerald', 0.131, 0.521, 0.125, isGhost);
+    addXmasVoxel(group, 0.052, 0.090, 0.095, 'muffGold', -0.154, 0.465, 0.125, isGhost); addXmasVoxel(group, 0.025, 0.065, 0.075, 'muffEmerald', -0.180, 0.465, 0.125, isGhost);
+    addXmasVoxel(group, 0.010, 0.020, 0.020, 'muffGold', -0.193, 0.465, 0.125, isGhost); addXmasVoxel(group, 0.052, 0.090, 0.095, 'muffGold', 0.154, 0.465, 0.125, isGhost);
+    addXmasVoxel(group, 0.025, 0.065, 0.075, 'muffEmerald', 0.180, 0.465, 0.125, isGhost); addXmasVoxel(group, 0.010, 0.020, 0.020, 'muffGold', 0.193, 0.465, 0.125, isGhost);
+    addXmasVoxel(group, 0.085, 0.075, 0.065, 'foxSilverWhite', 0.000, 0.258, -0.212, isGhost); addXmasVoxel(group, 0.125, 0.090, 0.085, 'foxSilverWhite', 0.000, 0.320, -0.273, isGhost);
+    addXmasVoxel(group, 0.155, 0.125, 0.105, 'foxSilverWhite', 0.000, 0.407, -0.323, isGhost); addXmasVoxel(group, 0.022, 0.085, 0.075, 'foxWhite', -0.084, 0.407, -0.323, isGhost);
+    addXmasVoxel(group, 0.022, 0.085, 0.075, 'foxWhite', 0.084, 0.407, -0.323, isGhost); addXmasVoxel(group, 0.135, 0.105, 0.100, 'foxWhite', 0.000, 0.507, -0.305, isGhost);
+    addXmasVoxel(group, 0.105, 0.085, 0.090, 'foxWhite', 0.000, 0.588, -0.265, isGhost); addXmasVoxel(group, 0.070, 0.055, 0.070, 'foxWhite', 0.000, 0.642, -0.230, isGhost);
+    addXmasVoxel(group, 0.100, 0.055, 0.065, 'foxSilver', 0.000, 0.333, -0.273, isGhost); addXmasVoxel(group, 0.080, 0.085, 0.040, 'foxSilverWhite', 0.000, 0.482, -0.365, isGhost);
+    addXmasVoxel(group, 0.050, 0.035, 0.050, 'foxWhite', 0.000, 0.672, -0.200, isGhost);
+  } else {
+    createChristmasCharacterExp(skinId, isGhost, innerPivot);
+  }
+
+  root.add(innerPivot);
+  return root;
+}
+
 // --- Module: src/view/urbanCharacters.ts ---
 function addCharVoxel(
   group             , w        , h        , d        ,
@@ -1035,8 +1471,7 @@ function addCharVoxel(
 )       {
   const mat = VoxelPalette.getMaterial(color, isGhost);
   group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
-}
-const URBAN_CHARACTER_CALIBRATIONS                                            = {
+}const URBAN_CHARACTER_CALIBRATIONS                                            = {
   corgi: { scale: 1.00, offsetY: 0 },
   pigeon_pizza: { scale: 1.05, offsetY: 0 },
   barista_pug: { scale: 1.38, offsetY: 0 },
@@ -1047,8 +1482,8 @@ const URBAN_CHARACTER_CALIBRATIONS                                            = 
   raincoat_duck: { scale: 1.30, offsetY: 0 },
   capybara_zen: { scale: 1.00, offsetY: 0 },
   pigeon_king: { scale: 1.14, offsetY: 0 },
-};
-function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+  ...CHRISTMAS_CHARACTER_CALIBRATIONS,
+};function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
   const root = new THREE.Group();
   root.name = 'char_root';
 
@@ -1278,6 +1713,8 @@ function createUrbanCharacter(skinId         = 'corgi', isGhost = false)        
     createUrbanCharacterExpA(skinId, isGhost, innerPivot);
   } else if (skinId === 'capybara_zen' || skinId === 'raincoat_duck' || skinId === 'pigeon_king') {
     createUrbanCharacterExpB(skinId, isGhost, innerPivot);
+  } else if (skinId in CHRISTMAS_CHARACTER_CALIBRATIONS) {
+    return createChristmasCharacter(skinId, isGhost);
   } else {
     // Fallback to Corgi mascot
     return createUrbanCharacter('corgi', isGhost);
@@ -1291,8 +1728,7 @@ function createUrbanCharacter(skinId         = 'corgi', isGhost = false)        
 /**
  * VoxelMeshBuilder — Compiles multi-cube voxel structures into a single
  * monolithic BufferGeometry mesh with vertex colors, drastically reducing Draw Calls.
- */
-class VoxelMeshBuilder {
+ */class VoxelMeshBuilder {
                    boxes                                                                  = [];
           static          geoCache = new Map                              ();
           static sharedLambertMaterial                                   = null;
@@ -2250,8 +2686,7 @@ function buildPallet(length        , biome            = 'forest')               
   }
 
   return specs;
-}
-function createUrbanVehicle(
+}function createUrbanVehicle(
   vOrType                                                           ,
   speed         ,
   colorOverride         
@@ -2298,8 +2733,7 @@ function createUrbanVehicle(
   group.add(mesh);
   group.rotation.y = vehicleScreenRotationY(spd);
   return group;
-}
-function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+}function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
   const group = new THREE.Group();
   const mesh = VoxelMeshBuilder.buildCachedMesh('train', (builder) => {
     const specs = buildTrain();
@@ -2312,8 +2746,7 @@ function createUrbanTrain(lengthOrSpeed         = -1, speed         )           
   const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
   group.rotation.y = vehicleScreenRotationY(actualSpeed);
   return group;
-}
-function createUrbanPallet(log             , biome            = 'forest')              {
+}function createUrbanPallet(log             , biome            = 'forest')              {
   const group = new THREE.Group();
   const key = `pallet_${biome}_${log.length.toFixed(2)}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
@@ -2328,8 +2761,7 @@ function createUrbanPallet(log             , biome            = 'forest')       
 }
 
 // --- Module: src/view/urbanEnvironment.ts ---
-/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */
-function createUrbanHydrant()              {
+/** Asset 16: Cast-Iron Fire Hydrant (Ref: 16_fire_hydrant_turnaround.jpg) */function createUrbanHydrant()              {
   const group = new THREE.Group();
   const redMat = createVoxelMaterial(0xef4444);
   const silverMat = createVoxelMaterial(0xcbd5e1);
@@ -2352,8 +2784,7 @@ function createUrbanHydrant()              {
   return group;
 }
 
-/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */
-function createUrbanTrashCan()              {
+/** Asset 17: Green Street Trash Can (Ref: 17_trash_can_turnaround.jpg) */function createUrbanTrashCan()              {
   const group = new THREE.Group();
   const greenMat = createVoxelMaterial(0x15803d);
   const darkMat = createVoxelMaterial(0x1e293b);
@@ -2375,8 +2806,7 @@ function createUrbanTrashCan()              {
   return group;
 }
 
-/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */
-function createUrbanBench()              {
+/** Asset 14: Park Wooden Bench (Ref: 14_park_bench_turnaround.jpg) */function createUrbanBench()              {
   const group = new THREE.Group();
   const woodMat = createVoxelMaterial(0x854d0e);
   const ironMat = createVoxelMaterial(0x1e293b);
@@ -2400,8 +2830,7 @@ function createUrbanBench()              {
   return group;
 }
 
-/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */
-function createUrbanLampPost()              {
+/** Asset 15: City Street Lamp Post (Ref: 15_street_lamp_turnaround.jpg) */function createUrbanLampPost()              {
   const group = new THREE.Group();
   const ironMat = createVoxelMaterial(0x0f172a);
   const glowMat = createVoxelBasicMaterial(0xfef08a);
@@ -2420,8 +2849,7 @@ function createUrbanLampPost()              {
   return group;
 }
 
-/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */
-function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
+/** Asset 18: Square Tree in Planter Box (Ref: 18_tree_planter_turnaround.jpg) */function createUrbanTreePlanter(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
   const boxMat = createVoxelMaterial(0x78350f);
@@ -2451,8 +2879,7 @@ function createUrbanTreePlanter(seedVariant        , biome            = 'forest'
   return group;
 }
 
-/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */
-function createUrbanHedge(seedVariant        , biome            = 'forest')              {
+/** Asset 19: Neat Trimmed Cubic Bush Hedge (Ref: 19_cubic_hedge_turnaround.jpg) */function createUrbanHedge(seedVariant        , biome            = 'forest')              {
   const group = new THREE.Group();
   const absSeed = Math.abs(seedVariant);
   const hedgeColor =
@@ -2475,8 +2902,7 @@ function createUrbanHedge(seedVariant        , biome            = 'forest')     
   return group;
 }
 
-/** Obstacle Dispatcher */
-function createUrbanObstacle(
+/** Obstacle Dispatcher */function createUrbanObstacle(
   kind              ,
   seedVariant        ,
   biomeOrSnow                      = false
@@ -2498,16 +2924,14 @@ function createUrbanObstacle(
   return absSeed % 5 < 3
     ? createUrbanTreePlanter(absSeed, biome)
     : createUrbanLampPost();
-}
-function createUrbanCoin()              {
+}function createUrbanCoin()              {
   const group = new THREE.Group();
   const goldMat = createVoxelMaterial(VOXEL_PALETTE.goldCoin);
   const innerMat = createVoxelMaterial(0xef4444);
   group.add(createVoxelMesh(0.44, 0.44, 0.12, goldMat, 0, 0.36, 0));
   group.add(createVoxelMesh(0.18, 0.22, 0.15, innerMat, 0, 0.36, 0));
   return group;
-}
-function createUrbanRailwaySignal()                                                {
+}function createUrbanRailwaySignal()                                                {
   const group = new THREE.Group();
   const poleMat = createVoxelMaterial(0x1e293b);
   const lightMat = createVoxelBasicMaterial(0x334155);
@@ -2516,15 +2940,13 @@ function createUrbanRailwaySignal()                                             
   const lightMesh = createVoxelMesh(0.22, 0.16, 0.28, lightMat, 0, 1.22, 0, false, false);
   group.add(lightMesh);
   return { group, lightMesh };
-}
-function createUrbanRoadMarkings()              {
+}function createUrbanRoadMarkings()              {
   const group = new THREE.Group();
   const whiteLineMat = createVoxelBasicMaterial(0xf8fafc);
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(-9.5), 0.015, 0, false, false));
   group.add(createVoxelMesh(0.12, 0.02, 1.0, whiteLineMat, worldToScreenX(9.5), 0.015, 0, false, false));
   return group;
-}
-function createUrbanRoadBarrier(biome            = 'forest')              {
+}function createUrbanRoadBarrier(biome            = 'forest')              {
   const group = new THREE.Group();
   const postColor = biome === 'neon' ? 0x1e1b4b : biome === 'winter' ? 0x475569 : 0x64748b;
   const railColor = biome === 'neon' ? 0x06b6d4 : biome === 'winter' ? 0xe2e8f0 : 0x94a3b8;
@@ -2539,8 +2961,7 @@ function createUrbanRoadBarrier(biome            = 'forest')              {
   group.add(createVoxelMesh(0.14, 0.18, 0.96, railMat, 0, 0.28, 0));
   group.add(createVoxelMesh(0.15, 0.08, 0.18, reflectorMat, 0, 0.28, 0, false, false));
   return group;
-}
-function createUrbanRiverbankEdge(
+}function createUrbanRiverbankEdge(
   side                  ,
   biome            = 'forest'
 )              {
@@ -2559,8 +2980,7 @@ function createUrbanRiverbankEdge(
   group.add(createVoxelMesh(0.36, 0.22, 0.32, rockMat, bx, 0.07, 0.2));
   group.add(createVoxelMesh(0.18, 0.10, 0.16, capMat, bx + (side === 'left' ? 0.03 : -0.03), 0.17, 0.22));
   return group;
-}
-function createUrbanRecordFlag()              {
+}function createUrbanRecordFlag()              {
   const group = new THREE.Group();
   group.name = 'recordFlag';
 
@@ -2597,12 +3017,9 @@ function createUrbanRecordFlag()              {
 
   group.add(clothGroup);
   return group;
-}
-const createUrbanTree = (seedVariant        , biome                      )              =>
-  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
-const createUrbanRock = (seedVariant        , _biome            )              =>
-  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
-const createUrbanBush = (seedVariant        , biome                      )              =>
+}const createUrbanTree = (seedVariant        , biome                      )              =>
+  createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);const createUrbanRock = (seedVariant        , _biome            )              =>
+  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();const createUrbanBush = (seedVariant        , biome                      )              =>
   Math.abs(seedVariant) % 2 === 0
     ? createUrbanBench()
     : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
@@ -2818,8 +3235,7 @@ const BOOKS_BOXES                                                               
   [0.09,0.12,0.09,0.502,2.4,-0.33,21], [0.112,0.037,0.112,0.502,2.479,-0.33,21],
   [0.09,0.12,0.09,0.382,2.4,-0.33,21], [0.112,0.037,0.112,0.382,2.479,-0.33,21],
   [0.03,0.09,0.09,0.596,1.92,-0.285,4], [0.06,0.075,0.007,0.33,2.175,-0.195,4],
-];
-function populateBooksBuilder(b                  , biome            = 'forest')       {
+];function populateBooksBuilder(b                  , biome            = 'forest')       {
   let pal = BOOKS_PALETTE_FOREST;
   if (biome === 'winter') pal = BOOKS_PALETTE_WINTER;
   else if (biome === 'desert') pal = BOOKS_PALETTE_DESERT;
@@ -3041,8 +3457,7 @@ const CAFE_BOXES                                                                
   [0.052,0.052,0.052,-0.27,0.371,0.795,5], [0.165,0.135,0.165,0.637,0.068,0.795,10],
   [0.135,0.12,0.135,0.637,0.195,0.795,5], [0.09,0.09,0.09,0.637,0.3,0.795,5],
   [0.052,0.052,0.052,0.637,0.371,0.795,5],
-];
-function populateCafeBuilder(b                  , biome            = 'forest')       {
+];function populateCafeBuilder(b                  , biome            = 'forest')       {
   let pal = CAFE_PALETTE_FOREST;
   if (biome === 'winter') pal = CAFE_PALETTE_WINTER;
   else if (biome === 'desert') pal = CAFE_PALETTE_DESERT;
@@ -3244,8 +3659,7 @@ const BAKERY_BOXES                                                              
   [0.12,0.075,0.27,-0.78,2.228,-0.225,0], [0.09,0.12,0.24,0.78,2.13,-0.225,4],
   [0.12,0.075,0.27,0.78,2.228,-0.225,0], [0.3,0.12,0.09,0.675,2.13,-0.645,4],
   [0.33,0.075,0.12,0.675,2.228,-0.645,0], [0.135,0.135,0.135,0.713,2.813,-0.398,0],
-];
-function populateBakeryBuilder(b                  , biome            = 'winter')       {
+];function populateBakeryBuilder(b                  , biome            = 'winter')       {
   let pal = BAKERY_PALETTE_WINTER;
   if (biome === 'forest') pal = BAKERY_PALETTE_FOREST;
   else if (biome === 'desert') pal = BAKERY_PALETTE_DESERT;
@@ -3258,8 +3672,7 @@ function populateBakeryBuilder(b                  , biome            = 'winter')
 }
 
 // --- Module: src/view/urbanBuildings.ts ---
-/** Townhouse A: Parisian Blue Cafe / Desert Cantina / Cyber Diner (Ref: 11_townhouse_cafe_turnaround.jpg) */
-function createTownhouseA(biomeOrWinter                      = 'forest')              {
+/** Townhouse A: Parisian Blue Cafe / Desert Cantina / Cyber Diner (Ref: 11_townhouse_cafe_turnaround.jpg) */function createTownhouseA(biomeOrWinter                      = 'forest')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_a_${biome}`;
@@ -3270,8 +3683,7 @@ function createTownhouseA(biomeOrWinter                      = 'forest')        
   return group;
 }
 
-/** Townhouse B: Red Brick Bakery / Adobe Bakehouse / Synth-Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */
-function createTownhouseB(biomeOrWinter                      = 'winter')              {
+/** Townhouse B: Red Brick Bakery / Adobe Bakehouse / Synth-Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */function createTownhouseB(biomeOrWinter                      = 'winter')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_b_${biome}`;
@@ -3282,8 +3694,7 @@ function createTownhouseB(biomeOrWinter                      = 'winter')        
   return group;
 }
 
-/** Townhouse C: Green Books Store / Alpine Bookstore / Desert Scrolls / Synth-Library (Ref: 13_townhouse_books_turnaround.jpg) */
-function createTownhouseC(biomeOrWinter                      = 'forest')              {
+/** Townhouse C: Green Books Store / Alpine Bookstore / Desert Scrolls / Synth-Library (Ref: 13_townhouse_books_turnaround.jpg) */function createTownhouseC(biomeOrWinter                      = 'forest')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_c_${biome}`;
@@ -3292,8 +3703,7 @@ function createTownhouseC(biomeOrWinter                      = 'forest')        
   });
   group.add(mesh);
   return group;
-}
-function createUrbanTownhouse(seed        , biome            = 'forest')              {
+}function createUrbanTownhouse(seed        , biome            = 'forest')              {
   const root = new THREE.Group();
   root.name = 'urbanTownhouse';
   const variant = Math.abs(seed) % 3;
@@ -3409,8 +3819,17 @@ const SKIN_DESCRIPTIONS                         = {
   raincoat_duck: 'Белая уточка в ярко-жёлтом непромокаемом дождевике с капюшоном и синих сапожках.',
   capybara_zen: 'Умиротворённая дзен-капибара в медитативной позе со спелым воксельным мандарином на голове.',
   pigeon_king: 'Напыщенный белоснежный голубь в золотой короне, мантии с горностаем и царским рубиновым орденом.',
-};
-function getCharacterModelItems()                     {
+  penguin_cocoa: 'Очаровательный пингвинёнок в вязаном шарфике с тёплой кружкой горячего какао и зефирками.',
+  snow_hare: 'Пушистый белоснежный заяц с длинными ушками, румяными щёчками и спелой хрустящей морковкой.',
+  husky_sweater: 'Задорный северный хаски с голубыми глазами в уютном рождественском красно-белом свитере.',
+  derpy_snowman: 'Смешной воксельный снеговик с синим ведром на голове, полосатым шарфом и метлой из веток.',
+  arctic_fox: 'Благородный песец с серебристо-белым мехом в стильных изумрудно-золотых наушниках.',
+  holiday_elf: 'Маленький эльф-помощник Санты в остроконечном колпаке с бубенчиком и праздничной коробкой с бантом.',
+  holiday_owl: 'Мудрая полярная сова с золотистыми глазами, шапочкой Санты и заснеженной еловой шишкой в лапках.',
+  gingerbread_man: 'Ароматный пряничный человечек с сахарной белой глазурью, румяными щечками и мармеладными пуговками.',
+  reindeer_glow: 'Знаменитый рождественский олень Рудольф с ветвистыми рогами, светящимся рубиновым носом и золотым колокольчиком.',
+  santa_claus: 'Легендарный Дедушка Санта в бархатном кафтане с меховой опушкой, поясом с золотой пряжкой и мешком подарков.',
+};function getCharacterModelItems()                     {
   return ALL_SKINS.map((skin) => ({
     id: skin.id,
     name: skin.name,
@@ -3419,8 +3838,7 @@ function getCharacterModelItems()                     {
     desc: SKIN_DESCRIPTIONS[skin.id] ?? `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
     create: (_biome            = 'forest', isGhost = false) => createUrbanCharacter(skin.id, isGhost),
   }));
-}
-function getVehicleModelItems()                     {
+}function getVehicleModelItems()                     {
   return [
     {
       id: 'taxi',
@@ -3471,8 +3889,7 @@ function getVehicleModelItems()                     {
       create: () => createUrbanPallet({ id: 1, x: 0, length: 2.4, speed: 1 }),
     },
   ];
-}
-function getPropModelItems()                     {
+}function getPropModelItems()                     {
   return [
     {
       id: 'hydrant',
@@ -3555,8 +3972,7 @@ function getPropModelItems()                     {
       create: (b            = 'forest') => createUrbanRiverbankEdge('left', b),
     },
   ];
-}
-function getNatureModelItems()                     {
+}function getNatureModelItems()                     {
   return [
     {
       id: 'tree_planter_0',
@@ -3583,8 +3999,7 @@ function getNatureModelItems()                     {
       create: (b            = 'forest') => createUrbanHedge(0, b),
     },
   ];
-}
-function getBuildingModelItems()                     {
+}function getBuildingModelItems()                     {
   return [
     {
       id: 'townhouse_cafe',
@@ -3611,31 +4026,22 @@ function getBuildingModelItems()                     {
       create: (b            = 'forest') => createTownhouseC(b),
     },
   ];
-}
-function getModelCatalog()                     {
+}function getModelCatalog()                     {
   return [
-    ...getCharacterModelItems(),
-    ...getVehicleModelItems(),
-    ...getPropModelItems(),
-    ...getNatureModelItems(),
-    ...getBuildingModelItems(),
+    ...getCharacterModelItems(), ...getVehicleModelItems(),
+    ...getPropModelItems(), ...getNatureModelItems(), ...getBuildingModelItems(),
   ];
-}
-function getModelDiagnostics(group             )                                      {
+}function getModelDiagnostics(group             )                                      {
   let meshCount = 0;
   group.traverse((c) => {
     if ((c              ).isMesh) {
-      const vx = (c.userData && typeof c.userData.voxelCount === 'number') ? c.userData.voxelCount : 1;
-      meshCount += vx;
+      meshCount += (c.userData && typeof c.userData.voxelCount === 'number') ? c.userData.voxelCount : 1;
     }
   });
   const box = new THREE.Box3().setFromObject(group);
-  const w = Math.max(0.01, box.max.x - box.min.x).toFixed(2);
-  const h = Math.max(0.01, box.max.y - box.min.y).toFixed(2);
-  const d = Math.max(0.01, box.max.z - box.min.z).toFixed(2);
+  const [w, h, d] = [box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z].map((v) => Math.max(0.01, v).toFixed(2));
   return { meshCount, dims: `${w} × ${h} × ${d}` };
-}
-function verifyModelRegistry()   
+}function verifyModelRegistry()   
                                                                             
   {
   const catalog = getModelCatalog();
@@ -3659,9 +4065,7 @@ function verifyModelRegistry()
   }
 
   for (const skin of ALL_SKINS) {
-    if (!catalog.some((m) => m.id === skin.id && m.cat === 'chars')) {
-      errors.push(`Skin "${skin.id}" missing from model catalog!`);
-    }
+    if (!catalog.some((m) => m.id === skin.id && m.cat === 'chars')) errors.push(`Skin "${skin.id}" missing from model catalog!`);
   }
 
   return { total: catalog.length, countsByCategory, errors };

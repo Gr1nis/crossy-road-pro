@@ -1,0 +1,68 @@
+
+Cube.all.slice().forEach(c => c.remove());
+Group.all.slice().forEach(g => g.remove());
+Texture.all.slice().forEach(t => t.remove());
+
+Project.name = 'holiday_elf';
+Project.texture_width = 16;
+Project.texture_height = 16;
+
+const canvas = document.createElement('canvas');
+canvas.width = 16;
+canvas.height = 16;
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = '#0f172a';
+ctx.fillRect(0, 0, 16, 16);
+
+const swatches = ["#15803d", "#166534", "#dc2626", "#ffffff", "#facc15", "#fed7aa", "#fca5a5", "#0f172a", "#18181b", "#b45309"];
+swatches.forEach((hex, idx) => {
+  ctx.fillStyle = hex;
+  ctx.fillRect(idx, 0, 1, 1);
+});
+
+const tex = new Texture({ name: 'holiday_elf_palette' });
+tex.fromDataURL(canvas.toDataURL('image/png')).add(false);
+
+const groupDefs = ["shoes_legs", "coat_body", "head_face", "elf_hat", "hands_key"];
+const groups = {};
+groupDefs.forEach(name => {
+  groups[name] = new Group({ name: name }).init();
+});
+
+const cubesData = [{"name": "shoe_main_left", "group": "shoes_legs", "from": [-1.8, 0.0, -1.8], "to": [-0.8, 0.7, 0.6], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "shoe_toe_curve_left", "group": "shoes_legs", "from": [-1.6, 0.15, -2.5], "to": [-1.0, 0.85, -1.7], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "shoe_toe_tip_left", "group": "shoes_legs", "from": [-1.5, 0.65, -2.85], "to": [-1.1, 1.2, -2.35], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "shoe_bell_left", "group": "shoes_legs", "from": [-1.45, 1.05, -3.15], "to": [-1.15, 1.45, -2.75], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "shoe_main_right", "group": "shoes_legs", "from": [0.8, 0.0, -1.8], "to": [1.8, 0.7, 0.6], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "shoe_toe_curve_right", "group": "shoes_legs", "from": [1.0, 0.15, -2.5], "to": [1.6, 0.85, -1.7], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "shoe_toe_tip_right", "group": "shoes_legs", "from": [1.1, 0.65, -2.85], "to": [1.5, 1.2, -2.35], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "shoe_bell_right", "group": "shoes_legs", "from": [1.15, 1.05, -3.15], "to": [1.45, 1.45, -2.75], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "leg_stripe_r1_left", "group": "shoes_legs", "from": [-1.65, 0.55, -0.95], "to": [-0.95, 1.25, -0.05], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "leg_stripe_w1_left", "group": "shoes_legs", "from": [-1.6, 1.15, -0.9], "to": [-1.0, 1.85, -0.1], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "leg_stripe_r2_left", "group": "shoes_legs", "from": [-1.65, 1.75, -0.95], "to": [-0.95, 2.45, -0.05], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "leg_stripe_w2_left", "group": "shoes_legs", "from": [-1.6, 2.35, -0.9], "to": [-1.0, 3.1, -0.1], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "leg_stripe_r1_right", "group": "shoes_legs", "from": [0.95, 0.55, -0.95], "to": [1.65, 1.25, -0.05], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "leg_stripe_w1_right", "group": "shoes_legs", "from": [1.0, 1.15, -0.9], "to": [1.6, 1.85, -0.1], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "leg_stripe_r2_right", "group": "shoes_legs", "from": [0.95, 1.75, -0.95], "to": [1.65, 2.45, -0.05], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "leg_stripe_w2_right", "group": "shoes_legs", "from": [1.0, 2.35, -0.9], "to": [1.6, 3.1, -0.1], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "tunic_skirt_hem", "group": "coat_body", "from": [-2.2, 2.85, -1.5], "to": [2.2, 3.85, 1.1], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tunic_skirt_trim", "group": "coat_body", "from": [-2.0, 2.7, -1.35], "to": [2.0, 3.0, 0.95], "color": "elfGreenDark", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "tunic_torso_main", "group": "coat_body", "from": [-2.05, 3.65, -1.35], "to": [2.05, 5.65, 0.95], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tunic_chest_breast", "group": "coat_body", "from": [-1.75, 4.25, -1.55], "to": [1.75, 5.45, -1.25], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "belt_strap", "group": "coat_body", "from": [-2.15, 3.8, -1.45], "to": [2.15, 4.3, 1.05], "color": "elfBelt", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "belt_buckle_gold", "group": "coat_body", "from": [-0.6, 3.7, -1.65], "to": [0.6, 4.4, -1.3], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "belt_buckle_center", "group": "coat_body", "from": [-0.25, 3.85, -1.7], "to": [0.25, 4.25, -1.55], "color": "elfBelt", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "collar_front_bib", "group": "coat_body", "from": [-1.65, 5.3, -1.6], "to": [1.65, 5.95, -1.15], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "collar_front_petal_center", "group": "coat_body", "from": [-0.45, 4.85, -1.65], "to": [0.45, 5.4, -1.3], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "collar_front_petal_left", "group": "coat_body", "from": [-1.45, 5.0, -1.65], "to": [-0.75, 5.4, -1.2], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "collar_front_petal_right", "group": "coat_body", "from": [0.75, 5.0, -1.65], "to": [1.45, 5.4, -1.2], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "collar_back_mantle", "group": "coat_body", "from": [-1.9, 5.35, -0.7], "to": [1.9, 6.0, 1.15], "color": "elfRed", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "neck_core", "group": "coat_body", "from": [-1.2, 5.45, -0.8], "to": [1.2, 6.35, 0.4], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "head_core", "group": "head_face", "from": [-2.1, 6.15, -1.8], "to": [2.1, 9.45, 1.4], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "hair_back_bob", "group": "head_face", "from": [-2.2, 6.3, 0.45], "to": [2.2, 9.1, 1.6], "color": "elfHair", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hair_side_left", "group": "head_face", "from": [-2.25, 7.2, -0.6], "to": [-1.95, 8.8, 0.7], "color": "elfHair", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hair_side_right", "group": "head_face", "from": [1.95, 7.2, -0.6], "to": [2.25, 8.8, 0.7], "color": "elfHair", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hair_bangs_front", "group": "head_face", "from": [-1.7, 8.65, -1.9], "to": [1.7, 9.25, -1.75], "color": "elfHair", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "cheek_blush_left", "group": "head_face", "from": [-1.95, 6.7, -1.9], "to": [-1.15, 7.35, -1.75], "color": "elfCheek", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "cheek_blush_right", "group": "head_face", "from": [1.15, 6.7, -1.9], "to": [1.95, 7.35, -1.75], "color": "elfCheek", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "nose_cute", "group": "head_face", "from": [-0.3, 7.2, -2.0], "to": [0.3, 7.6, -1.75], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "eye_pupil_left", "group": "head_face", "from": [-1.75, 7.45, -1.95], "to": [-0.95, 8.45, -1.75], "color": "elfEye", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "eye_sparkle_left", "group": "head_face", "from": [-1.65, 8.0, -2.0], "to": [-1.25, 8.4, -1.85], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "eye_pupil_right", "group": "head_face", "from": [0.95, 7.45, -1.95], "to": [1.75, 8.45, -1.75], "color": "elfEye", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "eye_sparkle_right", "group": "head_face", "from": [1.25, 8.0, -2.0], "to": [1.65, 8.4, -1.85], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "ear_base_left", "group": "head_face", "from": [-2.7, 7.15, -0.4], "to": [-2.0, 8.15, 0.4], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "ear_tip_point_left", "group": "head_face", "from": [-3.3, 7.6, 0.1], "to": [-2.6, 8.45, 0.7], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "ear_base_right", "group": "head_face", "from": [2.0, 7.15, -0.4], "to": [2.7, 8.15, 0.4], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "ear_tip_point_right", "group": "head_face", "from": [2.6, 7.6, 0.1], "to": [3.3, 8.45, 0.7], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "hat_brim_trim", "group": "elf_hat", "from": [-2.3, 9.15, -2.0], "to": [2.3, 9.85, 1.6], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "hat_cone_tier1", "group": "elf_hat", "from": [-2.0, 9.75, -1.7], "to": [2.0, 10.95, 1.3], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "hat_cone_tier2", "group": "elf_hat", "from": [-1.6, 10.85, -1.2], "to": [1.6, 11.95, 1.4], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "hat_cone_tier3_bend", "group": "elf_hat", "from": [-1.45, 11.75, -0.5], "to": [1.05, 12.75, 1.7], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "hat_droop_tier4", "group": "elf_hat", "from": [-1.2, 11.35, 1.25], "to": [0.6, 12.35, 2.45], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "hat_droop_tier5_tail", "group": "elf_hat", "from": [-0.95, 10.25, 1.85], "to": [0.35, 11.45, 2.75], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "hat_tip_socket", "group": "elf_hat", "from": [-0.75, 9.55, 2.05], "to": [0.15, 10.35, 2.7], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "hat_pompom_bell", "group": "elf_hat", "from": [-0.65, 8.85, 2.15], "to": [0.05, 9.65, 2.85], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "arm_shoulder_left", "group": "hands_key", "from": [-2.65, 4.35, -0.9], "to": [-1.95, 5.45, 0.5], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "arm_forearm_left", "group": "hands_key", "from": [-2.45, 4.05, -1.85], "to": [-1.85, 4.85, -0.65], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "sleeve_cuff_left", "group": "hands_key", "from": [-2.35, 4.0, -2.15], "to": [-1.75, 4.7, -1.75], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "hand_clasp_left", "group": "hands_key", "from": [-1.8, 4.05, -2.45], "to": [-1.2, 4.65, -1.95], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "arm_shoulder_right", "group": "hands_key", "from": [1.95, 4.35, -0.9], "to": [2.65, 5.45, 0.5], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "arm_forearm_right", "group": "hands_key", "from": [1.85, 4.05, -1.85], "to": [2.45, 4.85, -0.65], "color": "elfGreen", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "sleeve_cuff_right", "group": "hands_key", "from": [1.75, 4.0, -2.15], "to": [2.35, 4.7, -1.75], "color": "elfWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "hand_clasp_right", "group": "hands_key", "from": [1.2, 4.05, -2.45], "to": [1.8, 4.65, -1.95], "color": "elfSkin", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "key_shaft", "group": "hands_key", "from": [-0.3, 3.25, -2.35], "to": [0.3, 5.35, -1.95], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "key_bridge_bar", "group": "hands_key", "from": [-1.35, 4.15, -2.3], "to": [1.35, 4.55, -2.0], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "key_handle_hub", "group": "hands_key", "from": [-0.55, 5.25, -2.4], "to": [0.55, 5.75, -1.9], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "key_wing_left", "group": "hands_key", "from": [-1.45, 5.65, -2.3], "to": [-0.3, 6.75, -2.0], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "key_wing_right", "group": "hands_key", "from": [0.3, 5.65, -2.3], "to": [1.45, 6.75, -2.0], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "key_wing_center", "group": "hands_key", "from": [-0.35, 5.95, -2.25], "to": [0.35, 6.45, -2.05], "color": "elfGold", "col_idx": 4, "uv": [4, 0, 5, 1]}];
+
+Undo.initEdit({ elements: [], groups: [] });
+
+cubesData.forEach(d => {
+  const cube = new Cube({
+    name: d.name,
+    from: d.from,
+    to: d.to,
+    faces: {
+      north: { uv: d.uv, texture: tex.uuid },
+      east:  { uv: d.uv, texture: tex.uuid },
+      south: { uv: d.uv, texture: tex.uuid },
+      west:  { uv: d.uv, texture: tex.uuid },
+      up:    { uv: d.uv, texture: tex.uuid },
+      down:  { uv: d.uv, texture: tex.uuid }
+    }
+  });
+  cube.init();
+  if (groups[d.group]) {
+    cube.addTo(groups[d.group]);
+  }
+});
+
+Undo.finishEdit('Holiday Elf (Rare 🧝) - Emerald Coat, Striped Stockings, Pointy Ears, Golden Wind-up Key, Zero Z-Fighting, 67 Cubes');
+Canvas.updateAll();
+
+const modelData = Format.codec.compile();
+Blockbench.writeFile('C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/assets/models/holiday_elf.bbmodel', { content: modelData });
+
+return {
+  success: true,
+  cubesCount: Cube.all.length,
+  groupsCount: Group.all.length,
+  textureName: tex.name,
+  savedPath: 'C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/assets/models/holiday_elf.bbmodel'
+};

@@ -1,0 +1,68 @@
+
+Cube.all.slice().forEach(c => c.remove());
+Group.all.slice().forEach(g => g.remove());
+Texture.all.slice().forEach(t => t.remove());
+
+Project.name = 'holiday_owl';
+Project.texture_width = 16;
+Project.texture_height = 16;
+
+const canvas = document.createElement('canvas');
+canvas.width = 16;
+canvas.height = 16;
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = '#0f172a';
+ctx.fillRect(0, 0, 16, 16);
+
+const swatches = ["#f8fafc", "#ffffff", "#cbd5e1", "#94a3b8", "#e2e8f0", "#334155", "#0f172a", "#f59e0b", "#fbbf24", "#dc2626", "#78350f", "#92400e", "#15803d"];
+swatches.forEach((hex, idx) => {
+  ctx.fillStyle = hex;
+  ctx.fillRect(idx, 0, 1, 1);
+});
+
+const tex = new Texture({ name: 'holiday_owl_palette' });
+tex.fromDataURL(canvas.toDataURL('image/png')).add(false);
+
+const groupDefs = ["feet", "body_wings", "head_face", "santa_hat", "silver_pinecone"];
+const groups = {};
+groupDefs.forEach(name => {
+  groups[name] = new Group({ name: name }).init();
+});
+
+const cubesData = [{"name": "foot_pad_left", "group": "feet", "from": [-1.75, 0.0, -1.15], "to": [-0.65, 0.6, 0.55], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "talon_outer_left", "group": "feet", "from": [-1.85, 0.1, -1.65], "to": [-1.45, 0.45, -0.95], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "talon_center_left", "group": "feet", "from": [-1.35, 0.1, -1.95], "to": [-0.95, 0.5, -0.9], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "talon_inner_left", "group": "feet", "from": [-0.85, 0.1, -1.7], "to": [-0.5, 0.45, -0.9], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "foot_pad_right", "group": "feet", "from": [0.65, 0.0, -1.15], "to": [1.75, 0.6, 0.55], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "talon_inner_right", "group": "feet", "from": [0.5, 0.1, -1.7], "to": [0.85, 0.45, -0.9], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "talon_center_right", "group": "feet", "from": [0.95, 0.1, -1.95], "to": [1.35, 0.5, -0.9], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "talon_outer_right", "group": "feet", "from": [1.45, 0.1, -1.65], "to": [1.85, 0.45, -0.95], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "leg_fluff_left", "group": "feet", "from": [-1.65, 0.5, -0.85], "to": [-0.75, 1.45, 0.45], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "leg_fluff_right", "group": "feet", "from": [0.75, 0.5, -0.85], "to": [1.65, 1.45, 0.45], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_belly_lower", "group": "body_wings", "from": [-2.15, 1.25, -1.45], "to": [2.15, 3.25, 1.35], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_belly_fluff_front", "group": "body_wings", "from": [-1.65, 1.55, -1.75], "to": [1.65, 3.1, -1.35], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_belly_speckle_center", "group": "body_wings", "from": [-0.6, 1.85, -1.8], "to": [0.6, 2.75, -1.65], "color": "owlSpeckleLight", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "body_torso_mid", "group": "body_wings", "from": [-2.35, 3.0, -1.65], "to": [2.35, 5.25, 1.55], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_chest_puffy", "group": "body_wings", "from": [-1.85, 3.35, -1.95], "to": [1.85, 5.05, -1.55], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "body_chest_speckle_left", "group": "body_wings", "from": [-1.55, 3.65, -2.0], "to": [-0.65, 4.45, -1.85], "color": "owlSpeckleDark", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "body_chest_speckle_right", "group": "body_wings", "from": [0.65, 3.65, -2.0], "to": [1.55, 4.45, -1.85], "color": "owlSpeckleDark", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "body_chest_speckle_mid", "group": "body_wings", "from": [-0.45, 4.25, -2.0], "to": [0.45, 4.85, -1.85], "color": "owlSpeckleLight", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "tail_rump_coverts", "group": "body_wings", "from": [-1.35, 2.1, 1.15], "to": [1.35, 3.1, 1.7], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tail_fan_upper", "group": "body_wings", "from": [-1.55, 1.2, 1.3], "to": [1.55, 2.25, 1.9], "color": "owlSpeckleDark", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "tail_wedge_lower", "group": "body_wings", "from": [-1.2, 0.55, 1.45], "to": [1.2, 1.4, 2.05], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "tail_feather_tips", "group": "body_wings", "from": [-0.75, 0.15, 1.55], "to": [0.75, 0.7, 2.1], "color": "owlSpeckleDark", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "wing_shoulder_left", "group": "body_wings", "from": [-3.05, 3.55, -1.15], "to": [-2.25, 5.15, 1.35], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_mid_left", "group": "body_wings", "from": [-3.15, 2.25, -1.25], "to": [-2.2, 3.75, 1.15], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_primaries_left", "group": "body_wings", "from": [-3.0, 1.15, -0.65], "to": [-2.1, 2.45, 1.45], "color": "owlSpeckleDark", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "wing_tip_point_left", "group": "body_wings", "from": [-2.75, 0.45, 0.15], "to": [-2.05, 1.35, 1.85], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_hand_front_left", "group": "body_wings", "from": [-2.65, 2.15, -1.85], "to": [-1.85, 3.2, -0.95], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_shoulder_right", "group": "body_wings", "from": [2.25, 3.55, -1.15], "to": [3.05, 5.15, 1.35], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_mid_right", "group": "body_wings", "from": [2.2, 2.25, -1.25], "to": [3.15, 3.75, 1.15], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_primaries_right", "group": "body_wings", "from": [2.1, 1.15, -0.65], "to": [3.0, 2.45, 1.45], "color": "owlSpeckleDark", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "wing_tip_point_right", "group": "body_wings", "from": [2.05, 0.45, 0.15], "to": [2.75, 1.35, 1.85], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "wing_hand_front_right", "group": "body_wings", "from": [1.85, 2.15, -1.85], "to": [2.65, 3.2, -0.95], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_neck_core", "group": "head_face", "from": [-1.75, 4.95, -1.35], "to": [1.75, 5.85, 1.25], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_cranium_main", "group": "head_face", "from": [-2.25, 5.65, -1.55], "to": [2.25, 8.45, 1.45], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_back_plumage", "group": "head_face", "from": [-2.15, 5.8, 1.15], "to": [2.15, 8.2, 1.85], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "face_disc_base", "group": "head_face", "from": [-2.35, 5.75, -1.85], "to": [2.35, 8.15, -1.3], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "face_disc_rim", "group": "head_face", "from": [-2.55, 5.95, -1.75], "to": [2.55, 7.95, -1.45], "color": "owlSpeckleLight", "col_idx": 2, "uv": [2, 0, 3, 1]}, {"name": "brow_ridge", "group": "head_face", "from": [-2.05, 7.85, -2.0], "to": [2.05, 8.45, -1.65], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "ear_tuft_left", "group": "head_face", "from": [-2.45, 8.3, -0.75], "to": [-1.65, 9.15, 0.15], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "ear_tuft_right", "group": "head_face", "from": [1.65, 8.3, -0.75], "to": [2.45, 9.15, 0.15], "color": "owlWhite", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "eye_iris_amber_left", "group": "head_face", "from": [-1.9, 6.35, -2.0], "to": [-0.6, 7.65, -1.7], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "eye_iris_inner_left", "group": "head_face", "from": [-1.8, 6.45, -2.05], "to": [-0.7, 7.55, -1.9], "color": "brightAmber", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "eye_pupil_left", "group": "head_face", "from": [-1.65, 6.6, -2.15], "to": [-0.85, 7.4, -1.95], "color": "eyePupil", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "eye_glint_left", "group": "head_face", "from": [-1.55, 7.05, -2.2], "to": [-1.2, 7.35, -2.1], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "eye_iris_amber_right", "group": "head_face", "from": [0.6, 6.35, -2.0], "to": [1.9, 7.65, -1.7], "color": "amberGold", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "eye_iris_inner_right", "group": "head_face", "from": [0.7, 6.45, -2.05], "to": [1.8, 7.55, -1.9], "color": "brightAmber", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "eye_pupil_right", "group": "head_face", "from": [0.85, 6.6, -2.15], "to": [1.65, 7.4, -1.95], "color": "eyePupil", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "eye_glint_right", "group": "head_face", "from": [0.95, 7.05, -2.2], "to": [1.3, 7.35, -2.1], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "beak_base", "group": "head_face", "from": [-0.35, 6.25, -2.25], "to": [0.35, 7.15, -1.7], "color": "graphiteBeak", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "beak_hook_tip", "group": "head_face", "from": [-0.25, 5.75, -2.4], "to": [0.25, 6.45, -2.05], "color": "graphiteBeak", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "hat_fur_brim", "group": "santa_hat", "from": [-2.1, 8.25, -1.75], "to": [2.1, 8.95, 1.35], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "hat_cone_tier1", "group": "santa_hat", "from": [-1.75, 8.85, -1.45], "to": [1.75, 9.95, 1.15], "color": "santaRed", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hat_cone_tier2", "group": "santa_hat", "from": [-1.45, 9.75, -1.05], "to": [1.45, 10.75, 1.25], "color": "santaRed", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hat_cone_tier3_bend", "group": "santa_hat", "from": [-1.25, 10.45, -0.45], "to": [0.95, 11.35, 1.55], "color": "santaRed", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hat_droop_tier4", "group": "santa_hat", "from": [-1.05, 9.95, 1.15], "to": [0.55, 10.85, 2.15], "color": "santaRed", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hat_droop_tail", "group": "santa_hat", "from": [-0.85, 8.95, 1.65], "to": [0.35, 10.15, 2.45], "color": "santaRed", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "hat_pompom_socket", "group": "santa_hat", "from": [-0.65, 8.35, 1.85], "to": [0.15, 9.15, 2.5], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "hat_pompom_fluff", "group": "santa_hat", "from": [-0.55, 7.65, 1.95], "to": [0.05, 8.55, 2.65], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "cone_tip_bottom", "group": "silver_pinecone", "from": [-0.45, 0.35, -2.25], "to": [0.45, 0.9, -1.65], "color": "coneWoodDark", "col_idx": 10, "uv": [10, 0, 11, 1]}, {"name": "cone_tier_lower", "group": "silver_pinecone", "from": [-0.95, 0.8, -2.45], "to": [0.95, 1.5, -1.55], "color": "coneWoodWarm", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "cone_tier_lower_frost", "group": "silver_pinecone", "from": [-1.05, 1.0, -2.55], "to": [1.05, 1.35, -1.75], "color": "silverFrost", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "cone_tier_mid_core", "group": "silver_pinecone", "from": [-1.25, 1.45, -2.6], "to": [1.25, 2.3, -1.5], "color": "coneWoodDark", "col_idx": 10, "uv": [10, 0, 11, 1]}, {"name": "cone_tier_mid_scales", "group": "silver_pinecone", "from": [-1.15, 1.6, -2.7], "to": [1.15, 2.15, -1.6], "color": "coneWoodWarm", "col_idx": 11, "uv": [11, 0, 12, 1]}, {"name": "cone_scale_frost_center", "group": "silver_pinecone", "from": [-0.55, 1.7, -2.85], "to": [0.55, 2.1, -2.45], "color": "owlSnowPure", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "cone_tier_upper_core", "group": "silver_pinecone", "from": [-0.9, 2.2, -2.45], "to": [0.9, 2.9, -1.55], "color": "coneWoodDark", "col_idx": 10, "uv": [10, 0, 11, 1]}, {"name": "cone_tier_upper_frost", "group": "silver_pinecone", "from": [-0.75, 2.45, -2.55], "to": [0.75, 2.8, -1.7], "color": "silverFrost", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "cone_spruce_left", "group": "silver_pinecone", "from": [-0.75, 2.85, -2.35], "to": [-0.1, 3.4, -1.7], "color": "pineGreen", "col_idx": 12, "uv": [12, 0, 13, 1]}, {"name": "cone_spruce_right", "group": "silver_pinecone", "from": [0.1, 2.85, -2.3], "to": [0.75, 3.4, -1.7], "color": "pineGreen", "col_idx": 12, "uv": [12, 0, 13, 1]}, {"name": "cone_winter_berry", "group": "silver_pinecone", "from": [-0.25, 3.15, -2.45], "to": [0.25, 3.65, -1.9], "color": "santaRed", "col_idx": 9, "uv": [9, 0, 10, 1]}];
+
+Undo.initEdit({ elements: [], groups: [] });
+
+cubesData.forEach(d => {
+  const cube = new Cube({
+    name: d.name,
+    from: d.from,
+    to: d.to,
+    faces: {
+      north: { uv: d.uv, texture: tex.uuid },
+      east:  { uv: d.uv, texture: tex.uuid },
+      south: { uv: d.uv, texture: tex.uuid },
+      west:  { uv: d.uv, texture: tex.uuid },
+      up:    { uv: d.uv, texture: tex.uuid },
+      down:  { uv: d.uv, texture: tex.uuid }
+    }
+  });
+  cube.init();
+  if (groups[d.group]) {
+    cube.addTo(groups[d.group]);
+  }
+});
+
+Undo.finishEdit('Holiday Owl (Rare 🦉) - Snowy Owl, Santa Hat, Frosted Cedar Pinecone with Sprig & Berry, Zero Z-Fighting, 69 Cubes');
+Canvas.updateAll();
+
+const modelData = Format.codec.compile();
+Blockbench.writeFile('C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/assets/models/holiday_owl.bbmodel', { content: modelData });
+
+return {
+  success: true,
+  cubesCount: Cube.all.length,
+  groupsCount: Group.all.length,
+  textureName: tex.name,
+  savedPath: 'C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/assets/models/holiday_owl.bbmodel'
+};

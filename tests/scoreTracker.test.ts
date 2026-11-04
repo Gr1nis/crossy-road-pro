@@ -139,8 +139,8 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
     // 100 + 40 (cashback) = 140 coins after spin completes
     assert.equal(tracker.getCoins(), 140, 'Cashback credited after spin completion');
 
-    // Roll weighted probability 0.97 -> Legendary 'capybara_zen' (new skin!)
-    const legRoll = tracker.rollGacha(0.97);
+    // Roll weighted probability 0.45 -> Legendary 'capybara_zen' (new skin!)
+    const legRoll = tracker.rollGacha(0.425);
     assert.equal(legRoll.success, true);
     assert.equal(legRoll.skinId, 'capybara_zen');
     assert.equal(legRoll.rarity, 'Legendary');
@@ -150,7 +150,7 @@ describe('ScoreTracker — Monotonicity & Adversarial Storage Tests', () => {
 
     // Roll capybara_zen again -> duplicate Legendary gives +40 cashback
     tracker.addCoins(60); // now 100 coins
-    const dupLegRoll = tracker.rollGacha(0.97);
+    const dupLegRoll = tracker.rollGacha(0.425);
     assert.equal(dupLegRoll.isDuplicate, true);
     assert.equal(dupLegRoll.cashback, 40);
     assert.equal(tracker.getCoins(), 0, '100 - 100 = 0 coins during spin');

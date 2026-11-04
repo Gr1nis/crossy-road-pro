@@ -24,13 +24,13 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
     const gacha = new GachaMachine();
     const droppedSkins = new Set<SkinId>();
 
-    // Roll across 200 nonces (simulating player rolls in gameplay)
-    for (let nonce = 1; nonce <= 300; nonce++) {
+    // Roll across nonces (simulating player rolls in gameplay)
+    for (let nonce = 1; nonce <= 600; nonce++) {
       const skin = gacha.pickSkin(nonce);
       droppedSkins.add(skin);
     }
 
-    assert.equal(ALL_SKINS.length, 10, 'ALL_SKINS must define exactly 10 characters');
+    assert.equal(ALL_SKINS.length, 20, 'ALL_SKINS must define exactly 20 characters');
 
     for (const skin of ALL_SKINS) {
       assert.ok(
@@ -109,8 +109,8 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
       }
     }
 
-    assert.equal(tracker.isAllSkinsUnlocked(), true, 'Player must be able to unlock all 10 characters');
-    assert.equal(tracker.getUnlockedSkins().length, 10, 'All 10 characters unlocked');
+    assert.equal(tracker.isAllSkinsUnlocked(), true, 'Player must be able to unlock all 20 characters');
+    assert.equal(tracker.getUnlockedSkins().length, 20, 'All 20 characters unlocked');
   });
 
   it('Property 4 (Thumbnail preloading): preloadGachaCardThumbnails caches all 10 character thumbnails', () => {
@@ -129,7 +129,7 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
 
     const droppedSkins = new Set<SkinId>();
     // Provide coins and roll repeatedly
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 600; i++) {
       engine.addCoins(100);
       const res = engine.rollGacha();
       assert.equal(res.success, true);
@@ -141,7 +141,7 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
       }
     }
 
-    assert.equal(droppedSkins.size, 10, 'Live GameEngine.rollGacha() must drop all 10 characters');
+    assert.equal(droppedSkins.size, 20, 'Live GameEngine.rollGacha() must drop all 20 characters');
     const newCharacters: SkinId[] = [
       'barista_pug',
       'skater_ferret',
@@ -159,27 +159,22 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
 
     // 1. Base probabilities (no unlocked skins):
     const baseProbs = gacha.getDropProbabilities();
-    assert.equal(Math.round(baseProbs.corgi * 10) / 10, 12.5, 'Common base is 12.5%');
-    assert.equal(Math.round(baseProbs.box_cat * 10) / 10, 15.0, 'Rare base is 15.0%');
-    assert.equal(Math.round(baseProbs.raccoon_bandit * 10) / 10, 7.5, 'Epic base is 7.5%');
-    assert.equal(Math.round(baseProbs.capybara_zen * 10) / 10, 2.5, 'Legendary base is 2.5%');
+    assert.equal(Math.round(baseProbs.corgi * 10) / 10, 6.3, 'Common base is 6.3%');
+    assert.equal(Math.round(baseProbs.box_cat * 10) / 10, 6.0, 'Rare base is 6.0%');
+    assert.equal(Math.round(baseProbs.raccoon_bandit * 10) / 10, 3.8, 'Epic base is 3.8%');
+    assert.equal(Math.round(baseProbs.capybara_zen * 10) / 10, 1.7, 'Legendary base is 1.7%');
 
     // 2. With corgi unlocked:
     const probsWithCorgi = gacha.getDropProbabilities(new Set(['corgi']));
-    // corgi weight is 12.5 * 0.25 = 3.125. Total weight = 90.625.
-    // corgi prob = (3.125 / 90.625) * 100 = 3.448%
-    // pigeon_pizza prob = (12.5 / 90.625) * 100 = 13.793%
-    assert.ok(probsWithCorgi.corgi < 4.0, 'Owned corgi probability drops to ~3.45%');
-    assert.ok(probsWithCorgi.pigeon_pizza > 13.0, 'New common pigeon_pizza has ~13.79%');
     const ratio = probsWithCorgi.pigeon_pizza / probsWithCorgi.corgi;
     assert.ok(Math.abs(ratio - 4.0) < 0.05, `New character chance must be 4x higher than owned duplicate (got ${ratio.toFixed(2)})`);
 
     // 3. When all skins are unlocked: relative chances return to base
     const allUnlockedProbs = gacha.getDropProbabilities(new Set(ALL_SKINS.map((s) => s.id)));
-    assert.equal(Math.round(allUnlockedProbs.corgi * 10) / 10, 12.5);
-    assert.equal(Math.round(allUnlockedProbs.box_cat * 10) / 10, 15.0);
-    assert.equal(Math.round(allUnlockedProbs.raccoon_bandit * 10) / 10, 7.5);
-    assert.equal(Math.round(allUnlockedProbs.capybara_zen * 10) / 10, 2.5);
+    assert.equal(Math.round(allUnlockedProbs.corgi * 10) / 10, 6.3);
+    assert.equal(Math.round(allUnlockedProbs.box_cat * 10) / 10, 6.0);
+    assert.equal(Math.round(allUnlockedProbs.raccoon_bandit * 10) / 10, 3.8);
+    assert.equal(Math.round(allUnlockedProbs.capybara_zen * 10) / 10, 1.7);
   });
 
   it('Property 7 (Monte Carlo verification): pickSkin favors new skins over owned skins', () => {

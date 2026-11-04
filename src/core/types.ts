@@ -37,7 +37,17 @@ export type SkinId =
   | 'raccoon_bandit'
   | 'raincoat_duck'
   | 'capybara_zen'
-  | 'pigeon_king';
+  | 'pigeon_king'
+  | 'penguin_cocoa'
+  | 'snow_hare'
+  | 'husky_sweater'
+  | 'derpy_snowman'
+  | 'arctic_fox'
+  | 'holiday_elf'
+  | 'holiday_owl'
+  | 'gingerbread_man'
+  | 'reindeer_glow'
+  | 'santa_claus';
 
 export const DEFAULT_SKIN_ID: SkinId = 'corgi';
 
@@ -52,6 +62,16 @@ export const ALL_SKINS: ReadonlyArray<{ id: SkinId; name: string; badge: string 
   { id: 'raincoat_duck', name: 'Утка в дождевике', badge: '🦆' },
   { id: 'capybara_zen', name: 'Дзен-Капибара', badge: '🍊' },
   { id: 'pigeon_king', name: 'Голубиный Барон', badge: '👑' },
+  { id: 'penguin_cocoa', name: 'Пингвинёнок с какао', badge: '🐧' },
+  { id: 'snow_hare', name: 'Снежный заяц с морковкой', badge: '🐰' },
+  { id: 'husky_sweater', name: 'Хаски в свитере', badge: '🐕' },
+  { id: 'derpy_snowman', name: 'Снеговик с шарфом', badge: '⛄' },
+  { id: 'arctic_fox', name: 'Песец в наушниках', badge: '🦊' },
+  { id: 'holiday_elf', name: 'Эльф-помощник', badge: '🧝' },
+  { id: 'holiday_owl', name: 'Полярная сова с шишкой', badge: '🦉' },
+  { id: 'gingerbread_man', name: 'Пряничный человечек', badge: '🍪' },
+  { id: 'reindeer_glow', name: 'Олень Рудольф', badge: '🦌' },
+  { id: 'santa_claus', name: 'Дедушка Санта', badge: '🎅' },
 ];
 
 export const Biome = {

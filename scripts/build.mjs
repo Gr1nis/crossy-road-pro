@@ -40,6 +40,8 @@ const moduleOrder = [
   'src/view/voxelPalette.ts',
   'src/view/urbanCharactersExpansionA.ts',
   'src/view/urbanCharactersExpansionB.ts',
+  'src/view/christmasCharactersExpansion.ts',
+  'src/view/christmasCharacters.ts',
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
   'src/view/urbanVehicles.ts',
@@ -3186,7 +3188,9 @@ function auditDeployModels() {
   const charsSource =
     fs.readFileSync(path.join(ROOT, 'src/view/urbanCharacters.ts'), 'utf8') +
     fs.readFileSync(path.join(ROOT, 'src/view/urbanCharactersExpansionA.ts'), 'utf8') +
-    fs.readFileSync(path.join(ROOT, 'src/view/urbanCharactersExpansionB.ts'), 'utf8');
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanCharactersExpansionB.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/christmasCharacters.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/christmasCharactersExpansion.ts'), 'utf8');
   const vehSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanVehicles.ts'), 'utf8');
   const envSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanEnvironment.ts'), 'utf8');
   const bldgSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanBuildings.ts'), 'utf8');
@@ -3260,6 +3264,8 @@ const viewerModuleOrder = [
   'src/view/voxelPalette.ts',
   'src/view/urbanCharactersExpansionA.ts',
   'src/view/urbanCharactersExpansionB.ts',
+  'src/view/christmasCharactersExpansion.ts',
+  'src/view/christmasCharacters.ts',
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
   'src/view/urbanVehicles.ts',

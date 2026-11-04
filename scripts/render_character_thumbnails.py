@@ -22,7 +22,9 @@ TS_OUT_FILE = os.path.join(ROOT_DIR, 'src', 'view', 'gachaSkinsBase64.ts')
 SOURCE_FILES = [
     os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharacters.ts'),
     os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharactersExpansionA.ts'),
-    os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharactersExpansionB.ts')
+    os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharactersExpansionB.ts'),
+    os.path.join(ROOT_DIR, 'src', 'view', 'christmasCharacters.ts'),
+    os.path.join(ROOT_DIR, 'src', 'view', 'christmasCharactersExpansion.ts')
 ]
 
 SKIN_IDS = [
@@ -35,7 +37,17 @@ SKIN_IDS = [
     'raccoon_bandit',
     'raincoat_duck',
     'capybara_zen',
-    'pigeon_king'
+    'pigeon_king',
+    'penguin_cocoa',
+    'snow_hare',
+    'husky_sweater',
+    'derpy_snowman',
+    'arctic_fox',
+    'holiday_elf',
+    'holiday_owl',
+    'gingerbread_man',
+    'reindeer_glow',
+    'santa_claus'
 ]
 
 
@@ -49,15 +61,17 @@ def load_palette():
 
 
 def load_calibrations():
-    urban_file = os.path.join(ROOT_DIR, 'src', 'view', 'urbanCharacters.ts')
-    with open(urban_file, 'r', encoding='utf-8') as f:
-        content = f.read()
     calibs = {}
-    for m in re.finditer(r'(\w+):\s*\{\s*scale:\s*([0-9.]+),\s*offsetY:\s*([0-9.-]+)\s*\}', content):
-        calibs[m.group(1)] = {
-            'scale': float(m.group(2)),
-            'offsetY': float(m.group(3))
-        }
+    for fname in ['urbanCharacters.ts', 'christmasCharacters.ts']:
+        fpath = os.path.join(ROOT_DIR, 'src', 'view', fname)
+        if os.path.exists(fpath):
+            with open(fpath, 'r', encoding='utf-8') as f:
+                content = f.read()
+            for m in re.finditer(r'(\w+):\s*\{\s*scale:\s*([0-9.]+),\s*offsetY:\s*([0-9.-]+)\s*\}', content):
+                calibs[m.group(1)] = {
+                    'scale': float(m.group(2)),
+                    'offsetY': float(m.group(3))
+                }
     return calibs
 
 
@@ -76,7 +90,7 @@ def load_skin_voxels(skin_id, palette, calib=None):
 
     block = m.group(1) if m else ''
     raw_calls = re.findall(
-        r'(?:addCharVoxel|addExpAVoxel|addExpBVoxel)\s*\(\s*group\s*,\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*[\x27\x22]([^\x27\x22]+)[\x27\x22],\s*([^,]+),\s*([^,]+),\s*([^,]+)',
+        r'(?:addCharVoxel|addExpAVoxel|addExpBVoxel|addXmasVoxel|addXmasExpVoxel)\s*\(\s*group\s*,\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*[\x27\x22]([^\x27\x22]+)[\x27\x22],\s*([^,]+),\s*([^,]+),\s*([^,]+)',
         block
     )
 

@@ -3,10 +3,9 @@ import { ALL_SKINS, type BiomeType, type SkinId } from '../core/types.ts';
 import { createUrbanCharacter } from './urbanCharacters.ts';
 import { createUrbanPallet, createUrbanTrain, createUrbanVehicle } from './urbanVehicles.ts';
 import {
-  createUrbanBench, createUrbanCoin, createUrbanHedge, createUrbanHydrant,
-  createUrbanLampPost, createUrbanRailwaySignal, createUrbanRecordFlag,
-  createUrbanRiverbankEdge, createUrbanRoadBarrier, createUrbanRoadMarkings,
-  createUrbanTrashCan, createUrbanTreePlanter,
+  createUrbanBench, createUrbanCoin, createUrbanHedge, createUrbanHydrant, createUrbanLampPost,
+  createUrbanRailwaySignal, createUrbanRecordFlag, createUrbanRiverbankEdge, createUrbanRoadBarrier,
+  createUrbanRoadMarkings, createUrbanTrashCan, createUrbanTreePlanter,
 } from './urbanEnvironment.ts';
 import { createTownhouseA, createTownhouseB, createTownhouseC } from './urbanBuildings.ts';
 
@@ -32,6 +31,16 @@ const SKIN_DESCRIPTIONS: Record<SkinId, string> = {
   raincoat_duck: 'Белая уточка в ярко-жёлтом непромокаемом дождевике с капюшоном и синих сапожках.',
   capybara_zen: 'Умиротворённая дзен-капибара в медитативной позе со спелым воксельным мандарином на голове.',
   pigeon_king: 'Напыщенный белоснежный голубь в золотой короне, мантии с горностаем и царским рубиновым орденом.',
+  penguin_cocoa: 'Очаровательный пингвинёнок в вязаном шарфике с тёплой кружкой горячего какао и зефирками.',
+  snow_hare: 'Пушистый белоснежный заяц с длинными ушками, румяными щёчками и спелой хрустящей морковкой.',
+  husky_sweater: 'Задорный северный хаски с голубыми глазами в уютном рождественском красно-белом свитере.',
+  derpy_snowman: 'Смешной воксельный снеговик с синим ведром на голове, полосатым шарфом и метлой из веток.',
+  arctic_fox: 'Благородный песец с серебристо-белым мехом в стильных изумрудно-золотых наушниках.',
+  holiday_elf: 'Маленький эльф-помощник Санты в остроконечном колпаке с бубенчиком и праздничной коробкой с бантом.',
+  holiday_owl: 'Мудрая полярная сова с золотистыми глазами, шапочкой Санты и заснеженной еловой шишкой в лапках.',
+  gingerbread_man: 'Ароматный пряничный человечек с сахарной белой глазурью, румяными щечками и мармеладными пуговками.',
+  reindeer_glow: 'Знаменитый рождественский олень Рудольф с ветвистыми рогами, светящимся рубиновым носом и золотым колокольчиком.',
+  santa_claus: 'Легендарный Дедушка Санта в бархатном кафтане с меховой опушкой, поясом с золотой пряжкой и мешком подарков.',
 };
 
 export function getCharacterModelItems(): ModelCatalogItem[] {
@@ -44,7 +53,6 @@ export function getCharacterModelItems(): ModelCatalogItem[] {
     create: (_biome: BiomeType = 'forest', isGhost = false) => createUrbanCharacter(skin.id, isGhost),
   }));
 }
-
 export function getVehicleModelItems(): ModelCatalogItem[] {
   return [
     {
@@ -243,11 +251,8 @@ export function getBuildingModelItems(): ModelCatalogItem[] {
 
 export function getModelCatalog(): ModelCatalogItem[] {
   return [
-    ...getCharacterModelItems(),
-    ...getVehicleModelItems(),
-    ...getPropModelItems(),
-    ...getNatureModelItems(),
-    ...getBuildingModelItems(),
+    ...getCharacterModelItems(), ...getVehicleModelItems(),
+    ...getPropModelItems(), ...getNatureModelItems(), ...getBuildingModelItems(),
   ];
 }
 
@@ -255,14 +260,11 @@ export function getModelDiagnostics(group: THREE.Group): { meshCount: number; di
   let meshCount = 0;
   group.traverse((c) => {
     if ((c as THREE.Mesh).isMesh) {
-      const vx = (c.userData && typeof c.userData.voxelCount === 'number') ? c.userData.voxelCount : 1;
-      meshCount += vx;
+      meshCount += (c.userData && typeof c.userData.voxelCount === 'number') ? c.userData.voxelCount : 1;
     }
   });
   const box = new THREE.Box3().setFromObject(group);
-  const w = Math.max(0.01, box.max.x - box.min.x).toFixed(2);
-  const h = Math.max(0.01, box.max.y - box.min.y).toFixed(2);
-  const d = Math.max(0.01, box.max.z - box.min.z).toFixed(2);
+  const [w, h, d] = [box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z].map((v) => Math.max(0.01, v).toFixed(2));
   return { meshCount, dims: `${w} × ${h} × ${d}` };
 }
 
@@ -290,9 +292,7 @@ export function verifyModelRegistry(): {
   }
 
   for (const skin of ALL_SKINS) {
-    if (!catalog.some((m) => m.id === skin.id && m.cat === 'chars')) {
-      errors.push(`Skin "${skin.id}" missing from model catalog!`);
-    }
+    if (!catalog.some((m) => m.id === skin.id && m.cat === 'chars')) errors.push(`Skin "${skin.id}" missing from model catalog!`);
   }
 
   return { total: catalog.length, countsByCategory, errors };

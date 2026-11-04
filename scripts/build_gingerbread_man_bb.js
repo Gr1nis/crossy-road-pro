@@ -1,0 +1,68 @@
+
+Cube.all.slice().forEach(c => c.remove());
+Group.all.slice().forEach(g => g.remove());
+Texture.all.slice().forEach(t => t.remove());
+
+Project.name = 'gingerbread_man';
+Project.texture_width = 16;
+Project.texture_height = 16;
+
+const canvas = document.createElement('canvas');
+canvas.width = 16;
+canvas.height = 16;
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = '#1c1917';
+ctx.fillRect(0, 0, 16, 16);
+
+const swatches = ["#d97706", "#b45309", "#92400e", "#ffffff", "#1c1917", "#fb7185", "#dc2626", "#10b981", "#f59e0b", "#ef4444"];
+swatches.forEach((hex, idx) => {
+  ctx.fillStyle = hex;
+  ctx.fillRect(idx, 0, 1, 1);
+});
+
+const tex = new Texture({ name: 'gingerbread_man_palette' });
+tex.fromDataURL(canvas.toDataURL('image/png')).add(false);
+
+const groupDefs = ["legs_feet", "torso_cookie", "head_cookie", "icing_decor", "accessories"];
+const groups = {};
+groupDefs.forEach(name => {
+  groups[name] = new Group({ name: name }).init();
+});
+
+const cubesData = [{"name": "foot_sole_left", "group": "legs_feet", "from": [-1.9, 0.0, -1.3], "to": [-0.7, 0.7, 1.1], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "foot_toe_round_left", "group": "legs_feet", "from": [-1.75, 0.1, -1.65], "to": [-0.85, 0.65, -1.05], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "foot_heel_round_left", "group": "legs_feet", "from": [-1.75, 0.1, 0.85], "to": [-0.85, 0.65, 1.4], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "leg_shaft_left", "group": "legs_feet", "from": [-1.8, 0.55, -1.15], "to": [-0.8, 2.8, 0.95], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "foot_sole_right", "group": "legs_feet", "from": [0.7, 0.0, -1.3], "to": [1.9, 0.7, 1.1], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "foot_toe_round_right", "group": "legs_feet", "from": [0.85, 0.1, -1.65], "to": [1.75, 0.65, -1.05], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "foot_heel_round_right", "group": "legs_feet", "from": [0.85, 0.1, 0.85], "to": [1.75, 0.65, 1.4], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "leg_shaft_right", "group": "legs_feet", "from": [0.8, 0.55, -1.15], "to": [1.8, 2.8, 0.95], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "torso_pelvis_crotch", "group": "torso_cookie", "from": [-1.3, 2.4, -1.1], "to": [1.3, 3.4, 0.9], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "torso_belly_main", "group": "torso_cookie", "from": [-2.1, 3.15, -1.15], "to": [2.1, 5.45, 0.95], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "torso_belly_bulge", "group": "torso_cookie", "from": [-1.7, 3.45, -1.35], "to": [1.7, 5.15, -1.05], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "torso_back_bulge", "group": "torso_cookie", "from": [-1.7, 3.45, 0.85], "to": [1.7, 5.15, 1.15], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "torso_chest_upper", "group": "torso_cookie", "from": [-1.95, 5.25, -1.1], "to": [1.95, 6.35, 0.9], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "neck_stem", "group": "torso_cookie", "from": [-1.1, 6.15, -0.75], "to": [1.1, 6.85, 0.65], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "arm_shoulder_left", "group": "torso_cookie", "from": [-2.75, 4.95, -0.9], "to": [-1.9, 6.05, 0.7], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "arm_bicep_left", "group": "torso_cookie", "from": [-3.45, 4.15, -0.85], "to": [-2.55, 5.25, 0.65], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "arm_forearm_left", "group": "torso_cookie", "from": [-3.9, 3.35, -1.25], "to": [-3.15, 4.45, 0.4], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "hand_mitten_left", "group": "torso_cookie", "from": [-4.2, 2.85, -1.45], "to": [-3.4, 3.8, -0.2], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "arm_shoulder_right", "group": "torso_cookie", "from": [1.9, 4.95, -0.9], "to": [2.75, 6.05, 0.7], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "arm_bicep_right", "group": "torso_cookie", "from": [2.55, 4.15, -0.85], "to": [3.45, 5.25, 0.65], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "arm_forearm_right", "group": "torso_cookie", "from": [3.15, 3.35, -1.25], "to": [3.9, 4.45, 0.4], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "hand_mitten_right", "group": "torso_cookie", "from": [3.4, 2.85, -1.45], "to": [4.2, 3.8, -0.2], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "head_core", "group": "head_cookie", "from": [-2.15, 6.65, -1.1], "to": [2.15, 9.85, 0.9], "color": "doughWarm", "col_idx": 0, "uv": [0, 0, 1, 1]}, {"name": "head_chin_round", "group": "head_cookie", "from": [-1.65, 6.45, -0.95], "to": [1.65, 7.05, 0.75], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "head_crown_round", "group": "head_cookie", "from": [-1.65, 9.65, -0.95], "to": [1.65, 10.35, 0.75], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "head_cheek_left", "group": "head_cookie", "from": [-2.5, 7.25, -0.95], "to": [-1.95, 9.25, 0.75], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "head_cheek_right", "group": "head_cookie", "from": [1.95, 7.25, -0.95], "to": [2.5, 9.25, 0.75], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "head_front_round", "group": "head_cookie", "from": [-1.9, 7.1, -1.25], "to": [1.9, 9.5, -0.95], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "head_back_round", "group": "head_cookie", "from": [-1.85, 7.15, 0.8], "to": [1.85, 9.45, 1.1], "color": "doughCrust", "col_idx": 1, "uv": [1, 0, 2, 1]}, {"name": "icing_cuff_leg_left_main", "group": "icing_decor", "from": [-1.95, 1.05, -1.25], "to": [-0.65, 1.45, 1.05], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_cuff_leg_left_wave1", "group": "icing_decor", "from": [-1.75, 0.9, -1.4], "to": [-0.85, 1.55, -1.05], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_cuff_leg_left_wave2", "group": "icing_decor", "from": [-1.75, 0.9, 0.85], "to": [-0.85, 1.55, 1.2], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_cuff_leg_right_main", "group": "icing_decor", "from": [0.65, 1.05, -1.25], "to": [1.95, 1.45, 1.05], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_cuff_leg_right_wave1", "group": "icing_decor", "from": [0.85, 0.9, -1.4], "to": [1.75, 1.55, -1.05], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_cuff_leg_right_wave2", "group": "icing_decor", "from": [0.85, 0.9, 0.85], "to": [1.75, 1.55, 1.2], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_cuff_arm_left", "group": "icing_decor", "from": [-4.05, 3.25, -1.35], "to": [-3.25, 3.65, 0.3], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_wave_arm_left", "group": "icing_decor", "from": [-4.15, 3.15, -1.5], "to": [-3.35, 3.75, -1.1], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_cuff_arm_right", "group": "icing_decor", "from": [3.25, 3.25, -1.35], "to": [4.05, 3.65, 0.3], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_wave_arm_right", "group": "icing_decor", "from": [3.35, 3.15, -1.5], "to": [4.15, 3.75, -1.1], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_eye_white_left", "group": "icing_decor", "from": [-1.55, 8.1, -1.4], "to": [-0.75, 8.9, -1.15], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_pupil_left", "group": "icing_decor", "from": [-1.35, 8.25, -1.45], "to": [-0.95, 8.7, -1.2], "color": "eyePupil", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "icing_eye_white_right", "group": "icing_decor", "from": [0.75, 8.1, -1.4], "to": [1.55, 8.9, -1.15], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_pupil_right", "group": "icing_decor", "from": [0.95, 8.25, -1.45], "to": [1.35, 8.7, -1.2], "color": "eyePupil", "col_idx": 4, "uv": [4, 0, 5, 1]}, {"name": "icing_eyebrow_left", "group": "icing_decor", "from": [-1.6, 9.05, -1.35], "to": [-0.7, 9.35, -1.2], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_eyebrow_right", "group": "icing_decor", "from": [0.7, 9.05, -1.35], "to": [1.6, 9.35, -1.2], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_smile_center", "group": "icing_decor", "from": [-0.7, 7.2, -1.4], "to": [0.7, 7.45, -1.2], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_smile_left_upturn", "group": "icing_decor", "from": [-1.15, 7.3, -1.35], "to": [-0.6, 7.75, -1.15], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_smile_right_upturn", "group": "icing_decor", "from": [0.6, 7.3, -1.35], "to": [1.15, 7.75, -1.15], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "blush_cheek_left", "group": "icing_decor", "from": [-1.8, 7.4, -1.35], "to": [-1.25, 7.95, -1.2], "color": "cheekPink", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "blush_cheek_right", "group": "icing_decor", "from": [1.25, 7.4, -1.35], "to": [1.8, 7.95, -1.2], "color": "cheekPink", "col_idx": 5, "uv": [5, 0, 6, 1]}, {"name": "icing_hair_swirl_base", "group": "icing_decor", "from": [-0.9, 10.15, -0.7], "to": [0.9, 10.65, 0.5], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "icing_hair_swirl_peak", "group": "icing_decor", "from": [-0.45, 10.55, -0.5], "to": [0.55, 11.05, 0.3], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "bowtie_knot_center", "group": "accessories", "from": [-0.35, 6.1, -1.55], "to": [0.35, 6.6, -1.0], "color": "gumdropGreen", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "bowtie_wing_left", "group": "accessories", "from": [-1.35, 6.05, -1.5], "to": [-0.25, 6.55, -1.05], "color": "candyRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "bowtie_wing_right", "group": "accessories", "from": [0.25, 6.05, -1.5], "to": [1.35, 6.55, -1.05], "color": "candyRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "bowtie_stripe_left", "group": "accessories", "from": [-1.05, 6.15, -1.55], "to": [-0.55, 6.5, -1.35], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "bowtie_stripe_right", "group": "accessories", "from": [0.55, 6.15, -1.55], "to": [1.05, 6.5, -1.35], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "button_ruby_top", "group": "accessories", "from": [-0.4, 4.9, -1.6], "to": [0.4, 5.4, -1.25], "color": "gumdropRuby", "col_idx": 9, "uv": [9, 0, 10, 1]}, {"name": "button_ruby_highlight", "group": "accessories", "from": [-0.2, 5.05, -1.65], "to": [0.2, 5.3, -1.45], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "button_emerald_mid", "group": "accessories", "from": [-0.4, 4.15, -1.6], "to": [0.4, 4.65, -1.25], "color": "gumdropGreen", "col_idx": 7, "uv": [7, 0, 8, 1]}, {"name": "button_emerald_highlight", "group": "accessories", "from": [-0.2, 4.3, -1.65], "to": [0.2, 4.55, -1.45], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "button_amber_bot", "group": "accessories", "from": [-0.4, 3.4, -1.6], "to": [0.4, 3.9, -1.25], "color": "gumdropYellow", "col_idx": 8, "uv": [8, 0, 9, 1]}, {"name": "button_amber_highlight", "group": "accessories", "from": [-0.2, 3.55, -1.65], "to": [0.2, 3.8, -1.45], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "candycane_stem_lower", "group": "accessories", "from": [-3.95, 1.8, -1.6], "to": [-3.55, 2.65, -1.2], "color": "candyRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "candycane_stem_grip", "group": "accessories", "from": [-3.85, 2.55, -1.55], "to": [-3.6, 3.7, -1.15], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "candycane_stem_upper", "group": "accessories", "from": [-3.95, 3.6, -1.6], "to": [-3.55, 4.8, -1.2], "color": "candyRed", "col_idx": 6, "uv": [6, 0, 7, 1]}, {"name": "candycane_hook_top", "group": "accessories", "from": [-3.85, 4.7, -1.55], "to": [-2.95, 5.3, -1.25], "color": "icingWhite", "col_idx": 3, "uv": [3, 0, 4, 1]}, {"name": "candycane_hook_tip", "group": "accessories", "from": [-3.05, 4.25, -1.6], "to": [-2.65, 4.85, -1.2], "color": "candyRed", "col_idx": 6, "uv": [6, 0, 7, 1]}];
+
+Undo.initEdit({ elements: [], groups: [] });
+
+cubesData.forEach(d => {
+  const cube = new Cube({
+    name: d.name,
+    from: d.from,
+    to: d.to,
+    faces: {
+      north: { uv: d.uv, texture: tex.uuid },
+      east:  { uv: d.uv, texture: tex.uuid },
+      south: { uv: d.uv, texture: tex.uuid },
+      west:  { uv: d.uv, texture: tex.uuid },
+      up:    { uv: d.uv, texture: tex.uuid },
+      down:  { uv: d.uv, texture: tex.uuid }
+    }
+  });
+  cube.init();
+  if (groups[d.group]) {
+    cube.addTo(groups[d.group]);
+  }
+});
+
+Undo.finishEdit('Gingerbread Man (Epic 🍪) - Golden Honey Dough, Royal Sugar Icing Cuffs & Face, Festive Candy Bowtie, 3 Juicy Gumdrop Buttons, Peppermint Candy Cane in Hand, Zero Z-Fighting, 68 Cubes');
+Canvas.updateAll();
+
+const modelData = Format.codec.compile();
+Blockbench.writeFile('C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/assets/models/gingerbread_man.bbmodel', { content: modelData });
+
+return {
+  success: true,
+  cubesCount: Cube.all.length,
+  groupsCount: Group.all.length,
+  textureName: tex.name,
+  savedPath: 'C:/Users/MIXPC/.gemini/antigravity/scratch/crossy-road-pro/assets/models/gingerbread_man.bbmodel'
+};

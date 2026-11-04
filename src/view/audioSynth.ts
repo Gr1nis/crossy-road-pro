@@ -593,6 +593,131 @@ export class AudioSynth {
       gain.connect(this.sfxGainNode ?? ctx.destination);
       osc.start(now);
       osc.stop(now + 0.065);
+    } else if (id.includes('penguin_cocoa') || (id.includes('penguin') && id.includes('cocoa'))) {
+      // Penguin Cocoa: joyful winter chirp + warm cocoa slurp
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(740, now);
+      osc.frequency.exponentialRampToValueAtTime(1380, now + 0.035);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.07);
+      osc.frequency.exponentialRampToValueAtTime(420, now + 0.12);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.13);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.135);
+    } else if (id.includes('snow_hare') || id.includes('hare')) {
+      // Snow Hare: gentle soft squeak + crisp carrot bite
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1150, now);
+      osc.frequency.exponentialRampToValueAtTime(1650, now + 0.03);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.07);
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.003, now + 0.08);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.085);
+    } else if (id.includes('husky')) {
+      // Husky Sweater: energetic playful husky bark / joyful 'awoo'
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(360, now);
+      osc.frequency.exponentialRampToValueAtTime(720, now + 0.03);
+      osc.frequency.exponentialRampToValueAtTime(260, now + 0.085);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.09);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.095);
+    } else if (id.includes('snowman')) {
+      // Derpy Snowman: winter wind whistle + broom rustle
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(680, now);
+      osc.frequency.linearRampToValueAtTime(1180, now + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(520, now + 0.11);
+      gain.gain.setValueAtTime(0.10, now);
+      gain.gain.exponentialRampToValueAtTime(0.003, now + 0.12);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.125);
+    } else if (id.includes('arctic_fox') || id.includes('fox')) {
+      // Arctic Fox: crisp energetic double-yap in headphones
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(920, now);
+      osc.frequency.exponentialRampToValueAtTime(1580, now + 0.025);
+      osc.frequency.exponentialRampToValueAtTime(1100, now + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(1750, now + 0.075);
+      gain.gain.setValueAtTime(0.10, now);
+      gain.gain.exponentialRampToValueAtTime(0.003, now + 0.08);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.085);
+    } else if (id.includes('elf')) {
+      // Holiday Elf: bright cheerful holiday giggle
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1046.5, now);
+      osc.frequency.setValueAtTime(1318.5, now + 0.03);
+      osc.frequency.setValueAtTime(1567.9, now + 0.06);
+      osc.frequency.exponentialRampToValueAtTime(1174.6, now + 0.10);
+      gain.gain.setValueAtTime(0.11, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.11);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.115);
+    } else if (id.includes('owl')) {
+      // Holiday Owl: deep mellow snowy owl 'whoo-whoo'
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(340, now);
+      osc.frequency.exponentialRampToValueAtTime(440, now + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(290, now + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(380, now + 0.12);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.14);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.145);
+    } else if (id.includes('gingerbread')) {
+      // Gingerbread Man: crunchy cookie snap + sweet giggle
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(1200, now);
+      osc.frequency.exponentialRampToValueAtTime(450, now + 0.02);
+      osc.frequency.exponentialRampToValueAtTime(980, now + 0.06);
+      gain.gain.setValueAtTime(0.10, now);
+      gain.gain.exponentialRampToValueAtTime(0.003, now + 0.08);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.085);
+    } else if (id.includes('reindeer')) {
+      // Reindeer Glow: festive jingle bell chime + noble snort
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1864.6, now);
+      osc.frequency.setValueAtTime(2349.3, now + 0.03);
+      osc.frequency.exponentialRampToValueAtTime(932.3, now + 0.10);
+      gain.gain.setValueAtTime(0.13, now);
+      gain.gain.exponentialRampToValueAtTime(0.004, now + 0.12);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.125);
+    } else if (id.includes('santa')) {
+      // Santa Claus: legendary deep bass 'Ho-ho-ho!' + bell chime
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.045);
+      osc.frequency.exponentialRampToValueAtTime(130, now + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(95, now + 0.14);
+      gain.gain.setValueAtTime(0.16, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.16);
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode ?? ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.17);
     } else if (id.includes('penguin') || id.includes('frost')) {
       // Frost-Penguin: crystalline icy chirp
       osc.type = 'sine';

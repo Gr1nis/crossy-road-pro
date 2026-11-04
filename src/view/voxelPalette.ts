@@ -96,6 +96,37 @@ export const VOXEL_PALETTE = {
   featherPureWhite: 0xffffff,
   mantleRed: 0x991b1b,
   royalRuby: 0xdc2626,
+
+  // Christmas Wonders Pack (10 Holiday Characters)
+  amberGold: 0xf59e0b, antlerBone: 0xe7e5e4, bellGold: 0xfacc15, bellyWhite: 0xf8fafc,
+  beltBlack: 0x0f172a, bibCream: 0xfef3c7, blushPink: 0xfb7185, bootBlack: 0x1c1917,
+  brightAmber: 0xfbbf24, bucketBlue: 0x1d4ed8, buckleGold: 0xfacc15, candyRed: 0xdc2626,
+  carrotOrange: 0xf97316, carrotOrangeBright: 0xfb923c, carrotOrangeDark: 0xea580c,
+  cheekPink: 0xfb7185, coalBlack: 0x18181b, cocoaBrown: 0x451a03, collarRed: 0xdc2626,
+  coneWoodDark: 0x78350f, coneWoodWarm: 0x92400e, doughCrust: 0xb45309, doughWarm: 0xd97706,
+  earPink: 0xf472b6, earPinkLight: 0xfbcfe8, elfBelt: 0x18181b, elfCheek: 0xfca5a5,
+  elfEye: 0x0f172a, elfGold: 0xfacc15, elfGreen: 0x15803d, elfGreenDark: 0x166534,
+  elfHair: 0xb45309, elfRed: 0xdc2626, elfSkin: 0xfed7aa, elfWhite: 0xffffff,
+  foxEye: 0x1e293b, foxNose: 0x0f172a, foxSilver: 0xcbd5e1, foxSilverWhite: 0xf1f5f9,
+  foxWhite: 0xffffff, furWhite: 0xffffff, furWhiteSoft: 0xf1f5f9, giftCyan: 0x0284c7,
+  goldAccent: 0xfbbf24, graphiteBeak: 0x334155, gumdropGreen: 0x10b981, gumdropRuby: 0xef4444,
+  gumdropYellow: 0xf59e0b, hareCream: 0xfef3c7, hareWhite: 0xf8fafc, hareWhiteSoft: 0xe2e8f0,
+  hoofDark: 0x1c1917, huskyBlue: 0x38bdf8, huskyDark: 0x1e293b, huskyGray: 0x475569,
+  huskyWhite: 0xf8fafc, icingWhite: 0xffffff, innerEarPink: 0xfbcfe8, leafGreen: 0x22c55e, leafGreenDark: 0x15803d,
+  leafGreenBright: 0x4ade80, lightCyan: 0x38bdf8, lightEmerald: 0x10b981, lightRuby: 0xf43f5e,
+  marshmallowCream: 0xfef08a, marshmallowWhite: 0xffffff, metalSilver: 0x94a3b8, mittenGreen: 0x15803d,
+  muffEmerald: 0x059669, muffGold: 0xfacc15, mugRim: 0x14b8a6, mugTeal: 0x0d9488,
+  noseBlack: 0x09090b, noseRubyGlow: 0xef4444, owlSnowPure: 0xffffff, owlSpeckleDark: 0x94a3b8,
+  owlSpeckleLight: 0xcbd5e1, owlWhite: 0xf8fafc, peachSkin: 0xfed7aa, penguinBlack: 0x0f172a,
+  penguinOrange: 0xf97316, penguinOrangeLight: 0xfb923c, penguinWhite: 0xf8fafc, pineGreen: 0x15803d,
+  pureWhite: 0xffffff, reindeerCaramel: 0xb45309, reindeerDark: 0x78350f, rosyCheek: 0xf87171,
+  sackDark: 0x14532d, sackEmerald: 0x166534, santaRed: 0xdc2626, santaRedDark: 0xb91c1c,
+  scarfDarkRed: 0x991b1b, scarfGoldTassel: 0xfacc15, scarfRed: 0xdc2626, scarfWhite: 0xf8fafc,
+  scarfWhiteStripe: 0xffffff, silverFrost: 0xe2e8f0, snowBody: 0xe2e8f0, snowWhite: 0xffffff,
+  steamWhite: 0xe2e8f0, sweaterRed: 0xdc2626, sweaterWhite: 0xffffff, tonguePink: 0xf472b6,
+  woodBrown: 0x78350f, gingerbreadBrown: 0xb45309, firGreen: 0x15803d, goldBell: 0xfacc15,
+  boneIvory: 0xe7e5e4, foxEarmuffCyan: 0x059669, rubyGlow: 0xef4444,
+
 } as const;
 
 export type VoxelColorKey = keyof typeof VOXEL_PALETTE;

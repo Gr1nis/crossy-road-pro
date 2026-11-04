@@ -25,6 +25,16 @@ export const SKIN_RARITY_MAP: Record<SkinId, SkinRarityValue> = {
   raincoat_duck: SkinRarity.EPIC,
   capybara_zen: SkinRarity.LEGENDARY,
   pigeon_king: SkinRarity.LEGENDARY,
+  penguin_cocoa: SkinRarity.COMMON,
+  snow_hare: SkinRarity.COMMON,
+  husky_sweater: SkinRarity.COMMON,
+  derpy_snowman: SkinRarity.COMMON,
+  arctic_fox: SkinRarity.RARE,
+  holiday_elf: SkinRarity.RARE,
+  holiday_owl: SkinRarity.RARE,
+  gingerbread_man: SkinRarity.EPIC,
+  reindeer_glow: SkinRarity.EPIC,
+  santa_claus: SkinRarity.LEGENDARY,
 };
 
 export const SKIN_RARITY_WEIGHTS: Record<SkinRarityValue, number> = {

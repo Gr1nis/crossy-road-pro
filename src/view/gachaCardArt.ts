@@ -5,16 +5,11 @@ import { createUrbanCharacter } from './urbanCharacters.ts';
 import { GACHA_CHARACTER_SKIN_BASE64 } from './gachaSkinsBase64.ts';
 
 export const CARD_NAMES_UPPER: Record<string, string> = {
-  corgi: 'CORGI',
-  pigeon_pizza: 'PIZZA PIGEON',
-  barista_pug: 'BARISTA PUG',
-  skater_ferret: 'SKATER FERRET',
-  box_cat: 'BOX CAT',
-  subway_rat: 'SUBWAY RAT',
-  raccoon_bandit: 'RACCOON',
-  raincoat_duck: 'RAINCOAT DUCK',
-  capybara_zen: 'CAPYBARA',
-  pigeon_king: 'PIGEON KING',
+  corgi: 'CORGI', pigeon_pizza: 'PIZZA PIGEON', barista_pug: 'BARISTA PUG', skater_ferret: 'SKATER FERRET',
+  box_cat: 'BOX CAT', subway_rat: 'SUBWAY RAT', raccoon_bandit: 'RACCOON', raincoat_duck: 'RAINCOAT DUCK',
+  capybara_zen: 'CAPYBARA', pigeon_king: 'PIGEON KING', penguin_cocoa: 'COCOA PENGUIN', snow_hare: 'SNOW HARE',
+  husky_sweater: 'WINTER HUSKY', derpy_snowman: 'SNOWMAN', arctic_fox: 'ARCTIC FOX', holiday_elf: 'HOLIDAY ELF',
+  holiday_owl: 'POLAR OWL', gingerbread_man: 'GINGERBREAD', reindeer_glow: 'RUDOLPH', santa_claus: 'SANTA CLAUS',
 };
 
 export const RARITY_CSS_MAP: Record<SkinRarityValue, { label: string; css: string }> = {

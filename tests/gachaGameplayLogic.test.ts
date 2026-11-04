@@ -118,7 +118,7 @@ describe('Gacha Machine Stage 3 — Silhouettes, Fair Pool & Continuous Conveyor
   it('Requirement 6 (ScoreTracker Full Pool & Duplicate Cashback): rolls can yield duplicates with delayed cashback, and roll never blocks when full collection', () => {
     const storage = new MemoryStorage();
     const tracker = new ScoreTracker(storage);
-    tracker.addCoins(1000);
+    tracker.addCoins(3000);
 
     const initialUnlocked = tracker.getUnlockedSkins();
     assert.deepEqual(initialUnlocked, ['corgi']);
@@ -128,11 +128,9 @@ describe('Gacha Machine Stage 3 — Silhouettes, Fair Pool & Continuous Conveyor
     assert.equal(dupRes.success, true);
     assert.equal(dupRes.isDuplicate, true);
     assert.equal(dupRes.cashback, 40);
-    assert.equal(tracker.getCoins(), 900, 'Initial roll deducts full 100 coins (1000 - 100 = 900)');
+    assert.equal(tracker.getCoins(), 2900, 'Initial roll deducts full 100 coins (3000 - 100 = 2900)');
     tracker.claimDuplicateCashback(dupRes.cashback);
-    assert.equal(tracker.getCoins(), 940, 'Cashback credited separately (900 + 40 = 940)');
-
-    tracker.addCoins(1000);
+    assert.equal(tracker.getCoins(), 2940, 'Cashback credited separately (2900 + 40 = 2940)');
 
     // Unlock remaining skins
     for (const skin of ALL_SKINS) {

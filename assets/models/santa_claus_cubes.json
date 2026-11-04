@@ -1,0 +1,1718 @@
+[
+  {
+    "name": "boot_sole_left",
+    "group": "boots_legs",
+    "from": [
+      -2.2,
+      0.0,
+      -2.4
+    ],
+    "to": [
+      -0.7,
+      0.7,
+      0.6
+    ],
+    "color": "bootBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "boot_instep_left",
+    "group": "boots_legs",
+    "from": [
+      -2.05,
+      0.6,
+      -2.25
+    ],
+    "to": [
+      -0.85,
+      1.15,
+      -0.65
+    ],
+    "color": "bootBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "boot_fur_cuff_left",
+    "group": "boots_legs",
+    "from": [
+      -2.35,
+      1.05,
+      -1.75
+    ],
+    "to": [
+      -0.55,
+      1.65,
+      0.45
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "pants_leg_left",
+    "group": "boots_legs",
+    "from": [
+      -2.1,
+      1.55,
+      -1.45
+    ],
+    "to": [
+      -0.8,
+      2.5,
+      0.25
+    ],
+    "color": "santaRedDark",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "boot_sole_right",
+    "group": "boots_legs",
+    "from": [
+      0.7,
+      0.0,
+      -2.4
+    ],
+    "to": [
+      2.2,
+      0.7,
+      0.6
+    ],
+    "color": "bootBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "boot_instep_right",
+    "group": "boots_legs",
+    "from": [
+      0.85,
+      0.6,
+      -2.25
+    ],
+    "to": [
+      2.05,
+      1.15,
+      -0.65
+    ],
+    "color": "bootBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "boot_fur_cuff_right",
+    "group": "boots_legs",
+    "from": [
+      0.55,
+      1.05,
+      -1.75
+    ],
+    "to": [
+      2.35,
+      1.65,
+      0.45
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "pants_leg_right",
+    "group": "boots_legs",
+    "from": [
+      0.8,
+      1.55,
+      -1.45
+    ],
+    "to": [
+      2.1,
+      2.5,
+      0.25
+    ],
+    "color": "santaRedDark",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "coat_fur_hem_front",
+    "group": "coat_body",
+    "from": [
+      -2.55,
+      2.2,
+      -1.85
+    ],
+    "to": [
+      2.55,
+      2.9,
+      -0.95
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "coat_fur_hem_back",
+    "group": "coat_body",
+    "from": [
+      -2.5,
+      2.25,
+      -1.0
+    ],
+    "to": [
+      2.5,
+      2.85,
+      1.25
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "coat_skirt_lower",
+    "group": "coat_body",
+    "from": [
+      -2.45,
+      2.8,
+      -1.8
+    ],
+    "to": [
+      2.45,
+      3.6,
+      1.1
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "coat_belly_main",
+    "group": "coat_body",
+    "from": [
+      -2.35,
+      3.55,
+      -1.75
+    ],
+    "to": [
+      2.35,
+      5.25,
+      1.05
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "coat_belly_bump",
+    "group": "coat_body",
+    "from": [
+      -1.85,
+      3.65,
+      -2.15
+    ],
+    "to": [
+      1.85,
+      5.0,
+      -1.55
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "coat_chest_upper",
+    "group": "coat_body",
+    "from": [
+      -2.2,
+      5.15,
+      -1.55
+    ],
+    "to": [
+      2.2,
+      6.2,
+      0.95
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "coat_center_fur_lower",
+    "group": "coat_body",
+    "from": [
+      -0.45,
+      2.85,
+      -2.25
+    ],
+    "to": [
+      0.45,
+      3.85,
+      -1.65
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "coat_center_fur_upper",
+    "group": "coat_body",
+    "from": [
+      -0.45,
+      4.7,
+      -2.25
+    ],
+    "to": [
+      0.45,
+      5.7,
+      -1.45
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "belt_strap_main",
+    "group": "coat_body",
+    "from": [
+      -2.5,
+      3.8,
+      -1.8
+    ],
+    "to": [
+      2.5,
+      4.75,
+      1.1
+    ],
+    "color": "beltBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "belt_buckle_gold_rim",
+    "group": "coat_body",
+    "from": [
+      -1.0,
+      3.7,
+      -2.35
+    ],
+    "to": [
+      1.0,
+      4.8,
+      -1.7
+    ],
+    "color": "buckleGold",
+    "col_idx": 6,
+    "uv": [
+      6,
+      0,
+      7,
+      1
+    ]
+  },
+  {
+    "name": "belt_buckle_inner_dark",
+    "group": "coat_body",
+    "from": [
+      -0.6,
+      3.9,
+      -2.4
+    ],
+    "to": [
+      0.6,
+      4.65,
+      -2.25
+    ],
+    "color": "beltBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "belt_buckle_prong_gold",
+    "group": "coat_body",
+    "from": [
+      -0.15,
+      3.85,
+      -2.45
+    ],
+    "to": [
+      0.15,
+      4.7,
+      -2.3
+    ],
+    "color": "goldAccent",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "coat_collar_fur_back",
+    "group": "coat_body",
+    "from": [
+      -2.1,
+      5.95,
+      -0.85
+    ],
+    "to": [
+      2.1,
+      6.55,
+      1.1
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "coat_collar_fur_front",
+    "group": "coat_body",
+    "from": [
+      -1.85,
+      5.8,
+      -1.85
+    ],
+    "to": [
+      1.85,
+      6.4,
+      -0.75
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "neck_core",
+    "group": "coat_body",
+    "from": [
+      -1.2,
+      6.15,
+      -0.95
+    ],
+    "to": [
+      1.2,
+      6.85,
+      0.55
+    ],
+    "color": "peachSkin",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "arm_shoulder_left",
+    "group": "arms_mittens",
+    "from": [
+      -3.15,
+      4.45,
+      -1.25
+    ],
+    "to": [
+      -2.15,
+      6.05,
+      0.65
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "arm_forearm_left",
+    "group": "arms_mittens",
+    "from": [
+      -3.3,
+      3.65,
+      -1.85
+    ],
+    "to": [
+      -2.3,
+      4.7,
+      -0.45
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "arm_cuff_fur_left",
+    "group": "arms_mittens",
+    "from": [
+      -3.45,
+      3.15,
+      -2.15
+    ],
+    "to": [
+      -2.2,
+      3.85,
+      -0.85
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "mitten_hand_left",
+    "group": "arms_mittens",
+    "from": [
+      -3.25,
+      2.35,
+      -2.35
+    ],
+    "to": [
+      -2.35,
+      3.35,
+      -1.15
+    ],
+    "color": "mittenGreen",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "mitten_thumb_left",
+    "group": "arms_mittens",
+    "from": [
+      -2.45,
+      2.7,
+      -2.55
+    ],
+    "to": [
+      -1.95,
+      3.2,
+      -2.05
+    ],
+    "color": "mittenGreen",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "mitten_cuff_piping_left",
+    "group": "arms_mittens",
+    "from": [
+      -3.35,
+      3.0,
+      -2.25
+    ],
+    "to": [
+      -2.25,
+      3.25,
+      -1.05
+    ],
+    "color": "mittenGreen",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "arm_shoulder_right",
+    "group": "arms_mittens",
+    "from": [
+      2.15,
+      4.45,
+      -1.25
+    ],
+    "to": [
+      3.15,
+      6.05,
+      0.65
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "arm_forearm_right",
+    "group": "arms_mittens",
+    "from": [
+      2.3,
+      3.65,
+      -1.85
+    ],
+    "to": [
+      3.3,
+      4.7,
+      -0.45
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "arm_cuff_fur_right",
+    "group": "arms_mittens",
+    "from": [
+      2.2,
+      3.15,
+      -2.15
+    ],
+    "to": [
+      3.45,
+      3.85,
+      -0.85
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "mitten_hand_right",
+    "group": "arms_mittens",
+    "from": [
+      2.35,
+      2.35,
+      -2.35
+    ],
+    "to": [
+      3.25,
+      3.35,
+      -1.15
+    ],
+    "color": "mittenGreen",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "mitten_thumb_right",
+    "group": "arms_mittens",
+    "from": [
+      1.95,
+      2.7,
+      -2.55
+    ],
+    "to": [
+      2.45,
+      3.2,
+      -2.05
+    ],
+    "color": "mittenGreen",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "mitten_cuff_piping_right",
+    "group": "arms_mittens",
+    "from": [
+      2.25,
+      3.0,
+      -2.25
+    ],
+    "to": [
+      3.35,
+      3.25,
+      -1.05
+    ],
+    "color": "mittenGreen",
+    "col_idx": 9,
+    "uv": [
+      9,
+      0,
+      10,
+      1
+    ]
+  },
+  {
+    "name": "head_core",
+    "group": "head_face_beard",
+    "from": [
+      -1.75,
+      6.45,
+      -1.35
+    ],
+    "to": [
+      1.75,
+      8.25,
+      0.85
+    ],
+    "color": "peachSkin",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "face_forehead_brow",
+    "group": "head_face_beard",
+    "from": [
+      -1.65,
+      7.4,
+      -1.55
+    ],
+    "to": [
+      1.65,
+      8.15,
+      -1.25
+    ],
+    "color": "peachSkin",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "cheek_left",
+    "group": "head_face_beard",
+    "from": [
+      -1.85,
+      6.75,
+      -1.7
+    ],
+    "to": [
+      -1.15,
+      7.35,
+      -1.3
+    ],
+    "color": "rosyCheek",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "cheek_right",
+    "group": "head_face_beard",
+    "from": [
+      1.15,
+      6.75,
+      -1.7
+    ],
+    "to": [
+      1.85,
+      7.35,
+      -1.3
+    ],
+    "color": "rosyCheek",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "nose_santa",
+    "group": "head_face_beard",
+    "from": [
+      -0.45,
+      6.85,
+      -2.2
+    ],
+    "to": [
+      0.45,
+      7.45,
+      -1.55
+    ],
+    "color": "rosyCheek",
+    "col_idx": 8,
+    "uv": [
+      8,
+      0,
+      9,
+      1
+    ]
+  },
+  {
+    "name": "eye_left",
+    "group": "head_face_beard",
+    "from": [
+      -1.1,
+      7.3,
+      -1.75
+    ],
+    "to": [
+      -0.55,
+      7.75,
+      -1.5
+    ],
+    "color": "beltBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "eye_right",
+    "group": "head_face_beard",
+    "from": [
+      0.55,
+      7.3,
+      -1.75
+    ],
+    "to": [
+      1.1,
+      7.75,
+      -1.5
+    ],
+    "color": "beltBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "eye_sparkle_left",
+    "group": "head_face_beard",
+    "from": [
+      -0.95,
+      7.5,
+      -1.8
+    ],
+    "to": [
+      -0.65,
+      7.7,
+      -1.65
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "eye_sparkle_right",
+    "group": "head_face_beard",
+    "from": [
+      0.65,
+      7.5,
+      -1.8
+    ],
+    "to": [
+      0.95,
+      7.7,
+      -1.65
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "eyebrow_bushy_left",
+    "group": "head_face_beard",
+    "from": [
+      -1.3,
+      7.8,
+      -1.85
+    ],
+    "to": [
+      -0.45,
+      8.25,
+      -1.45
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "eyebrow_bushy_right",
+    "group": "head_face_beard",
+    "from": [
+      0.45,
+      7.8,
+      -1.85
+    ],
+    "to": [
+      1.3,
+      8.25,
+      -1.45
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "mustache_center",
+    "group": "head_face_beard",
+    "from": [
+      -0.4,
+      6.55,
+      -2.25
+    ],
+    "to": [
+      0.4,
+      7.05,
+      -1.8
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "mustache_wing_left",
+    "group": "head_face_beard",
+    "from": [
+      -1.55,
+      6.45,
+      -2.15
+    ],
+    "to": [
+      -0.35,
+      6.95,
+      -1.75
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "mustache_wing_right",
+    "group": "head_face_beard",
+    "from": [
+      0.35,
+      6.45,
+      -2.15
+    ],
+    "to": [
+      1.55,
+      6.95,
+      -1.75
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "beard_sideburn_left",
+    "group": "head_face_beard",
+    "from": [
+      -2.05,
+      6.25,
+      -1.6
+    ],
+    "to": [
+      -1.55,
+      7.55,
+      -0.2
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "beard_sideburn_right",
+    "group": "head_face_beard",
+    "from": [
+      1.55,
+      6.25,
+      -1.6
+    ],
+    "to": [
+      2.05,
+      7.55,
+      -0.2
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "beard_jaw_chin_main",
+    "group": "head_face_beard",
+    "from": [
+      -1.9,
+      5.75,
+      -2.1
+    ],
+    "to": [
+      1.9,
+      6.65,
+      -0.8
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "beard_chest_cascade",
+    "group": "head_face_beard",
+    "from": [
+      -1.45,
+      4.85,
+      -2.3
+    ],
+    "to": [
+      1.45,
+      5.85,
+      -1.6
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "beard_tip_curl",
+    "group": "head_face_beard",
+    "from": [
+      -0.85,
+      4.35,
+      -2.2
+    ],
+    "to": [
+      0.85,
+      4.95,
+      -1.85
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "hat_brim_front",
+    "group": "santa_hat",
+    "from": [
+      -2.05,
+      8.05,
+      -1.75
+    ],
+    "to": [
+      2.05,
+      8.75,
+      -0.9
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "hat_brim_sides",
+    "group": "santa_hat",
+    "from": [
+      -2.15,
+      8.0,
+      -0.95
+    ],
+    "to": [
+      2.15,
+      8.7,
+      0.95
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "hat_brim_back",
+    "group": "santa_hat",
+    "from": [
+      -2.05,
+      8.05,
+      0.8
+    ],
+    "to": [
+      2.05,
+      8.75,
+      1.25
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "hat_cone_lower",
+    "group": "santa_hat",
+    "from": [
+      -1.8,
+      8.65,
+      -1.25
+    ],
+    "to": [
+      1.8,
+      9.45,
+      0.9
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hat_cone_mid",
+    "group": "santa_hat",
+    "from": [
+      -1.55,
+      9.35,
+      -0.95
+    ],
+    "to": [
+      1.55,
+      10.05,
+      0.7
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hat_cone_upper",
+    "group": "santa_hat",
+    "from": [
+      -1.25,
+      9.95,
+      -0.65
+    ],
+    "to": [
+      1.25,
+      10.55,
+      0.5
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hat_droop_slant",
+    "group": "santa_hat",
+    "from": [
+      0.45,
+      9.85,
+      0.4
+    ],
+    "to": [
+      1.65,
+      10.45,
+      1.35
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hat_droop_hang",
+    "group": "santa_hat",
+    "from": [
+      1.15,
+      8.85,
+      0.95
+    ],
+    "to": [
+      1.95,
+      9.95,
+      1.65
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hat_pom_pom_main",
+    "group": "santa_hat",
+    "from": [
+      1.05,
+      8.1,
+      1.15
+    ],
+    "to": [
+      2.15,
+      8.95,
+      2.05
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "hat_pom_pom_fluff",
+    "group": "santa_hat",
+    "from": [
+      1.2,
+      8.2,
+      1.05
+    ],
+    "to": [
+      2.0,
+      8.8,
+      2.15
+    ],
+    "color": "furWhiteSoft",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "sack_body_base",
+    "group": "gift_sack",
+    "from": [
+      -2.25,
+      2.75,
+      0.95
+    ],
+    "to": [
+      2.25,
+      4.35,
+      3.25
+    ],
+    "color": "sackEmerald",
+    "col_idx": 10,
+    "uv": [
+      10,
+      0,
+      11,
+      1
+    ]
+  },
+  {
+    "name": "sack_body_mid",
+    "group": "gift_sack",
+    "from": [
+      -2.45,
+      4.25,
+      0.85
+    ],
+    "to": [
+      2.45,
+      5.8,
+      3.45
+    ],
+    "color": "sackEmerald",
+    "col_idx": 10,
+    "uv": [
+      10,
+      0,
+      11,
+      1
+    ]
+  },
+  {
+    "name": "sack_bulge_left",
+    "group": "gift_sack",
+    "from": [
+      -2.85,
+      3.55,
+      1.15
+    ],
+    "to": [
+      -2.35,
+      5.25,
+      2.95
+    ],
+    "color": "sackDark",
+    "col_idx": 11,
+    "uv": [
+      11,
+      0,
+      12,
+      1
+    ]
+  },
+  {
+    "name": "sack_bulge_right",
+    "group": "gift_sack",
+    "from": [
+      2.35,
+      3.55,
+      1.15
+    ],
+    "to": [
+      2.85,
+      5.25,
+      2.95
+    ],
+    "color": "sackDark",
+    "col_idx": 11,
+    "uv": [
+      11,
+      0,
+      12,
+      1
+    ]
+  },
+  {
+    "name": "sack_bulge_back",
+    "group": "gift_sack",
+    "from": [
+      -2.05,
+      3.75,
+      3.35
+    ],
+    "to": [
+      2.05,
+      5.35,
+      3.85
+    ],
+    "color": "sackDark",
+    "col_idx": 11,
+    "uv": [
+      11,
+      0,
+      12,
+      1
+    ]
+  },
+  {
+    "name": "sack_neck_cinch",
+    "group": "gift_sack",
+    "from": [
+      -1.65,
+      5.75,
+      1.25
+    ],
+    "to": [
+      1.65,
+      6.35,
+      2.95
+    ],
+    "color": "sackEmerald",
+    "col_idx": 10,
+    "uv": [
+      10,
+      0,
+      11,
+      1
+    ]
+  },
+  {
+    "name": "sack_rope_gold",
+    "group": "gift_sack",
+    "from": [
+      -1.75,
+      5.95,
+      1.15
+    ],
+    "to": [
+      1.75,
+      6.2,
+      3.05
+    ],
+    "color": "buckleGold",
+    "col_idx": 6,
+    "uv": [
+      6,
+      0,
+      7,
+      1
+    ]
+  },
+  {
+    "name": "sack_rope_knot_gold",
+    "group": "gift_sack",
+    "from": [
+      -0.45,
+      5.85,
+      3.0
+    ],
+    "to": [
+      0.45,
+      6.45,
+      3.4
+    ],
+    "color": "goldAccent",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  },
+  {
+    "name": "sack_ruffle_top",
+    "group": "gift_sack",
+    "from": [
+      -1.95,
+      6.25,
+      1.05
+    ],
+    "to": [
+      1.95,
+      6.95,
+      2.85
+    ],
+    "color": "sackEmerald",
+    "col_idx": 10,
+    "uv": [
+      10,
+      0,
+      11,
+      1
+    ]
+  },
+  {
+    "name": "candy_stem_red",
+    "group": "gift_sack",
+    "from": [
+      -1.35,
+      6.85,
+      1.55
+    ],
+    "to": [
+      -0.85,
+      7.85,
+      2.05
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "candy_stem_white",
+    "group": "gift_sack",
+    "from": [
+      -1.3,
+      7.8,
+      1.6
+    ],
+    "to": [
+      -0.9,
+      8.45,
+      2.0
+    ],
+    "color": "furWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "candy_hook_curve",
+    "group": "gift_sack",
+    "from": [
+      -1.65,
+      8.25,
+      1.55
+    ],
+    "to": [
+      -0.85,
+      8.85,
+      2.05
+    ],
+    "color": "santaRed",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "gift_box_main",
+    "group": "gift_sack",
+    "from": [
+      0.35,
+      6.85,
+      1.45
+    ],
+    "to": [
+      1.55,
+      8.05,
+      2.65
+    ],
+    "color": "giftCyan",
+    "col_idx": 12,
+    "uv": [
+      12,
+      0,
+      13,
+      1
+    ]
+  },
+  {
+    "name": "gift_ribbon_bow",
+    "group": "gift_sack",
+    "from": [
+      0.65,
+      8.0,
+      1.75
+    ],
+    "to": [
+      1.25,
+      8.45,
+      2.35
+    ],
+    "color": "goldAccent",
+    "col_idx": 13,
+    "uv": [
+      13,
+      0,
+      14,
+      1
+    ]
+  }
+]
