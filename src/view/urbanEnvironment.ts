@@ -21,10 +21,13 @@ import {
 } from './urbanEnvironmentExpansionB.ts';
 
 /** Model 3: Cast-Iron Fire Hydrant (22 cubes, Grade A+ 10/10) */
-export function createUrbanHydrant(): THREE.Group {
+export function createUrbanHydrant(seedVariant: number = 0): THREE.Group {
   const group = new THREE.Group();
   const mesh = VoxelMeshBuilder.buildCachedMesh('urban_hydrant', populateHydrantBuilder);
   group.add(mesh.clone());
+  // 50% facing towards player (Math.PI), 50% facing away (0)
+  const isFlipped = Math.floor(Math.abs(seedVariant) / 2) % 2 === 1;
+  group.rotation.y = isFlipped ? Math.PI : 0;
   return group;
 }
 
@@ -37,10 +40,13 @@ export function createUrbanTrashCan(): THREE.Group {
 }
 
 /** Model 5: Park Wooden Bench (22 cubes, Grade A+ 10/10) */
-export function createUrbanBench(): THREE.Group {
+export function createUrbanBench(seedVariant: number = 0): THREE.Group {
   const group = new THREE.Group();
   const mesh = VoxelMeshBuilder.buildCachedMesh('urban_bench', populateBenchBuilder);
   group.add(mesh.clone());
+  // 50% facing towards player (Math.PI), 50% facing away (0)
+  const isFlipped = Math.floor(Math.abs(seedVariant) / 2) % 2 === 1;
+  group.rotation.y = isFlipped ? Math.PI : 0;
   return group;
 }
 
@@ -210,11 +216,11 @@ export function createUrbanObstacle(
 
   if (kind === 'rock') {
     // 50% Fire Hydrant (Model 3), 50% Street Trash Can (Model 4)
-    return absSeed % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+    return absSeed % 2 === 0 ? createUrbanHydrant(seedVariant) : createUrbanTrashCan();
   }
   if (kind === 'bush') {
     // 50% Park Wooden Bench (Model 5), 50% Trimmed Cubic Hedge (Model 2)
-    return absSeed % 2 === 0 ? createUrbanBench() : createUrbanHedge(absSeed, biome);
+    return absSeed % 2 === 0 ? createUrbanBench(seedVariant) : createUrbanHedge(absSeed, biome);
   }
   // kind === 'tree':
   // 60% Tree in Planter (Model 1), 40% Street Lamp Post (Model 6)
@@ -227,9 +233,9 @@ export const createUrbanTree = (seedVariant: number, biome?: BiomeType | boolean
   createUrbanTreePlanter(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
 
 export const createUrbanRock = (seedVariant: number, _biome?: BiomeType): THREE.Group =>
-  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant() : createUrbanTrashCan();
+  Math.abs(seedVariant) % 2 === 0 ? createUrbanHydrant(seedVariant) : createUrbanTrashCan();
 
 export const createUrbanBush = (seedVariant: number, biome?: BiomeType | boolean): THREE.Group =>
   Math.abs(seedVariant) % 2 === 0
-    ? createUrbanBench()
+    ? createUrbanBench(seedVariant)
     : createUrbanHedge(seedVariant, typeof biome === 'boolean' ? (biome ? 'winter' : 'forest') : biome);
