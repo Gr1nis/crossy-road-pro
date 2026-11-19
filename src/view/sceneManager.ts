@@ -37,7 +37,6 @@ interface RenderedLane {
   redSignalLight?: THREE.Mesh;
   greenSignalLight?: THREE.Mesh;
   signalLight?: THREE.Mesh;
-  waterRipples?: THREE.Mesh[];
   decorTrees?: DecorTreeItem[];
   decorRocks?: DecorRockItem[];
 }
@@ -559,7 +558,6 @@ export class SceneManager {
     const vehicleMeshes = new Map<number, THREE.Object3D>();
     const logMeshes = new Map<number, THREE.Object3D>();
     const coinMeshes = new Map<number, THREE.Object3D>();
-    const waterRipples: THREE.Mesh[] = [];
     const biome: BiomeType = lane.biome ?? Biome.FOREST;
     const isEven = lane.index % 2 === 0;
 
@@ -598,23 +596,14 @@ export class SceneManager {
     group.add(ground);
 
     if (lane.type === LaneType.ROAD) {
-      // Clean dark asphalt with zero crossings/dividers (disabled MeshFactory.createLaneDivider())
+      // Clean dark asphalt with zero crossings/dividers
       for (const xPos of [-10.2, 10.2]) {
         const barrier = MeshFactory.createRoadBarrier(biome);
         barrier.position.set(worldToScreenX(xPos), 0, 0);
         group.add(barrier);
       }
     } else if (lane.type === LaneType.RIVER) {
-      // Animated current foam ripples across river surface (pooled geometry and materials)
-      const rippleMat = LaneGeometryPool.getRiverRippleMaterial(biome === Biome.NEON);
-      for (let rx = -14; rx <= 14; rx += 4.5) {
-        const ripple = new THREE.Mesh(LaneGeometryPool.riverRippleGeo, rippleMat);
-        ripple.position.set(rx, 0.01, (rx % 2 === 0 ? 1 : -1) * 0.24);
-        group.add(ripple);
-        waterRipples.push(ripple);
-      }
-
-      // Clean low riverbank posts & boulders at border edges (no waterfalls, no z-fighting)
+      // Clean low riverbank posts & boulders at border edges (no waterfalls, no z-fighting, clean water)
       const leftBank = MeshFactory.createRiverbankEdge('left', biome);
       leftBank.position.set(worldToScreenX(-10.2), 0, 0);
       const rightBank = MeshFactory.createRiverbankEdge('right', biome);
@@ -730,7 +719,6 @@ export class SceneManager {
       redSignalLight,
       greenSignalLight,
       signalLight,
-      waterRipples,
       decorTrees,
       decorRocks,
     };
@@ -830,17 +818,6 @@ export class SceneManager {
       for (const v of lane.vehicles) {
         const m = rendered.vehicleMeshes.get(v.id);
         if (m) m.position.x = worldToScreenX(v.x);
-      }
-
-      if (rendered.waterRipples) {
-        const flowDir = -lane.direction;
-        for (let i = 0; i < rendered.waterRipples.length; i++) {
-          const rp = rendered.waterRipples[i];
-          rp.position.x += flowDir * Math.abs(lane.speed) * 0.85 * dt;
-          if (rp.position.x > 15) rp.position.x = -15;
-          else if (rp.position.x < -15) rp.position.x = 15;
-          rp.scale.x = 0.85 + 0.3 * Math.sin(nowSec * 1.8 + i);
-        }
       }
 
       for (const log of lane.logs) {

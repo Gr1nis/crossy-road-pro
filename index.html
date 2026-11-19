@@ -9653,6 +9653,22 @@ function createUrbanVehicle(
     return createUrbanTrain(spd);
   }
 
+  // Enforce authentic iconic palettes across all urban vehicles
+  if (type === 'taxi') {
+    col = 0xf59e0b; // Iconic NYC Checker Cab Yellow
+  } else if (type === 'scooter') {
+    col = 0xea580c; // Delivery Courier Safety Orange
+  } else if (type === 'sweeper') {
+    col = 0xea580c; // Municipal Safety Orange
+  } else if (type === 'bus') {
+    col = col === 0x2563eb ? 0x2563eb : 0xdc2626; // City Transit Red or Blue
+  } else if (type === 'truck') {
+    col = col === 0x2563eb ? 0x2563eb : 0x059669; // Delivery Van Green or Royal Blue
+  } else if (type === 'car') {
+    const carPalette = [0x2563eb, 0xdc2626, 0xf59e0b, 0xf8fafc, 0x334155];
+    col = carPalette[Math.abs(col) % carPalette.length] ?? 0x2563eb;
+  }
+
   const key = `veh_${type}_${col}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
     let specs                  ;
@@ -11091,20 +11107,6 @@ class MeshFactory {
     return createUrbanRiverbankEdge(side, biome);
   }
 
-  static createLaneDivider()              {
-    const group = new THREE.Group();
-    const dividerMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
-    const dashGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
-
-    for (let x = -8.5; x <= 8.5; x += 1.6) {
-      const dash = new THREE.Mesh(dashGeo, dividerMat);
-      dash.position.set(x, 0.015, 0.5);
-      group.add(dash);
-    }
-
-    return group;
-  }
-
   static createRoadBarrier(biome            = 'forest')              {
     return createUrbanRoadBarrier(biome);
   }
@@ -11417,29 +11419,16 @@ const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProg
  * LaneGeometryPool — Pre-allocates and caches static lane geometries and materials.
  * Eliminates GPU VRAM memory leaks and GC spikes during lane generation & eviction.
  */class LaneGeometryPool {
-  // Pre-allocated static geometries (7 fixed ground and road furniture meshes)
+  // Pre-allocated static geometries (5 fixed ground and rail meshes)
          static          grassStripGeo = new THREE.BoxGeometry(80, 0.24, 1);
          static          roadStripGeo = new THREE.BoxGeometry(80, 0.16, 1);
          static          riverStripGeo = new THREE.BoxGeometry(80, 0.08, 1);
          static          railStripGeo = new THREE.BoxGeometry(80, 0.2, 1);
          static          railGeo = new THREE.BoxGeometry(80, 0.06, 0.08);
-         static          dividerGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
-         static          riverRippleGeo = new THREE.BoxGeometry(1.1, 0.02, 0.12);
 
-  // Cached materials for dividers, rails, and ripples
-         static          dividerMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+  // Cached materials for rails
          static          railMatDefault = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
          static          railMatNeon = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
-         static          riverRippleMatDefault = new THREE.MeshBasicMaterial({
-    color: 0xbae6fd,
-    transparent: true,
-    opacity: 0.55,
-  });
-         static          riverRippleMatNeon = new THREE.MeshBasicMaterial({
-    color: 0x22d3ee,
-    transparent: true,
-    opacity: 0.55,
-  });
 
   // Cached strip materials map (stripColor -> material)
           static          stripMaterials = new Map                                   ();
@@ -11451,16 +11440,11 @@ const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProg
     LaneGeometryPool.riverStripGeo,
     LaneGeometryPool.railStripGeo,
     LaneGeometryPool.railGeo,
-    LaneGeometryPool.dividerGeo,
-    LaneGeometryPool.riverRippleGeo,
   ]);
 
           static          sharedMaterials = new Set                ([
-    LaneGeometryPool.dividerMat,
     LaneGeometryPool.railMatDefault,
     LaneGeometryPool.railMatNeon,
-    LaneGeometryPool.riverRippleMatDefault,
-    LaneGeometryPool.riverRippleMatNeon,
   ]);
 
          static getGroundGeometry(laneType               )                    {
@@ -11489,20 +11473,6 @@ const LANDING_BOUNCE_DURATION = 0.12;function calculateHopSquashStretch(hopProg
 
          static getRailMaterial(isNeon         )                            {
     return isNeon ? LaneGeometryPool.railMatNeon : LaneGeometryPool.railMatDefault;
-  }
-
-         static getRiverRippleMaterial(isNeon         )                          {
-    return isNeon ? LaneGeometryPool.riverRippleMatNeon : LaneGeometryPool.riverRippleMatDefault;
-  }
-
-         static createLaneDivider()              {
-    const group = new THREE.Group();
-    for (let x = -8.5; x <= 8.5; x += 1.6) {
-      const dash = new THREE.Mesh(LaneGeometryPool.dividerGeo, LaneGeometryPool.dividerMat);
-      dash.position.set(x, 0.015, 0.5);
-      group.add(dash);
-    }
-    return group;
   }
 
          static isSharedGeometry(geometry                                         )          {
@@ -12711,7 +12681,6 @@ const PLAYER_VIEW_OFFSET_Y = -0.90;class SceneManager {
     const vehicleMeshes = new Map                        ();
     const logMeshes = new Map                        ();
     const coinMeshes = new Map                        ();
-    const waterRipples               = [];
     const biome            = lane.biome ?? Biome.FOREST;
     const isEven = lane.index % 2 === 0;
 
@@ -12750,23 +12719,14 @@ const PLAYER_VIEW_OFFSET_Y = -0.90;class SceneManager {
     group.add(ground);
 
     if (lane.type === LaneType.ROAD) {
-      // Clean dark asphalt with zero crossings/dividers (disabled MeshFactory.createLaneDivider())
+      // Clean dark asphalt with zero crossings/dividers
       for (const xPos of [-10.2, 10.2]) {
         const barrier = MeshFactory.createRoadBarrier(biome);
         barrier.position.set(worldToScreenX(xPos), 0, 0);
         group.add(barrier);
       }
     } else if (lane.type === LaneType.RIVER) {
-      // Animated current foam ripples across river surface (pooled geometry and materials)
-      const rippleMat = LaneGeometryPool.getRiverRippleMaterial(biome === Biome.NEON);
-      for (let rx = -14; rx <= 14; rx += 4.5) {
-        const ripple = new THREE.Mesh(LaneGeometryPool.riverRippleGeo, rippleMat);
-        ripple.position.set(rx, 0.01, (rx % 2 === 0 ? 1 : -1) * 0.24);
-        group.add(ripple);
-        waterRipples.push(ripple);
-      }
-
-      // Clean low riverbank posts & boulders at border edges (no waterfalls, no z-fighting)
+      // Clean low riverbank posts & boulders at border edges (no waterfalls, no z-fighting, clean water)
       const leftBank = MeshFactory.createRiverbankEdge('left', biome);
       leftBank.position.set(worldToScreenX(-10.2), 0, 0);
       const rightBank = MeshFactory.createRiverbankEdge('right', biome);
@@ -12882,7 +12842,6 @@ const PLAYER_VIEW_OFFSET_Y = -0.90;class SceneManager {
       redSignalLight,
       greenSignalLight,
       signalLight,
-      waterRipples,
       decorTrees,
       decorRocks,
     };
@@ -12982,17 +12941,6 @@ const PLAYER_VIEW_OFFSET_Y = -0.90;class SceneManager {
       for (const v of lane.vehicles) {
         const m = rendered.vehicleMeshes.get(v.id);
         if (m) m.position.x = worldToScreenX(v.x);
-      }
-
-      if (rendered.waterRipples) {
-        const flowDir = -lane.direction;
-        for (let i = 0; i < rendered.waterRipples.length; i++) {
-          const rp = rendered.waterRipples[i];
-          rp.position.x += flowDir * Math.abs(lane.speed) * 0.85 * dt;
-          if (rp.position.x > 15) rp.position.x = -15;
-          else if (rp.position.x < -15) rp.position.x = 15;
-          rp.scale.x = 0.85 + 0.3 * Math.sin(nowSec * 1.8 + i);
-        }
       }
 
       for (const log of lane.logs) {

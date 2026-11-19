@@ -202,39 +202,29 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
     );
   });
 
-  it('Bug 8 (Multi-Lane Road Divider Markings): MeshFactory creates dashed lane divider at z = 0.5 and SceneManager adds it for consecutive roads', () => {
+  it('Bug 8 (Clean Road Surface Without Markings): Road dividers and zebra crossings are completely removed for clean solid asphalt', () => {
     const meshFactorySrc = fs.readFileSync(
       path.join(process.cwd(), 'src/view/meshFactory.ts'),
       'utf8'
     );
-    assert.ok(
+    assert.strictEqual(
       meshFactorySrc.includes('createLaneDivider(): THREE.Group'),
-      'meshFactory.ts must declare createLaneDivider(): THREE.Group'
-    );
-    assert.ok(
-      meshFactorySrc.includes('BoxGeometry(0.65, 0.02, 0.08)'),
-      'createLaneDivider must create dashes with dimensions (0.65, 0.02, 0.08)'
-    );
-    assert.ok(
-      meshFactorySrc.includes('dash.position.set(x, 0.015, 0.5)'),
-      'createLaneDivider must place dashes at y=0.015 and z=0.5'
+      false,
+      'meshFactory.ts must not declare createLaneDivider'
     );
 
     const sceneManagerSrc = fs.readFileSync(
       path.join(process.cwd(), 'src/view/sceneManager.ts'),
       'utf8'
     );
-    assert.ok(
-      sceneManagerSrc.includes('buildLaneGroup(lane: Lane, hasNextRoad: boolean = false)'),
-      'sceneManager.ts must have buildLaneGroup accept hasNextRoad flag'
-    );
-    assert.ok(
+    assert.strictEqual(
       sceneManagerSrc.includes('MeshFactory.createLaneDivider()'),
-      'sceneManager.ts must invoke MeshFactory.createLaneDivider() for consecutive road lanes'
+      false,
+      'sceneManager.ts must not invoke createLaneDivider'
     );
     assert.ok(
-      sceneManagerSrc.includes('const nextLane = engine.getLane(lane.index + 1);'),
-      'sceneManager.ts must query next lane type in sync()'
+      sceneManagerSrc.includes('createRoadBarrier'),
+      'sceneManager.ts retains roadside road barriers'
     );
   });
 

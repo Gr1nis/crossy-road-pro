@@ -37,6 +37,22 @@ export function createUrbanVehicle(
     return createUrbanTrain(spd);
   }
 
+  // Enforce authentic iconic palettes across all urban vehicles
+  if (type === 'taxi') {
+    col = 0xf59e0b; // Iconic NYC Checker Cab Yellow
+  } else if (type === 'scooter') {
+    col = 0xea580c; // Delivery Courier Safety Orange
+  } else if (type === 'sweeper') {
+    col = 0xea580c; // Municipal Safety Orange
+  } else if (type === 'bus') {
+    col = col === 0x2563eb ? 0x2563eb : 0xdc2626; // City Transit Red or Blue
+  } else if (type === 'truck') {
+    col = col === 0x2563eb ? 0x2563eb : 0x059669; // Delivery Van Green or Royal Blue
+  } else if (type === 'car') {
+    const carPalette = [0x2563eb, 0xdc2626, 0xf59e0b, 0xf8fafc, 0x334155];
+    col = carPalette[Math.abs(col) % carPalette.length] ?? 0x2563eb;
+  }
+
   const key = `veh_${type}_${col}`;
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
     let specs: UrbanVoxelSpec[];
