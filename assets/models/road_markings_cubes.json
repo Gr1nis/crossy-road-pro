@@ -1,0 +1,266 @@
+[
+  {
+    "name": "zebra_1",
+    "group": "markings_zebra",
+    "from": [
+      -8.85,
+      0.0,
+      -7.85
+    ],
+    "to": [
+      -5.45,
+      1.0,
+      7.85
+    ],
+    "color": "markingWhite",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "zebra_2",
+    "group": "markings_zebra",
+    "from": [
+      -4.55,
+      0.0,
+      -7.85
+    ],
+    "to": [
+      -1.15,
+      1.0,
+      7.85
+    ],
+    "color": "markingWhite",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "zebra_3",
+    "group": "markings_zebra",
+    "from": [
+      -0.25,
+      0.0,
+      -7.85
+    ],
+    "to": [
+      3.15,
+      1.0,
+      7.85
+    ],
+    "color": "markingWhite",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "zebra_4",
+    "group": "markings_zebra",
+    "from": [
+      4.05,
+      0.0,
+      -7.85
+    ],
+    "to": [
+      7.45,
+      1.0,
+      7.85
+    ],
+    "color": "markingWhite",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stop_line_front",
+    "group": "markings_stop",
+    "from": [
+      -8.85,
+      0.0,
+      -8.65
+    ],
+    "to": [
+      7.45,
+      1.0,
+      -7.95
+    ],
+    "color": "markingYellow",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "stop_line_rear",
+    "group": "markings_stop",
+    "from": [
+      -8.85,
+      0.0,
+      7.95
+    ],
+    "to": [
+      7.45,
+      1.0,
+      8.65
+    ],
+    "color": "markingYellow",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "tack_dot_1",
+    "group": "markings_dots",
+    "from": [
+      -7.45,
+      0.85,
+      -5.45
+    ],
+    "to": [
+      -6.85,
+      1.15,
+      -4.85
+    ],
+    "color": "reflectShine",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "tack_dot_2",
+    "group": "markings_dots",
+    "from": [
+      -3.15,
+      0.85,
+      -1.85
+    ],
+    "to": [
+      -2.55,
+      1.15,
+      -1.25
+    ],
+    "color": "reflectShine",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "tack_dot_3",
+    "group": "markings_dots",
+    "from": [
+      1.15,
+      0.85,
+      1.85
+    ],
+    "to": [
+      1.75,
+      1.15,
+      2.45
+    ],
+    "color": "reflectShine",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "tack_dot_4",
+    "group": "markings_dots",
+    "from": [
+      5.45,
+      0.85,
+      5.45
+    ],
+    "to": [
+      6.05,
+      1.15,
+      6.05
+    ],
+    "color": "reflectShine",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "guide_dash_l",
+    "group": "markings_guide",
+    "from": [
+      -9.45,
+      0.0,
+      -3.25
+    ],
+    "to": [
+      -8.95,
+      1.0,
+      3.25
+    ],
+    "color": "markingWhite",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "guide_dash_r",
+    "group": "markings_guide",
+    "from": [
+      7.55,
+      0.0,
+      -3.25
+    ],
+    "to": [
+      8.05,
+      1.0,
+      3.25
+    ],
+    "color": "markingWhite",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  }
+]

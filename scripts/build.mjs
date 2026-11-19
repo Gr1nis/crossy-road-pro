@@ -45,6 +45,8 @@ const moduleOrder = [
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
   'src/view/urbanVehicles.ts',
+  'src/view/urbanEnvironmentExpansionA.ts',
+  'src/view/urbanEnvironmentExpansionB.ts',
   'src/view/urbanEnvironment.ts',
   'src/view/townhouse/books.ts',
   'src/view/townhouse/cafe.ts',
@@ -3269,6 +3271,8 @@ const viewerModuleOrder = [
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
   'src/view/urbanVehicles.ts',
+  'src/view/urbanEnvironmentExpansionA.ts',
+  'src/view/urbanEnvironmentExpansionB.ts',
   'src/view/urbanEnvironment.ts',
   'src/view/townhouse/books.ts',
   'src/view/townhouse/cafe.ts',
@@ -3419,11 +3423,10 @@ const viewerHtmlContent = `<!DOCTYPE html>
   <!-- Left Sidebar (Models Catalog) -->
   <aside class="sidebar">
     <div class="category-tabs">
-      <button class="cat-tab active" data-cat="chars">Персонажи (10)</button>
-      <button class="cat-tab" data-cat="vehicles">Транспорт (6)</button>
-      <button class="cat-tab" data-cat="props">Окружение (10)</button>
-      <button class="cat-tab" data-cat="nature">Биомы (3)</button>
-      <button class="cat-tab" data-cat="buildings">Здания (3)</button>
+      <button class="cat-tab active" data-cat="chars" data-title="Персонажи">Персонажи (10)</button>
+      <button class="cat-tab" data-cat="vehicles" data-title="Транспорт">Транспорт (6)</button>
+      <button class="cat-tab" data-cat="environment" data-title="🌳 Окружение">🌳 Окружение (13)</button>
+      <button class="cat-tab" data-cat="buildings" data-title="Здания">Здания (3)</button>
     </div>
     <div id="model-list" class="model-list"></div>
   </aside>
@@ -3625,9 +3628,18 @@ ${viewerModulesJs}
     }
 
     function renderSidebar() {
-      // Sync tab buttons active state
+      // Sync tab buttons active state and dynamic model count badges
       document.querySelectorAll('.cat-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.cat === activeCategory);
+        const cat = t.dataset.cat;
+        let count = 0;
+        if (cat === 'environment') {
+          count = MODELS.filter(m => m.cat === 'props' || m.cat === 'nature').length;
+        } else {
+          count = MODELS.filter(m => m.cat === cat).length;
+        }
+        const title = t.dataset.title || t.textContent.replace(/\s*\(\d+\)/, '').trim();
+        t.textContent = title + ' (' + count + ')';
       });
       if (document.getElementById('biome-select')) {
         document.getElementById('biome-select').value = currentBiome;
@@ -3635,7 +3647,9 @@ ${viewerModulesJs}
 
       const listEl = document.getElementById('model-list');
       listEl.innerHTML = '';
-      const filtered = MODELS.filter(m => m.cat === activeCategory);
+      const filtered = activeCategory === 'environment'
+        ? MODELS.filter(m => m.cat === 'props' || m.cat === 'nature')
+        : MODELS.filter(m => m.cat === activeCategory);
 
       filtered.forEach(m => {
         const btn = document.createElement('button');

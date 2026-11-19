@@ -1,0 +1,376 @@
+[
+  {
+    "name": "base_plate",
+    "group": "can_base",
+    "from": [
+      -3.25,
+      0.0,
+      -3.25
+    ],
+    "to": [
+      3.25,
+      0.8,
+      3.25
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "support_post",
+    "group": "can_base",
+    "from": [
+      -1.15,
+      0.7,
+      -1.15
+    ],
+    "to": [
+      1.15,
+      2.6,
+      1.15
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "receptacle_tray",
+    "group": "can_base",
+    "from": [
+      -3.15,
+      2.5,
+      -3.15
+    ],
+    "to": [
+      3.15,
+      3.6,
+      3.15
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "bin_body_core",
+    "group": "can_body",
+    "from": [
+      -2.95,
+      3.5,
+      -2.95
+    ],
+    "to": [
+      2.95,
+      9.6,
+      2.95
+    ],
+    "color": "binGreen",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "rib_fl",
+    "group": "can_body",
+    "from": [
+      -3.45,
+      3.4,
+      -3.45
+    ],
+    "to": [
+      -2.85,
+      9.8,
+      -2.85
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rib_fr",
+    "group": "can_body",
+    "from": [
+      2.85,
+      3.4,
+      -3.45
+    ],
+    "to": [
+      3.45,
+      9.8,
+      -2.85
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rib_bl",
+    "group": "can_body",
+    "from": [
+      -3.45,
+      3.4,
+      2.85
+    ],
+    "to": [
+      -2.85,
+      9.8,
+      3.45
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rib_br",
+    "group": "can_body",
+    "from": [
+      2.85,
+      3.4,
+      2.85
+    ],
+    "to": [
+      3.45,
+      9.8,
+      3.45
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "panel_white",
+    "group": "can_panel",
+    "from": [
+      -2.15,
+      5.0,
+      -3.15
+    ],
+    "to": [
+      2.15,
+      7.8,
+      -2.85
+    ],
+    "color": "panelWhite",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "panel_logo",
+    "group": "can_panel",
+    "from": [
+      -0.75,
+      5.8,
+      -3.25
+    ],
+    "to": [
+      0.75,
+      7.0,
+      -3.05
+    ],
+    "color": "logoGreen",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "handle_l",
+    "group": "can_details",
+    "from": [
+      -3.35,
+      6.2,
+      -0.65
+    ],
+    "to": [
+      -2.85,
+      7.4,
+      0.65
+    ],
+    "color": "silverSteel",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "handle_r",
+    "group": "can_details",
+    "from": [
+      2.85,
+      6.2,
+      -0.65
+    ],
+    "to": [
+      3.35,
+      7.4,
+      0.65
+    ],
+    "color": "silverSteel",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "top_rim",
+    "group": "can_hood",
+    "from": [
+      -3.25,
+      9.5,
+      -3.25
+    ],
+    "to": [
+      3.25,
+      10.6,
+      3.25
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hood_roof",
+    "group": "can_hood",
+    "from": [
+      -3.05,
+      10.5,
+      -3.05
+    ],
+    "to": [
+      3.05,
+      11.5,
+      3.05
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "trash_slot",
+    "group": "can_hood",
+    "from": [
+      -2.05,
+      10.4,
+      -3.2
+    ],
+    "to": [
+      2.05,
+      11.0,
+      -2.8
+    ],
+    "color": "slotBlack",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "ashtray_plate",
+    "group": "can_hood",
+    "from": [
+      -1.45,
+      11.4,
+      -1.45
+    ],
+    "to": [
+      1.45,
+      11.9,
+      1.45
+    ],
+    "color": "silverSteel",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "ashtray_grate",
+    "group": "can_hood",
+    "from": [
+      -0.75,
+      11.8,
+      -0.75
+    ],
+    "to": [
+      0.75,
+      12.0,
+      0.75
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  }
+]

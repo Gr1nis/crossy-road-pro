@@ -1,0 +1,486 @@
+[
+  {
+    "name": "signal_base_plate",
+    "group": "signal_base",
+    "from": [
+      -3.45,
+      0.0,
+      -2.95
+    ],
+    "to": [
+      3.45,
+      1.2,
+      2.95
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "signal_cabinet",
+    "group": "signal_base",
+    "from": [
+      -2.85,
+      1.1,
+      -2.45
+    ],
+    "to": [
+      -0.85,
+      5.2,
+      2.45
+    ],
+    "color": "cabinetGrey",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "signal_cabinet_door",
+    "group": "signal_base",
+    "from": [
+      -2.95,
+      1.8,
+      -1.85
+    ],
+    "to": [
+      -2.75,
+      4.6,
+      1.85
+    ],
+    "color": "cabinetDark",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "signal_mast_collar",
+    "group": "signal_base",
+    "from": [
+      0.65,
+      1.1,
+      -1.25
+    ],
+    "to": [
+      2.85,
+      2.4,
+      1.25
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "signal_mast_column",
+    "group": "signal_mast",
+    "from": [
+      1.15,
+      2.3,
+      -0.75
+    ],
+    "to": [
+      2.35,
+      24.2,
+      0.75
+    ],
+    "color": "poleSilver",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "signal_mast_top_collar",
+    "group": "signal_mast",
+    "from": [
+      0.95,
+      24.1,
+      -0.95
+    ],
+    "to": [
+      2.55,
+      25.4,
+      0.95
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rung_1",
+    "group": "signal_mast",
+    "from": [
+      -0.65,
+      7.8,
+      -0.35
+    ],
+    "to": [
+      1.25,
+      8.4,
+      0.35
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rung_2",
+    "group": "signal_mast",
+    "from": [
+      -0.65,
+      13.8,
+      -0.35
+    ],
+    "to": [
+      1.25,
+      14.4,
+      0.35
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rung_3",
+    "group": "signal_mast",
+    "from": [
+      -0.65,
+      19.8,
+      -0.35
+    ],
+    "to": [
+      1.25,
+      20.4,
+      0.35
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform_grate",
+    "group": "signal_platform",
+    "from": [
+      -2.95,
+      24.8,
+      -2.65
+    ],
+    "to": [
+      3.25,
+      25.8,
+      2.65
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform_railing_back",
+    "group": "signal_platform",
+    "from": [
+      -2.45,
+      25.7,
+      2.35
+    ],
+    "to": [
+      3.15,
+      29.4,
+      2.75
+    ],
+    "color": "safetyYellow",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "platform_railing_left",
+    "group": "signal_platform",
+    "from": [
+      -2.85,
+      25.7,
+      -2.35
+    ],
+    "to": [
+      -2.55,
+      29.4,
+      2.45
+    ],
+    "color": "safetyYellow",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "signal_backboard",
+    "group": "signal_head",
+    "from": [
+      -3.45,
+      25.6,
+      -2.45
+    ],
+    "to": [
+      0.65,
+      35.8,
+      -2.05
+    ],
+    "color": "blackPlate",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "signal_head_body",
+    "group": "signal_head",
+    "from": [
+      -3.15,
+      26.0,
+      -2.15
+    ],
+    "to": [
+      0.35,
+      35.4,
+      -0.25
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "visor_upper",
+    "group": "signal_head",
+    "from": [
+      -2.85,
+      33.6,
+      -3.45
+    ],
+    "to": [
+      0.05,
+      35.2,
+      -2.75
+    ],
+    "color": "blackPlate",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "lens_red_upper",
+    "group": "signal_head",
+    "from": [
+      -2.45,
+      31.8,
+      -2.95
+    ],
+    "to": [
+      -0.25,
+      34.2,
+      -2.25
+    ],
+    "color": "redGlow",
+    "col_idx": 6,
+    "uv": [
+      6,
+      0,
+      7,
+      1
+    ]
+  },
+  {
+    "name": "visor_lower",
+    "group": "signal_head",
+    "from": [
+      -2.85,
+      28.8,
+      -3.45
+    ],
+    "to": [
+      0.05,
+      30.4,
+      -2.75
+    ],
+    "color": "blackPlate",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "lens_green_lower",
+    "group": "signal_head",
+    "from": [
+      -2.45,
+      27.0,
+      -2.95
+    ],
+    "to": [
+      -0.25,
+      29.4,
+      -2.25
+    ],
+    "color": "greenGlow",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "bracket_low",
+    "group": "signal_details",
+    "from": [
+      0.25,
+      26.8,
+      -1.25
+    ],
+    "to": [
+      1.25,
+      27.6,
+      0.05
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "bracket_high",
+    "group": "signal_details",
+    "from": [
+      0.25,
+      33.2,
+      -1.25
+    ],
+    "to": [
+      1.25,
+      34.0,
+      0.05
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "conduit_cable",
+    "group": "signal_details",
+    "from": [
+      1.95,
+      2.2,
+      0.7
+    ],
+    "to": [
+      2.25,
+      25.2,
+      1.0
+    ],
+    "color": "blackPlate",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "mast_finial_cap",
+    "group": "signal_details",
+    "from": [
+      1.35,
+      25.3,
+      -0.55
+    ],
+    "to": [
+      2.15,
+      26.2,
+      0.55
+    ],
+    "color": "poleSilver",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  }
+]

@@ -1,0 +1,398 @@
+[
+  {
+    "name": "barrier_base_foot",
+    "group": "barrier_body",
+    "from": [
+      -8.85,
+      0.0,
+      -2.85
+    ],
+    "to": [
+      8.85,
+      1.8,
+      2.85
+    ],
+    "color": "concreteDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "barrier_chamfer_mid",
+    "group": "barrier_body",
+    "from": [
+      -8.75,
+      1.7,
+      -2.25
+    ],
+    "to": [
+      8.75,
+      4.4,
+      2.25
+    ],
+    "color": "concreteMid",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "barrier_stem_wall",
+    "group": "barrier_body",
+    "from": [
+      -8.65,
+      4.3,
+      -1.25
+    ],
+    "to": [
+      8.65,
+      7.8,
+      1.25
+    ],
+    "color": "concreteLight",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "barrier_top_cap",
+    "group": "barrier_body",
+    "from": [
+      -8.55,
+      7.7,
+      -0.95
+    ],
+    "to": [
+      8.55,
+      9.0,
+      0.95
+    ],
+    "color": "concreteMid",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "front_stripe_y1",
+    "group": "barrier_stripes",
+    "from": [
+      -7.85,
+      4.6,
+      -1.35
+    ],
+    "to": [
+      -5.25,
+      7.5,
+      -1.15
+    ],
+    "color": "hazardYellow",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "front_stripe_b1",
+    "group": "barrier_stripes",
+    "from": [
+      -5.15,
+      4.6,
+      -1.35
+    ],
+    "to": [
+      -2.55,
+      7.5,
+      -1.15
+    ],
+    "color": "hazardBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "front_stripe_y2",
+    "group": "barrier_stripes",
+    "from": [
+      -2.45,
+      4.6,
+      -1.35
+    ],
+    "to": [
+      0.15,
+      7.5,
+      -1.15
+    ],
+    "color": "hazardYellow",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "front_stripe_b2",
+    "group": "barrier_stripes",
+    "from": [
+      0.25,
+      4.6,
+      -1.35
+    ],
+    "to": [
+      2.85,
+      7.5,
+      -1.15
+    ],
+    "color": "hazardBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "front_stripe_y3",
+    "group": "barrier_stripes",
+    "from": [
+      2.95,
+      4.6,
+      -1.35
+    ],
+    "to": [
+      5.55,
+      7.5,
+      -1.15
+    ],
+    "color": "hazardYellow",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "front_stripe_b3",
+    "group": "barrier_stripes",
+    "from": [
+      5.65,
+      4.6,
+      -1.35
+    ],
+    "to": [
+      7.85,
+      7.5,
+      -1.15
+    ],
+    "color": "hazardBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "rear_stripe_y1",
+    "group": "barrier_stripes",
+    "from": [
+      -7.85,
+      4.6,
+      1.15
+    ],
+    "to": [
+      -5.25,
+      7.5,
+      1.35
+    ],
+    "color": "hazardYellow",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "rear_stripe_b1",
+    "group": "barrier_stripes",
+    "from": [
+      -5.15,
+      4.6,
+      1.15
+    ],
+    "to": [
+      -2.55,
+      7.5,
+      1.35
+    ],
+    "color": "hazardBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "rear_stripe_y2",
+    "group": "barrier_stripes",
+    "from": [
+      -2.45,
+      4.6,
+      1.15
+    ],
+    "to": [
+      0.15,
+      7.5,
+      1.35
+    ],
+    "color": "hazardYellow",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "rear_stripe_b2",
+    "group": "barrier_stripes",
+    "from": [
+      0.25,
+      4.6,
+      1.15
+    ],
+    "to": [
+      2.85,
+      7.5,
+      1.35
+    ],
+    "color": "hazardBlack",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "top_marker_l",
+    "group": "barrier_reflectors",
+    "from": [
+      -4.55,
+      8.9,
+      -0.75
+    ],
+    "to": [
+      -2.55,
+      9.2,
+      0.75
+    ],
+    "color": "hazardYellow",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "top_marker_r",
+    "group": "barrier_reflectors",
+    "from": [
+      2.55,
+      8.9,
+      -0.75
+    ],
+    "to": [
+      4.55,
+      9.2,
+      0.75
+    ],
+    "color": "hazardYellow",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "reflector_end_l",
+    "group": "barrier_reflectors",
+    "from": [
+      -8.75,
+      4.8,
+      -0.45
+    ],
+    "to": [
+      -8.55,
+      7.2,
+      0.45
+    ],
+    "color": "reflectorRed",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "reflector_end_r",
+    "group": "barrier_reflectors",
+    "from": [
+      8.55,
+      4.8,
+      -0.45
+    ],
+    "to": [
+      8.75,
+      7.2,
+      0.45
+    ],
+    "color": "reflectorRed",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  }
+]

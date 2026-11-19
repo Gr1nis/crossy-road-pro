@@ -1,0 +1,684 @@
+[
+  {
+    "name": "leg_fl",
+    "group": "planter_base",
+    "from": [
+      -7.85,
+      0.0,
+      -7.85
+    ],
+    "to": [
+      -5.85,
+      2.0,
+      -5.85
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "leg_fr",
+    "group": "planter_base",
+    "from": [
+      5.85,
+      0.0,
+      -7.85
+    ],
+    "to": [
+      7.85,
+      2.0,
+      -5.85
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "leg_bl",
+    "group": "planter_base",
+    "from": [
+      -7.85,
+      0.0,
+      5.85
+    ],
+    "to": [
+      -5.85,
+      2.0,
+      7.85
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "leg_br",
+    "group": "planter_base",
+    "from": [
+      5.85,
+      0.0,
+      5.85
+    ],
+    "to": [
+      7.85,
+      2.0,
+      7.85
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "planter_bottom",
+    "group": "planter_base",
+    "from": [
+      -7.65,
+      1.9,
+      -7.65
+    ],
+    "to": [
+      7.65,
+      3.2,
+      7.65
+    ],
+    "color": "woodPlankMid",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "wall_front",
+    "group": "planter_walls",
+    "from": [
+      -7.9,
+      3.1,
+      -7.9
+    ],
+    "to": [
+      7.9,
+      10.0,
+      -6.1
+    ],
+    "color": "woodPlankMid",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "wall_back",
+    "group": "planter_walls",
+    "from": [
+      -7.9,
+      3.1,
+      6.1
+    ],
+    "to": [
+      7.9,
+      10.0,
+      7.9
+    ],
+    "color": "woodPlankMid",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "wall_left",
+    "group": "planter_walls",
+    "from": [
+      -7.8,
+      3.1,
+      -6.0
+    ],
+    "to": [
+      -6.1,
+      10.0,
+      6.0
+    ],
+    "color": "woodPlankMid",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "wall_right",
+    "group": "planter_walls",
+    "from": [
+      6.1,
+      3.1,
+      -6.0
+    ],
+    "to": [
+      7.8,
+      10.0,
+      6.0
+    ],
+    "color": "woodPlankMid",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "rim_front",
+    "group": "planter_walls",
+    "from": [
+      -8.0,
+      9.9,
+      -8.0
+    ],
+    "to": [
+      8.0,
+      11.2,
+      -5.9
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rim_back",
+    "group": "planter_walls",
+    "from": [
+      -8.0,
+      9.9,
+      5.9
+    ],
+    "to": [
+      8.0,
+      11.2,
+      8.0
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rim_left",
+    "group": "planter_walls",
+    "from": [
+      -7.9,
+      9.9,
+      -5.8
+    ],
+    "to": [
+      -5.9,
+      11.2,
+      5.8
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rim_right",
+    "group": "planter_walls",
+    "from": [
+      5.9,
+      9.9,
+      -5.8
+    ],
+    "to": [
+      7.9,
+      11.2,
+      5.8
+    ],
+    "color": "woodPlankDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "soil_bed",
+    "group": "soil_trunk",
+    "from": [
+      -5.7,
+      9.0,
+      -5.7
+    ],
+    "to": [
+      5.7,
+      10.6,
+      5.7
+    ],
+    "color": "soilDark",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "trunk_stem",
+    "group": "soil_trunk",
+    "from": [
+      -1.45,
+      10.5,
+      -1.45
+    ],
+    "to": [
+      1.45,
+      18.0,
+      1.45
+    ],
+    "color": "trunkBark",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t1_core",
+    "group": "foliage_lower",
+    "from": [
+      -6.85,
+      17.8,
+      -6.85
+    ],
+    "to": [
+      6.85,
+      23.2,
+      6.85
+    ],
+    "color": "foliageBase",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t1_front",
+    "group": "foliage_lower",
+    "from": [
+      -5.45,
+      18.4,
+      -7.85
+    ],
+    "to": [
+      5.45,
+      22.6,
+      -6.75
+    ],
+    "color": "foliageBase",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t1_back",
+    "group": "foliage_lower",
+    "from": [
+      -5.45,
+      18.4,
+      6.75
+    ],
+    "to": [
+      5.45,
+      22.6,
+      7.85
+    ],
+    "color": "foliageBase",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t1_left",
+    "group": "foliage_lower",
+    "from": [
+      -7.85,
+      18.4,
+      -5.45
+    ],
+    "to": [
+      -6.75,
+      22.6,
+      5.45
+    ],
+    "color": "foliageBase",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t1_right",
+    "group": "foliage_lower",
+    "from": [
+      6.75,
+      18.4,
+      -5.45
+    ],
+    "to": [
+      7.85,
+      22.6,
+      5.45
+    ],
+    "color": "foliageBase",
+    "col_idx": 4,
+    "uv": [
+      4,
+      0,
+      5,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t2_core",
+    "group": "foliage_mid",
+    "from": [
+      -6.15,
+      23.1,
+      -6.15
+    ],
+    "to": [
+      6.15,
+      29.5,
+      6.15
+    ],
+    "color": "foliageMid",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t2_front",
+    "group": "foliage_mid",
+    "from": [
+      -4.65,
+      24.0,
+      -7.15
+    ],
+    "to": [
+      4.65,
+      28.5,
+      -6.05
+    ],
+    "color": "foliageMid",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t2_back",
+    "group": "foliage_mid",
+    "from": [
+      -4.65,
+      24.0,
+      6.05
+    ],
+    "to": [
+      4.65,
+      28.5,
+      7.15
+    ],
+    "color": "foliageMid",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t2_left",
+    "group": "foliage_mid",
+    "from": [
+      -7.15,
+      24.0,
+      -4.65
+    ],
+    "to": [
+      -6.05,
+      28.5,
+      4.65
+    ],
+    "color": "foliageMid",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t2_right",
+    "group": "foliage_mid",
+    "from": [
+      6.05,
+      24.0,
+      -4.65
+    ],
+    "to": [
+      7.15,
+      28.5,
+      4.65
+    ],
+    "color": "foliageMid",
+    "col_idx": 5,
+    "uv": [
+      5,
+      0,
+      6,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t3_core",
+    "group": "foliage_crown",
+    "from": [
+      -4.25,
+      29.4,
+      -4.25
+    ],
+    "to": [
+      4.25,
+      34.6,
+      4.25
+    ],
+    "color": "foliageLight",
+    "col_idx": 6,
+    "uv": [
+      6,
+      0,
+      7,
+      1
+    ]
+  },
+  {
+    "name": "foliage_t3_top",
+    "group": "foliage_crown",
+    "from": [
+      -2.45,
+      34.5,
+      -2.45
+    ],
+    "to": [
+      2.45,
+      36.0,
+      2.45
+    ],
+    "color": "foliageLight",
+    "col_idx": 6,
+    "uv": [
+      6,
+      0,
+      7,
+      1
+    ]
+  },
+  {
+    "name": "fruit_front_l",
+    "group": "foliage_crown",
+    "from": [
+      -3.45,
+      21.0,
+      -7.95
+    ],
+    "to": [
+      -2.05,
+      22.4,
+      -7.65
+    ],
+    "color": "appleRed",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "fruit_front_r",
+    "group": "foliage_crown",
+    "from": [
+      2.55,
+      20.0,
+      -7.95
+    ],
+    "to": [
+      3.95,
+      21.4,
+      -7.65
+    ],
+    "color": "appleRed",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "fruit_right_side",
+    "group": "foliage_crown",
+    "from": [
+      7.05,
+      25.5,
+      -2.45
+    ],
+    "to": [
+      7.35,
+      26.9,
+      -1.05
+    ],
+    "color": "appleRed",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  },
+  {
+    "name": "fruit_left_side",
+    "group": "foliage_crown",
+    "from": [
+      -7.35,
+      26.0,
+      1.25
+    ],
+    "to": [
+      -7.05,
+      27.4,
+      2.65
+    ],
+    "color": "appleRed",
+    "col_idx": 7,
+    "uv": [
+      7,
+      0,
+      8,
+      1
+    ]
+  }
+]

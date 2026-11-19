@@ -1,0 +1,486 @@
+[
+  {
+    "name": "leg_fl",
+    "group": "bench_iron_left",
+    "from": [
+      -7.85,
+      0.0,
+      1.85
+    ],
+    "to": [
+      -6.45,
+      4.2,
+      3.25
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "leg_bl",
+    "group": "bench_iron_left",
+    "from": [
+      -7.85,
+      0.0,
+      -3.45
+    ],
+    "to": [
+      -6.45,
+      9.8,
+      -2.05
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "armrest_l",
+    "group": "bench_iron_left",
+    "from": [
+      -7.75,
+      4.8,
+      -2.25
+    ],
+    "to": [
+      -6.55,
+      5.8,
+      3.15
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "brace_low_l",
+    "group": "bench_iron_left",
+    "from": [
+      -7.65,
+      1.2,
+      -2.15
+    ],
+    "to": [
+      -6.65,
+      2.2,
+      2.15
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "seat_bracket_l",
+    "group": "bench_iron_left",
+    "from": [
+      -7.65,
+      3.9,
+      -2.15
+    ],
+    "to": [
+      -6.65,
+      4.6,
+      2.85
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "leg_fr",
+    "group": "bench_iron_right",
+    "from": [
+      6.45,
+      0.0,
+      1.85
+    ],
+    "to": [
+      7.85,
+      4.2,
+      3.25
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "leg_br",
+    "group": "bench_iron_right",
+    "from": [
+      6.45,
+      0.0,
+      -3.45
+    ],
+    "to": [
+      7.85,
+      9.8,
+      -2.05
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "armrest_r",
+    "group": "bench_iron_right",
+    "from": [
+      6.55,
+      4.8,
+      -2.25
+    ],
+    "to": [
+      7.75,
+      5.8,
+      3.15
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "brace_low_r",
+    "group": "bench_iron_right",
+    "from": [
+      6.65,
+      1.2,
+      -2.15
+    ],
+    "to": [
+      7.65,
+      2.2,
+      2.15
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "seat_bracket_r",
+    "group": "bench_iron_right",
+    "from": [
+      6.65,
+      3.9,
+      -2.15
+    ],
+    "to": [
+      7.65,
+      4.6,
+      2.85
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "tie_bar",
+    "group": "bench_tie",
+    "from": [
+      -6.55,
+      1.4,
+      -0.45
+    ],
+    "to": [
+      6.55,
+      2.0,
+      0.45
+    ],
+    "color": "ironDark",
+    "col_idx": 0,
+    "uv": [
+      0,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "slat_seat_1",
+    "group": "bench_seat",
+    "from": [
+      -8.85,
+      4.4,
+      -1.95
+    ],
+    "to": [
+      8.85,
+      5.1,
+      -0.85
+    ],
+    "color": "woodWarm",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "slat_seat_2",
+    "group": "bench_seat",
+    "from": [
+      -8.85,
+      4.4,
+      -0.55
+    ],
+    "to": [
+      8.85,
+      5.1,
+      0.55
+    ],
+    "color": "woodMid",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "slat_seat_3",
+    "group": "bench_seat",
+    "from": [
+      -8.85,
+      4.4,
+      0.85
+    ],
+    "to": [
+      8.85,
+      5.1,
+      1.95
+    ],
+    "color": "woodWarm",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "slat_seat_4_bullnose",
+    "group": "bench_seat",
+    "from": [
+      -8.85,
+      4.1,
+      2.25
+    ],
+    "to": [
+      8.85,
+      4.9,
+      3.45
+    ],
+    "color": "woodMid",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "slat_back_1",
+    "group": "bench_back",
+    "from": [
+      -8.85,
+      6.2,
+      -2.75
+    ],
+    "to": [
+      8.85,
+      7.2,
+      -1.95
+    ],
+    "color": "woodWarm",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "slat_back_2",
+    "group": "bench_back",
+    "from": [
+      -8.85,
+      7.5,
+      -2.75
+    ],
+    "to": [
+      8.85,
+      8.5,
+      -1.95
+    ],
+    "color": "woodMid",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "slat_back_3_crest",
+    "group": "bench_back",
+    "from": [
+      -8.85,
+      8.8,
+      -2.85
+    ],
+    "to": [
+      8.85,
+      10.0,
+      -1.95
+    ],
+    "color": "woodWarm",
+    "col_idx": 1,
+    "uv": [
+      1,
+      0,
+      2,
+      1
+    ]
+  },
+  {
+    "name": "bolt_slat_f1",
+    "group": "bench_bolts",
+    "from": [
+      -8.55,
+      5.05,
+      -1.55
+    ],
+    "to": [
+      -7.95,
+      5.35,
+      -1.25
+    ],
+    "color": "boltSteel",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "bolt_slat_f2",
+    "group": "bench_bolts",
+    "from": [
+      7.95,
+      5.05,
+      -1.55
+    ],
+    "to": [
+      8.55,
+      5.35,
+      -1.25
+    ],
+    "color": "boltSteel",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "bolt_slat_b1",
+    "group": "bench_bolts",
+    "from": [
+      -8.55,
+      9.35,
+      -1.85
+    ],
+    "to": [
+      -7.95,
+      9.65,
+      -1.65
+    ],
+    "color": "boltSteel",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  },
+  {
+    "name": "bolt_slat_b2",
+    "group": "bench_bolts",
+    "from": [
+      7.95,
+      9.35,
+      -1.85
+    ],
+    "to": [
+      8.55,
+      9.65,
+      -1.65
+    ],
+    "color": "boltSteel",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
+      1
+    ]
+  }
+]
