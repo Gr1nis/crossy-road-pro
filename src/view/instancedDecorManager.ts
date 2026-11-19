@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { BiomeType } from '../core/types.ts';
+import { HYDRANT_BOXES } from './urbanEnvironmentExpansionA.ts';
 import { COIN_BOXES, TREE_PALETTES, TREE_PLANTER_GEO } from './urbanEnvironmentExpansionB.ts';
 
 interface InstancedVoxelBox {
@@ -61,28 +62,24 @@ const INSTANCED_WINTER_TREE_BOXES: readonly InstancedVoxelBox[] = createTreeBoxe
 const INSTANCED_DESERT_TREE_BOXES: readonly InstancedVoxelBox[] = createTreeBoxesForBiome('desert');
 const INSTANCED_NEON_TREE_BOXES: readonly InstancedVoxelBox[] = createTreeBoxesForBiome('neon');
 
-const INSTANCED_FOREST_ROCK_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.60, 0.25, 0.60, 0, 0.125, 0, 0x64748b), b(0.45, 0.20, 0.45, -0.05, 0.30, 0.05, 0x475569),
-  b(0.30, 0.15, 0.30, 0.05, 0.45, -0.05, 0x94a3b8), b(0.15, 0.10, 0.15, 0.25, 0.05, 0.20, 0x64748b),
-];
+const INSTANCED_FOREST_ROCK_BOXES: readonly InstancedVoxelBox[] = HYDRANT_BOXES.map((d) =>
+  b(d[0], d[1], d[2], d[3], d[4], d[5], d[6])
+);
 
-// Winter Biome: Dark trunk 0x475569, pine teal 0x0f766e, snow cap 0xf8fafc, 0xe2e8f0 | Rock: 0x94a3b8, snow cap 0xf1f5f9
-const INSTANCED_WINTER_ROCK_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.60, 0.25, 0.60, 0, 0.125, 0, 0x94a3b8), b(0.45, 0.20, 0.45, -0.05, 0.30, 0.05, 0x64748b),
-  b(0.45, 0.08, 0.45, -0.05, 0.42, 0.05, 0xf1f5f9), b(0.25, 0.10, 0.25, 0.15, 0.20, -0.15, 0xf1f5f9),
-];
+// Winter Biome: Frosted aqua/ice hydrant (0x0284c7, 0x0369a1, 0xe0f2fe)
+const INSTANCED_WINTER_ROCK_BOXES: readonly InstancedVoxelBox[] = HYDRANT_BOXES.map((d) =>
+  b(d[0], d[1], d[2], d[3], d[4], d[5], d[6] === 0xef4444 ? 0x0284c7 : d[6] === 0xb91c1c ? 0x0369a1 : 0xe0f2fe)
+);
 
-// Desert Biome: Terracotta trunk 0x78350f, cactus green / golden-olive 0xa16207, 0xb45309, 0xd97706 | Rock: 0xd97706, 0xb45309, 0x92400e
-const INSTANCED_DESERT_ROCK_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.65, 0.20, 0.65, 0, 0.10, 0, 0x92400e), b(0.50, 0.20, 0.50, 0.05, 0.28, -0.05, 0xb45309),
-  b(0.35, 0.15, 0.35, 0.05, 0.43, -0.05, 0xd97706), b(0.18, 0.12, 0.18, -0.25, 0.06, 0.20, 0xd97706),
-];
+// Desert Biome: Terracotta & weathered bronze hydrant (0xd97706, 0xb45309, 0x78350f)
+const INSTANCED_DESERT_ROCK_BOXES: readonly InstancedVoxelBox[] = HYDRANT_BOXES.map((d) =>
+  b(d[0], d[1], d[2], d[3], d[4], d[5], d[6] === 0xef4444 ? 0xd97706 : d[6] === 0xb91c1c ? 0xb45309 : 0x78350f)
+);
 
-// Neon Biome: Obsidian trunk 0x1e1b4b, glowing cyan/magenta 0x06b6d4, 0xd946ef, 0xa855f7 | Rock: 0x312e81, 0x4338ca, 0x06b6d4
-const INSTANCED_NEON_ROCK_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.55, 0.20, 0.55, 0, 0.10, 0, 0x312e81), b(0.35, 0.35, 0.35, -0.05, 0.35, 0.05, 0x4338ca),
-  b(0.15, 0.25, 0.15, 0.18, 0.25, -0.12, 0x06b6d4), b(0.10, 0.18, 0.10, -0.15, 0.48, -0.05, 0x06b6d4),
-];
+// Neon Biome: Cyber cyan & magenta glowing hydrant (0x06b6d4, 0x3b82f6, 0xec4899)
+const INSTANCED_NEON_ROCK_BOXES: readonly InstancedVoxelBox[] = HYDRANT_BOXES.map((d) =>
+  b(d[0], d[1], d[2], d[3], d[4], d[5], d[6] === 0xef4444 ? 0x06b6d4 : d[6] === 0xb91c1c ? 0x3b82f6 : 0xec4899)
+);
 
 const INSTANCED_COIN_BOXES: readonly InstancedVoxelBox[] = COIN_BOXES.map((d) =>
   b(d[0], d[1], d[2], d[3], Number((d[4] - 0.365).toFixed(4)), d[5], d[6])

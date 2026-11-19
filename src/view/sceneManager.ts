@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { getCameraFrustumDimensions, vehicleScreenRotationY, worldToScreenX } from '../core/collision.ts';
 import type { GameEngine } from '../core/gameEngine.ts';
-import { Biome, DeathReason, LaneType, MoveDirection, type BiomeType, type Lane, type SkinId } from '../core/types.ts';
+import { Biome, DeathReason, LaneType, MoveDirection, type BiomeType, type Lane, type ObstacleKind, type SkinId } from '../core/types.ts';
 import { MeshFactory } from './meshFactory.ts';
 import { LaneGeometryPool } from './laneGeometryPool.ts';
 import { VoxelPalette } from './voxelPalette.ts';
@@ -598,10 +598,7 @@ export class SceneManager {
     group.add(ground);
 
     if (lane.type === LaneType.ROAD) {
-      if (hasNextRoad) {
-        // Pooled divider dashes (replaces MeshFactory.createLaneDivider())
-        group.add(LaneGeometryPool.createLaneDivider());
-      }
+      // Clean dark asphalt with zero crossings/dividers (disabled MeshFactory.createLaneDivider())
       for (const xPos of [-10.2, 10.2]) {
         const barrier = MeshFactory.createRoadBarrier(biome);
         barrier.position.set(worldToScreenX(xPos), 0, 0);
@@ -666,13 +663,11 @@ export class SceneManager {
             mesh.position.x = worldToScreenX(xCur);
             group.add(mesh);
           } else {
-            const kind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
+            const kind: ObstacleKind = Math.abs(seed) % 5 === 0 ? 'rock' : 'tree';
             const screenX = worldToScreenX(xCur);
-            if (kind === 'rock') {
-              decorRocks.push({ x: screenX, y: 0, z: lane.index, scale: 1 });
-            } else {
-              decorTrees.push({ x: screenX, y: 0, z: lane.index, scale: 1, rotation: 0 });
-            }
+            const obs = MeshFactory.createObstacle(kind, seed, biome);
+            obs.position.set(screenX, 0, 0);
+            group.add(obs);
           }
           const step = isBuilding ? 2.0 : 1.2 + ((Math.abs(seed) % 100) / 100) * 0.3;
           xCur += step;

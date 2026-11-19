@@ -2,7 +2,7 @@ import type { BiomeType } from '../core/types.ts';
 import type { VoxelMeshBuilder } from './voxelMeshBuilder.ts';
 
 // Model 3: Cast-Iron Fire Hydrant (22 cubes, Zero Z-Fighting Certified)
-const HYDRANT_BOXES: readonly [number, number, number, number, number, number, number][] = [
+export const HYDRANT_BOXES: readonly [number, number, number, number, number, number, number][] = [
   [0.345, 0.07, 0.345, 0.0, 0.035, 0.0, 0xb91c1c],
   [0.06, 0.025, 0.06, -0.1375, 0.0725, -0.1375, 0xf59e0b],
   [0.06, 0.025, 0.06, 0.1375, 0.0725, -0.1375, 0xf59e0b],
