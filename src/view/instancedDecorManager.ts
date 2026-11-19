@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { BiomeType } from '../core/types.ts';
+import { COIN_BOXES } from './urbanEnvironmentExpansionB.ts';
 
 interface InstancedVoxelBox {
   w: number;
@@ -11,9 +12,7 @@ interface InstancedVoxelBox {
   color: number;
 }
 
-const b = (w: number, h: number, d: number, x: number, y: number, z: number, color: number): InstancedVoxelBox => ({
-  w, h, d, x, y, z, color,
-});
+const b = (w: number, h: number, d: number, x: number, y: number, z: number, color: number): InstancedVoxelBox => ({ w, h, d, x, y, z, color });
 
 function createMergedDecorGeometry(boxes: readonly InstancedVoxelBox[]): THREE.BufferGeometry {
   const totalVerts = boxes.length * 36;
@@ -97,9 +96,9 @@ const INSTANCED_NEON_ROCK_BOXES: readonly InstancedVoxelBox[] = [
   b(0.15, 0.25, 0.15, 0.18, 0.25, -0.12, 0x06b6d4), b(0.10, 0.18, 0.10, -0.15, 0.48, -0.05, 0x06b6d4),
 ];
 
-const INSTANCED_COIN_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.44, 0.44, 0.12, 0, 0, 0, 0xfacc15), b(0.18, 0.22, 0.15, 0, 0, 0, 0xef4444),
-];
+const INSTANCED_COIN_BOXES: readonly InstancedVoxelBox[] = COIN_BOXES.map((d) =>
+  b(d[0], d[1], d[2], d[3], Number((d[4] - 0.365).toFixed(4)), d[5], d[6])
+);
 
 const INSTANCED_DECOR_Y_AXIS = new THREE.Vector3(0, 1, 0);
 const INSTANCED_BIOMES: readonly BiomeType[] = ['forest', 'winter', 'desert', 'neon'];

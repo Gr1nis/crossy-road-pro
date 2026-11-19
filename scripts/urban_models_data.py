@@ -42,6 +42,44 @@ def build_tree_planter():
     ]
 
 # =============================================================================
+# 1b. TREE PLANTER B (31 cubes, 20×34×20, min_y = 0.00, dome canopy)
+# =============================================================================
+def build_tree_planter_b():
+    return [
+        {"name": "plinth", "group": "planter_base", "from": [-7.00, 0.00, -7.00], "to": [7.00, 1.80, 7.00], "color": "concreteDark", "col_idx": 0},
+        {"name": "planter_bottom", "group": "planter_base", "from": [-7.25, 1.70, -7.25], "to": [7.25, 3.20, 7.25], "color": "concreteMid", "col_idx": 1},
+        {"name": "wall_front", "group": "planter_walls", "from": [-7.90, 3.10, -7.90], "to": [7.90, 9.60, -6.10], "color": "concreteMid", "col_idx": 1},
+        {"name": "wall_back", "group": "planter_walls", "from": [-7.90, 3.10, 6.10], "to": [7.90, 9.60, 7.90], "color": "concreteMid", "col_idx": 1},
+        {"name": "wall_left", "group": "planter_walls", "from": [-7.80, 3.10, -6.00], "to": [-6.10, 9.60, 6.00], "color": "concreteMid", "col_idx": 1},
+        {"name": "wall_right", "group": "planter_walls", "from": [6.10, 3.10, -6.00], "to": [7.80, 9.60, 6.00], "color": "concreteMid", "col_idx": 1},
+        {"name": "rim_front", "group": "planter_rim", "from": [-8.00, 9.50, -8.00], "to": [8.00, 10.80, -5.90], "color": "goldRim", "col_idx": 2},
+        {"name": "rim_back", "group": "planter_rim", "from": [-8.00, 9.50, 5.90], "to": [8.00, 10.80, 8.00], "color": "goldRim", "col_idx": 2},
+        {"name": "rim_left", "group": "planter_rim", "from": [-7.90, 9.50, -5.80], "to": [-5.90, 10.80, 5.80], "color": "goldRim", "col_idx": 2},
+        {"name": "rim_right", "group": "planter_rim", "from": [5.90, 9.50, -5.80], "to": [7.90, 10.80, 5.80], "color": "goldRim", "col_idx": 2},
+        {"name": "soil_bed", "group": "soil_trunk", "from": [-5.65, 8.60, -5.65], "to": [5.65, 10.20, 5.65], "color": "soilDark", "col_idx": 3},
+        {"name": "trunk_stem", "group": "soil_trunk", "from": [-1.85, 10.10, -1.85], "to": [1.85, 16.50, 1.85], "color": "trunkBark", "col_idx": 4},
+        {"name": "branch_left", "group": "soil_trunk", "from": [-3.65, 15.50, -1.45], "to": [-1.65, 19.50, 1.45], "color": "trunkBark", "col_idx": 4},
+        {"name": "branch_right", "group": "soil_trunk", "from": [1.65, 15.50, -1.45], "to": [3.65, 19.50, 1.45], "color": "trunkBark", "col_idx": 4},
+        {"name": "canopy_t1_core", "group": "foliage_lower", "from": [-8.85, 19.00, -8.85], "to": [8.85, 23.80, 8.85], "color": "foliageBase", "col_idx": 5},
+        {"name": "canopy_t1_f", "group": "foliage_lower", "from": [-7.45, 19.50, -9.85], "to": [7.45, 23.20, -8.75], "color": "foliageBase", "col_idx": 5},
+        {"name": "canopy_t1_b", "group": "foliage_lower", "from": [-7.45, 19.50, 8.75], "to": [7.45, 23.20, 9.85], "color": "foliageBase", "col_idx": 5},
+        {"name": "canopy_t1_l", "group": "foliage_lower", "from": [-9.85, 19.50, -7.45], "to": [-8.75, 23.20, 7.45], "color": "foliageBase", "col_idx": 5},
+        {"name": "canopy_t1_r", "group": "foliage_lower", "from": [8.75, 19.50, -7.45], "to": [9.85, 23.20, 7.45], "color": "foliageBase", "col_idx": 5},
+        {"name": "canopy_t2_core", "group": "foliage_mid", "from": [-7.65, 23.70, -7.65], "to": [7.65, 28.20, 7.65], "color": "foliageMid", "col_idx": 6},
+        {"name": "canopy_t2_f", "group": "foliage_mid", "from": [-5.85, 24.20, -8.65], "to": [5.85, 27.60, -7.55], "color": "foliageMid", "col_idx": 6},
+        {"name": "canopy_t2_b", "group": "foliage_mid", "from": [-5.85, 24.20, 7.55], "to": [5.85, 27.60, 8.65], "color": "foliageMid", "col_idx": 6},
+        {"name": "canopy_t2_l", "group": "foliage_mid", "from": [-8.65, 24.20, -5.85], "to": [-7.55, 27.60, 5.85], "color": "foliageMid", "col_idx": 6},
+        {"name": "canopy_t2_r", "group": "foliage_mid", "from": [7.55, 24.20, -5.85], "to": [8.65, 27.60, 5.85], "color": "foliageMid", "col_idx": 6},
+        {"name": "canopy_t3_core", "group": "foliage_crown", "from": [-5.45, 28.10, -5.45], "to": [5.45, 31.80, 5.45], "color": "foliageLight", "col_idx": 7},
+        {"name": "canopy_t3_top", "group": "foliage_crown", "from": [-3.25, 31.70, -3.25], "to": [3.25, 33.20, 3.25], "color": "foliageLight", "col_idx": 7},
+        {"name": "fruit_fl", "group": "foliage_crown", "from": [-6.25, 21.00, -9.95], "to": [-4.85, 22.40, -9.65], "color": "appleRed", "col_idx": 8},
+        {"name": "fruit_fr", "group": "foliage_crown", "from": [4.85, 21.50, -9.95], "to": [6.25, 22.90, -9.65], "color": "appleRed", "col_idx": 8},
+        {"name": "fruit_r", "group": "foliage_crown", "from": [9.65, 22.00, -3.25], "to": [9.95, 23.40, -1.85], "color": "appleRed", "col_idx": 8},
+        {"name": "fruit_l", "group": "foliage_crown", "from": [-9.95, 22.20, 1.85], "to": [-9.65, 23.60, 3.25], "color": "appleRed", "col_idx": 8},
+        {"name": "fruit_b", "group": "foliage_crown", "from": [-1.45, 24.50, 8.45], "to": [0.05, 25.90, 8.75], "color": "appleRed", "col_idx": 8},
+    ]
+
+# =============================================================================
 # 2. HEDGE (18 cubes, 14×12×14, min_y = 0.00)
 # =============================================================================
 def build_hedge():
@@ -237,30 +275,30 @@ def build_railway_signal():
 # =============================================================================
 def build_road_barrier():
     return [
-        # Base Foot (Grounded min_y = 0.00)
-        {"name": "barrier_base_foot", "group": "barrier_body", "from": [-8.85, 0.00, -2.85], "to": [8.85, 1.80, 2.85], "color": "concreteDark", "col_idx": 0},
-        # Jersey Sloped Chamfer & Stem Wall & Crown Cap
-        {"name": "barrier_chamfer_mid", "group": "barrier_body", "from": [-8.75, 1.70, -2.25], "to": [8.75, 4.40, 2.25], "color": "concreteMid", "col_idx": 1},
-        {"name": "barrier_stem_wall", "group": "barrier_body", "from": [-8.65, 4.30, -1.25], "to": [8.65, 7.80, 1.25], "color": "concreteLight", "col_idx": 2},
-        {"name": "barrier_top_cap", "group": "barrier_body", "from": [-8.55, 7.70, -0.95], "to": [8.55, 9.00, 0.95], "color": "concreteMid", "col_idx": 1},
-        # Front Hazard Chevron Stripes
-        {"name": "front_stripe_y1", "group": "barrier_stripes", "from": [-7.85, 4.60, -1.35], "to": [-5.25, 7.50, -1.15], "color": "hazardYellow", "col_idx": 3},
-        {"name": "front_stripe_b1", "group": "barrier_stripes", "from": [-5.15, 4.60, -1.35], "to": [-2.55, 7.50, -1.15], "color": "hazardBlack", "col_idx": 4},
-        {"name": "front_stripe_y2", "group": "barrier_stripes", "from": [-2.45, 4.60, -1.35], "to": [0.15, 7.50, -1.15], "color": "hazardYellow", "col_idx": 3},
-        {"name": "front_stripe_b2", "group": "barrier_stripes", "from": [0.25, 4.60, -1.35], "to": [2.85, 7.50, -1.15], "color": "hazardBlack", "col_idx": 4},
-        {"name": "front_stripe_y3", "group": "barrier_stripes", "from": [2.95, 4.60, -1.35], "to": [5.55, 7.50, -1.15], "color": "hazardYellow", "col_idx": 3},
-        {"name": "front_stripe_b3", "group": "barrier_stripes", "from": [5.65, 4.60, -1.35], "to": [7.85, 7.50, -1.15], "color": "hazardBlack", "col_idx": 4},
-        # Rear Hazard Chevron Stripes
-        {"name": "rear_stripe_y1", "group": "barrier_stripes", "from": [-7.85, 4.60, 1.15], "to": [-5.25, 7.50, 1.35], "color": "hazardYellow", "col_idx": 3},
-        {"name": "rear_stripe_b1", "group": "barrier_stripes", "from": [-5.15, 4.60, 1.15], "to": [-2.55, 7.50, 1.35], "color": "hazardBlack", "col_idx": 4},
-        {"name": "rear_stripe_y2", "group": "barrier_stripes", "from": [-2.45, 4.60, 1.15], "to": [0.15, 7.50, 1.35], "color": "hazardYellow", "col_idx": 3},
-        {"name": "rear_stripe_b2", "group": "barrier_stripes", "from": [0.25, 4.60, 1.15], "to": [2.85, 7.50, 1.35], "color": "hazardBlack", "col_idx": 4},
-        # Top Cap Warning Markers
-        {"name": "top_marker_l", "group": "barrier_reflectors", "from": [-4.55, 8.90, -0.75], "to": [-2.55, 9.20, 0.75], "color": "hazardYellow", "col_idx": 3},
-        {"name": "top_marker_r", "group": "barrier_reflectors", "from": [2.55, 8.90, -0.75], "to": [4.55, 9.20, 0.75], "color": "hazardYellow", "col_idx": 3},
-        # End Reflectors
-        {"name": "reflector_end_l", "group": "barrier_reflectors", "from": [-8.75, 4.80, -0.45], "to": [-8.55, 7.20, 0.45], "color": "reflectorRed", "col_idx": 5},
-        {"name": "reflector_end_r", "group": "barrier_reflectors", "from": [8.55, 4.80, -0.45], "to": [8.75, 7.20, 0.45], "color": "reflectorRed", "col_idx": 5},
+        # Left Post: mounting foot & column
+        {"name": "foot_left", "group": "barrier_posts", "from": [-6.45, 0.00, -1.85], "to": [-3.55, 1.20, 1.85], "color": "ironDark", "col_idx": 0},
+        {"name": "post_left", "group": "barrier_posts", "from": [-5.75, 1.10, -1.25], "to": [-4.25, 8.80, 1.25], "color": "postSteel", "col_idx": 1},
+        # Right Post: mounting foot & column
+        {"name": "foot_right", "group": "barrier_posts", "from": [3.55, 0.00, -1.85], "to": [6.45, 1.20, 1.85], "color": "ironDark", "col_idx": 0},
+        {"name": "post_right", "group": "barrier_posts", "from": [4.25, 1.10, -1.25], "to": [5.75, 8.80, 1.25], "color": "postSteel", "col_idx": 1},
+        # Offset brackets
+        {"name": "bracket_left", "group": "barrier_posts", "from": [-5.55, 4.20, -1.95], "to": [-4.45, 7.80, -1.15], "color": "ironDark", "col_idx": 0},
+        {"name": "bracket_right", "group": "barrier_posts", "from": [4.45, 4.20, -1.95], "to": [5.55, 7.80, -1.15], "color": "ironDark", "col_idx": 0},
+        # Main Galvanized W-Beam Rail
+        {"name": "rail_main", "group": "barrier_rail", "from": [-8.85, 4.00, -2.85], "to": [8.85, 8.00, -1.85], "color": "galvanizedLight", "col_idx": 2},
+        {"name": "rail_top_ridge", "group": "barrier_rail", "from": [-8.65, 7.90, -2.55], "to": [8.65, 8.80, -1.95], "color": "galvanizedShadow", "col_idx": 3},
+        {"name": "rail_bot_ridge", "group": "barrier_rail", "from": [-8.65, 3.20, -2.55], "to": [8.65, 4.10, -1.95], "color": "galvanizedShadow", "col_idx": 3},
+        # End Terminal Wings
+        {"name": "end_terminal_l", "group": "barrier_rail", "from": [-9.45, 3.40, -2.65], "to": [-8.75, 8.60, -1.80], "color": "galvanizedShadow", "col_idx": 3},
+        {"name": "end_terminal_r", "group": "barrier_rail", "from": [8.75, 3.40, -2.65], "to": [9.45, 8.60, -1.80], "color": "galvanizedShadow", "col_idx": 3},
+        # Rear Flange
+        {"name": "rail_rear", "group": "barrier_rail", "from": [-8.85, 4.50, 1.15], "to": [8.85, 7.50, 1.85], "color": "galvanizedShadow", "col_idx": 3},
+        # Reflectors / Cataphotes
+        {"name": "reflector_left", "group": "barrier_reflectors", "from": [-5.65, 5.20, -3.05], "to": [-4.35, 6.80, -2.75], "color": "reflectorAmber", "col_idx": 4},
+        {"name": "reflector_right", "group": "barrier_reflectors", "from": [4.35, 5.20, -3.05], "to": [5.65, 6.80, -2.75], "color": "reflectorAmber", "col_idx": 4},
+        {"name": "reflector_center", "group": "barrier_reflectors", "from": [-0.65, 5.20, -3.05], "to": [0.65, 6.80, -2.75], "color": "reflectorAmber", "col_idx": 4},
+        {"name": "end_cap_red_l", "group": "barrier_reflectors", "from": [-9.55, 5.00, -2.75], "to": [-9.35, 7.00, -1.75], "color": "reflectorRed", "col_idx": 5},
+        {"name": "end_cap_red_r", "group": "barrier_reflectors", "from": [9.35, 5.00, -2.75], "to": [9.55, 7.00, -1.75], "color": "reflectorRed", "col_idx": 5},
     ]
 
 # =============================================================================
@@ -272,12 +310,12 @@ def build_riverbank_edge():
         {"name": "seawall_base", "group": "river_quay", "from": [-9.85, 0.00, -3.85], "to": [9.85, 2.20, 3.85], "color": "graniteDark", "col_idx": 0},
         {"name": "curb_coping", "group": "river_quay", "from": [-9.75, 2.10, -3.75], "to": [9.75, 4.40, 2.45], "color": "graniteMid", "col_idx": 1},
         {"name": "promenade_paving", "group": "river_quay", "from": [-9.65, 4.30, -3.65], "to": [9.65, 6.00, 1.25], "color": "graniteLight", "col_idx": 2},
-        # Cast-Iron Mooring Bollard (Кнехт на набережной)
-        {"name": "bollard_base", "group": "river_bollard", "from": [-2.15, 5.90, -1.85], "to": [2.15, 6.80, 1.85], "color": "bollardIron", "col_idx": 3},
-        {"name": "bollard_column", "group": "river_bollard", "from": [-1.45, 6.70, -1.25], "to": [1.45, 10.40, 1.25], "color": "bollardIron", "col_idx": 3},
-        {"name": "bollard_cap", "group": "river_bollard", "from": [-1.95, 10.30, -1.75], "to": [1.95, 11.60, 1.75], "color": "bollardIron", "col_idx": 3},
-        {"name": "bollard_pin_l", "group": "river_bollard", "from": [-3.15, 8.20, -0.45], "to": [-1.35, 9.40, 0.45], "color": "bollardIron", "col_idx": 3},
-        {"name": "bollard_pin_r", "group": "river_bollard", "from": [1.35, 8.20, -0.45], "to": [3.15, 9.40, 0.45], "color": "bollardIron", "col_idx": 3},
+        # Cast-Iron Mooring Bollard (Shifted to center X = +2.00, Three.js 0.10)
+        {"name": "bollard_base", "group": "river_bollard", "from": [-0.15, 5.90, -1.85], "to": [4.15, 6.80, 1.85], "color": "bollardIron", "col_idx": 3},
+        {"name": "bollard_column", "group": "river_bollard", "from": [0.55, 6.70, -1.25], "to": [3.45, 10.40, 1.25], "color": "bollardIron", "col_idx": 3},
+        {"name": "bollard_cap", "group": "river_bollard", "from": [0.05, 10.30, -1.75], "to": [3.95, 11.60, 1.75], "color": "bollardIron", "col_idx": 3},
+        {"name": "bollard_pin_l", "group": "river_bollard", "from": [-1.15, 8.20, -0.45], "to": [0.65, 9.40, 0.45], "color": "bollardIron", "col_idx": 3},
+        {"name": "bollard_pin_r", "group": "river_bollard", "from": [3.35, 8.20, -0.45], "to": [5.15, 9.40, 0.45], "color": "bollardIron", "col_idx": 3},
         # Storm Drain Scupper Grate (Raised on pavement)
         {"name": "drain_frame", "group": "river_drain", "from": [-7.85, 5.90, -2.85], "to": [-4.25, 6.10, -0.45], "color": "grateMetal", "col_idx": 4},
         {"name": "drain_slot_1", "group": "river_drain", "from": [-7.45, 5.95, -2.65], "to": [-6.85, 6.25, -0.65], "color": "slotBlack", "col_idx": 5},
@@ -299,24 +337,29 @@ def build_riverbank_edge():
 # =============================================================================
 def build_coin():
     return [
-        {"name": "core_vert", "group": "coin_core", "from": [-2.25, 4.10, -0.65], "to": [2.25, 10.50, 0.65], "color": "goldBase", "col_idx": 1},
-        {"name": "core_horiz", "group": "coin_core", "from": [-3.45, 5.20, -0.55], "to": [3.45, 9.40, 0.55], "color": "goldBase", "col_idx": 1},
-        {"name": "core_diag_tl", "group": "coin_core", "from": [-3.05, 8.40, -0.45], "to": [-1.95, 9.80, 0.45], "color": "goldBase", "col_idx": 1},
-        {"name": "core_diag_br", "group": "coin_core", "from": [1.95, 4.80, -0.45], "to": [3.05, 6.20, 0.45], "color": "goldBase", "col_idx": 1},
-        {"name": "rim_top", "group": "coin_rim", "from": [-1.85, 9.80, -0.85], "to": [1.85, 10.70, 0.85], "color": "goldDeep", "col_idx": 0},
-        {"name": "rim_bottom", "group": "coin_rim", "from": [-1.85, 4.00, -0.85], "to": [1.85, 4.80, 0.85], "color": "goldDeep", "col_idx": 0},
-        {"name": "rim_left", "group": "coin_rim", "from": [-3.50, 5.40, -0.75], "to": [-2.65, 9.20, 0.75], "color": "goldDeep", "col_idx": 0},
-        {"name": "rim_right", "group": "coin_rim", "from": [2.65, 5.40, -0.75], "to": [3.50, 9.20, 0.75], "color": "goldDeep", "col_idx": 0},
-        {"name": "rim_tl", "group": "coin_rim", "from": [-3.15, 8.60, -0.95], "to": [-1.75, 10.20, 0.95], "color": "goldDeep", "col_idx": 0},
-        {"name": "rim_tr", "group": "coin_rim", "from": [1.75, 8.60, -0.95], "to": [3.15, 10.20, 0.95], "color": "goldDeep", "col_idx": 0},
-        {"name": "rim_bl", "group": "coin_rim", "from": [-3.15, 4.40, -0.95], "to": [-1.75, 6.00, 0.95], "color": "goldDeep", "col_idx": 0},
-        {"name": "rim_br", "group": "coin_rim", "from": [1.75, 4.40, -0.95], "to": [3.15, 6.00, 0.95], "color": "goldDeep", "col_idx": 0},
-        {"name": "dollar_spine", "group": "coin_symbol", "from": [-0.35, 4.50, -1.05], "to": [0.35, 10.10, 1.05], "color": "goldBright", "col_idx": 2},
-        {"name": "dollar_top_bar", "group": "coin_symbol", "from": [-1.35, 8.80, -1.15], "to": [1.35, 9.50, 1.15], "color": "goldBright", "col_idx": 2},
-        {"name": "dollar_mid_bar", "group": "coin_symbol", "from": [-1.15, 7.00, -1.15], "to": [1.15, 7.60, 1.15], "color": "goldBright", "col_idx": 2},
-        {"name": "dollar_bot_bar", "group": "coin_symbol", "from": [-1.35, 5.10, -1.15], "to": [1.35, 5.80, 1.15], "color": "goldBright", "col_idx": 2},
-        {"name": "dollar_hook_tl", "group": "coin_symbol", "from": [-1.45, 7.50, -1.20], "to": [-0.85, 8.90, 1.20], "color": "goldBright", "col_idx": 2},
-        {"name": "dollar_hook_br", "group": "coin_symbol", "from": [0.85, 5.70, -1.20], "to": [1.45, 7.10, 1.20], "color": "goldBright", "col_idx": 2},
+        # Recessed Face / Core
+        {"name": "core_vert", "group": "coin_core", "from": [-2.25, 4.20, -0.65], "to": [2.25, 10.40, 0.65], "color": "goldBase", "col_idx": 1},
+        {"name": "core_horiz", "group": "coin_core", "from": [-3.30, 5.25, -0.55], "to": [3.30, 9.35, 0.55], "color": "goldBase", "col_idx": 1},
+        {"name": "core_diag_tl", "group": "coin_core", "from": [-2.95, 8.35, -0.45], "to": [-1.95, 9.75, 0.45], "color": "goldBase", "col_idx": 1},
+        {"name": "core_diag_br", "group": "coin_core", "from": [1.95, 4.85, -0.45], "to": [2.95, 6.25, 0.45], "color": "goldBase", "col_idx": 1},
+        # Outer Raised Rim
+        {"name": "rim_top", "group": "coin_rim", "from": [-1.85, 9.80, -0.85], "to": [1.85, 10.60, 0.85], "color": "goldRim", "col_idx": 0},
+        {"name": "rim_bottom", "group": "coin_rim", "from": [-1.85, 4.00, -0.85], "to": [1.85, 4.80, 0.85], "color": "goldRim", "col_idx": 0},
+        {"name": "rim_left", "group": "coin_rim", "from": [-3.40, 5.40, -0.75], "to": [-2.65, 9.20, 0.75], "color": "goldRim", "col_idx": 0},
+        {"name": "rim_right", "group": "coin_rim", "from": [2.65, 5.40, -0.75], "to": [3.40, 9.20, 0.75], "color": "goldRim", "col_idx": 0},
+        {"name": "rim_tl", "group": "coin_rim", "from": [-3.15, 8.60, -0.95], "to": [-1.75, 10.10, 0.95], "color": "goldRim", "col_idx": 0},
+        {"name": "rim_tr", "group": "coin_rim", "from": [1.75, 8.60, -0.95], "to": [3.15, 10.10, 0.95], "color": "goldRim", "col_idx": 0},
+        {"name": "rim_bl", "group": "coin_rim", "from": [-3.15, 4.50, -0.95], "to": [-1.75, 6.00, 0.95], "color": "goldRim", "col_idx": 0},
+        {"name": "rim_br", "group": "coin_rim", "from": [1.75, 4.50, -0.95], "to": [3.15, 6.00, 0.95], "color": "goldRim", "col_idx": 0},
+        # Embossed 5-Pointed Star ⭐
+        {"name": "star_core", "group": "coin_star", "from": [-0.75, 6.60, -1.05], "to": [0.75, 7.80, 1.05], "color": "goldBright", "col_idx": 2},
+        {"name": "star_top_ray", "group": "coin_star", "from": [-0.45, 7.70, -1.10], "to": [0.45, 9.20, 1.10], "color": "goldShine", "col_idx": 3},
+        {"name": "star_left_ray", "group": "coin_star", "from": [-1.95, 7.10, -1.10], "to": [-0.65, 8.00, 1.10], "color": "goldBright", "col_idx": 2},
+        {"name": "star_right_ray", "group": "coin_star", "from": [0.65, 7.10, -1.10], "to": [1.95, 8.00, 1.10], "color": "goldBright", "col_idx": 2},
+        {"name": "star_bl_ray", "group": "coin_star", "from": [-1.55, 5.40, -1.10], "to": [-0.55, 6.70, 1.10], "color": "goldBright", "col_idx": 2},
+        {"name": "star_br_ray", "group": "coin_star", "from": [0.55, 5.40, -1.10], "to": [1.55, 6.70, 1.10], "color": "goldBright", "col_idx": 2},
+        {"name": "star_center_pip", "group": "coin_star", "from": [-0.35, 7.00, -1.20], "to": [0.35, 7.60, 1.20], "color": "goldShine", "col_idx": 3},
+        # Glints
         {"name": "glint_tl", "group": "coin_glints", "from": [-2.45, 8.80, 0.90], "to": [-1.85, 9.40, 1.05], "color": "goldShine", "col_idx": 3},
         {"name": "glint_br", "group": "coin_glints", "from": [1.85, 5.20, 0.90], "to": [2.45, 5.80, 1.05], "color": "goldShine", "col_idx": 3},
     ]
@@ -358,22 +401,17 @@ def build_record_flag():
 # =============================================================================
 def build_road_markings():
     return [
-        # 4 Wide Zebra Crossing White Stripes (Height strictly 1 voxel = 1.00)
-        {"name": "zebra_1", "group": "markings_zebra", "from": [-8.85, 0.00, -7.85], "to": [-5.45, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
-        {"name": "zebra_2", "group": "markings_zebra", "from": [-4.55, 0.00, -7.85], "to": [-1.15, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
-        {"name": "zebra_3", "group": "markings_zebra", "from": [-0.25, 0.00, -7.85], "to": [3.15, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
-        {"name": "zebra_4", "group": "markings_zebra", "from": [4.05, 0.00, -7.85], "to": [7.45, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
+        # 4 Clean Monolithic White Zebra Crossing Stripes (Height strictly 1 voxel = 1.00)
+        {"name": "zebra_1", "group": "markings_zebra", "from": [-8.45, 0.00, -7.85], "to": [-5.45, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
+        {"name": "zebra_2", "group": "markings_zebra", "from": [-4.25, 0.00, -7.85], "to": [-1.25, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
+        {"name": "zebra_3", "group": "markings_zebra", "from": [-0.05, 0.00, -7.85], "to": [2.95, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
+        {"name": "zebra_4", "group": "markings_zebra", "from": [4.15, 0.00, -7.85], "to": [7.15, 1.00, 7.85], "color": "markingWhite", "col_idx": 0},
         # Transverse Stop-Line Edge Borders
-        {"name": "stop_line_front", "group": "markings_stop", "from": [-8.85, 0.00, -8.65], "to": [7.45, 1.00, -7.95], "color": "markingYellow", "col_idx": 1},
-        {"name": "stop_line_rear", "group": "markings_stop", "from": [-8.85, 0.00, 7.95], "to": [7.45, 1.00, 8.65], "color": "markingYellow", "col_idx": 1},
-        # Reflective Glass Bead Tactile Dots (Micro-spheres protruding above zebra paint)
-        {"name": "tack_dot_1", "group": "markings_dots", "from": [-7.45, 0.85, -5.45], "to": [-6.85, 1.15, -4.85], "color": "reflectShine", "col_idx": 2},
-        {"name": "tack_dot_2", "group": "markings_dots", "from": [-3.15, 0.85, -1.85], "to": [-2.55, 1.15, -1.25], "color": "reflectShine", "col_idx": 2},
-        {"name": "tack_dot_3", "group": "markings_dots", "from": [1.15, 0.85, 1.85], "to": [1.75, 1.15, 2.45], "color": "reflectShine", "col_idx": 2},
-        {"name": "tack_dot_4", "group": "markings_dots", "from": [5.45, 0.85, 5.45], "to": [6.05, 1.15, 6.05], "color": "reflectShine", "col_idx": 2},
+        {"name": "stop_line_front", "group": "markings_stop", "from": [-8.85, 0.00, -8.65], "to": [7.55, 1.00, -7.95], "color": "markingYellow", "col_idx": 1},
+        {"name": "stop_line_rear", "group": "markings_stop", "from": [-8.85, 0.00, 7.95], "to": [7.55, 1.00, 8.65], "color": "markingYellow", "col_idx": 1},
         # Outer Boundary Guide Dashes
         {"name": "guide_dash_l", "group": "markings_guide", "from": [-9.45, 0.00, -3.25], "to": [-8.95, 1.00, 3.25], "color": "markingWhite", "col_idx": 0},
-        {"name": "guide_dash_r", "group": "markings_guide", "from": [7.55, 0.00, -3.25], "to": [8.05, 1.00, 3.25], "color": "markingWhite", "col_idx": 0},
+        {"name": "guide_dash_r", "group": "markings_guide", "from": [7.65, 0.00, -3.25], "to": [8.15, 1.00, 3.25], "color": "markingWhite", "col_idx": 0},
     ]
 
 # =============================================================================
@@ -381,7 +419,7 @@ def build_road_markings():
 # =============================================================================
 ALL_URBAN_MODELS = {
     "tree_planter": {
-        "title": "Городское дерево в кадке",
+        "title": "Городское дерево в кадке А (Терракота)",
         "category": "nature",
         "builder": build_tree_planter,
         "budget": (25, 35),
@@ -390,9 +428,9 @@ ALL_URBAN_MODELS = {
         "min_y": 0.0,
         "palette": [
             ("#78350f", "woodPlankDark"),
-            ("#92400e", "woodPlankMid"),
+            ("#b45309", "woodPlankMid"),
             ("#451a03", "soilDark"),
-            ("#b45309", "trunkBark"),
+            ("#92400e", "trunkBark"),
             ("#15803d", "foliageBase"),
             ("#16a34a", "foliageMid"),
             ("#22c55e", "foliageLight"),
@@ -400,6 +438,26 @@ ALL_URBAN_MODELS = {
         ],
         "groups": ["planter_base", "planter_walls", "soil_trunk", "foliage_lower", "foliage_mid", "foliage_crown"]
     },
+    "tree_planter_b": {
+        "title": "Городское дерево в кадке Б (Купольная крона)",
+        "category": "nature",
+        "builder": build_tree_planter_b,
+        "budget": (25, 35),
+        "dims": (1.00, 1.66, 1.00),
+        "grid_dims": (20, 34, 20),
+        "min_y": 0.0,
+        "palette": [
+            ("#1e293b", "concreteDark"),
+            ("#334155", "concreteMid"),
+            ("#d97706", "goldRim"),
+            ("#27170a", "soilDark"),
+            ("#78350f", "trunkBark"),
+            ("#166534", "foliageBase"),
+            ("#15803d", "foliageMid"),
+            ("#22c55e", "foliageLight"),
+            ("#ef4444", "appleRed"),
+        ],
+        "groups": ["planter_base", "planter_walls", "planter_rim", "soil_trunk", "foliage_lower", "foliage_mid", "foliage_crown"]},
     "hedge": {
         "title": "Подстриженная живая изгородь",
         "category": "nature",
@@ -503,23 +561,22 @@ ALL_URBAN_MODELS = {
         "groups": ["signal_base", "signal_mast", "signal_platform", "signal_head", "signal_details"]
     },
     "road_barrier": {
-        "title": "Дорожный отбойник Jersey",
+        "title": "Дорожный металлический отбойник",
         "category": "props",
         "builder": build_road_barrier,
-        "budget": (15, 22),
-        "dims": (0.90, 0.45, 0.30),
-        "grid_dims": (18, 9, 6),
+        "budget": (15, 25),
+        "dims": (0.95, 0.44, 0.20),
+        "grid_dims": (19, 9, 4),
         "min_y": 0.0,
         "palette": [
-            ("#475569", "concreteDark"),
-            ("#64748b", "concreteMid"),
-            ("#94a3b8", "concreteLight"),
-            ("#facc15", "hazardYellow"),
-            ("#0f172a", "hazardBlack"),
+            ("#1e293b", "ironDark"),
+            ("#334155", "postSteel"),
+            ("#cbd5e1", "galvanizedLight"),
+            ("#94a3b8", "galvanizedShadow"),
+            ("#facc15", "reflectorAmber"),
             ("#ef4444", "reflectorRed"),
         ],
-        "groups": ["barrier_body", "barrier_stripes", "barrier_reflectors"]
-    },
+        "groups": ["barrier_posts", "barrier_rail", "barrier_reflectors"]},
     "riverbank_edge": {
         "title": "Парапет набережной с кнехтом",
         "category": "props",
@@ -542,21 +599,20 @@ ALL_URBAN_MODELS = {
         "groups": ["river_quay", "river_bollard", "river_drain", "river_safety"]
     },
     "coin": {
-        "title": "3D Золотая монета",
-        "category": "props",
+        "title": "Золотая монета 3D со звездой",
+        "category": "pickups",
         "builder": build_coin,
-        "budget": (16, 24),
-        "dims": (0.35, 0.35, 0.10),
+        "budget": (18, 25),
+        "dims": (0.35, 0.35, 0.12),
         "grid_dims": (7, 7, 2),
-        "min_y": 4.0,  # 0.20 Three.js floating
+        "min_y": 4.0,
         "palette": [
-            ("#d97706", "goldDeep"),
+            ("#d97706", "goldRim"),
             ("#f59e0b", "goldBase"),
             ("#facc15", "goldBright"),
             ("#fef08a", "goldShine"),
         ],
-        "groups": ["coin_rim", "coin_core", "coin_symbol", "coin_glints"]
-    },
+        "groups": ["coin_core", "coin_rim", "coin_star", "coin_glints"]},
     "record_flag": {
         "title": "Постамент флага рекорда",
         "category": "props",
@@ -576,23 +632,17 @@ ALL_URBAN_MODELS = {
         "groups": ["flag_pedestal", "flag_mast", "flag_crown", "flag_cloth", "flag_emblem"]
     },
     "road_markings": {
-        "title": "Дорожная разметка (зебра)",
-        "category": "props",
+        "title": "Дорожная разметка (Пешеходный переход)",
+        "category": "infrastructure",
         "builder": build_road_markings,
-        "budget": (10, 16),
-        "dims": (0.90, 0.05, 0.80),
-        "grid_dims": (18, 1, 16),
+        "budget": (6, 12),
+        "dims": (0.90, 0.05, 0.90),
+        "grid_dims": (18, 1, 18),
         "min_y": 0.0,
         "palette": [
             ("#f8fafc", "markingWhite"),
             ("#facc15", "markingYellow"),
-            ("#e2e8f0", "reflectShine"),
         ],
-        "groups": ["markings_zebra", "markings_stop", "markings_dots", "markings_guide"]
+        "groups": ["markings_zebra", "markings_stop", "markings_guide"]
     }
 }
-
-
-
-
-

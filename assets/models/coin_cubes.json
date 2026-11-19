@@ -4,12 +4,12 @@
     "group": "coin_core",
     "from": [
       -2.25,
-      4.1,
+      4.2,
       -0.65
     ],
     "to": [
       2.25,
-      10.5,
+      10.4,
       0.65
     ],
     "color": "goldBase",
@@ -25,13 +25,13 @@
     "name": "core_horiz",
     "group": "coin_core",
     "from": [
-      -3.45,
-      5.2,
+      -3.3,
+      5.25,
       -0.55
     ],
     "to": [
-      3.45,
-      9.4,
+      3.3,
+      9.35,
       0.55
     ],
     "color": "goldBase",
@@ -47,13 +47,13 @@
     "name": "core_diag_tl",
     "group": "coin_core",
     "from": [
-      -3.05,
-      8.4,
+      -2.95,
+      8.35,
       -0.45
     ],
     "to": [
       -1.95,
-      9.8,
+      9.75,
       0.45
     ],
     "color": "goldBase",
@@ -70,12 +70,12 @@
     "group": "coin_core",
     "from": [
       1.95,
-      4.8,
+      4.85,
       -0.45
     ],
     "to": [
-      3.05,
-      6.2,
+      2.95,
+      6.25,
       0.45
     ],
     "color": "goldBase",
@@ -97,10 +97,10 @@
     ],
     "to": [
       1.85,
-      10.7,
+      10.6,
       0.85
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -122,7 +122,7 @@
       4.8,
       0.85
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -135,7 +135,7 @@
     "name": "rim_left",
     "group": "coin_rim",
     "from": [
-      -3.5,
+      -3.4,
       5.4,
       -0.75
     ],
@@ -144,7 +144,7 @@
       9.2,
       0.75
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -162,11 +162,11 @@
       -0.75
     ],
     "to": [
-      3.5,
+      3.4,
       9.2,
       0.75
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -185,10 +185,10 @@
     ],
     "to": [
       -1.75,
-      10.2,
+      10.1,
       0.95
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -207,10 +207,10 @@
     ],
     "to": [
       3.15,
-      10.2,
+      10.1,
       0.95
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -224,7 +224,7 @@
     "group": "coin_rim",
     "from": [
       -3.15,
-      4.4,
+      4.5,
       -0.95
     ],
     "to": [
@@ -232,7 +232,7 @@
       6.0,
       0.95
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -246,7 +246,7 @@
     "group": "coin_rim",
     "from": [
       1.75,
-      4.4,
+      4.5,
       -0.95
     ],
     "to": [
@@ -254,7 +254,7 @@
       6.0,
       0.95
     ],
-    "color": "goldDeep",
+    "color": "goldRim",
     "col_idx": 0,
     "uv": [
       0,
@@ -264,16 +264,16 @@
     ]
   },
   {
-    "name": "dollar_spine",
-    "group": "coin_symbol",
+    "name": "star_core",
+    "group": "coin_star",
     "from": [
-      -0.35,
-      4.5,
+      -0.75,
+      6.6,
       -1.05
     ],
     "to": [
-      0.35,
-      10.1,
+      0.75,
+      7.8,
       1.05
     ],
     "color": "goldBright",
@@ -286,105 +286,39 @@
     ]
   },
   {
-    "name": "dollar_top_bar",
-    "group": "coin_symbol",
+    "name": "star_top_ray",
+    "group": "coin_star",
     "from": [
-      -1.35,
-      8.8,
-      -1.15
+      -0.45,
+      7.7,
+      -1.1
     ],
     "to": [
-      1.35,
-      9.5,
-      1.15
+      0.45,
+      9.2,
+      1.1
     ],
-    "color": "goldBright",
-    "col_idx": 2,
+    "color": "goldShine",
+    "col_idx": 3,
     "uv": [
-      2,
-      0,
       3,
+      0,
+      4,
       1
     ]
   },
   {
-    "name": "dollar_mid_bar",
-    "group": "coin_symbol",
+    "name": "star_left_ray",
+    "group": "coin_star",
     "from": [
-      -1.15,
-      7.0,
-      -1.15
-    ],
-    "to": [
-      1.15,
-      7.6,
-      1.15
-    ],
-    "color": "goldBright",
-    "col_idx": 2,
-    "uv": [
-      2,
-      0,
-      3,
-      1
-    ]
-  },
-  {
-    "name": "dollar_bot_bar",
-    "group": "coin_symbol",
-    "from": [
-      -1.35,
-      5.1,
-      -1.15
-    ],
-    "to": [
-      1.35,
-      5.8,
-      1.15
-    ],
-    "color": "goldBright",
-    "col_idx": 2,
-    "uv": [
-      2,
-      0,
-      3,
-      1
-    ]
-  },
-  {
-    "name": "dollar_hook_tl",
-    "group": "coin_symbol",
-    "from": [
-      -1.45,
-      7.5,
-      -1.2
-    ],
-    "to": [
-      -0.85,
-      8.9,
-      1.2
-    ],
-    "color": "goldBright",
-    "col_idx": 2,
-    "uv": [
-      2,
-      0,
-      3,
-      1
-    ]
-  },
-  {
-    "name": "dollar_hook_br",
-    "group": "coin_symbol",
-    "from": [
-      0.85,
-      5.7,
-      -1.2
-    ],
-    "to": [
-      1.45,
+      -1.95,
       7.1,
-      1.2
+      -1.1
+    ],
+    "to": [
+      -0.65,
+      8.0,
+      1.1
     ],
     "color": "goldBright",
     "col_idx": 2,
@@ -392,6 +326,94 @@
       2,
       0,
       3,
+      1
+    ]
+  },
+  {
+    "name": "star_right_ray",
+    "group": "coin_star",
+    "from": [
+      0.65,
+      7.1,
+      -1.1
+    ],
+    "to": [
+      1.95,
+      8.0,
+      1.1
+    ],
+    "color": "goldBright",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "star_bl_ray",
+    "group": "coin_star",
+    "from": [
+      -1.55,
+      5.4,
+      -1.1
+    ],
+    "to": [
+      -0.55,
+      6.7,
+      1.1
+    ],
+    "color": "goldBright",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "star_br_ray",
+    "group": "coin_star",
+    "from": [
+      0.55,
+      5.4,
+      -1.1
+    ],
+    "to": [
+      1.55,
+      6.7,
+      1.1
+    ],
+    "color": "goldBright",
+    "col_idx": 2,
+    "uv": [
+      2,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "name": "star_center_pip",
+    "group": "coin_star",
+    "from": [
+      -0.35,
+      7.0,
+      -1.2
+    ],
+    "to": [
+      0.35,
+      7.6,
+      1.2
+    ],
+    "color": "goldShine",
+    "col_idx": 3,
+    "uv": [
+      3,
+      0,
+      4,
       1
     ]
   },

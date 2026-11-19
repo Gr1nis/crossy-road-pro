@@ -259,7 +259,12 @@ def main():
     print("=" * 70)
 
     summary = []
-    for model_id, meta in ALL_URBAN_MODELS.items():
+    targets = sys.argv[1:] if len(sys.argv) > 1 else list(ALL_URBAN_MODELS.keys())
+    for model_id in targets:
+        if model_id not in ALL_URBAN_MODELS:
+            print(f"Skipping unknown model: {model_id}")
+            continue
+        meta = ALL_URBAN_MODELS[model_id]
         print(f"\n>>> Processing Model: {model_id} («{meta['title']}»)...")
         cubes = meta['builder']()
 

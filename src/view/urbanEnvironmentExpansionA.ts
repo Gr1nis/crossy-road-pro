@@ -74,7 +74,7 @@ const BENCH_BOXES: readonly [number, number, number, number, number, number, num
   [0.03, 0.015, 0.01, 0.4125, 0.475, -0.0875, 0x64748b],
 ];
 
-// Model 6: City Street Lamp Post (22 cubes, Zero Z-Fighting Certified)
+// Model 6: Classical Street Lamp Post (22 cubes, Zero Z-Fighting Certified)
 const LAMP_POST_BOXES: readonly [number, number, number, number, number, number, number][] = [
   [0.345, 0.07, 0.345, 0.0, 0.035, 0.0, 0x0f172a],
   [0.275, 0.165, 0.275, 0.0, 0.1475, 0.0, 0x0f172a],
@@ -100,7 +100,7 @@ const LAMP_POST_BOXES: readonly [number, number, number, number, number, number,
   [0.075, 0.07, 0.07, 0.0, 1.345, 0.2775, 0xf59e0b],
 ];
 
-// Model 7: Railway Signal Mast & Head (22 cubes, Zero Z-Fighting Certified)
+// Model 7: Railway Semaphore Mast (22 cubes, Zero Z-Fighting Certified)
 const RAILWAY_SIGNAL_BOXES: readonly [number, number, number, number, number, number, number][] = [
   [0.345, 0.06, 0.295, 0.0, 0.03, 0.0, 0x1e293b],
   [0.1, 0.205, 0.245, -0.0925, 0.1575, 0.0, 0x475569],
@@ -126,33 +126,32 @@ const RAILWAY_SIGNAL_BOXES: readonly [number, number, number, number, number, nu
   [0.04, 0.045, 0.055, 0.0875, 1.2875, 0.0, 0x94a3b8],
 ];
 
-// Model 8: Jersey Road Barrier (18 cubes, Zero Z-Fighting Certified)
+// Model 8: Highway Steel Guardrail (17 cubes, Zero Z-Fighting Certified)
 const ROAD_BARRIER_GEO: readonly [number, number, number, number, number, number, string][] = [
-  [0.885, 0.09, 0.285, 0.0, 0.045, 0.0, 'concreteDark'],
-  [0.875, 0.135, 0.225, 0.0, 0.1525, 0.0, 'concreteMid'],
-  [0.865, 0.175, 0.125, 0.0, 0.3025, 0.0, 'concreteLight'],
-  [0.855, 0.065, 0.095, 0.0, 0.4175, 0.0, 'concreteMid'],
-  [0.13, 0.145, 0.01, -0.3275, 0.3025, -0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, -0.1925, 0.3025, -0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, -0.0575, 0.3025, -0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, 0.0775, 0.3025, -0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, 0.2125, 0.3025, -0.0625, 'hazardYellow'],
-  [0.11, 0.145, 0.01, 0.3375, 0.3025, -0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, -0.3275, 0.3025, 0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, -0.1925, 0.3025, 0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, -0.0575, 0.3025, 0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, 0.0775, 0.3025, 0.0625, 'hazardBlack'],
-  [0.1, 0.015, 0.075, -0.1775, 0.4525, 0.0, 'hazardYellow'],
-  [0.1, 0.015, 0.075, 0.1775, 0.4525, 0.0, 'hazardYellow'],
-  [0.01, 0.12, 0.045, -0.4325, 0.3, 0.0, 'reflectorRed'],
-  [0.01, 0.12, 0.045, 0.4325, 0.3, 0.0, 'reflectorRed'],
+  [0.145, 0.06, 0.185, -0.25, 0.03, 0.0, 'ironDark'],
+  [0.075, 0.385, 0.125, -0.25, 0.2475, 0.0, 'postSteel'],
+  [0.145, 0.06, 0.185, 0.25, 0.03, 0.0, 'ironDark'],
+  [0.075, 0.385, 0.125, 0.25, 0.2475, 0.0, 'postSteel'],
+  [0.055, 0.18, 0.04, -0.25, 0.3, -0.0775, 'ironDark'],
+  [0.055, 0.18, 0.04, 0.25, 0.3, -0.0775, 'ironDark'],
+  [0.885, 0.2, 0.05, 0.0, 0.3, -0.1175, 'galvanizedLight'],
+  [0.865, 0.045, 0.03, 0.0, 0.4175, -0.1125, 'galvanizedShadow'],
+  [0.865, 0.045, 0.03, 0.0, 0.1825, -0.1125, 'galvanizedShadow'],
+  [0.035, 0.26, 0.0425, -0.455, 0.3, -0.1113, 'galvanizedShadow'],
+  [0.035, 0.26, 0.0425, 0.455, 0.3, -0.1113, 'galvanizedShadow'],
+  [0.885, 0.15, 0.035, 0.0, 0.3, 0.075, 'galvanizedShadow'],
+  [0.065, 0.08, 0.015, -0.25, 0.3, -0.145, 'reflectorAmber'],
+  [0.065, 0.08, 0.015, 0.25, 0.3, -0.145, 'reflectorAmber'],
+  [0.065, 0.08, 0.015, 0.0, 0.3, -0.145, 'reflectorAmber'],
+  [0.01, 0.1, 0.05, -0.4725, 0.3, -0.1125, 'reflectorRed'],
+  [0.01, 0.1, 0.05, 0.4725, 0.3, -0.1125, 'reflectorRed'],
 ];
 
 const BARRIER_PALETTES: Record<BiomeType, Record<string, number>> = {
-  forest: { concreteBase: 0x94a3b8, concreteDark: 0x64748b, warningYellow: 0xfacc15, hazardStripe: 0x0f172a },
-  winter: { concreteBase: 0xe2e8f0, concreteDark: 0x94a3b8, warningYellow: 0x38bdf8, hazardStripe: 0x1e293b },
-  desert: { concreteBase: 0xd97706, concreteDark: 0xb45309, warningYellow: 0xfef08a, hazardStripe: 0x78350f },
-  neon: { concreteBase: 0x1e1b4b, concreteDark: 0x312e81, warningYellow: 0x06b6d4, hazardStripe: 0xec4899 },
+  forest: { ironDark: 0x1e293b, postSteel: 0x334155, galvanizedLight: 0xcbd5e1, galvanizedShadow: 0x94a3b8, reflectorAmber: 0xfacc15, reflectorRed: 0xef4444 },
+  winter: { ironDark: 0x1e293b, postSteel: 0x475569, galvanizedLight: 0xe2e8f0, galvanizedShadow: 0x94a3b8, reflectorAmber: 0x38bdf8, reflectorRed: 0xef4444 },
+  desert: { ironDark: 0x451a03, postSteel: 0x78350f, galvanizedLight: 0xfef08a, galvanizedShadow: 0xd97706, reflectorAmber: 0xf59e0b, reflectorRed: 0xdc2626 },
+  neon: { ironDark: 0x0f172a, postSteel: 0x1e1b4b, galvanizedLight: 0x06b6d4, galvanizedShadow: 0x312e81, reflectorAmber: 0xf43f5e, reflectorRed: 0xd946ef },
 };
 
 export function populateHydrantBuilder(b: VoxelMeshBuilder): void {
@@ -194,7 +193,7 @@ export function populateRoadBarrierBuilder(b: VoxelMeshBuilder, biome: BiomeType
   const pal = BARRIER_PALETTES[biome] ?? BARRIER_PALETTES.forest;
   for (let i = 0; i < ROAD_BARRIER_GEO.length; i++) {
     const d = ROAD_BARRIER_GEO[i];
-    const col = pal[d[6]] ?? 0x94a3b8;
+    const col = pal[d[6]] ?? 0xcbd5e1;
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], col);
   }
 }

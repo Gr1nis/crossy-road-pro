@@ -17,6 +17,7 @@ import {
   populateRecordFlagBuilder,
   populateRoadMarkingsBuilder,
   populateTreePlanterBuilder,
+  populateTreePlanterBBuilder,
   populateHedgeBuilder,
 } from './urbanEnvironmentExpansionB.ts';
 
@@ -52,15 +53,29 @@ export function createUrbanLampPost(): THREE.Group {
   return group;
 }
 
-/** Model 1: Tree Planter Box & Layered Foliage (31 cubes, Grade A+ 10/10) */
+/** Model 1: Tree Planter Box A (Terracotta & Pyramid Foliage, 31 cubes, Grade A+ 10/10) */
 export function createUrbanTreePlanter(
-  _seedVariant: number,
+  seedVariant = 0,
   biome: BiomeType = 'forest'
 ): THREE.Group {
+  if (Math.abs(seedVariant) % 2 === 1) {
+    return createUrbanTreePlanterB(biome);
+  }
   const group = new THREE.Group();
   const mesh = VoxelMeshBuilder.buildCachedMesh(
     `urban_tree_planter_${biome}`,
     (b) => populateTreePlanterBuilder(b, biome)
+  );
+  group.add(mesh.clone());
+  return group;
+}
+
+/** Model 1b: Tree Planter B (Concrete Planter & Dome Canopy, 31 cubes, Grade A+ 10/10) */
+export function createUrbanTreePlanterB(biome: BiomeType = 'forest'): THREE.Group {
+  const group = new THREE.Group();
+  const mesh = VoxelMeshBuilder.buildCachedMesh(
+    `urban_tree_planter_b_${biome}`,
+    (b) => populateTreePlanterBBuilder(b, biome)
   );
   group.add(mesh.clone());
   return group;

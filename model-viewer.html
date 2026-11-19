@@ -2833,7 +2833,7 @@ const BENCH_BOXES                                                               
   [0.03, 0.015, 0.01, 0.4125, 0.475, -0.0875, 0x64748b],
 ];
 
-// Model 6: City Street Lamp Post (22 cubes, Zero Z-Fighting Certified)
+// Model 6: Classical Street Lamp Post (22 cubes, Zero Z-Fighting Certified)
 const LAMP_POST_BOXES                                                                      = [
   [0.345, 0.07, 0.345, 0.0, 0.035, 0.0, 0x0f172a],
   [0.275, 0.165, 0.275, 0.0, 0.1475, 0.0, 0x0f172a],
@@ -2859,7 +2859,7 @@ const LAMP_POST_BOXES                                                           
   [0.075, 0.07, 0.07, 0.0, 1.345, 0.2775, 0xf59e0b],
 ];
 
-// Model 7: Railway Signal Mast & Head (22 cubes, Zero Z-Fighting Certified)
+// Model 7: Railway Semaphore Mast (22 cubes, Zero Z-Fighting Certified)
 const RAILWAY_SIGNAL_BOXES                                                                      = [
   [0.345, 0.06, 0.295, 0.0, 0.03, 0.0, 0x1e293b],
   [0.1, 0.205, 0.245, -0.0925, 0.1575, 0.0, 0x475569],
@@ -2885,33 +2885,32 @@ const RAILWAY_SIGNAL_BOXES                                                      
   [0.04, 0.045, 0.055, 0.0875, 1.2875, 0.0, 0x94a3b8],
 ];
 
-// Model 8: Jersey Road Barrier (18 cubes, Zero Z-Fighting Certified)
+// Model 8: Highway Steel Guardrail (17 cubes, Zero Z-Fighting Certified)
 const ROAD_BARRIER_GEO                                                                      = [
-  [0.885, 0.09, 0.285, 0.0, 0.045, 0.0, 'concreteDark'],
-  [0.875, 0.135, 0.225, 0.0, 0.1525, 0.0, 'concreteMid'],
-  [0.865, 0.175, 0.125, 0.0, 0.3025, 0.0, 'concreteLight'],
-  [0.855, 0.065, 0.095, 0.0, 0.4175, 0.0, 'concreteMid'],
-  [0.13, 0.145, 0.01, -0.3275, 0.3025, -0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, -0.1925, 0.3025, -0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, -0.0575, 0.3025, -0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, 0.0775, 0.3025, -0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, 0.2125, 0.3025, -0.0625, 'hazardYellow'],
-  [0.11, 0.145, 0.01, 0.3375, 0.3025, -0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, -0.3275, 0.3025, 0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, -0.1925, 0.3025, 0.0625, 'hazardBlack'],
-  [0.13, 0.145, 0.01, -0.0575, 0.3025, 0.0625, 'hazardYellow'],
-  [0.13, 0.145, 0.01, 0.0775, 0.3025, 0.0625, 'hazardBlack'],
-  [0.1, 0.015, 0.075, -0.1775, 0.4525, 0.0, 'hazardYellow'],
-  [0.1, 0.015, 0.075, 0.1775, 0.4525, 0.0, 'hazardYellow'],
-  [0.01, 0.12, 0.045, -0.4325, 0.3, 0.0, 'reflectorRed'],
-  [0.01, 0.12, 0.045, 0.4325, 0.3, 0.0, 'reflectorRed'],
+  [0.145, 0.06, 0.185, -0.25, 0.03, 0.0, 'ironDark'],
+  [0.075, 0.385, 0.125, -0.25, 0.2475, 0.0, 'postSteel'],
+  [0.145, 0.06, 0.185, 0.25, 0.03, 0.0, 'ironDark'],
+  [0.075, 0.385, 0.125, 0.25, 0.2475, 0.0, 'postSteel'],
+  [0.055, 0.18, 0.04, -0.25, 0.3, -0.0775, 'ironDark'],
+  [0.055, 0.18, 0.04, 0.25, 0.3, -0.0775, 'ironDark'],
+  [0.885, 0.2, 0.05, 0.0, 0.3, -0.1175, 'galvanizedLight'],
+  [0.865, 0.045, 0.03, 0.0, 0.4175, -0.1125, 'galvanizedShadow'],
+  [0.865, 0.045, 0.03, 0.0, 0.1825, -0.1125, 'galvanizedShadow'],
+  [0.035, 0.26, 0.0425, -0.455, 0.3, -0.1113, 'galvanizedShadow'],
+  [0.035, 0.26, 0.0425, 0.455, 0.3, -0.1113, 'galvanizedShadow'],
+  [0.885, 0.15, 0.035, 0.0, 0.3, 0.075, 'galvanizedShadow'],
+  [0.065, 0.08, 0.015, -0.25, 0.3, -0.145, 'reflectorAmber'],
+  [0.065, 0.08, 0.015, 0.25, 0.3, -0.145, 'reflectorAmber'],
+  [0.065, 0.08, 0.015, 0.0, 0.3, -0.145, 'reflectorAmber'],
+  [0.01, 0.1, 0.05, -0.4725, 0.3, -0.1125, 'reflectorRed'],
+  [0.01, 0.1, 0.05, 0.4725, 0.3, -0.1125, 'reflectorRed'],
 ];
 
 const BARRIER_PALETTES                                            = {
-  forest: { concreteBase: 0x94a3b8, concreteDark: 0x64748b, warningYellow: 0xfacc15, hazardStripe: 0x0f172a },
-  winter: { concreteBase: 0xe2e8f0, concreteDark: 0x94a3b8, warningYellow: 0x38bdf8, hazardStripe: 0x1e293b },
-  desert: { concreteBase: 0xd97706, concreteDark: 0xb45309, warningYellow: 0xfef08a, hazardStripe: 0x78350f },
-  neon: { concreteBase: 0x1e1b4b, concreteDark: 0x312e81, warningYellow: 0x06b6d4, hazardStripe: 0xec4899 },
+  forest: { ironDark: 0x1e293b, postSteel: 0x334155, galvanizedLight: 0xcbd5e1, galvanizedShadow: 0x94a3b8, reflectorAmber: 0xfacc15, reflectorRed: 0xef4444 },
+  winter: { ironDark: 0x1e293b, postSteel: 0x475569, galvanizedLight: 0xe2e8f0, galvanizedShadow: 0x94a3b8, reflectorAmber: 0x38bdf8, reflectorRed: 0xef4444 },
+  desert: { ironDark: 0x451a03, postSteel: 0x78350f, galvanizedLight: 0xfef08a, galvanizedShadow: 0xd97706, reflectorAmber: 0xf59e0b, reflectorRed: 0xdc2626 },
+  neon: { ironDark: 0x0f172a, postSteel: 0x1e1b4b, galvanizedLight: 0x06b6d4, galvanizedShadow: 0x312e81, reflectorAmber: 0xf43f5e, reflectorRed: 0xd946ef },
 };function populateHydrantBuilder(b                  )       {
   for (let i = 0; i < HYDRANT_BOXES.length; i++) {
     const d = HYDRANT_BOXES[i];
@@ -2941,7 +2940,7 @@ const BARRIER_PALETTES                                            = {
   const pal = BARRIER_PALETTES[biome] ?? BARRIER_PALETTES.forest;
   for (let i = 0; i < ROAD_BARRIER_GEO.length; i++) {
     const d = ROAD_BARRIER_GEO[i];
-    const col = pal[d[6]] ?? 0x94a3b8;
+    const col = pal[d[6]] ?? 0xcbd5e1;
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], col);
   }
 }
@@ -2952,11 +2951,11 @@ const RIVERBANK_GEO                                                             
   [0.985, 0.11, 0.385, 0.0, 0.055, 0.0, 'graniteDark'],
   [0.975, 0.115, 0.31, 0.0, 0.1625, -0.0325, 'graniteMid'],
   [0.965, 0.085, 0.245, 0.0, 0.2575, -0.06, 'graniteLight'],
-  [0.215, 0.045, 0.185, 0.0, 0.3175, 0.0, 'bollardIron'],
-  [0.145, 0.185, 0.125, 0.0, 0.4275, 0.0, 'bollardIron'],
-  [0.195, 0.065, 0.175, 0.0, 0.5475, 0.0, 'bollardIron'],
-  [0.09, 0.06, 0.045, -0.1125, 0.44, 0.0, 'bollardIron'],
-  [0.09, 0.06, 0.045, 0.1125, 0.44, 0.0, 'bollardIron'],
+  [0.215, 0.045, 0.185, 0.1, 0.3175, 0.0, 'bollardIron'],
+  [0.145, 0.185, 0.125, 0.1, 0.4275, 0.0, 'bollardIron'],
+  [0.195, 0.065, 0.175, 0.1, 0.5475, 0.0, 'bollardIron'],
+  [0.09, 0.06, 0.045, -0.0125, 0.44, 0.0, 'bollardIron'],
+  [0.09, 0.06, 0.045, 0.2125, 0.44, 0.0, 'bollardIron'],
   [0.18, 0.01, 0.12, -0.3025, 0.3, -0.0825, 'grateMetal'],
   [0.03, 0.015, 0.1, -0.3575, 0.305, -0.0825, 'slotBlack'],
   [0.03, 0.015, 0.1, -0.3025, 0.305, -0.0825, 'slotBlack'],
@@ -2971,32 +2970,32 @@ const RIVERBANK_GEO                                                             
 ];
 
 const RIVERBANK_PALETTES                                            = {
-  forest: { granitePavement: 0x64748b, graniteDark: 0x475569, timberPost: 0x78350f, ironBollard: 0x334155, scupperHole: 0x0f172a },
-  winter: { granitePavement: 0x94a3b8, graniteDark: 0x64748b, timberPost: 0x475569, ironBollard: 0xf1f5f9, scupperHole: 0x1e293b },
-  desert: { granitePavement: 0xd97706, graniteDark: 0xb45309, timberPost: 0x92400e, ironBollard: 0x78350f, scupperHole: 0x451a03 },
-  neon: { granitePavement: 0x312e81, graniteDark: 0x1e1b4b, timberPost: 0x06b6d4, ironBollard: 0xec4899, scupperHole: 0x020617 },
+  forest: { graniteDark: 0x475569, graniteMid: 0x64748b, graniteLight: 0x94a3b8, bollardIron: 0x334155, grateMetal: 0x1e293b, slotBlack: 0x0f172a, buoyOrange: 0xea580c, buoyWhite: 0xf8fafc, mossGreen: 0x15803d },
+  winter: { graniteDark: 0x64748b, graniteMid: 0x94a3b8, graniteLight: 0xcbd5e1, bollardIron: 0x1e293b, grateMetal: 0x334155, slotBlack: 0x0f172a, buoyOrange: 0x38bdf8, buoyWhite: 0xf8fafc, mossGreen: 0x0f766e },
+  desert: { graniteDark: 0x78350f, graniteMid: 0xb45309, graniteLight: 0xd97706, bollardIron: 0x451a03, grateMetal: 0x78350f, slotBlack: 0x27170a, buoyOrange: 0xf59e0b, buoyWhite: 0xfef08a, mossGreen: 0x854d0e },
+  neon: { graniteDark: 0x1e1b4b, graniteMid: 0x312e81, graniteLight: 0x4338ca, bollardIron: 0x06b6d4, grateMetal: 0x0f172a, slotBlack: 0x020617, buoyOrange: 0xf43f5e, buoyWhite: 0xd946ef, mossGreen: 0x10b981 },
 };
 
-// Model 10: 3D Floating Gold Coin (20 cubes, Zero Z-Fighting Certified)
-const COIN_BOXES                                                                      = [
-  [0.225, 0.32, 0.065, 0.0, 0.365, 0.0, 0xf59e0b],
-  [0.345, 0.21, 0.055, 0.0, 0.365, 0.0, 0xf59e0b],
-  [0.055, 0.07, 0.045, -0.125, 0.455, 0.0, 0xf59e0b],
-  [0.055, 0.07, 0.045, 0.125, 0.275, 0.0, 0xf59e0b],
-  [0.185, 0.045, 0.085, 0.0, 0.5125, 0.0, 0xd97706],
+// Model 10: 3D Floating Gold Coin with Star (21 cubes, Zero Z-Fighting Certified)const COIN_BOXES                                                                      = [
+  [0.225, 0.31, 0.065, 0.0, 0.365, 0.0, 0xf59e0b],
+  [0.33, 0.205, 0.055, 0.0, 0.365, 0.0, 0xf59e0b],
+  [0.05, 0.07, 0.045, -0.1225, 0.4525, 0.0, 0xf59e0b],
+  [0.05, 0.07, 0.045, 0.1225, 0.2775, 0.0, 0xf59e0b],
+  [0.185, 0.04, 0.085, 0.0, 0.51, 0.0, 0xd97706],
   [0.185, 0.04, 0.085, 0.0, 0.22, 0.0, 0xd97706],
-  [0.0425, 0.19, 0.075, -0.1538, 0.365, 0.0, 0xd97706],
-  [0.0425, 0.19, 0.075, 0.1538, 0.365, 0.0, 0xd97706],
-  [0.07, 0.08, 0.095, -0.1225, 0.47, 0.0, 0xd97706],
-  [0.07, 0.08, 0.095, 0.1225, 0.47, 0.0, 0xd97706],
-  [0.07, 0.08, 0.095, -0.1225, 0.26, 0.0, 0xd97706],
-  [0.07, 0.08, 0.095, 0.1225, 0.26, 0.0, 0xd97706],
-  [0.035, 0.28, 0.105, 0.0, 0.365, 0.0, 0xfacc15],
-  [0.135, 0.035, 0.115, 0.0, 0.4575, 0.0, 0xfacc15],
-  [0.115, 0.03, 0.115, 0.0, 0.365, 0.0, 0xfacc15],
-  [0.135, 0.035, 0.115, 0.0, 0.2725, 0.0, 0xfacc15],
-  [0.03, 0.07, 0.12, -0.0575, 0.41, 0.0, 0xfacc15],
-  [0.03, 0.07, 0.12, 0.0575, 0.32, 0.0, 0xfacc15],
+  [0.0375, 0.19, 0.075, -0.1512, 0.365, 0.0, 0xd97706],
+  [0.0375, 0.19, 0.075, 0.1512, 0.365, 0.0, 0xd97706],
+  [0.07, 0.075, 0.095, -0.1225, 0.4675, 0.0, 0xd97706],
+  [0.07, 0.075, 0.095, 0.1225, 0.4675, 0.0, 0xd97706],
+  [0.07, 0.075, 0.095, -0.1225, 0.2625, 0.0, 0xd97706],
+  [0.07, 0.075, 0.095, 0.1225, 0.2625, 0.0, 0xd97706],
+  [0.075, 0.06, 0.105, 0.0, 0.36, 0.0, 0xfacc15],
+  [0.045, 0.075, 0.11, 0.0, 0.4225, 0.0, 0xfef08a],
+  [0.065, 0.045, 0.11, -0.065, 0.3775, 0.0, 0xfacc15],
+  [0.065, 0.045, 0.11, 0.065, 0.3775, 0.0, 0xfacc15],
+  [0.05, 0.065, 0.11, -0.0525, 0.3025, 0.0, 0xfacc15],
+  [0.05, 0.065, 0.11, 0.0525, 0.3025, 0.0, 0xfacc15],
+  [0.035, 0.03, 0.12, 0.0, 0.365, 0.0, 0xfef08a],
   [0.03, 0.03, 0.0075, -0.1075, 0.455, 0.0488, 0xfef08a],
   [0.03, 0.03, 0.0075, 0.1075, 0.275, 0.0488, 0xfef08a],
 ];
@@ -3025,23 +3024,19 @@ const RECORD_FLAG_BOXES                                                         
   [0.085, 0.035, 0.085, 0.0, 0.2325, 0.0, 0xf59e0b],
 ];
 
-// Model 12: Road Markings / Zebra Crossing (12 cubes, Zero Z-Fighting Certified)
+// Model 12: Road Markings / Clean Zebra (8 cubes, Zero Z-Fighting Certified)
 const ROAD_MARKINGS_BOXES                                                                      = [
-  [0.17, 0.05, 0.785, -0.3575, 0.025, 0.0, 0xf8fafc],
-  [0.17, 0.05, 0.785, -0.1425, 0.025, 0.0, 0xf8fafc],
-  [0.17, 0.05, 0.785, 0.0725, 0.025, 0.0, 0xf8fafc],
-  [0.17, 0.05, 0.785, 0.2875, 0.025, 0.0, 0xf8fafc],
-  [0.815, 0.05, 0.035, -0.035, 0.025, -0.415, 0xfacc15],
-  [0.815, 0.05, 0.035, -0.035, 0.025, 0.415, 0xfacc15],
-  [0.03, 0.015, 0.03, -0.3575, 0.05, -0.2575, 0xe2e8f0],
-  [0.03, 0.015, 0.03, -0.1425, 0.05, -0.0775, 0xe2e8f0],
-  [0.03, 0.015, 0.03, 0.0725, 0.05, 0.1075, 0xe2e8f0],
-  [0.03, 0.015, 0.03, 0.2875, 0.05, 0.2875, 0xe2e8f0],
+  [0.15, 0.05, 0.785, -0.3475, 0.025, 0.0, 0xf8fafc],
+  [0.15, 0.05, 0.785, -0.1375, 0.025, 0.0, 0xf8fafc],
+  [0.15, 0.05, 0.785, 0.0725, 0.025, 0.0, 0xf8fafc],
+  [0.15, 0.05, 0.785, 0.2825, 0.025, 0.0, 0xf8fafc],
+  [0.82, 0.05, 0.035, -0.0325, 0.025, -0.415, 0xfacc15],
+  [0.82, 0.05, 0.035, -0.0325, 0.025, 0.415, 0xfacc15],
   [0.025, 0.05, 0.325, -0.46, 0.025, 0.0, 0xf8fafc],
-  [0.025, 0.05, 0.325, 0.39, 0.025, 0.0, 0xf8fafc],
+  [0.025, 0.05, 0.325, 0.395, 0.025, 0.0, 0xf8fafc],
 ];
 
-// Model 1: Tree Planter Box & Foliage (31 cubes, Zero Z-Fighting Certified)
+// Model 1: Tree Planter A (31 cubes, Terracotta & Vibrant Red Apples)
 const TREE_PLANTER_GEO                                                                      = [
   [0.1, 0.1, 0.1, -0.3425, 0.05, -0.3425, 'woodPlankDark'],
   [0.1, 0.1, 0.1, 0.3425, 0.05, -0.3425, 'woodPlankDark'],
@@ -3077,10 +3072,52 @@ const TREE_PLANTER_GEO                                                          
 ];
 
 const TREE_PALETTES                                            = {
-  forest: { woodPlankDark: 0x78350f, woodDarkEdge: 0x451a03, fertileSoil: 0x27170a, treeTrunk: 0x5c3217, greenLeaf: 0x16a34a, greenAccent: 0x4ade80 },
-  winter: { woodPlankDark: 0x475569, woodDarkEdge: 0x334155, fertileSoil: 0x1e293b, treeTrunk: 0x475569, greenLeaf: 0x0f766e, greenAccent: 0xf8fafc },
-  desert: { woodPlankDark: 0x92400e, woodDarkEdge: 0x78350f, fertileSoil: 0x451a03, treeTrunk: 0x78350f, greenLeaf: 0xa16207, greenAccent: 0xca8a04 },
-  neon: { woodPlankDark: 0x1e1b4b, woodDarkEdge: 0x0f172a, fertileSoil: 0x020617, treeTrunk: 0x312e81, greenLeaf: 0x06b6d4, greenAccent: 0xd946ef },
+  forest: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x15803d, foliageMid: 0x16a34a, foliageLight: 0x22c55e, appleRed: 0xef4444 },
+  winter: { woodPlankDark: 0x334155, woodPlankMid: 0x64748b, soilDark: 0x1e293b, trunkBark: 0x475569, foliageBase: 0x0f766e, foliageMid: 0x115e59, foliageLight: 0xf8fafc, appleRed: 0xef4444 },
+  desert: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x854d0e, foliageMid: 0xa16207, foliageLight: 0xca8a04, appleRed: 0xdc2626 },
+  neon: { woodPlankDark: 0x0f172a, woodPlankMid: 0x1e1b4b, soilDark: 0x020617, trunkBark: 0x312e81, foliageBase: 0x4338ca, foliageMid: 0x06b6d4, foliageLight: 0xd946ef, appleRed: 0xf43f5e },
+};
+
+// Model 1b: Tree Planter B (31 cubes, Graphite/Gold Concrete Planter & Dome Canopy)
+const TREE_PLANTER_B_GEO                                                                      = [
+  [0.7, 0.09, 0.7, 0.0, 0.045, 0.0, 'concreteDark'],
+  [0.725, 0.075, 0.725, 0.0, 0.1225, 0.0, 'concreteMid'],
+  [0.79, 0.325, 0.09, 0.0, 0.3175, -0.35, 'concreteMid'],
+  [0.79, 0.325, 0.09, 0.0, 0.3175, 0.35, 'concreteMid'],
+  [0.085, 0.325, 0.6, -0.3475, 0.3175, 0.0, 'concreteMid'],
+  [0.085, 0.325, 0.6, 0.3475, 0.3175, 0.0, 'concreteMid'],
+  [0.8, 0.065, 0.105, 0.0, 0.5075, -0.3475, 'goldRim'],
+  [0.8, 0.065, 0.105, 0.0, 0.5075, 0.3475, 'goldRim'],
+  [0.1, 0.065, 0.58, -0.345, 0.5075, 0.0, 'goldRim'],
+  [0.1, 0.065, 0.58, 0.345, 0.5075, 0.0, 'goldRim'],
+  [0.565, 0.08, 0.565, 0.0, 0.47, 0.0, 'soilDark'],
+  [0.185, 0.32, 0.185, 0.0, 0.665, 0.0, 'trunkBark'],
+  [0.1, 0.2, 0.145, -0.1325, 0.875, 0.0, 'trunkBark'],
+  [0.1, 0.2, 0.145, 0.1325, 0.875, 0.0, 'trunkBark'],
+  [0.885, 0.24, 0.885, 0.0, 1.07, 0.0, 'foliageBase'],
+  [0.745, 0.185, 0.055, 0.0, 1.0675, -0.465, 'foliageBase'],
+  [0.745, 0.185, 0.055, 0.0, 1.0675, 0.465, 'foliageBase'],
+  [0.055, 0.185, 0.745, -0.465, 1.0675, 0.0, 'foliageBase'],
+  [0.055, 0.185, 0.745, 0.465, 1.0675, 0.0, 'foliageBase'],
+  [0.765, 0.225, 0.765, 0.0, 1.2975, 0.0, 'foliageMid'],
+  [0.585, 0.17, 0.055, 0.0, 1.295, -0.405, 'foliageMid'],
+  [0.585, 0.17, 0.055, 0.0, 1.295, 0.405, 'foliageMid'],
+  [0.055, 0.17, 0.585, -0.405, 1.295, 0.0, 'foliageMid'],
+  [0.055, 0.17, 0.585, 0.405, 1.295, 0.0, 'foliageMid'],
+  [0.545, 0.185, 0.545, 0.0, 1.4975, 0.0, 'foliageLight'],
+  [0.325, 0.075, 0.325, 0.0, 1.6225, 0.0, 'foliageLight'],
+  [0.07, 0.07, 0.015, -0.2775, 1.085, -0.49, 'appleRed'],
+  [0.07, 0.07, 0.015, 0.2775, 1.11, -0.49, 'appleRed'],
+  [0.015, 0.07, 0.07, 0.49, 1.135, -0.1275, 'appleRed'],
+  [0.015, 0.07, 0.07, -0.49, 1.145, 0.1275, 'appleRed'],
+  [0.075, 0.07, 0.015, -0.035, 1.26, 0.43, 'appleRed'],
+];
+
+const TREE_B_PALETTES                                            = {
+  forest: { concreteDark: 0x1e293b, concreteMid: 0x334155, goldRim: 0xd97706, soilDark: 0x27170a, trunkBark: 0x78350f, foliageBase: 0x166534, foliageMid: 0x15803d, foliageLight: 0x22c55e, appleRed: 0xef4444 },
+  winter: { concreteDark: 0x1e293b, concreteMid: 0x475569, goldRim: 0x94a3b8, soilDark: 0x0f172a, trunkBark: 0x334155, foliageBase: 0x042f2e, foliageMid: 0x0f766e, foliageLight: 0xf8fafc, appleRed: 0xef4444 },
+  desert: { concreteDark: 0x451a03, concreteMid: 0x78350f, goldRim: 0xb45309, soilDark: 0x27170a, trunkBark: 0x78350f, foliageBase: 0x713f12, foliageMid: 0x854d0e, foliageLight: 0xca8a04, appleRed: 0xdc2626 },
+  neon: { concreteDark: 0x020617, concreteMid: 0x0f172a, goldRim: 0x06b6d4, soilDark: 0x000000, trunkBark: 0x1e1b4b, foliageBase: 0x312e81, foliageMid: 0x4338ca, foliageLight: 0xd946ef, appleRed: 0xf43f5e },
 };
 
 // Model 2: Trimmed Cubic Hedge (18 cubes, Zero Z-Fighting Certified)
@@ -3106,10 +3143,10 @@ const HEDGE_GEO                                                                 
 ];
 
 const HEDGE_PALETTES                                            = {
-  forest: { limeFoliage: 0x84cc16, greenAccent: 0x4ade80 },
-  winter: { limeFoliage: 0xdbeafe, greenAccent: 0xf8fafc },
-  desert: { limeFoliage: 0xb45309, greenAccent: 0xfde047 },
-  neon: { limeFoliage: 0x7e22ce, greenAccent: 0xec4899 },
+  forest: { hedgeDark: 0x166534, hedgeMid: 0x15803d, hedgeLight: 0x22c55e, leafLime: 0x84cc16, blossomYellow: 0xfacc15 },
+  winter: { hedgeDark: 0x334155, hedgeMid: 0x475569, hedgeLight: 0x94a3b8, leafLime: 0xdbeafe, blossomYellow: 0xf8fafc },
+  desert: { hedgeDark: 0x78350f, hedgeMid: 0x92400e, hedgeLight: 0xb45309, leafLime: 0xca8a04, blossomYellow: 0xfef08a },
+  neon: { hedgeDark: 0x1e1b4b, hedgeMid: 0x312e81, hedgeLight: 0x4338ca, leafLime: 0x06b6d4, blossomYellow: 0xf43f5e },
 };function populateRiverbankBuilder(
   b                  ,
   side                   = 'left',
@@ -3142,6 +3179,13 @@ const HEDGE_PALETTES                                            = {
   for (let i = 0; i < TREE_PLANTER_GEO.length; i++) {
     const d = TREE_PLANTER_GEO[i];
     const col = pal[d[6]] ?? 0x16a34a;
+    b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], col);
+  }
+}function populateTreePlanterBBuilder(b                  , biome            = 'forest')       {
+  const pal = TREE_B_PALETTES[biome] ?? TREE_B_PALETTES.forest;
+  for (let i = 0; i < TREE_PLANTER_B_GEO.length; i++) {
+    const d = TREE_PLANTER_B_GEO[i];
+    const col = pal[d[6]] ?? 0x15803d;
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], col);
   }
 }function populateHedgeBuilder(b                  , biome            = 'forest')       {
@@ -3186,15 +3230,29 @@ function createUrbanLampPost()              {
   return group;
 }
 
-/** Model 1: Tree Planter Box & Layered Foliage (31 cubes, Grade A+ 10/10) */
+/** Model 1: Tree Planter Box A (Terracotta & Pyramid Foliage, 31 cubes, Grade A+ 10/10) */
 function createUrbanTreePlanter(
-  _seedVariant        ,
+  seedVariant = 0,
   biome            = 'forest'
 )              {
+  if (Math.abs(seedVariant) % 2 === 1) {
+    return createUrbanTreePlanterB(biome);
+  }
   const group = new THREE.Group();
   const mesh = VoxelMeshBuilder.buildCachedMesh(
     `urban_tree_planter_${biome}`,
     (b) => populateTreePlanterBuilder(b, biome)
+  );
+  group.add(mesh.clone());
+  return group;
+}
+
+/** Model 1b: Tree Planter B (Concrete Planter & Dome Canopy, 31 cubes, Grade A+ 10/10) */
+function createUrbanTreePlanterB(biome            = 'forest')              {
+  const group = new THREE.Group();
+  const mesh = VoxelMeshBuilder.buildCachedMesh(
+    `urban_tree_planter_b_${biome}`,
+    (b) => populateTreePlanterBBuilder(b, biome)
   );
   group.add(mesh.clone());
   return group;

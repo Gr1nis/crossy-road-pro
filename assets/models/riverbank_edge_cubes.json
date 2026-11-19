@@ -69,12 +69,12 @@
     "name": "bollard_base",
     "group": "river_bollard",
     "from": [
-      -2.15,
+      -0.15,
       5.9,
       -1.85
     ],
     "to": [
-      2.15,
+      4.15,
       6.8,
       1.85
     ],
@@ -91,12 +91,12 @@
     "name": "bollard_column",
     "group": "river_bollard",
     "from": [
-      -1.45,
+      0.55,
       6.7,
       -1.25
     ],
     "to": [
-      1.45,
+      3.45,
       10.4,
       1.25
     ],
@@ -113,12 +113,12 @@
     "name": "bollard_cap",
     "group": "river_bollard",
     "from": [
-      -1.95,
+      0.05,
       10.3,
       -1.75
     ],
     "to": [
-      1.95,
+      3.95,
       11.6,
       1.75
     ],
@@ -135,12 +135,12 @@
     "name": "bollard_pin_l",
     "group": "river_bollard",
     "from": [
-      -3.15,
+      -1.15,
       8.2,
       -0.45
     ],
     "to": [
-      -1.35,
+      0.65,
       9.4,
       0.45
     ],
@@ -157,12 +157,12 @@
     "name": "bollard_pin_r",
     "group": "river_bollard",
     "from": [
-      1.35,
+      3.35,
       8.2,
       -0.45
     ],
     "to": [
-      3.15,
+      5.15,
       9.4,
       0.45
     ],
