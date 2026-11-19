@@ -59,9 +59,9 @@ describe('3D Model Viewer & Dynamic Model Registry Suite', () => {
     }
   });
 
-  it('Property 3 (Vehicle Models High-Fidelity Geometry): all 6 vehicles instantiate with rich voxel detail', () => {
+  it('Property 3 (Vehicle Models High-Fidelity Geometry): all 8 vehicles instantiate with rich voxel detail', () => {
     const vehicles = getVehicleModelItems();
-    const expectedIds = ['taxi', 'scooter', 'bus', 'sweeper', 'train', 'pallet'];
+    const expectedIds = ['car', 'truck', 'taxi', 'scooter', 'bus', 'sweeper', 'train', 'pallet'];
 
     assert.equal(vehicles.length, expectedIds.length);
 
@@ -80,9 +80,9 @@ describe('3D Model Viewer & Dynamic Model Registry Suite', () => {
     }
   });
 
-  it('Property 4 (Environment Props Integrity): all 10 props instantiate correctly', () => {
+  it('Property 4 (Environment Props Integrity): all 9 props instantiate correctly', () => {
     const props = getPropModelItems();
-    assert.equal(props.length, 10, 'Must have 10 environment prop items');
+    assert.equal(props.length, 9, 'Must have 9 environment prop items');
 
     for (const prop of props) {
       assert.equal(prop.cat, 'props');
@@ -129,8 +129,8 @@ describe('3D Model Viewer & Dynamic Model Registry Suite', () => {
     assert.equal(report.errors.length, 0, `Registry errors found: ${report.errors.join('; ')}`);
     assert.ok(report.total >= 25, `Total models should be >= 25 (was ${report.total})`);
     assert.equal(report.countsByCategory['chars'], ALL_SKINS.length);
-    assert.equal(report.countsByCategory['vehicles'], 6);
-    assert.equal(report.countsByCategory['props'], 10);
+    assert.equal(report.countsByCategory['vehicles'], 8);
+    assert.equal(report.countsByCategory['props'], 9);
     assert.equal(report.countsByCategory['nature'], 3);
     assert.equal(report.countsByCategory['buildings'], 3);
   });

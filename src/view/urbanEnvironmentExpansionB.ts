@@ -80,20 +80,8 @@ const RECORD_FLAG_BOXES: readonly [number, number, number, number, number, numbe
   [0.085, 0.035, 0.085, 0.0, 0.2325, 0.0, 0xf59e0b],
 ];
 
-// Model 12: Road Markings / Clean Zebra (8 cubes, Zero Z-Fighting Certified)
-const ROAD_MARKINGS_BOXES: readonly [number, number, number, number, number, number, number][] = [
-  [0.15, 0.05, 0.785, -0.3475, 0.025, 0.0, 0xf8fafc],
-  [0.15, 0.05, 0.785, -0.1375, 0.025, 0.0, 0xf8fafc],
-  [0.15, 0.05, 0.785, 0.0725, 0.025, 0.0, 0xf8fafc],
-  [0.15, 0.05, 0.785, 0.2825, 0.025, 0.0, 0xf8fafc],
-  [0.82, 0.05, 0.035, -0.0325, 0.025, -0.415, 0xfacc15],
-  [0.82, 0.05, 0.035, -0.0325, 0.025, 0.415, 0xfacc15],
-  [0.025, 0.05, 0.325, -0.46, 0.025, 0.0, 0xf8fafc],
-  [0.025, 0.05, 0.325, 0.395, 0.025, 0.0, 0xf8fafc],
-];
-
 // Model 1: Tree Planter A (31 cubes, Terracotta & Vibrant Red Apples)
-const TREE_PLANTER_GEO: readonly [number, number, number, number, number, number, string][] = [
+export const TREE_PLANTER_GEO: readonly [number, number, number, number, number, number, string][] = [
   [0.1, 0.1, 0.1, -0.3425, 0.05, -0.3425, 'woodPlankDark'],
   [0.1, 0.1, 0.1, 0.3425, 0.05, -0.3425, 'woodPlankDark'],
   [0.1, 0.1, 0.1, -0.3425, 0.05, 0.3425, 'woodPlankDark'],
@@ -127,7 +115,7 @@ const TREE_PLANTER_GEO: readonly [number, number, number, number, number, number
   [0.015, 0.07, 0.07, -0.36, 1.335, 0.0975, 'appleRed'],
 ];
 
-const TREE_PALETTES: Record<BiomeType, Record<string, number>> = {
+export const TREE_PALETTES: Record<BiomeType, Record<string, number>> = {
   forest: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x15803d, foliageMid: 0x16a34a, foliageLight: 0x22c55e, appleRed: 0xef4444 },
   winter: { woodPlankDark: 0x334155, woodPlankMid: 0x64748b, soilDark: 0x1e293b, trunkBark: 0x475569, foliageBase: 0x0f766e, foliageMid: 0x115e59, foliageLight: 0xf8fafc, appleRed: 0xef4444 },
   desert: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x854d0e, foliageMid: 0xa16207, foliageLight: 0xca8a04, appleRed: 0xdc2626 },
@@ -229,13 +217,6 @@ export function populateCoinBuilder(b: VoxelMeshBuilder): void {
 export function populateRecordFlagBuilder(b: VoxelMeshBuilder): void {
   for (let i = 0; i < RECORD_FLAG_BOXES.length; i++) {
     const d = RECORD_FLAG_BOXES[i];
-    b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
-  }
-}
-
-export function populateRoadMarkingsBuilder(b: VoxelMeshBuilder): void {
-  for (let i = 0; i < ROAD_MARKINGS_BOXES.length; i++) {
-    const d = ROAD_MARKINGS_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
 }

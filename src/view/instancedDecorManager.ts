@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { BiomeType } from '../core/types.ts';
-import { COIN_BOXES } from './urbanEnvironmentExpansionB.ts';
+import { COIN_BOXES, TREE_PALETTES, TREE_PLANTER_GEO } from './urbanEnvironmentExpansionB.ts';
 
 interface InstancedVoxelBox {
   w: number;
@@ -50,47 +50,35 @@ function createMergedDecorGeometry(boxes: readonly InstancedVoxelBox[]): THREE.B
   return merged;
 }
 
-// Forest Biome: Brown trunk 0x854d0e, green foliage 0x16a34a, 0x22c55e, 0x4ade80 | Rock: slate gray 0x64748b, 0x475569, 0x94a3b8
-const INSTANCED_FOREST_TREE_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.60, 0.10, 0.60, 0, 0.05, 0, 0x854d0e), b(0.20, 0.60, 0.20, 0, 0.35, 0, 0x854d0e),
-  b(0.75, 0.55, 0.75, 0, 0.85, 0, 0x16a34a), b(0.60, 0.40, 0.60, 0, 1.25, 0, 0x22c55e),
-  b(0.35, 0.25, 0.35, 0, 1.55, 0, 0x4ade80), b(0.15, 0.15, 0.15, 0.20, 1.15, 0.30, 0x4ade80),
-];
+function createTreeBoxesForBiome(biome: BiomeType): InstancedVoxelBox[] {
+  const pal = TREE_PALETTES[biome] ?? TREE_PALETTES.forest;
+  return TREE_PLANTER_GEO.map((d) => b(d[0], d[1], d[2], d[3], d[4], d[5], pal[d[6]] ?? 0x15803d));
+}
+
+// Tree Planter (Tree A) with red apples across all biomes
+const INSTANCED_FOREST_TREE_BOXES: readonly InstancedVoxelBox[] = createTreeBoxesForBiome('forest');
+const INSTANCED_WINTER_TREE_BOXES: readonly InstancedVoxelBox[] = createTreeBoxesForBiome('winter');
+const INSTANCED_DESERT_TREE_BOXES: readonly InstancedVoxelBox[] = createTreeBoxesForBiome('desert');
+const INSTANCED_NEON_TREE_BOXES: readonly InstancedVoxelBox[] = createTreeBoxesForBiome('neon');
+
 const INSTANCED_FOREST_ROCK_BOXES: readonly InstancedVoxelBox[] = [
   b(0.60, 0.25, 0.60, 0, 0.125, 0, 0x64748b), b(0.45, 0.20, 0.45, -0.05, 0.30, 0.05, 0x475569),
   b(0.30, 0.15, 0.30, 0.05, 0.45, -0.05, 0x94a3b8), b(0.15, 0.10, 0.15, 0.25, 0.05, 0.20, 0x64748b),
 ];
 
 // Winter Biome: Dark trunk 0x475569, pine teal 0x0f766e, snow cap 0xf8fafc, 0xe2e8f0 | Rock: 0x94a3b8, snow cap 0xf1f5f9
-const INSTANCED_WINTER_TREE_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.20, 0.50, 0.20, 0, 0.25, 0, 0x475569), b(0.80, 0.40, 0.80, 0, 0.65, 0, 0x0f766e),
-  b(0.85, 0.05, 0.85, 0, 0.85, 0, 0xe2e8f0), b(0.60, 0.35, 0.60, 0, 1.00, 0, 0x0f766e),
-  b(0.65, 0.05, 0.65, 0, 1.18, 0, 0xf8fafc), b(0.35, 0.30, 0.35, 0, 1.30, 0, 0x0f766e),
-  b(0.40, 0.10, 0.40, 0, 1.48, 0, 0xf8fafc),
-];
 const INSTANCED_WINTER_ROCK_BOXES: readonly InstancedVoxelBox[] = [
   b(0.60, 0.25, 0.60, 0, 0.125, 0, 0x94a3b8), b(0.45, 0.20, 0.45, -0.05, 0.30, 0.05, 0x64748b),
   b(0.45, 0.08, 0.45, -0.05, 0.42, 0.05, 0xf1f5f9), b(0.25, 0.10, 0.25, 0.15, 0.20, -0.15, 0xf1f5f9),
 ];
 
 // Desert Biome: Terracotta trunk 0x78350f, cactus green / golden-olive 0xa16207, 0xb45309, 0xd97706 | Rock: 0xd97706, 0xb45309, 0x92400e
-const INSTANCED_DESERT_TREE_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.45, 0.05, 0.45, 0, 0.025, 0, 0x78350f), b(0.25, 1.35, 0.25, 0, 0.70, 0, 0xa16207),
-  b(0.28, 1.05, 0.20, 0, 0.65, 0, 0xb45309), b(0.25, 0.20, 0.20, -0.22, 0.60, 0, 0xa16207),
-  b(0.20, 0.50, 0.20, -0.32, 0.85, 0, 0xd97706), b(0.25, 0.20, 0.20, 0.22, 0.80, 0, 0xa16207),
-  b(0.20, 0.45, 0.20, 0.32, 1.025, 0, 0xd97706), b(0.15, 0.10, 0.15, 0, 1.425, 0, 0xd97706),
-];
 const INSTANCED_DESERT_ROCK_BOXES: readonly InstancedVoxelBox[] = [
   b(0.65, 0.20, 0.65, 0, 0.10, 0, 0x92400e), b(0.50, 0.20, 0.50, 0.05, 0.28, -0.05, 0xb45309),
   b(0.35, 0.15, 0.35, 0.05, 0.43, -0.05, 0xd97706), b(0.18, 0.12, 0.18, -0.25, 0.06, 0.20, 0xd97706),
 ];
 
 // Neon Biome: Obsidian trunk 0x1e1b4b, glowing cyan/magenta 0x06b6d4, 0xd946ef, 0xa855f7 | Rock: 0x312e81, 0x4338ca, 0x06b6d4
-const INSTANCED_NEON_TREE_BOXES: readonly InstancedVoxelBox[] = [
-  b(0.50, 0.10, 0.50, 0, 0.05, 0, 0x1e1b4b), b(0.25, 1.40, 0.25, 0, 0.75, 0, 0x1e1b4b),
-  b(0.65, 0.10, 0.65, 0, 0.70, 0, 0x06b6d4), b(0.50, 0.10, 0.50, 0, 1.05, 0, 0xd946ef),
-  b(0.35, 0.10, 0.35, 0, 1.35, 0, 0xa855f7), b(0.15, 0.20, 0.15, 0, 1.55, 0, 0x06b6d4),
-];
 const INSTANCED_NEON_ROCK_BOXES: readonly InstancedVoxelBox[] = [
   b(0.55, 0.20, 0.55, 0, 0.10, 0, 0x312e81), b(0.35, 0.35, 0.35, -0.05, 0.35, 0.05, 0x4338ca),
   b(0.15, 0.25, 0.15, 0.18, 0.25, -0.12, 0x06b6d4), b(0.10, 0.18, 0.10, -0.15, 0.48, -0.05, 0x06b6d4),

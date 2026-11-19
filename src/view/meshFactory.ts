@@ -9,9 +9,9 @@ import {
   createUrbanRecordFlag,
   createUrbanRiverbankEdge,
   createUrbanRoadBarrier,
-  createUrbanRoadMarkings,
   createUrbanRock,
   createUrbanTree,
+  type RailwaySignalComponents,
 } from './urbanEnvironment.ts';
 import { createUrbanPallet, createUrbanTrain, createUrbanVehicle } from './urbanVehicles.ts';
 import { createUrbanTownhouse } from './urbanBuildings.ts';
@@ -53,7 +53,7 @@ export class MeshFactory {
     return createUrbanCoin();
   }
 
-  static createRailwaySignal(): { group: THREE.Group; lightMesh: THREE.Mesh } {
+  static createRailwaySignal(): RailwaySignalComponents {
     return createUrbanRailwaySignal();
   }
 
@@ -75,10 +75,6 @@ export class MeshFactory {
 
   static createWaterfallEdge(side: 'left' | 'right', biome: BiomeType = 'forest'): THREE.Group {
     return createUrbanRiverbankEdge(side, biome);
-  }
-
-  static createRoadMarkings(): THREE.Group {
-    return createUrbanRoadMarkings();
   }
 
   static createLaneDivider(): THREE.Group {

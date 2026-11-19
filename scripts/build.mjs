@@ -44,6 +44,10 @@ const moduleOrder = [
   'src/view/christmasCharacters.ts',
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
+  'src/view/urbanVehiclesExpansionA.ts',
+  'src/view/urbanVehiclesExpansionB.ts',
+  'src/view/urbanVehiclesExpansion.ts',
+  'src/view/urbanVehiclesRailRiver.ts',
   'src/view/urbanVehicles.ts',
   'src/view/urbanEnvironmentExpansionA.ts',
   'src/view/urbanEnvironmentExpansionB.ts',
@@ -3193,7 +3197,12 @@ function auditDeployModels() {
     fs.readFileSync(path.join(ROOT, 'src/view/urbanCharactersExpansionB.ts'), 'utf8') +
     fs.readFileSync(path.join(ROOT, 'src/view/christmasCharacters.ts'), 'utf8') +
     fs.readFileSync(path.join(ROOT, 'src/view/christmasCharactersExpansion.ts'), 'utf8');
-  const vehSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanVehicles.ts'), 'utf8');
+  const vehSource =
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanVehiclesExpansionA.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanVehiclesExpansionB.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanVehiclesExpansion.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanVehiclesRailRiver.ts'), 'utf8') +
+    fs.readFileSync(path.join(ROOT, 'src/view/urbanVehicles.ts'), 'utf8');
   const envSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanEnvironment.ts'), 'utf8');
   const bldgSource = fs.readFileSync(path.join(ROOT, 'src/view/urbanBuildings.ts'), 'utf8');
 
@@ -3212,7 +3221,7 @@ function auditDeployModels() {
   console.log(`✔ Verified ${uniqueSkins.length} character skins in ALL_SKINS: ${uniqueSkins.join(', ')}`);
 
   // Check vehicles
-  const vehicles = ['taxi', 'scooter', 'bus', 'sweeper', 'train', 'pallet'];
+  const vehicles = ['taxi', 'scooter', 'bus', 'sweeper', 'car', 'truck', 'train', 'pallet'];
   for (const v of vehicles) {
     const fnName = v === 'train' ? 'createUrbanTrain' : v === 'pallet' ? 'createUrbanPallet' : `build${v.charAt(0).toUpperCase() + v.slice(1)}`;
     if (!vehSource.includes(fnName)) {
@@ -3231,7 +3240,6 @@ function auditDeployModels() {
     'createUrbanRailwaySignal',
     'createUrbanRecordFlag',
     'createUrbanRoadBarrier',
-    'createUrbanRoadMarkings',
     'createUrbanRiverbankEdge',
     'createUrbanTreePlanter',
     'createUrbanHedge',
@@ -3270,6 +3278,10 @@ const viewerModuleOrder = [
   'src/view/christmasCharacters.ts',
   'src/view/urbanCharacters.ts',
   'src/view/voxelMeshBuilder.ts',
+  'src/view/urbanVehiclesExpansionA.ts',
+  'src/view/urbanVehiclesExpansionB.ts',
+  'src/view/urbanVehiclesExpansion.ts',
+  'src/view/urbanVehiclesRailRiver.ts',
   'src/view/urbanVehicles.ts',
   'src/view/urbanEnvironmentExpansionA.ts',
   'src/view/urbanEnvironmentExpansionB.ts',

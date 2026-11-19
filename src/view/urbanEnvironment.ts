@@ -15,7 +15,6 @@ import {
   populateRiverbankBuilder,
   populateCoinBuilder,
   populateRecordFlagBuilder,
-  populateRoadMarkingsBuilder,
   populateTreePlanterBuilder,
   populateTreePlanterBBuilder,
   populateHedgeBuilder,
@@ -128,18 +127,28 @@ export function createUrbanCoin(): THREE.Group {
   return group;
 }
 
-/** Model 7: Railway Semaphore Mast & Signal Head (22 cubes, Grade A+ 10/10) */
-export function createUrbanRailwaySignal(): { group: THREE.Group; lightMesh: THREE.Mesh } {
+export interface RailwaySignalComponents {
+  group: THREE.Group;
+  redLightMesh: THREE.Mesh;
+  greenLightMesh: THREE.Mesh;
+  lightMesh: THREE.Mesh;
+}
+
+/** Model 7: Railway Semaphore Mast & Signal Head (Grade A+ 10/10) */
+export function createUrbanRailwaySignal(): RailwaySignalComponents {
   const group = new THREE.Group();
   const mastMesh = VoxelMeshBuilder.buildCachedMesh('urban_railway_signal', populateRailwaySignalBuilder);
   group.add(mastMesh.clone());
 
-  // Dynamic warning light toggle (switched by SceneManager)
-  const lightMat = createVoxelBasicMaterial(0x334155);
-  const lightMesh = createVoxelMesh(0.18, 0.16, 0.08, lightMat, 0, 1.45, 0.12, false, false);
-  group.add(lightMesh);
+  const redMat = createVoxelBasicMaterial(0x3f1010);
+  const redLightMesh = createVoxelMesh(0.11, 0.12, 0.035, redMat, -0.0675, 1.65, -0.13, false, false);
 
-  return { group, lightMesh };
+  const greenMat = createVoxelBasicMaterial(0x22c55e);
+  const greenLightMesh = createVoxelMesh(0.11, 0.12, 0.035, greenMat, -0.0675, 1.41, -0.13, false, false);
+
+  group.add(redLightMesh, greenLightMesh);
+
+  return { group, redLightMesh, greenLightMesh, lightMesh: redLightMesh };
 }
 
 /** Model 11: Personal Best Record Flag (20 cubes, Grade A+ 10/10) */
@@ -186,14 +195,6 @@ export function createUrbanRecordFlag(): THREE.Group {
   );
 
   group.add(clothGroup);
-  return group;
-}
-
-/** Model 12: Road Markings / Zebra Pedestrian Crossing (12 cubes, Grade A+ 10/10) */
-export function createUrbanRoadMarkings(): THREE.Group {
-  const group = new THREE.Group();
-  const zebraMesh = VoxelMeshBuilder.buildCachedMesh('urban_road_markings', populateRoadMarkingsBuilder);
-  group.add(zebraMesh.clone());
   return group;
 }
 

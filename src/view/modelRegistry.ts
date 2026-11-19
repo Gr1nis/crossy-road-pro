@@ -5,7 +5,7 @@ import { createUrbanPallet, createUrbanTrain, createUrbanVehicle } from './urban
 import {
   createUrbanBench, createUrbanCoin, createUrbanHedge, createUrbanHydrant, createUrbanLampPost,
   createUrbanRailwaySignal, createUrbanRecordFlag, createUrbanRiverbankEdge, createUrbanRoadBarrier,
-  createUrbanRoadMarkings, createUrbanTrashCan, createUrbanTreePlanter,
+  createUrbanTrashCan, createUrbanTreePlanter,
 } from './urbanEnvironment.ts';
 import { createTownhouseA, createTownhouseB, createTownhouseC } from './urbanBuildings.ts';
 
@@ -56,50 +56,42 @@ export function getCharacterModelItems(): ModelCatalogItem[] {
 export function getVehicleModelItems(): ModelCatalogItem[] {
   return [
     {
-      id: 'taxi',
-      name: 'Городское такси',
-      icon: '🚕',
-      cat: 'vehicles',
+      id: 'car', name: 'Спортивный седан', icon: '🚗', cat: 'vehicles',
+      desc: 'Динамичный синий седан с выразительным антикрылом, люком на крыше и спортивным сплиттером.',
+      create: () => createUrbanVehicle('car', 1),
+    },
+    {
+      id: 'truck', name: 'Фургон доставки', icon: '🚚', cat: 'vehicles',
+      desc: 'Белоснежный грузовой фургон с зелёной кабиной, распашными задними воротами и серебристым отбойником.',
+      create: () => createUrbanVehicle('truck', 1),
+    },
+    {
+      id: 'taxi', name: 'Городское такси', icon: '🚕', cat: 'vehicles',
       desc: 'Классическое жёлтое такси с шашечками на крыше, детальными фарами, номерами CITY и зеркалами.',
       create: () => createUrbanVehicle('taxi', 1),
     },
     {
-      id: 'scooter',
-      name: 'Курьерский скутер',
-      icon: '🛵',
-      cat: 'vehicles',
+      id: 'scooter', name: 'Курьерский скутер', icon: '🛵', cat: 'vehicles',
       desc: 'Манёвренный скутер: за рулём курьер в шлеме и яркой куртке, сзади термосумка FOOD HOT.',
       create: () => createUrbanVehicle('scooter', 1),
     },
     {
-      id: 'bus',
-      name: 'Рейсовый автобус',
-      icon: '🚌',
-      cat: 'vehicles',
+      id: 'bus', name: 'Рейсовый автобус', icon: '🚌', cat: 'vehicles',
       desc: 'Трёхосный автобус с двустворчатыми дверями, янтарным табло ROUTE 42, надписью CITY TRANSIT и блоками AC.',
       create: () => createUrbanVehicle('bus', 1),
     },
     {
-      id: 'sweeper',
-      name: 'Уборочная машина',
-      icon: '🚜',
-      cat: 'vehicles',
+      id: 'sweeper', name: 'Уборочная машина', icon: '🚜', cat: 'vehicles',
       desc: 'Коммунальная машина с вращающимися коническими щётками, маячком и рельефной надписью STREET SWEEP.',
       create: () => createUrbanVehicle('sweeper', 1),
     },
     {
-      id: 'train',
-      name: 'Скоростной поезд',
-      icon: '🚄',
-      cat: 'vehicles',
+      id: 'train', name: 'Скоростной поезд', icon: '🚄', cat: 'vehicles',
       desc: 'Высокоскоростной экспресс Сапсан с клиновидным носом, пантографом, вагоном CITY EXPRESS и мощным лучом прожектора.',
       create: () => createUrbanTrain(1),
     },
     {
-      id: 'pallet',
-      name: 'Речной поддон',
-      icon: '🪵',
-      cat: 'vehicles',
+      id: 'pallet', name: 'Речной поддон', icon: '🪵', cat: 'vehicles',
       desc: 'Деревянный европоддон с опорными брусьями и клеймом PALLET. Плавает по реке с белым пенным следом.',
       create: () => createUrbanPallet({ id: 1, x: 0, length: 2.4, speed: 1 }),
     },
@@ -171,14 +163,6 @@ export function getPropModelItems(): ModelCatalogItem[] {
       cat: 'props',
       desc: 'Металлическое дорожное ограждение с опорными столбиками и светоотражателями.',
       create: (b: BiomeType = 'forest') => createUrbanRoadBarrier(b),
-    },
-    {
-      id: 'markings',
-      name: 'Дорожная разметка',
-      icon: '➖',
-      cat: 'props',
-      desc: 'Белая сплошная краевая полоса дорожной разметки проезжей части.',
-      create: () => createUrbanRoadMarkings(),
     },
     {
       id: 'riverbank',

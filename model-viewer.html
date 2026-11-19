@@ -1884,7 +1884,7 @@ function addCharVoxel(
   }
 }
 
-// --- Module: src/view/urbanVehicles.ts ---
+// --- Module: src/view/urbanVehiclesExpansionA.ts ---
 function buildTaxi(color         = 0xfacc15)                   {
   const taxiYellow = 0xfacc15;
   const c = color === 0xeab308 || color === 0xfacc15 || !color ? taxiYellow : color;
@@ -2003,9 +2003,7 @@ function buildTaxi(color         = 0xfacc15)                   {
   }
 
   return specs;
-}
-
-function buildScooter(color         = 0x84cc16)                   {
+}function buildScooter(color         = 0x84cc16)                   {
   const limeGreen = color === 0x3b82f6 || !color ? 0x84cc16 : color;
   const darkGreen = 0x3f6212;
   const bagGreen = 0x22c55e;
@@ -2124,7 +2122,7 @@ function buildScooter(color         = 0x84cc16)                   {
   ];
 }
 
-
+// --- Module: src/view/urbanVehiclesExpansionB.ts ---
 function buildBus(_color        )                   {
   const transitGreen = 0x16a34a;
   const roofGreen = 0x15803d;
@@ -2265,9 +2263,7 @@ function buildBus(_color        )                   {
     [0.36, 0.02, 0.34, 0.42, 1.11, 0, acVent],
     [0.36, 0.02, 0.34, -0.42, 1.11, 0, acVent],
   ];
-}
-
-function buildSweeper(color        )                   {
+}function buildSweeper(color        )                   {
   const cabOrange = color || 0xf97316;
   const hopperGrey = 0x475569;
   const hopperDark = 0x334155;
@@ -2413,6 +2409,207 @@ function buildSweeper(color        )                   {
   return specs;
 }
 
+// --- Module: src/view/urbanVehiclesExpansion.ts ---
+/** Model: Sports Sedan Car with Rear Spoiler (87 cubes) */function buildCar(color         = 0x2563eb)                   {
+  const c = !color ? 0x2563eb : color;
+  return [
+    [1.1650, 0.08, 0.5250, 0.00, 0.1625, 0.00, 0x0f172a],
+    [0.0450, 0.0650, 0.6250, 0.40, 0.15, 0.00, 0x334155],
+    [0.0450, 0.0650, 0.6250, -0.40, 0.15, 0.00, 0x334155],
+    [0.1750, 0.2275, 0.12, 0.40, 0.1138, -0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, 0.5050, 0.1150, -0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, 0.2950, 0.1150, -0.3025, 0x0f172a],
+    [0.1050, 0.1150, 0.0150, 0.40, 0.1150, -0.3650, 0xcbd5e1],
+    [0.05, 0.0550, 0.0150, 0.4125, 0.1550, -0.36, 0xef4444],
+    [0.1750, 0.2275, 0.12, 0.40, 0.1138, 0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, 0.5050, 0.1150, 0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, 0.2950, 0.1150, 0.3025, 0x0f172a],
+    [0.1050, 0.1150, 0.0150, 0.40, 0.1150, 0.3650, 0xcbd5e1],
+    [0.05, 0.0550, 0.0150, 0.4125, 0.1550, 0.36, 0xef4444],
+    [0.1750, 0.2275, 0.12, -0.40, 0.1138, -0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, -0.2950, 0.1150, -0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, -0.5050, 0.1150, -0.3025, 0x0f172a],
+    [0.1050, 0.1150, 0.0150, -0.40, 0.1150, -0.3650, 0xcbd5e1],
+    [0.05, 0.0550, 0.0150, -0.3875, 0.1550, -0.36, 0xef4444],
+    [0.1750, 0.2275, 0.12, -0.40, 0.1138, 0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, -0.2950, 0.1150, 0.3025, 0x0f172a],
+    [0.0450, 0.1450, 0.10, -0.5050, 0.1150, 0.3025, 0x0f172a],
+    [0.1050, 0.1150, 0.0150, -0.40, 0.1150, 0.3650, 0xcbd5e1],
+    [0.05, 0.0550, 0.0150, -0.3875, 0.1550, 0.36, 0xef4444],
+    [0.4950, 0.1050, 0.1150, 0.00, 0.1850, -0.29, 0x1d4ed8],
+    [0.4950, 0.1050, 0.1150, 0.00, 0.1850, 0.29, 0x1d4ed8],
+    [0.3550, 0.1350, 0.13, 0.4150, 0.29, -0.3025, c],
+    [0.3550, 0.1350, 0.13, 0.4150, 0.29, 0.3025, c],
+    [0.3550, 0.14, 0.13, -0.4150, 0.2925, -0.3025, c],
+    [0.3550, 0.14, 0.13, -0.4150, 0.2925, 0.3025, c],
+    [0.4850, 0.14, 0.1150, 0.00, 0.2975, -0.30, c],
+    [0.4850, 0.14, 0.1150, 0.00, 0.2975, 0.30, c],
+    [0.07, 0.1050, 0.5150, 0.6075, 0.21, 0.00, 0x1d4ed8],
+    [0.4150, 0.1150, 0.4950, 0.40, 0.3050, 0.00, c],
+    [0.3650, 0.0250, 0.2650, 0.39, 0.3650, 0.00, 0x1d4ed8],
+    [0.07, 0.1050, 0.5150, -0.6075, 0.21, 0.00, 0x1d4ed8],
+    [0.4150, 0.11, 0.4950, -0.40, 0.2975, 0.00, c],
+    [0.0450, 0.0750, 0.0350, -0.55, 0.3850, -0.1550, 0x0f172a],
+    [0.0450, 0.0750, 0.0350, -0.55, 0.3850, 0.1550, 0x0f172a],
+    [0.1350, 0.03, 0.4650, -0.56, 0.4325, 0.00, c],
+    [0.4650, 0.0350, 0.02, 0.00, 0.1750, -0.3525, 0x0f172a],
+    [0.4650, 0.0350, 0.02, 0.00, 0.1750, 0.3525, 0x0f172a],
+    [0.07, 0.03, 0.02, 0.1125, 0.3175, -0.3575, 0x0f172a],
+    [0.07, 0.03, 0.02, -0.1125, 0.3175, -0.3575, 0x0f172a],
+    [0.07, 0.03, 0.02, 0.1125, 0.3175, 0.3575, 0x0f172a],
+    [0.07, 0.03, 0.02, -0.1125, 0.3175, 0.3575, 0x0f172a],
+    [0.0550, 0.04, 0.0150, -0.3850, 0.3025, -0.3650, 0x1d4ed8],
+    [0.04, 0.05, 0.4250, -0.6375, 0.1375, 0.00, 0x334155],
+    [0.0850, 0.2150, 0.4550, 0.17, 0.4650, 0.00, 0x38bdf8],
+    [0.0850, 0.23, 0.4550, -0.17, 0.4575, 0.00, 0x38bdf8],
+    [0.1250, 0.2050, 0.06, 0.07, 0.4650, -0.2625, 0x38bdf8],
+    [0.1050, 0.2050, 0.06, -0.08, 0.4650, -0.2625, 0x38bdf8],
+    [0.1250, 0.2050, 0.06, 0.07, 0.4650, 0.2625, 0x38bdf8],
+    [0.1050, 0.2050, 0.06, -0.08, 0.4650, 0.2625, 0x38bdf8],
+    [0.10, 0.2250, 0.08, 0.1725, 0.4650, -0.2575, c],
+    [0.10, 0.2250, 0.08, 0.1725, 0.4650, 0.2575, c],
+    [0.0450, 0.2150, 0.07, -0.01, 0.4650, -0.2625, c],
+    [0.0450, 0.2150, 0.07, -0.01, 0.4650, 0.2625, c],
+    [0.10, 0.23, 0.08, -0.1725, 0.4625, -0.2575, c],
+    [0.10, 0.23, 0.08, -0.1725, 0.4625, 0.2575, c],
+    [0.3250, 0.0550, 0.5150, 0.00, 0.59, 0.00, c],
+    [0.06, 0.04, 0.4850, 0.1875, 0.5875, 0.00, 0x1d4ed8],
+    [0.06, 0.04, 0.4850, -0.1875, 0.5875, 0.00, 0x1d4ed8],
+    [0.2550, 0.0250, 0.3950, 0.00, 0.6250, 0.00, 0x1d4ed8],
+    [0.14, 0.0350, 0.2850, 0.0275, 0.6250, 0.00, 0x0f172a],
+    [0.0750, 0.0950, 0.6850, 0.67, 0.1650, 0.00, 0x1d4ed8],
+    [0.07, 0.03, 0.7150, 0.6925, 0.1075, 0.00, 0x0f172a],
+    [0.04, 0.0650, 0.11, 0.6975, 0.16, -0.2925, 0x0f172a],
+    [0.04, 0.0650, 0.11, 0.6975, 0.16, 0.2925, 0x0f172a],
+    [0.04, 0.0650, 0.2550, 0.6975, 0.16, 0.00, 0x1d4ed8],
+    [0.0150, 0.0450, 0.1950, 0.72, 0.16, 0.00, 0xf8fafc],
+    [0.07, 0.0950, 0.3150, 0.6325, 0.2550, 0.00, 0x1e293b],
+    [0.0350, 0.06, 0.2750, 0.6650, 0.2575, 0.00, 0x94a3b8],
+    [0.06, 0.08, 0.0950, 0.6325, 0.2575, -0.22, 0xe0f2fe],
+    [0.06, 0.08, 0.0950, 0.6325, 0.2575, 0.22, 0xe0f2fe],
+    [0.05, 0.06, 0.06, 0.6325, 0.2575, -0.2925, 0xf97316],
+    [0.05, 0.06, 0.06, 0.6325, 0.2575, 0.2925, 0xf97316],
+    [0.0750, 0.0950, 0.6850, -0.67, 0.1650, 0.00, 0x1d4ed8],
+    [0.0550, 0.0350, 0.07, -0.7050, 0.1050, -0.1575, 0xcbd5e1],
+    [0.0550, 0.0350, 0.07, -0.7050, 0.1050, 0.1575, 0xcbd5e1],
+    [0.04, 0.0650, 0.2550, -0.6975, 0.16, 0.00, 0x1d4ed8],
+    [0.0150, 0.0450, 0.1950, -0.72, 0.16, 0.00, 0xf8fafc],
+    [0.06, 0.0750, 0.1250, -0.6325, 0.2650, -0.2550, 0xef4444],
+    [0.06, 0.0750, 0.1250, -0.6325, 0.2650, 0.2550, 0xef4444],
+    [0.06, 0.07, 0.1050, 0.1725, 0.4075, -0.34, c],
+    [0.02, 0.06, 0.0850, 0.1375, 0.4075, -0.3450, 0xcbd5e1],
+    [0.06, 0.07, 0.1050, 0.1725, 0.4075, 0.34, c],
+    [0.02, 0.06, 0.0850, 0.1375, 0.4075, 0.3450, 0xcbd5e1],
+  ];
+}
+
+/** Model: Box Delivery Van Truck (100 cubes) */function buildTruck(color         = 0x059669)                   {
+  const c = !color ? 0x059669 : color;
+  return [
+    [1.8150, 0.0750, 0.1150, -0.0350, 0.16, -0.1750, 0x0f172a],
+    [1.8150, 0.0750, 0.1150, -0.0350, 0.16, 0.1750, 0x0f172a],
+    [0.06, 0.05, 0.2650, 0.5925, 0.1575, 0.00, 0x0f172a],
+    [0.06, 0.05, 0.2650, 0.0425, 0.1575, 0.00, 0x0f172a],
+    [0.06, 0.05, 0.2650, -0.3425, 0.1575, 0.00, 0x0f172a],
+    [0.06, 0.06, 0.6850, 0.6925, 0.1425, 0.00, 0x334155],
+    [0.06, 0.06, 0.6850, -0.4925, 0.1425, 0.00, 0x334155],
+    [0.20, 0.2325, 0.13, 0.6925, 0.1163, -0.3225, 0x0f172a],
+    [0.05, 0.16, 0.11, 0.8125, 0.1225, -0.3225, 0x0f172a],
+    [0.05, 0.16, 0.11, 0.5725, 0.1225, -0.3225, 0x0f172a],
+    [0.12, 0.12, 0.0150, 0.6925, 0.1225, -0.39, 0xcbd5e1],
+    [0.20, 0.2325, 0.13, 0.6925, 0.1163, 0.3225, 0x0f172a],
+    [0.05, 0.16, 0.11, 0.8125, 0.1225, 0.3225, 0x0f172a],
+    [0.05, 0.16, 0.11, 0.5725, 0.1225, 0.3225, 0x0f172a],
+    [0.12, 0.12, 0.0150, 0.6925, 0.1225, 0.39, 0xcbd5e1],
+    [0.20, 0.2325, 0.15, -0.4925, 0.1163, -0.3225, 0x0f172a],
+    [0.05, 0.16, 0.13, -0.3725, 0.1225, -0.3225, 0x0f172a],
+    [0.05, 0.16, 0.13, -0.6125, 0.1225, -0.3225, 0x0f172a],
+    [0.12, 0.12, 0.02, -0.4925, 0.1225, -0.4025, 0xcbd5e1],
+    [0.20, 0.2325, 0.15, -0.4925, 0.1163, 0.3225, 0x0f172a],
+    [0.05, 0.16, 0.13, -0.3725, 0.1225, 0.3225, 0x0f172a],
+    [0.05, 0.16, 0.13, -0.6125, 0.1225, 0.3225, 0x0f172a],
+    [0.12, 0.12, 0.02, -0.4925, 0.1225, 0.4025, 0xcbd5e1],
+    [0.5750, 0.0850, 0.1550, 0.0750, 0.1450, -0.3150, 0x334155],
+    [0.28, 0.0850, 0.1550, 0.2025, 0.1450, 0.3150, 0x334155],
+    [0.23, 0.0850, 0.1550, -0.1275, 0.1450, 0.3150, 0x0f172a],
+    [0.03, 0.14, 0.16, -0.6575, 0.1275, -0.3225, 0x0f172a],
+    [0.03, 0.14, 0.16, -0.6575, 0.1275, 0.3225, 0x0f172a],
+    [0.44, 0.05, 0.7150, 0.6725, 0.2125, 0.00, 0x047857],
+    [0.15, 0.15, 0.13, 0.7475, 0.2975, -0.3125, 0x047857],
+    [0.15, 0.15, 0.13, 0.7475, 0.2975, 0.3125, 0x047857],
+    [0.0950, 0.0450, 0.05, 0.53, 0.14, -0.3675, 0x94a3b8],
+    [0.0950, 0.0450, 0.05, 0.53, 0.14, 0.3675, 0x94a3b8],
+    [0.22, 0.1650, 0.1050, 0.5675, 0.31, -0.3150, c],
+    [0.22, 0.1650, 0.1050, 0.5675, 0.31, 0.3150, c],
+    [0.04, 0.03, 0.0150, 0.5025, 0.3575, -0.37, 0x0f172a],
+    [0.04, 0.03, 0.0150, 0.5025, 0.3575, 0.37, 0x0f172a],
+    [0.18, 0.16, 0.5050, 0.8225, 0.3125, 0.00, c],
+    [0.15, 0.0350, 0.3250, 0.8175, 0.3950, 0.00, 0x047857],
+    [0.0650, 0.1050, 0.7750, 0.94, 0.17, 0.00, 0x94a3b8],
+    [0.06, 0.03, 0.5250, 0.9325, 0.1075, 0.00, 0x0f172a],
+    [0.05, 0.1250, 0.12, 0.9575, 0.17, -0.3325, 0x334155],
+    [0.05, 0.1250, 0.12, 0.9575, 0.17, 0.3325, 0x334155],
+    [0.03, 0.0650, 0.2550, 0.9725, 0.1650, 0.00, 0x1d4ed8],
+    [0.0150, 0.0450, 0.1950, 0.99, 0.1650, 0.00, 0xf8fafc],
+    [0.0450, 0.13, 0.3850, 0.92, 0.2825, 0.00, 0x1e293b],
+    [0.03, 0.10, 0.3450, 0.9375, 0.2825, 0.00, 0x94a3b8],
+    [0.04, 0.09, 0.1150, 0.9175, 0.2825, -0.2650, 0xe0f2fe],
+    [0.04, 0.09, 0.1150, 0.9175, 0.2825, 0.2650, 0xe0f2fe],
+    [0.0950, 0.26, 0.4950, 0.71, 0.5125, 0.00, 0x38bdf8],
+    [0.21, 0.25, 0.09, 0.5675, 0.5125, -0.2975, 0x38bdf8],
+    [0.21, 0.25, 0.09, 0.5675, 0.5125, 0.2975, 0x38bdf8],
+    [0.11, 0.27, 0.1150, 0.7125, 0.5125, -0.30, c],
+    [0.11, 0.27, 0.1150, 0.7125, 0.5125, 0.30, c],
+    [0.0350, 0.27, 0.1150, 0.47, 0.5125, -0.30, c],
+    [0.0350, 0.27, 0.1150, 0.47, 0.5125, 0.30, c],
+    [0.2850, 0.0650, 0.7250, 0.60, 0.6650, 0.00, c],
+    [0.04, 0.05, 0.7050, 0.7525, 0.6625, 0.00, 0x047857],
+    [0.0450, 0.0250, 0.08, 0.7350, 0.7050, -0.1725, 0xf97316],
+    [0.0450, 0.0250, 0.0850, 0.7350, 0.7050, 0.00, 0xf97316],
+    [0.0450, 0.0250, 0.08, 0.7350, 0.7050, 0.1725, 0xf97316],
+    [0.19, 0.13, 0.6850, 0.5475, 0.7575, 0.00, 0xf8fafc],
+    [0.1150, 0.1750, 0.6450, 0.5050, 0.9050, 0.00, 0xf8fafc],
+    [0.0450, 0.04, 0.0650, 0.6850, 0.4625, -0.3850, 0x0f172a],
+    [0.07, 0.18, 0.05, 0.6825, 0.5025, -0.3975, c],
+    [0.0150, 0.16, 0.04, 0.6450, 0.5025, -0.3975, 0xcbd5e1],
+    [0.0450, 0.04, 0.0650, 0.6850, 0.4625, 0.3850, 0x0f172a],
+    [0.07, 0.18, 0.05, 0.6825, 0.5025, 0.3975, c],
+    [0.0150, 0.16, 0.04, 0.6450, 0.5025, 0.3975, 0xcbd5e1],
+    [1.38, 0.89, 0.8150, -0.2225, 0.6375, 0.00, 0xf8fafc],
+    [1.3650, 0.02, 0.8050, -0.2250, 1.0875, 0.00, 0xf8fafc],
+    [1.3450, 0.05, 0.0150, -0.2250, 0.2475, -0.41, 0x94a3b8],
+    [1.3450, 0.05, 0.0150, -0.2250, 0.2475, 0.41, 0x94a3b8],
+    [1.3550, 0.0350, 0.0250, -0.2250, 1.0750, -0.4050, 0x334155],
+    [1.3550, 0.0350, 0.0250, -0.2250, 1.0750, 0.4050, 0x334155],
+    [1.2150, 0.08, 0.01, -0.2350, 0.6525, -0.4075, c],
+    [1.2150, 0.08, 0.01, -0.2350, 0.6525, 0.4075, c],
+    [0.0250, 0.8150, 0.38, -0.92, 0.6350, -0.1975, 0xf8fafc],
+    [0.0250, 0.8150, 0.38, -0.92, 0.6350, 0.1975, 0xf8fafc],
+    [0.0150, 0.83, 0.0250, -0.9350, 0.6375, 0.00, 0x0f172a],
+    [0.0250, 0.79, 0.03, -0.94, 0.6375, -0.2075, 0xcbd5e1],
+    [0.0250, 0.79, 0.03, -0.94, 0.6375, 0.2075, 0xcbd5e1],
+    [0.02, 0.05, 0.07, -0.9575, 0.5375, -0.1975, 0x0f172a],
+    [0.02, 0.05, 0.07, -0.9575, 0.5375, 0.1975, 0x0f172a],
+    [0.0250, 0.05, 0.03, -0.93, 0.9475, -0.3875, 0x0f172a],
+    [0.0250, 0.05, 0.03, -0.93, 0.3375, -0.3875, 0x0f172a],
+    [0.0250, 0.05, 0.03, -0.93, 0.9475, 0.3875, 0x0f172a],
+    [0.0250, 0.05, 0.03, -0.93, 0.3375, 0.3875, 0x0f172a],
+    [0.05, 0.06, 0.7650, -0.9575, 0.1425, 0.00, 0x94a3b8],
+    [0.0150, 0.06, 0.2550, -0.9850, 0.1525, 0.00, 0x1d4ed8],
+    [0.0150, 0.04, 0.1950, -0.9950, 0.1525, 0.00, 0xf8fafc],
+    [0.0150, 0.05, 0.12, -0.9850, 0.1425, -0.3025, 0xef4444],
+    [0.0150, 0.05, 0.12, -0.9850, 0.1425, 0.3025, 0xef4444],
+    [0.0250, 0.03, 0.06, -0.93, 1.0775, -0.3525, 0xef4444],
+    [0.0250, 0.03, 0.06, -0.93, 1.0775, 0.3525, 0xef4444],
+    [0.06, 0.04, 0.01, 0.3125, 0.3125, -0.4075, 0xf97316],
+    [0.06, 0.04, 0.01, 0.3125, 0.3125, 0.4075, 0xf97316],
+    [0.06, 0.04, 0.01, -0.7925, 0.3125, -0.4075, 0xef4444],
+    [0.06, 0.04, 0.01, -0.7925, 0.3125, 0.4075, 0xef4444],
+    [0.13, 0.04, 0.0350, 0.4575, 0.1125, 0.22, 0xcbd5e1],
+  ];
+}
+
+// --- Module: src/view/urbanVehiclesRailRiver.ts ---
 function buildTrain()                   {
   const whiteBody = 0xf1f5f9;
   const whiteRoof = 0xe2e8f0;
@@ -2551,9 +2748,7 @@ function buildTrain()                   {
     [0.06, 0.08, 0.08, -6.90, 0.28, 0.32, taillight, true],
     [0.06, 0.08, 0.08, -6.90, 0.28, -0.32, taillight, true],
   ];
-}
-
-function buildPallet(length        , biome            = 'forest')                   {
+}function buildPallet(length        , biome            = 'forest')                   {
   if (biome === 'winter') {
     // Winter: Ice floe / floating ice sheet with snowy surface (0xbae6fd, 0xe0f2fe, 0xf8fafc)
     const deepIce = 0x0369a1;  // Submerged keel
@@ -2685,8 +2880,11 @@ function buildPallet(length        , biome            = 'forest')               
   }
 
   return specs;
-}function createUrbanVehicle(
-  vOrType                                                           ,
+}
+
+// --- Module: src/view/urbanVehicles.ts ---
+function createUrbanVehicle(
+  vOrType                                                                             ,
   speed         ,
   colorOverride         
 )              {
@@ -2699,9 +2897,11 @@ function buildPallet(length        , biome            = 'forest')               
     spd = vOrType.speed;
     col = vOrType.color;
     if (vOrType.type === 'truck') {
-      type = Math.abs(vOrType.id) % 2 === 0 ? 'bus' : 'sweeper';
+      const variant = Math.abs(vOrType.id) % 3;
+      type = variant === 0 ? 'truck' : variant === 1 ? 'bus' : 'sweeper';
     } else {
-      type = Math.abs(vOrType.id) % 2 === 0 ? 'taxi' : 'scooter';
+      const variant = Math.abs(vOrType.id) % 3;
+      type = variant === 0 ? 'car' : variant === 1 ? 'taxi' : 'scooter';
     }
   } else {
     spd = speed ?? 1;
@@ -2720,6 +2920,8 @@ function buildPallet(length        , biome            = 'forest')               
       case 'scooter': specs = buildScooter(col); break;
       case 'bus': specs = buildBus(col); break;
       case 'sweeper': specs = buildSweeper(col); break;
+      case 'car': specs = buildCar(col); break;
+      case 'truck': specs = buildTruck(col); break;
       case 'taxi':
       default: specs = buildTaxi(col); break;
     }
@@ -2732,29 +2934,36 @@ function buildPallet(length        , biome            = 'forest')               
   group.add(mesh);
   group.rotation.y = vehicleScreenRotationY(spd);
   return group;
-}function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
+}
+function createUrbanTrain(lengthOrSpeed         = -1, speed         )              {
   const group = new THREE.Group();
-  const mesh = VoxelMeshBuilder.buildCachedMesh('train', (builder) => {
+  const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
+
+  const mesh = VoxelMeshBuilder.buildCachedMesh('urban_train', (builder) => {
     const specs = buildTrain();
     for (let i = 0; i < specs.length; i++) {
       const s = specs[i];
       builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
     }
   });
+
   group.add(mesh);
-  const actualSpeed = speed !== undefined ? speed : lengthOrSpeed;
   group.rotation.y = vehicleScreenRotationY(actualSpeed);
   return group;
-}function createUrbanPallet(log             , biome            = 'forest')              {
+}
+function createUrbanPallet(log             , biome            = 'forest')              {
   const group = new THREE.Group();
-  const key = `pallet_${biome}_${log.length.toFixed(2)}`;
+  const length = log.length ?? 3;
+  const key = `urban_pallet_${length}_${biome}`;
+
   const mesh = VoxelMeshBuilder.buildCachedMesh(key, (builder) => {
-    const specs = buildPallet(log.length, biome);
+    const specs = buildPallet(length, biome);
     for (let i = 0; i < specs.length; i++) {
       const s = specs[i];
       builder.addBox(s[0], s[1], s[2], s[3], s[4], s[5], s[6]);
     }
   });
+
   group.add(mesh);
   return group;
 }
@@ -2876,9 +3085,7 @@ const RAILWAY_SIGNAL_BOXES                                                      
   [0.205, 0.51, 0.02, -0.07, 1.535, -0.1125, 0x0f172a],
   [0.175, 0.47, 0.095, -0.07, 1.535, -0.06, 0x1e293b],
   [0.145, 0.08, 0.035, -0.07, 1.72, -0.155, 0x0f172a],
-  [0.11, 0.12, 0.035, -0.0675, 1.65, -0.13, 0xef4444],
   [0.145, 0.08, 0.035, -0.07, 1.48, -0.155, 0x0f172a],
-  [0.11, 0.12, 0.035, -0.0675, 1.41, -0.13, 0x22c55e],
   [0.05, 0.04, 0.065, 0.0375, 1.36, -0.03, 0x1e293b],
   [0.05, 0.04, 0.065, 0.0375, 1.68, -0.03, 0x1e293b],
   [0.015, 1.15, 0.015, 0.105, 0.685, 0.0425, 0x0f172a],
@@ -3024,20 +3231,7 @@ const RECORD_FLAG_BOXES                                                         
   [0.085, 0.035, 0.085, 0.0, 0.2325, 0.0, 0xf59e0b],
 ];
 
-// Model 12: Road Markings / Clean Zebra (8 cubes, Zero Z-Fighting Certified)
-const ROAD_MARKINGS_BOXES                                                                      = [
-  [0.15, 0.05, 0.785, -0.3475, 0.025, 0.0, 0xf8fafc],
-  [0.15, 0.05, 0.785, -0.1375, 0.025, 0.0, 0xf8fafc],
-  [0.15, 0.05, 0.785, 0.0725, 0.025, 0.0, 0xf8fafc],
-  [0.15, 0.05, 0.785, 0.2825, 0.025, 0.0, 0xf8fafc],
-  [0.82, 0.05, 0.035, -0.0325, 0.025, -0.415, 0xfacc15],
-  [0.82, 0.05, 0.035, -0.0325, 0.025, 0.415, 0xfacc15],
-  [0.025, 0.05, 0.325, -0.46, 0.025, 0.0, 0xf8fafc],
-  [0.025, 0.05, 0.325, 0.395, 0.025, 0.0, 0xf8fafc],
-];
-
-// Model 1: Tree Planter A (31 cubes, Terracotta & Vibrant Red Apples)
-const TREE_PLANTER_GEO                                                                      = [
+// Model 1: Tree Planter A (31 cubes, Terracotta & Vibrant Red Apples)const TREE_PLANTER_GEO                                                                      = [
   [0.1, 0.1, 0.1, -0.3425, 0.05, -0.3425, 'woodPlankDark'],
   [0.1, 0.1, 0.1, 0.3425, 0.05, -0.3425, 'woodPlankDark'],
   [0.1, 0.1, 0.1, -0.3425, 0.05, 0.3425, 'woodPlankDark'],
@@ -3069,9 +3263,7 @@ const TREE_PLANTER_GEO                                                          
   [0.07, 0.07, 0.015, 0.1625, 1.035, -0.39, 'appleRed'],
   [0.015, 0.07, 0.07, 0.36, 1.31, -0.0875, 'appleRed'],
   [0.015, 0.07, 0.07, -0.36, 1.335, 0.0975, 'appleRed'],
-];
-
-const TREE_PALETTES                                            = {
+];const TREE_PALETTES                                            = {
   forest: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x15803d, foliageMid: 0x16a34a, foliageLight: 0x22c55e, appleRed: 0xef4444 },
   winter: { woodPlankDark: 0x334155, woodPlankMid: 0x64748b, soilDark: 0x1e293b, trunkBark: 0x475569, foliageBase: 0x0f766e, foliageMid: 0x115e59, foliageLight: 0xf8fafc, appleRed: 0xef4444 },
   desert: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x854d0e, foliageMid: 0xa16207, foliageLight: 0xca8a04, appleRed: 0xdc2626 },
@@ -3167,11 +3359,6 @@ const HEDGE_PALETTES                                            = {
 }function populateRecordFlagBuilder(b                  )       {
   for (let i = 0; i < RECORD_FLAG_BOXES.length; i++) {
     const d = RECORD_FLAG_BOXES[i];
-    b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
-  }
-}function populateRoadMarkingsBuilder(b                  )       {
-  for (let i = 0; i < ROAD_MARKINGS_BOXES.length; i++) {
-    const d = ROAD_MARKINGS_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
 }function populateTreePlanterBuilder(b                  , biome            = 'forest')       {
@@ -3305,18 +3492,28 @@ function createUrbanCoin()              {
   return group;
 }
 
-/** Model 7: Railway Semaphore Mast & Signal Head (22 cubes, Grade A+ 10/10) */
-function createUrbanRailwaySignal()                                                {
+                                          
+                     
+                           
+                             
+                        
+ 
+
+/** Model 7: Railway Semaphore Mast & Signal Head (Grade A+ 10/10) */
+function createUrbanRailwaySignal()                          {
   const group = new THREE.Group();
   const mastMesh = VoxelMeshBuilder.buildCachedMesh('urban_railway_signal', populateRailwaySignalBuilder);
   group.add(mastMesh.clone());
 
-  // Dynamic warning light toggle (switched by SceneManager)
-  const lightMat = createVoxelBasicMaterial(0x334155);
-  const lightMesh = createVoxelMesh(0.18, 0.16, 0.08, lightMat, 0, 1.45, 0.12, false, false);
-  group.add(lightMesh);
+  const redMat = createVoxelBasicMaterial(0x3f1010);
+  const redLightMesh = createVoxelMesh(0.11, 0.12, 0.035, redMat, -0.0675, 1.65, -0.13, false, false);
 
-  return { group, lightMesh };
+  const greenMat = createVoxelBasicMaterial(0x22c55e);
+  const greenLightMesh = createVoxelMesh(0.11, 0.12, 0.035, greenMat, -0.0675, 1.41, -0.13, false, false);
+
+  group.add(redLightMesh, greenLightMesh);
+
+  return { group, redLightMesh, greenLightMesh, lightMesh: redLightMesh };
 }
 
 /** Model 11: Personal Best Record Flag (20 cubes, Grade A+ 10/10) */
@@ -3363,14 +3560,6 @@ function createUrbanRecordFlag()              {
   );
 
   group.add(clothGroup);
-  return group;
-}
-
-/** Model 12: Road Markings / Zebra Pedestrian Crossing (12 cubes, Grade A+ 10/10) */
-function createUrbanRoadMarkings()              {
-  const group = new THREE.Group();
-  const zebraMesh = VoxelMeshBuilder.buildCachedMesh('urban_road_markings', populateRoadMarkingsBuilder);
-  group.add(zebraMesh.clone());
   return group;
 }
 
@@ -4139,7 +4328,7 @@ class MeshFactory {
     return createUrbanCoin();
   }
 
-  static createRailwaySignal()                                                {
+  static createRailwaySignal()                          {
     return createUrbanRailwaySignal();
   }
 
@@ -4161,10 +4350,6 @@ class MeshFactory {
 
   static createWaterfallEdge(side                  , biome            = 'forest')              {
     return createUrbanRiverbankEdge(side, biome);
-  }
-
-  static createRoadMarkings()              {
-    return createUrbanRoadMarkings();
   }
 
   static createLaneDivider()              {
@@ -4224,50 +4409,42 @@ const SKIN_DESCRIPTIONS                         = {
 }function getVehicleModelItems()                     {
   return [
     {
-      id: 'taxi',
-      name: 'Городское такси',
-      icon: '🚕',
-      cat: 'vehicles',
+      id: 'car', name: 'Спортивный седан', icon: '🚗', cat: 'vehicles',
+      desc: 'Динамичный синий седан с выразительным антикрылом, люком на крыше и спортивным сплиттером.',
+      create: () => createUrbanVehicle('car', 1),
+    },
+    {
+      id: 'truck', name: 'Фургон доставки', icon: '🚚', cat: 'vehicles',
+      desc: 'Белоснежный грузовой фургон с зелёной кабиной, распашными задними воротами и серебристым отбойником.',
+      create: () => createUrbanVehicle('truck', 1),
+    },
+    {
+      id: 'taxi', name: 'Городское такси', icon: '🚕', cat: 'vehicles',
       desc: 'Классическое жёлтое такси с шашечками на крыше, детальными фарами, номерами CITY и зеркалами.',
       create: () => createUrbanVehicle('taxi', 1),
     },
     {
-      id: 'scooter',
-      name: 'Курьерский скутер',
-      icon: '🛵',
-      cat: 'vehicles',
+      id: 'scooter', name: 'Курьерский скутер', icon: '🛵', cat: 'vehicles',
       desc: 'Манёвренный скутер: за рулём курьер в шлеме и яркой куртке, сзади термосумка FOOD HOT.',
       create: () => createUrbanVehicle('scooter', 1),
     },
     {
-      id: 'bus',
-      name: 'Рейсовый автобус',
-      icon: '🚌',
-      cat: 'vehicles',
+      id: 'bus', name: 'Рейсовый автобус', icon: '🚌', cat: 'vehicles',
       desc: 'Трёхосный автобус с двустворчатыми дверями, янтарным табло ROUTE 42, надписью CITY TRANSIT и блоками AC.',
       create: () => createUrbanVehicle('bus', 1),
     },
     {
-      id: 'sweeper',
-      name: 'Уборочная машина',
-      icon: '🚜',
-      cat: 'vehicles',
+      id: 'sweeper', name: 'Уборочная машина', icon: '🚜', cat: 'vehicles',
       desc: 'Коммунальная машина с вращающимися коническими щётками, маячком и рельефной надписью STREET SWEEP.',
       create: () => createUrbanVehicle('sweeper', 1),
     },
     {
-      id: 'train',
-      name: 'Скоростной поезд',
-      icon: '🚄',
-      cat: 'vehicles',
+      id: 'train', name: 'Скоростной поезд', icon: '🚄', cat: 'vehicles',
       desc: 'Высокоскоростной экспресс Сапсан с клиновидным носом, пантографом, вагоном CITY EXPRESS и мощным лучом прожектора.',
       create: () => createUrbanTrain(1),
     },
     {
-      id: 'pallet',
-      name: 'Речной поддон',
-      icon: '🪵',
-      cat: 'vehicles',
+      id: 'pallet', name: 'Речной поддон', icon: '🪵', cat: 'vehicles',
       desc: 'Деревянный европоддон с опорными брусьями и клеймом PALLET. Плавает по реке с белым пенным следом.',
       create: () => createUrbanPallet({ id: 1, x: 0, length: 2.4, speed: 1 }),
     },
@@ -4337,14 +4514,6 @@ const SKIN_DESCRIPTIONS                         = {
       cat: 'props',
       desc: 'Металлическое дорожное ограждение с опорными столбиками и светоотражателями.',
       create: (b            = 'forest') => createUrbanRoadBarrier(b),
-    },
-    {
-      id: 'markings',
-      name: 'Дорожная разметка',
-      icon: '➖',
-      cat: 'props',
-      desc: 'Белая сплошная краевая полоса дорожной разметки проезжей части.',
-      create: () => createUrbanRoadMarkings(),
     },
     {
       id: 'riverbank',

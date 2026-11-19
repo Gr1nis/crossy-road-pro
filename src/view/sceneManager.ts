@@ -34,6 +34,8 @@ interface RenderedLane {
   logMeshes: Map<number, THREE.Object3D>;
   coinMeshes: Map<number, THREE.Object3D>;
   trainMesh?: THREE.Object3D;
+  redSignalLight?: THREE.Mesh;
+  greenSignalLight?: THREE.Mesh;
   signalLight?: THREE.Mesh;
   waterRipples?: THREE.Mesh[];
   decorTrees?: DecorTreeItem[];
@@ -596,8 +598,6 @@ export class SceneManager {
     group.add(ground);
 
     if (lane.type === LaneType.ROAD) {
-      const roadMarkings = MeshFactory.createRoadMarkings();
-      group.add(roadMarkings);
       if (hasNextRoad) {
         // Pooled divider dashes (replaces MeshFactory.createLaneDivider())
         group.add(LaneGeometryPool.createLaneDivider());
@@ -687,11 +687,10 @@ export class SceneManager {
     for (const item of details) {
       const treeX = item.x;
       const screenX = worldToScreenX(treeX);
-      if (item.kind === 'rock') {
-        decorRocks.push({ x: screenX, y: 0, z: lane.index, scale: 1 });
-      } else {
-        decorTrees.push({ x: screenX, y: 0, z: lane.index, scale: 1, rotation: 0 });
-      }
+      const seed = lane.index * 31 + Math.round(treeX * 10);
+      const obs = MeshFactory.createObstacle(item.kind, seed, biome);
+      obs.position.set(screenX, 0, 0);
+      group.add(obs);
     }
 
     for (const v of lane.vehicles) {
@@ -709,11 +708,15 @@ export class SceneManager {
     }
 
     let trainMesh: THREE.Object3D | undefined;
+    let redSignalLight: THREE.Mesh | undefined;
+    let greenSignalLight: THREE.Mesh | undefined;
     let signalLight: THREE.Mesh | undefined;
     if (lane.type === LaneType.RAILWAY && lane.train) {
       const sig = MeshFactory.createRailwaySignal();
       sig.group.position.set(worldToScreenX(-2.5), 0, -0.38);
       group.add(sig.group);
+      redSignalLight = sig.redLightMesh;
+      greenSignalLight = sig.greenLightMesh;
       signalLight = sig.lightMesh;
 
       trainMesh = MeshFactory.createTrain(lane.train.length, lane.train.speed);
@@ -729,6 +732,8 @@ export class SceneManager {
       logMeshes,
       coinMeshes,
       trainMesh,
+      redSignalLight,
+      greenSignalLight,
       signalLight,
       waterRipples,
       decorTrees,
@@ -865,13 +870,20 @@ export class SceneManager {
         }
       }
 
-      if (lane.train && rendered.trainMesh && rendered.signalLight) {
+      if (lane.train && rendered.trainMesh && rendered.redSignalLight && rendered.greenSignalLight) {
         rendered.trainMesh.visible = lane.train.isPassing;
         rendered.trainMesh.position.x = worldToScreenX(lane.train.x);
-        const blink = lane.train.isWarning && Math.floor(performance.now() / 120) % 2 === 0;
-        (rendered.signalLight.material as THREE.MeshBasicMaterial).color.setHex(
-          blink ? 0xef4444 : 0x334155
-        );
+        const isAlert = lane.train.isWarning || lane.train.isPassing;
+        if (isAlert) {
+          (rendered.greenSignalLight.material as THREE.MeshBasicMaterial).color.setHex(0x0f3818);
+          const redBlink = lane.train.isPassing || Math.floor(performance.now() / 120) % 2 === 0;
+          (rendered.redSignalLight.material as THREE.MeshBasicMaterial).color.setHex(
+            redBlink ? 0xef4444 : 0x3f1010
+          );
+        } else {
+          (rendered.greenSignalLight.material as THREE.MeshBasicMaterial).color.setHex(0x22c55e);
+          (rendered.redSignalLight.material as THREE.MeshBasicMaterial).color.setHex(0x3f1010);
+        }
       }
     }
 
