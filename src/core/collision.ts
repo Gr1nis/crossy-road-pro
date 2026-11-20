@@ -102,17 +102,22 @@ export function getCameraFrustumDimensions(aspect: number = 9 / 16): {
 }
 
 /**
- * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
- * of the player character under the isometric orthographic camera.
+ * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the player character's lane
+ * under the isometric orthographic camera.
+ *
+ * To ensure the death boundary runs strictly PARALLEL TO THE LANES (rather than cutting diagonally
+ * across the screen due to isometric tilt), this projects the lane's reference center (X = 0).
+ * This guarantees uniform row-based death regardless of whether the player is in the left corner,
+ * center, or right of the screen.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
  */
 export function getCameraFrustumNdcY(
-  playerX: number,
+  _playerX: number,
   playerRow: number,
   camZ: number,
   aspect: number = 9 / 16
 ): number {
-  const sx = -playerX + 0.35;
+  const sx = 0.35; // Aligned to lane axis (X = 0) so the death line is parallel to the lanes
   const sy = 0.65;
   const sz = playerRow + 0.35;
   const dx = sx - WORLD_CONFIG.CAMERA_OFFSET.X;

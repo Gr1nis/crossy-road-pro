@@ -6,16 +6,18 @@ import { LaneType, type LaneTypeValue } from '../core/types.ts';
  * Eliminates GPU VRAM memory leaks and GC spikes during lane generation & eviction.
  */
 export class LaneGeometryPool {
-  // Pre-allocated static geometries (5 fixed ground and rail meshes)
+  // Pre-allocated static geometries (6 fixed ground, rail and divider meshes)
   public static readonly grassStripGeo = new THREE.BoxGeometry(80, 0.24, 1);
   public static readonly roadStripGeo = new THREE.BoxGeometry(80, 0.16, 1);
   public static readonly riverStripGeo = new THREE.BoxGeometry(80, 0.08, 1);
   public static readonly railStripGeo = new THREE.BoxGeometry(80, 0.2, 1);
   public static readonly railGeo = new THREE.BoxGeometry(80, 0.06, 0.08);
+  public static readonly dividerGeo = new THREE.BoxGeometry(0.65, 0.02, 0.08);
 
-  // Cached materials for rails
+  // Cached materials for rails and dividers
   public static readonly railMatDefault = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
   public static readonly railMatNeon = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
+  public static readonly dividerMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
 
   // Cached strip materials map (stripColor -> material)
   private static readonly stripMaterials = new Map<number, THREE.MeshLambertMaterial>();
@@ -27,11 +29,13 @@ export class LaneGeometryPool {
     LaneGeometryPool.riverStripGeo,
     LaneGeometryPool.railStripGeo,
     LaneGeometryPool.railGeo,
+    LaneGeometryPool.dividerGeo,
   ]);
 
   private static readonly sharedMaterials = new Set<THREE.Material>([
     LaneGeometryPool.railMatDefault,
     LaneGeometryPool.railMatNeon,
+    LaneGeometryPool.dividerMat,
   ]);
 
   public static getGroundGeometry(laneType: LaneTypeValue): THREE.BoxGeometry {
@@ -60,6 +64,16 @@ export class LaneGeometryPool {
 
   public static getRailMaterial(isNeon: boolean): THREE.MeshLambertMaterial {
     return isNeon ? LaneGeometryPool.railMatNeon : LaneGeometryPool.railMatDefault;
+  }
+
+  public static createLaneDivider(): THREE.Group {
+    const group = new THREE.Group();
+    for (let x = -8.5; x <= 8.5; x += 1.6) {
+      const dash = new THREE.Mesh(LaneGeometryPool.dividerGeo, LaneGeometryPool.dividerMat);
+      dash.position.set(x, 0.015, 0.5);
+      group.add(dash);
+    }
+    return group;
   }
 
   public static isSharedGeometry(geometry: THREE.BufferGeometry | null | undefined): boolean {

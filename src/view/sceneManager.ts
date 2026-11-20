@@ -596,7 +596,9 @@ export class SceneManager {
     group.add(ground);
 
     if (lane.type === LaneType.ROAD) {
-      // Clean dark asphalt with zero crossings/dividers
+      if (hasNextRoad) {
+        group.add(MeshFactory.createLaneDivider());
+      }
       for (const xPos of [-10.2, 10.2]) {
         const barrier = MeshFactory.createRoadBarrier(biome);
         barrier.position.set(worldToScreenX(xPos), 0, 0);

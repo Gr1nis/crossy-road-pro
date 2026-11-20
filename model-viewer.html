@@ -208,19 +208,23 @@ const LaneType = {
   ROAD: 'ROAD',
   RIVER: 'RIVER',
   RAILWAY: 'RAILWAY',
-}         ;const MoveDirection = {
+}         ;
+const MoveDirection = {
   FORWARD: 'FORWARD',
   BACKWARD: 'BACKWARD',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
-}         ;const DeathReason = {
+}         ;
+const DeathReason = {
   NONE: 'NONE',
   CAR: 'CAR',
   TRAIN: 'TRAIN',
   WATER: 'WATER',
   OUT_OF_BOUNDS: 'OUT_OF_BOUNDS',
   CAMERA_BEHIND: 'CAMERA_BEHIND',
-}         ;const DEFAULT_SKIN_ID         = 'corgi';const ALL_SKINS                                                             = [
+}         ;
+const DEFAULT_SKIN_ID         = 'corgi';
+const ALL_SKINS                                                             = [
   { id: 'corgi', name: 'Весёлый Корги', badge: '🐶' },
   { id: 'pigeon_pizza', name: 'Пицца-Голубь', badge: '🐦' },
   { id: 'barista_pug', name: 'Бариста-Мопс', badge: '☕' },
@@ -241,21 +245,26 @@ const LaneType = {
   { id: 'gingerbread_man', name: 'Пряничный человечек', badge: '🍪' },
   { id: 'reindeer_glow', name: 'Олень Рудольф', badge: '🦌' },
   { id: 'santa_claus', name: 'Дедушка Санта', badge: '🎅' },
-];const Biome = {
+];
+const Biome = {
   FOREST: 'forest',
   WINTER: 'winter',
   DESERT: 'desert',
   NEON: 'neon',
-}         ;const BIOME_ORDER                           = [
+}         ;
+const BIOME_ORDER                           = [
   Biome.FOREST,
   Biome.WINTER,
   Biome.DESERT,
   Biome.NEON,
-];const BIOME_INTERVAL = 25;function getBiomeForScore(score        )            {
+];
+const BIOME_INTERVAL = 25;
+function getBiomeForScore(score        )            {
   const safeScore = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
   const biomeIndex = Math.floor(safeScore / BIOME_INTERVAL) % BIOME_ORDER.length;
   return BIOME_ORDER[biomeIndex];
-}const WORLD_CONFIG = {
+}
+const WORLD_CONFIG = {
   MIN_X: -9,
   MAX_X: 9,
   OUT_OF_BOUNDS_X: 9.6,
@@ -285,7 +294,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
     }
   }
   return null;
-}function findSupportingLog(playerX        , logs               )                     {
+}
+function findSupportingLog(playerX        , logs               )                     {
   for (const log of logs) {
     const halfLen = log.length / 2 + WORLD_CONFIG.LOG_MARGIN;
     if (Math.abs(playerX - log.x) <= halfLen) {
@@ -298,16 +308,19 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Snaps candidate landing X on a log to the nearest discrete segment slot [-1.0, 0, +1.0]
  * relative to the center of the log, so the character cleanly magnets to a log section.
- */function snapToLogSlot(landingX        , log             )         {
+ */
+function snapToLogSlot(landingX        , log             )         {
   const rel = landingX - log.x;
   // Discrete 1.0-spaced slots centered on log
   const snappedRel = Math.round(rel);
   const maxRel = Math.max(0, (log.length - 1.0) / 2);
   const clampedRel = Math.max(-maxRel, Math.min(maxRel, snappedRel));
   return log.x + clampedRel;
-}function isOutOfBoundsX(playerX        )          {
+}
+function isOutOfBoundsX(playerX        )          {
   return Math.abs(playerX) > WORLD_CONFIG.OUT_OF_BOUNDS_X;
-}function quantizeLandX(x        )         {
+}
+function quantizeLandX(x        )         {
   const rounded = Math.round(x);
   return Math.max(WORLD_CONFIG.MIN_X, Math.min(WORLD_CONFIG.MAX_X, rounded));
 }
@@ -315,11 +328,15 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Maps logical world X coordinate to Three.js right-handed X coordinate
  * (where camera looks toward +Z, so screen-right is -X and screen-left is +X).
- */function worldToScreenX(x        )         {
+ */
+function worldToScreenX(x        )         {
   return x === 0 ? 0 : -x;
-}function vehicleScreenRotationY(speed        )         {
+}
+function vehicleScreenRotationY(speed        )         {
   return speed > 0 ? Math.PI : 0;
-}const RECORD_FLAG_X = 3.8;function getRecordFlagPosition(
+}
+const RECORD_FLAG_X = 3.8;
+function getRecordFlagPosition(
   highScore        ,
   shoulderX         = RECORD_FLAG_X
 )                            {
@@ -330,14 +347,16 @@ function checkVehicleCollision(playerX        , vehicles           )            
     x: shoulderX,
     row: Math.floor(highScore),
   };
-}const CAMERA_CONFIG = {
+}
+const CAMERA_CONFIG = {
   MOBILE_VIEW_HEIGHT: 15.0,
   DESKTOP_VIEW_HEIGHT: 12.5,
   PLAYER_SCREEN_Y_RATIO: 0.28,
   BASE_PLAYER_VIEW_Y: -0.44,
   MAX_PAN_CORRIDOR_HALF: 10.0,
   FRUSTUM_EDGE_NDC_THRESHOLD: -0.98,
-}         ;function getCameraFrustumDimensions(aspect         = 9 / 16)   
+}         ;
+function getCameraFrustumDimensions(aspect         = 9 / 16)   
                      
                     
                  
@@ -356,16 +375,22 @@ function checkVehicleCollision(playerX        , vehicles           )            
 }
 
 /**
- * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the top-most visible vertex
- * of the player character under the isometric orthographic camera.
+ * Calculates normalized device coordinate (NDC) Y [-1.0..1.0] for the player character's lane
+ * under the isometric orthographic camera.
+ *
+ * To ensure the death boundary runs strictly PARALLEL TO THE LANES (rather than cutting diagonally
+ * across the screen due to isometric tilt), this projects the lane's reference center (X = 0).
+ * This guarantees uniform row-based death regardless of whether the player is in the left corner,
+ * center, or right of the screen.
  * -1.0 corresponds strictly to the bottom visible edge of the screen viewport.
- */function getCameraFrustumNdcY(
-  playerX        ,
+ */
+function getCameraFrustumNdcY(
+  _playerX        ,
   playerRow        ,
   camZ        ,
   aspect         = 9 / 16
 )         {
-  const sx = -playerX + 0.35;
+  const sx = 0.35; // Aligned to lane axis (X = 0) so the death line is parallel to the lanes
   const sy = 0.65;
   const sz = playerRow + 0.35;
   const dx = sx - WORLD_CONFIG.CAMERA_OFFSET.X;
@@ -382,7 +407,8 @@ function checkVehicleCollision(playerX        , vehicles           )            
 /**
  * Returns true when the player touches or crosses below the visible
  * bottom edge of the screen (NDC Y < -0.98).
- */function isPlayerBehindCameraFrustum(
+ */
+function isPlayerBehindCameraFrustum(
   playerX        ,
   playerRow        ,
   camZ        ,
@@ -519,7 +545,8 @@ const VOXEL_PALETTE = {
   woodBrown: 0x78350f, gingerbreadBrown: 0xb45309, firGreen: 0x15803d, goldBell: 0xfacc15,
   boneIvory: 0xe7e5e4, foxEarmuffCyan: 0x059669, rubyGlow: 0xef4444,
 
-}         ;class VoxelPalette {
+}         ;
+class VoxelPalette {
          static          geoCache = new Map                           ();
          static          matCache = new Map                                   ();
          static          basicMatCache = new Map                                 ();
@@ -621,18 +648,21 @@ for (const [w, h, d] of voxelStandardSizes) {
 for (const key of Object.keys(VOXEL_PALETTE)                   ) {
   VoxelPalette.getMaterial(key, false);
 }
-VoxelPalette.getGhostMaterial();function createVoxelMaterial(
+VoxelPalette.getGhostMaterial();
+function createVoxelMaterial(
   colorKey                        ,
   isGhost = false
 )                            {
   return VoxelPalette.getMaterial(colorKey, isGhost);
-}function createVoxelBasicMaterial(
+}
+function createVoxelBasicMaterial(
   color        ,
   transparent = false,
   opacity = 1.0
 )                          {
   return VoxelPalette.getBasicMaterial(color, transparent, opacity);
-}function createVoxelMesh(
+}
+function createVoxelMesh(
   w        ,
   h        ,
   d        ,
@@ -665,7 +695,8 @@ function addExpAVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}function createUrbanCharacterExpA(
+}
+function createUrbanCharacterExpA(
   skinId        ,
   isGhost = false,
   targetGroup              
@@ -856,7 +887,8 @@ function addExpBVoxel(
   const mat = VoxelPalette.getMaterial(color, isGhost);
   const mesh = createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost);
   group.add(mesh);
-}function createUrbanCharacterExpB(
+}
+function createUrbanCharacterExpB(
   skinId        ,
   isGhost = false,
   targetGroup              
@@ -1055,7 +1087,8 @@ function addXmasExpVoxel(
 )       {
   const mat = VoxelPalette.getMaterial(color, isGhost);
   group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
-}function createChristmasCharacterExp(
+}
+function createChristmasCharacterExp(
   skinId        ,
   isGhost = false,
   targetGroup              
@@ -1265,7 +1298,8 @@ function addXmasVoxel(
 )       {
   const mat = VoxelPalette.getMaterial(color, isGhost);
   group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
-}const CHRISTMAS_CHARACTER_CALIBRATIONS                                                = {
+}
+const CHRISTMAS_CHARACTER_CALIBRATIONS                                                = {
   penguin_cocoa: { scale: 1.35, offsetY: 0 },
   snow_hare: { scale: 1.10, offsetY: 0 },
   husky_sweater: { scale: 1.00, offsetY: 0 },
@@ -1276,7 +1310,8 @@ function addXmasVoxel(
   gingerbread_man: { scale: 1.35, offsetY: 0 },
   reindeer_glow: { scale: 1.20, offsetY: 0 },
   santa_claus: { scale: 1.35, offsetY: 0 },
-};function createChristmasCharacter(skinId        , isGhost = false)              {
+};
+function createChristmasCharacter(skinId        , isGhost = false)              {
   const root = new THREE.Group();
   root.name = 'char_root';
 
@@ -1470,7 +1505,8 @@ function addCharVoxel(
 )       {
   const mat = VoxelPalette.getMaterial(color, isGhost);
   group.add(createVoxelMesh(w, h, d, mat, x, y, z, !isGhost, !isGhost));
-}const URBAN_CHARACTER_CALIBRATIONS                                            = {
+}
+const URBAN_CHARACTER_CALIBRATIONS                                            = {
   corgi: { scale: 1.00, offsetY: 0 },
   pigeon_pizza: { scale: 1.05, offsetY: 0 },
   barista_pug: { scale: 1.38, offsetY: 0 },
@@ -1482,7 +1518,8 @@ function addCharVoxel(
   capybara_zen: { scale: 1.00, offsetY: 0 },
   pigeon_king: { scale: 1.14, offsetY: 0 },
   ...CHRISTMAS_CHARACTER_CALIBRATIONS,
-};function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
+};
+function createUrbanCharacter(skinId         = 'corgi', isGhost = false)              {
   const root = new THREE.Group();
   root.name = 'char_root';
 
@@ -1727,7 +1764,8 @@ function addCharVoxel(
 /**
  * VoxelMeshBuilder — Compiles multi-cube voxel structures into a single
  * monolithic BufferGeometry mesh with vertex colors, drastically reducing Draw Calls.
- */class VoxelMeshBuilder {
+ */
+class VoxelMeshBuilder {
                    boxes                                                                  = [];
           static          geoCache = new Map                              ();
           static sharedLambertMaterial                                   = null;
@@ -1885,7 +1923,8 @@ function addCharVoxel(
 }
 
 // --- Module: src/view/urbanVehiclesExpansionA.ts ---
-/** Model: NYC Checker Cab Taxi (94 cubes) */function buildTaxi(color         = 0xf59e0b)                   {
+/** Model: NYC Checker Cab Taxi (94 cubes) */
+function buildTaxi(color         = 0xf59e0b)                   {
   const c = !color ? 0xf59e0b : color;
   return [
     [1.285, 0.09, 0.525, -0, 0.1675, 0, 0x0f172a],
@@ -1985,7 +2024,8 @@ function addCharVoxel(
   ];
 }
 
-/** Model: Delivery Scooter with Rider & Cargo Box (78 cubes) */function buildScooter(color         = 0xea580c)                   {
+/** Model: Delivery Scooter with Rider & Cargo Box (78 cubes) */
+function buildScooter(color         = 0xea580c)                   {
   const c = !color ? 0xea580c : color;
   return [
     [0.11, 0.19, 0.065, 0.3725, 0.095, 0, 0x0f172a],
@@ -2070,7 +2110,8 @@ function addCharVoxel(
 }
 
 // --- Module: src/view/urbanVehiclesExpansionB.ts ---
-/** Model: Double-Deck Transit Bus (120 cubes) */function buildBus(color         = 0xdc2626)                   {
+/** Model: Double-Deck Transit Bus (120 cubes) */
+function buildBus(color         = 0xdc2626)                   {
   const c = !color ? 0xdc2626 : color;
   return [
     [2.615, 0.07, 0.115, -0.035, 0.1625, -0.175, 0x0f172a],
@@ -2196,7 +2237,8 @@ function addCharVoxel(
   ];
 }
 
-/** Model: Municipal Street Sweeper Truck (103 cubes) */function buildSweeper(color         = 0xea580c)                   {
+/** Model: Municipal Street Sweeper Truck (103 cubes) */
+function buildSweeper(color         = 0xea580c)                   {
   const c = !color ? 0xea580c : color;
   return [
     [1.135, 0.08, 0.465, -0.075, 0.1525, 0, 0x334155],
@@ -2306,7 +2348,8 @@ function addCharVoxel(
 }
 
 // --- Module: src/view/urbanVehiclesExpansion.ts ---
-/** Model: Sports Sedan Car with Rear Spoiler (87 cubes) */function buildCar(color         = 0x2563eb)                   {
+/** Model: Sports Sedan Car with Rear Spoiler (87 cubes) */
+function buildCar(color         = 0x2563eb)                   {
   const c = !color ? 0x2563eb : color;
   return [
     [1.165, 0.08, 0.525, -0, 0.1625, 0, 0x0f172a],
@@ -2399,7 +2442,8 @@ function addCharVoxel(
   ];
 }
 
-/** Model: Box Delivery Van Truck (100 cubes) */function buildTruck(color         = 0x059669)                   {
+/** Model: Box Delivery Van Truck (100 cubes) */
+function buildTruck(color         = 0x059669)                   {
   const c = !color ? 0x059669 : color;
   return [
     [1.815, 0.075, 0.115, -0.035, 0.16, -0.175, 0x0f172a],
@@ -2721,7 +2765,8 @@ const PALLET_BIOME_PALETTES                                            = {
   },
 };
 
-/** Model: EPAL-1 Euro Pallet with 4-Way Entry Tunnels and PALLET Brand Stamp (29 cubes) */function buildPallet(length        , biome            = 'forest')                   {
+/** Model: EPAL-1 Euro Pallet with 4-Way Entry Tunnels and PALLET Brand Stamp (29 cubes) */
+function buildPallet(length        , biome            = 'forest')                   {
   const pal = PALLET_BIOME_PALETTES[biome] ?? PALLET_BIOME_PALETTES.forest;
   const count = Math.max(1, Math.round(length));
   const halfSpan = (count - 1) * 0.5;
@@ -2844,7 +2889,8 @@ function createUrbanPallet(log             , biome            = 'forest')       
 }
 
 // --- Module: src/view/urbanEnvironmentExpansionA.ts ---
-// Model 3: Cast-Iron Fire Hydrant (22 cubes, Zero Z-Fighting Certified)const HYDRANT_BOXES                                                                      = [
+// Model 3: Cast-Iron Fire Hydrant (22 cubes, Zero Z-Fighting Certified)
+const HYDRANT_BOXES                                                                      = [
   [0.345, 0.07, 0.345, 0.0, 0.035, 0.0, 0xb91c1c],
   [0.06, 0.025, 0.06, -0.1375, 0.0725, -0.1375, 0xf59e0b],
   [0.06, 0.025, 0.06, 0.1375, 0.0725, -0.1375, 0xf59e0b],
@@ -2992,32 +3038,38 @@ const BARRIER_PALETTES                                            = {
   winter: { ironDark: 0x1e293b, postSteel: 0x475569, galvanizedLight: 0xe2e8f0, galvanizedShadow: 0x94a3b8, reflectorAmber: 0x38bdf8, reflectorRed: 0xef4444 },
   desert: { ironDark: 0x451a03, postSteel: 0x78350f, galvanizedLight: 0xfef08a, galvanizedShadow: 0xd97706, reflectorAmber: 0xf59e0b, reflectorRed: 0xdc2626 },
   neon: { ironDark: 0x0f172a, postSteel: 0x1e1b4b, galvanizedLight: 0x06b6d4, galvanizedShadow: 0x312e81, reflectorAmber: 0xf43f5e, reflectorRed: 0xd946ef },
-};function populateHydrantBuilder(b                  )       {
+};
+function populateHydrantBuilder(b                  )       {
   for (let i = 0; i < HYDRANT_BOXES.length; i++) {
     const d = HYDRANT_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
-}function populateTrashCanBuilder(b                  )       {
+}
+function populateTrashCanBuilder(b                  )       {
   for (let i = 0; i < TRASH_CAN_BOXES.length; i++) {
     const d = TRASH_CAN_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
-}function populateBenchBuilder(b                  )       {
+}
+function populateBenchBuilder(b                  )       {
   for (let i = 0; i < BENCH_BOXES.length; i++) {
     const d = BENCH_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
-}function populateLampPostBuilder(b                  )       {
+}
+function populateLampPostBuilder(b                  )       {
   for (let i = 0; i < LAMP_POST_BOXES.length; i++) {
     const d = LAMP_POST_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
-}function populateRailwaySignalBuilder(b                  )       {
+}
+function populateRailwaySignalBuilder(b                  )       {
   for (let i = 0; i < RAILWAY_SIGNAL_BOXES.length; i++) {
     const d = RAILWAY_SIGNAL_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
-}function populateRoadBarrierBuilder(b                  , biome            = 'forest')       {
+}
+function populateRoadBarrierBuilder(b                  , biome            = 'forest')       {
   const pal = BARRIER_PALETTES[biome] ?? BARRIER_PALETTES.forest;
   for (let i = 0; i < ROAD_BARRIER_GEO.length; i++) {
     const d = ROAD_BARRIER_GEO[i];
@@ -3057,7 +3109,8 @@ const RIVERBANK_PALETTES                                            = {
   neon: { graniteDark: 0x1e1b4b, graniteMid: 0x312e81, graniteLight: 0x4338ca, bollardIron: 0x06b6d4, grateMetal: 0x0f172a, slotBlack: 0x020617, buoyOrange: 0xf43f5e, buoyWhite: 0xd946ef, mossGreen: 0x10b981 },
 };
 
-// Model 10: 3D Floating Gold Coin with Star (21 cubes, Zero Z-Fighting Certified)const COIN_BOXES                                                                      = [
+// Model 10: 3D Floating Gold Coin with Star (21 cubes, Zero Z-Fighting Certified)
+const COIN_BOXES                                                                      = [
   [0.225, 0.31, 0.065, 0.0, 0.365, 0.0, 0xf59e0b],
   [0.33, 0.205, 0.055, 0.0, 0.365, 0.0, 0xf59e0b],
   [0.05, 0.07, 0.045, -0.1225, 0.4525, 0.0, 0xf59e0b],
@@ -3105,7 +3158,8 @@ const RECORD_FLAG_BOXES                                                         
   [0.085, 0.035, 0.085, 0.0, 0.2325, 0.0, 0xf59e0b],
 ];
 
-// Model 1: Tree Planter A (31 cubes, Terracotta & Vibrant Red Apples)const TREE_PLANTER_GEO                                                                      = [
+// Model 1: Tree Planter A (31 cubes, Terracotta & Vibrant Red Apples)
+const TREE_PLANTER_GEO                                                                      = [
   [0.1, 0.1, 0.1, -0.3425, 0.05, -0.3425, 'woodPlankDark'],
   [0.1, 0.1, 0.1, 0.3425, 0.05, -0.3425, 'woodPlankDark'],
   [0.1, 0.1, 0.1, -0.3425, 0.05, 0.3425, 'woodPlankDark'],
@@ -3137,7 +3191,8 @@ const RECORD_FLAG_BOXES                                                         
   [0.07, 0.07, 0.015, 0.1625, 1.035, -0.39, 'appleRed'],
   [0.015, 0.07, 0.07, 0.36, 1.31, -0.0875, 'appleRed'],
   [0.015, 0.07, 0.07, -0.36, 1.335, 0.0975, 'appleRed'],
-];const TREE_PALETTES                                            = {
+];
+const TREE_PALETTES                                            = {
   forest: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x15803d, foliageMid: 0x16a34a, foliageLight: 0x22c55e, appleRed: 0xef4444 },
   winter: { woodPlankDark: 0x334155, woodPlankMid: 0x64748b, soilDark: 0x1e293b, trunkBark: 0x475569, foliageBase: 0x0f766e, foliageMid: 0x115e59, foliageLight: 0xf8fafc, appleRed: 0xef4444 },
   desert: { woodPlankDark: 0x78350f, woodPlankMid: 0xb45309, soilDark: 0x451a03, trunkBark: 0x92400e, foliageBase: 0x854d0e, foliageMid: 0xa16207, foliageLight: 0xca8a04, appleRed: 0xdc2626 },
@@ -3213,7 +3268,8 @@ const HEDGE_PALETTES                                            = {
   winter: { hedgeDark: 0x334155, hedgeMid: 0x475569, hedgeLight: 0x94a3b8, leafLime: 0xdbeafe, blossomYellow: 0xf8fafc },
   desert: { hedgeDark: 0x78350f, hedgeMid: 0x92400e, hedgeLight: 0xb45309, leafLime: 0xca8a04, blossomYellow: 0xfef08a },
   neon: { hedgeDark: 0x1e1b4b, hedgeMid: 0x312e81, hedgeLight: 0x4338ca, leafLime: 0x06b6d4, blossomYellow: 0xf43f5e },
-};function populateRiverbankBuilder(
+};
+function populateRiverbankBuilder(
   b                  ,
   side                   = 'left',
   biome            = 'forest'
@@ -3225,31 +3281,36 @@ const HEDGE_PALETTES                                            = {
     const col = pal[d[6]] ?? 0x64748b;
     b.addBox(d[0], d[1], d[2], d[3] * flipX, d[4], d[5], col);
   }
-}function populateCoinBuilder(b                  )       {
+}
+function populateCoinBuilder(b                  )       {
   for (let i = 0; i < COIN_BOXES.length; i++) {
     const d = COIN_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
-}function populateRecordFlagBuilder(b                  )       {
+}
+function populateRecordFlagBuilder(b                  )       {
   for (let i = 0; i < RECORD_FLAG_BOXES.length; i++) {
     const d = RECORD_FLAG_BOXES[i];
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], d[6]);
   }
-}function populateTreePlanterBuilder(b                  , biome            = 'forest')       {
+}
+function populateTreePlanterBuilder(b                  , biome            = 'forest')       {
   const pal = TREE_PALETTES[biome] ?? TREE_PALETTES.forest;
   for (let i = 0; i < TREE_PLANTER_GEO.length; i++) {
     const d = TREE_PLANTER_GEO[i];
     const col = pal[d[6]] ?? 0x16a34a;
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], col);
   }
-}function populateTreePlanterBBuilder(b                  , biome            = 'forest')       {
+}
+function populateTreePlanterBBuilder(b                  , biome            = 'forest')       {
   const pal = TREE_B_PALETTES[biome] ?? TREE_B_PALETTES.forest;
   for (let i = 0; i < TREE_PLANTER_B_GEO.length; i++) {
     const d = TREE_PLANTER_B_GEO[i];
     const col = pal[d[6]] ?? 0x15803d;
     b.addBox(d[0], d[1], d[2], d[3], d[4], d[5], col);
   }
-}function populateHedgeBuilder(b                  , biome            = 'forest')       {
+}
+function populateHedgeBuilder(b                  , biome            = 'forest')       {
   const pal = HEDGE_PALETTES[biome] ?? HEDGE_PALETTES.forest;
   for (let i = 0; i < HEDGE_GEO.length; i++) {
     const d = HEDGE_GEO[i];
@@ -3347,6 +3408,8 @@ function createUrbanRoadBarrier(biome            = 'forest')              {
     (b) => populateRoadBarrierBuilder(b, biome)
   );
   group.add(mesh.clone());
+  // Rotated 90 degrees clockwise to stand perpendicular across the road edge
+  group.rotation.y = -Math.PI / 2;
   return group;
 }
 
@@ -3361,6 +3424,8 @@ function createUrbanRiverbankEdge(
     (b) => populateRiverbankBuilder(b, side, biome)
   );
   group.add(mesh.clone());
+  // Rotated 90 degrees clockwise to stand perpendicular across the river edge
+  group.rotation.y = -Math.PI / 2;
   return group;
 }
 
@@ -3687,7 +3752,8 @@ const BOOKS_BOXES                                                               
   [0.09,0.12,0.09,0.502,2.4,-0.33,21], [0.112,0.037,0.112,0.502,2.479,-0.33,21],
   [0.09,0.12,0.09,0.382,2.4,-0.33,21], [0.112,0.037,0.112,0.382,2.479,-0.33,21],
   [0.03,0.09,0.09,0.596,1.92,-0.285,4], [0.06,0.075,0.007,0.33,2.175,-0.195,4],
-];function populateBooksBuilder(b                  , biome            = 'forest')       {
+];
+function populateBooksBuilder(b                  , biome            = 'forest')       {
   let pal = BOOKS_PALETTE_FOREST;
   if (biome === 'winter') pal = BOOKS_PALETTE_WINTER;
   else if (biome === 'desert') pal = BOOKS_PALETTE_DESERT;
@@ -3909,7 +3975,8 @@ const CAFE_BOXES                                                                
   [0.052,0.052,0.052,-0.27,0.371,0.795,5], [0.165,0.135,0.165,0.637,0.068,0.795,10],
   [0.135,0.12,0.135,0.637,0.195,0.795,5], [0.09,0.09,0.09,0.637,0.3,0.795,5],
   [0.052,0.052,0.052,0.637,0.371,0.795,5],
-];function populateCafeBuilder(b                  , biome            = 'forest')       {
+];
+function populateCafeBuilder(b                  , biome            = 'forest')       {
   let pal = CAFE_PALETTE_FOREST;
   if (biome === 'winter') pal = CAFE_PALETTE_WINTER;
   else if (biome === 'desert') pal = CAFE_PALETTE_DESERT;
@@ -4111,7 +4178,8 @@ const BAKERY_BOXES                                                              
   [0.12,0.075,0.27,-0.78,2.228,-0.225,0], [0.09,0.12,0.24,0.78,2.13,-0.225,4],
   [0.12,0.075,0.27,0.78,2.228,-0.225,0], [0.3,0.12,0.09,0.675,2.13,-0.645,4],
   [0.33,0.075,0.12,0.675,2.228,-0.645,0], [0.135,0.135,0.135,0.713,2.813,-0.398,0],
-];function populateBakeryBuilder(b                  , biome            = 'winter')       {
+];
+function populateBakeryBuilder(b                  , biome            = 'winter')       {
   let pal = BAKERY_PALETTE_WINTER;
   if (biome === 'forest') pal = BAKERY_PALETTE_FOREST;
   else if (biome === 'desert') pal = BAKERY_PALETTE_DESERT;
@@ -4124,7 +4192,8 @@ const BAKERY_BOXES                                                              
 }
 
 // --- Module: src/view/urbanBuildings.ts ---
-/** Townhouse A: Parisian Blue Cafe / Desert Cantina / Cyber Diner (Ref: 11_townhouse_cafe_turnaround.jpg) */function createTownhouseA(biomeOrWinter                      = 'forest')              {
+/** Townhouse A: Parisian Blue Cafe / Desert Cantina / Cyber Diner (Ref: 11_townhouse_cafe_turnaround.jpg) */
+function createTownhouseA(biomeOrWinter                      = 'forest')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_a_${biome}`;
@@ -4135,7 +4204,8 @@ const BAKERY_BOXES                                                              
   return group;
 }
 
-/** Townhouse B: Red Brick Bakery / Adobe Bakehouse / Synth-Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */function createTownhouseB(biomeOrWinter                      = 'winter')              {
+/** Townhouse B: Red Brick Bakery / Adobe Bakehouse / Synth-Bakery (Ref: 12_townhouse_bakery_turnaround.jpg) */
+function createTownhouseB(biomeOrWinter                      = 'winter')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_b_${biome}`;
@@ -4146,7 +4216,8 @@ const BAKERY_BOXES                                                              
   return group;
 }
 
-/** Townhouse C: Green Books Store / Alpine Bookstore / Desert Scrolls / Synth-Library (Ref: 13_townhouse_books_turnaround.jpg) */function createTownhouseC(biomeOrWinter                      = 'forest')              {
+/** Townhouse C: Green Books Store / Alpine Bookstore / Desert Scrolls / Synth-Library (Ref: 13_townhouse_books_turnaround.jpg) */
+function createTownhouseC(biomeOrWinter                      = 'forest')              {
   const biome            = typeof biomeOrWinter === 'boolean' ? (biomeOrWinter ? 'winter' : 'forest') : biomeOrWinter;
   const group = new THREE.Group();
   const key = `townhouse_c_${biome}`;
@@ -4155,7 +4226,8 @@ const BAKERY_BOXES                                                              
   });
   group.add(mesh);
   return group;
-}function createUrbanTownhouse(seed        , biome            = 'forest')              {
+}
+function createUrbanTownhouse(seed        , biome            = 'forest')              {
   const root = new THREE.Group();
   root.name = 'urbanTownhouse';
   const variant = Math.abs(seed) % 3;
@@ -4236,6 +4308,10 @@ class MeshFactory {
     return createUrbanRoadBarrier(biome);
   }
 
+  static createLaneDivider()              {
+    return LaneGeometryPool.createLaneDivider();
+  }
+
   static createRecordFlag()              {
     return createUrbanRecordFlag();
   }
@@ -4263,7 +4339,8 @@ const SKIN_DESCRIPTIONS                         = {
   gingerbread_man: 'Ароматный пряничный человечек с сахарной белой глазурью, румяными щечками и мармеладными пуговками.',
   reindeer_glow: 'Знаменитый рождественский олень Рудольф с ветвистыми рогами, светящимся рубиновым носом и золотым колокольчиком.',
   santa_claus: 'Легендарный Дедушка Санта в бархатном кафтане с меховой опушкой, поясом с золотой пряжкой и мешком подарков.',
-};function getCharacterModelItems()                     {
+};
+function getCharacterModelItems()                     {
   return ALL_SKINS.map((skin) => ({
     id: skin.id,
     name: skin.name,
@@ -4272,7 +4349,8 @@ const SKIN_DESCRIPTIONS                         = {
     desc: SKIN_DESCRIPTIONS[skin.id] ?? `Игровой персонаж ${skin.name} (${skin.id}) для Crossy Road 3D.`,
     create: (_biome            = 'forest', isGhost = false) => createUrbanCharacter(skin.id, isGhost),
   }));
-}function getVehicleModelItems()                     {
+}
+function getVehicleModelItems()                     {
   return [
     {
       id: 'car', name: 'Спортивный седан', icon: '🚗', cat: 'vehicles',
@@ -4315,7 +4393,8 @@ const SKIN_DESCRIPTIONS                         = {
       create: () => createUrbanPallet({ id: 1, x: 0, length: 2.4, speed: 1 }),
     },
   ];
-}function getPropModelItems()                     {
+}
+function getPropModelItems()                     {
   return [
     {
       id: 'hydrant',
@@ -4390,7 +4469,8 @@ const SKIN_DESCRIPTIONS                         = {
       create: (b            = 'forest') => createUrbanRiverbankEdge('left', b),
     },
   ];
-}function getNatureModelItems()                     {
+}
+function getNatureModelItems()                     {
   return [
     {
       id: 'tree_planter_0',
@@ -4417,7 +4497,8 @@ const SKIN_DESCRIPTIONS                         = {
       create: (b            = 'forest') => createUrbanHedge(0, b),
     },
   ];
-}function getBuildingModelItems()                     {
+}
+function getBuildingModelItems()                     {
   return [
     {
       id: 'townhouse_cafe',
@@ -4444,12 +4525,14 @@ const SKIN_DESCRIPTIONS                         = {
       create: (b            = 'forest') => createTownhouseC(b),
     },
   ];
-}function getModelCatalog()                     {
+}
+function getModelCatalog()                     {
   return [
     ...getCharacterModelItems(), ...getVehicleModelItems(),
     ...getPropModelItems(), ...getNatureModelItems(), ...getBuildingModelItems(),
   ];
-}function getModelDiagnostics(group             )                                      {
+}
+function getModelDiagnostics(group             )                                      {
   let meshCount = 0;
   group.traverse((c) => {
     if ((c              ).isMesh) {
@@ -4459,7 +4542,8 @@ const SKIN_DESCRIPTIONS                         = {
   const box = new THREE.Box3().setFromObject(group);
   const [w, h, d] = [box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z].map((v) => Math.max(0.01, v).toFixed(2));
   return { meshCount, dims: `${w} × ${h} × ${d}` };
-}function verifyModelRegistry()   
+}
+function verifyModelRegistry()   
                                                                             
   {
   const catalog = getModelCatalog();

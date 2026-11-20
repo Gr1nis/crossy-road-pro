@@ -15,6 +15,7 @@ import {
 } from './urbanEnvironment.ts';
 import { createUrbanPallet, createUrbanTrain, createUrbanVehicle } from './urbanVehicles.ts';
 import { createUrbanTownhouse } from './urbanBuildings.ts';
+import { LaneGeometryPool } from './laneGeometryPool.ts';
 
 export class MeshFactory {
   static createTownhouse(seedVariant: number, biome: BiomeType = 'forest'): THREE.Group {
@@ -79,6 +80,10 @@ export class MeshFactory {
 
   static createRoadBarrier(biome: BiomeType = 'forest'): THREE.Group {
     return createUrbanRoadBarrier(biome);
+  }
+
+  static createLaneDivider(): THREE.Group {
+    return LaneGeometryPool.createLaneDivider();
   }
 
   static createRecordFlag(): THREE.Group {

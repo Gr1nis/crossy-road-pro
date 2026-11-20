@@ -108,6 +108,8 @@ export function createUrbanRoadBarrier(biome: BiomeType = 'forest'): THREE.Group
     (b) => populateRoadBarrierBuilder(b, biome)
   );
   group.add(mesh.clone());
+  // Rotated 90 degrees clockwise to stand perpendicular across the road edge
+  group.rotation.y = -Math.PI / 2;
   return group;
 }
 
@@ -122,6 +124,8 @@ export function createUrbanRiverbankEdge(
     (b) => populateRiverbankBuilder(b, side, biome)
   );
   group.add(mesh.clone());
+  // Rotated 90 degrees clockwise to stand perpendicular across the river edge
+  group.rotation.y = -Math.PI / 2;
   return group;
 }
 

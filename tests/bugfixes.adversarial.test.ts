@@ -202,25 +202,23 @@ describe('Adversarial Bugfix Suite — Coordinate Sync, Log Hop Drift, Input Que
     );
   });
 
-  it('Bug 8 (Clean Road Surface Without Markings): Road dividers and zebra crossings are completely removed for clean solid asphalt', () => {
+  it('Bug 8 (Multi-Lane Road Divider Markings): MeshFactory creates dashed lane divider at z = 0.5 and SceneManager adds it for consecutive roads', () => {
     const meshFactorySrc = fs.readFileSync(
       path.join(process.cwd(), 'src/view/meshFactory.ts'),
       'utf8'
     );
-    assert.strictEqual(
+    assert.ok(
       meshFactorySrc.includes('createLaneDivider(): THREE.Group'),
-      false,
-      'meshFactory.ts must not declare createLaneDivider'
+      'meshFactory.ts must declare createLaneDivider(): THREE.Group'
     );
 
     const sceneManagerSrc = fs.readFileSync(
       path.join(process.cwd(), 'src/view/sceneManager.ts'),
       'utf8'
     );
-    assert.strictEqual(
+    assert.ok(
       sceneManagerSrc.includes('MeshFactory.createLaneDivider()'),
-      false,
-      'sceneManager.ts must not invoke createLaneDivider'
+      'sceneManager.ts must invoke MeshFactory.createLaneDivider() for consecutive road lanes'
     );
     assert.ok(
       sceneManagerSrc.includes('createRoadBarrier'),
