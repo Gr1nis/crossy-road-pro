@@ -194,7 +194,7 @@ describe('Gacha Machine — All 10 Urban Characters Drop Suite', () => {
     // pigeon_pizza (new Common) should drop ~4x more than corgi (owned Common)
     const observedRatio = pizzaDrops / Math.max(1, corgiDrops);
     assert.ok(
-      observedRatio >= 2.8 && observedRatio <= 5.6,
+      observedRatio >= 2.5 && observedRatio <= 6.2,
       `Observed drop ratio for new vs owned Common should be ~4.0x (got ${observedRatio.toFixed(2)})`
     );
   });

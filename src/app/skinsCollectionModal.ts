@@ -17,19 +17,17 @@ export interface SkinRarityMeta {
   glow: string;
 }
 
-const META_COMMON: SkinRarityMeta = { label: 'Обычный', css: 'rarity-common', color: '#94a3b8', glow: 'rgba(148, 163, 184, 0.45)' }; const META_RARE: SkinRarityMeta = { label: 'Редкий', css: 'rarity-rare', color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.5)' };
+const META_COMMON: SkinRarityMeta = { label: 'Обычный', css: 'rarity-common', color: '#94a3b8', glow: 'rgba(148, 163, 184, 0.45)' };
+const META_RARE: SkinRarityMeta = { label: 'Редкий', css: 'rarity-rare', color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.5)' };
 const META_EPIC: SkinRarityMeta = { label: 'Эпический', css: 'rarity-epic', color: '#c084fc', glow: 'rgba(192, 132, 252, 0.55)' };
 const META_LEGENDARY: SkinRarityMeta = { label: 'Легендарный', css: 'rarity-legendary', color: '#fbbf24', glow: 'rgba(251, 191, 36, 0.6)' };
 
 export const SKINS_RARITY_MAP: Record<string, SkinRarityMeta> = {
   corgi: META_COMMON, pigeon_pizza: META_COMMON, barista_pug: META_COMMON, skater_ferret: META_COMMON,
-  box_cat: META_RARE, subway_rat: META_RARE,
-  raccoon_bandit: META_EPIC, raincoat_duck: META_EPIC,
-  capybara_zen: META_LEGENDARY, pigeon_king: META_LEGENDARY,
   penguin_cocoa: META_COMMON, snow_hare: META_COMMON, husky_sweater: META_COMMON, derpy_snowman: META_COMMON,
-  arctic_fox: META_RARE, holiday_elf: META_RARE, holiday_owl: META_RARE,
-  gingerbread_man: META_EPIC, reindeer_glow: META_EPIC,
-  santa_claus: META_LEGENDARY,
+  box_cat: META_RARE, subway_rat: META_RARE, arctic_fox: META_RARE, holiday_elf: META_RARE, holiday_owl: META_RARE,
+  raccoon_bandit: META_EPIC, raincoat_duck: META_EPIC, gingerbread_man: META_EPIC, reindeer_glow: META_EPIC,
+  capybara_zen: META_LEGENDARY, pigeon_king: META_LEGENDARY, santa_claus: META_LEGENDARY,
 };
 
 export class SkinsCollectionModal {
@@ -74,17 +72,29 @@ export class SkinsCollectionModal {
   }
 
   private bindEvents(): void {
-    const handleClose = (e?: Event) => {
-      e?.preventDefault();
-      this.close();
-    };
+    const handleClose = (e?: Event) => { e?.preventDefault(); this.close(); };
     this.closeBtn?.addEventListener('click', handleClose);
     this.closeBtn?.addEventListener('touchend', handleClose);
-    this.modal?.addEventListener('click', (e) => {
-      if (e.target === this.modal) this.close();
-    });
+    this.modal?.addEventListener('click', (e) => { if (e.target === this.modal) this.close(); });
     this.tabBtnCharacters?.addEventListener('click', () => this.switchTab('characters'));
     this.tabBtnWorlds?.addEventListener('click', () => this.switchTab('worlds'));
+
+    const get = (id: string) => (typeof document !== 'undefined' ? document.getElementById(id) : null);
+    get('skins-carousel-prev')?.addEventListener('click', () => this.focusDelta(-1));
+    get('skins-carousel-next')?.addEventListener('click', () => this.focusDelta(1));
+    get('worlds-carousel-prev')?.addEventListener('click', () => this.worldsListEl?.scrollBy({ left: -220, behavior: 'smooth' }));
+    get('worlds-carousel-next')?.addEventListener('click', () => this.worldsListEl?.scrollBy({ left: 220, behavior: 'smooth' }));
+
+    const bindWheel = (el: HTMLElement | null) => {
+      el?.addEventListener('wheel', (e: WheelEvent) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.preventDefault();
+          el.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    };
+    bindWheel(this.listEl);
+    bindWheel(this.worldsListEl);
 
     if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
       window.addEventListener('keydown', this.boundWindowKeyDown);
@@ -103,18 +113,9 @@ export class SkinsCollectionModal {
     if (!isChar) this.renderWorlds();
   }
 
-  public getActiveTab(): 'characters' | 'worlds' {
-    return this.activeTab;
-  }
-
-  public getCurrentBiome(): string | null {
-    return this.currentBiome;
-  }
-
-  public setCurrentBiome(biome: string | null): void {
-    this.currentBiome = biome;
-    this.renderWorlds();
-  }
+  public getActiveTab(): 'characters' | 'worlds' { return this.activeTab; }
+  public getCurrentBiome(): string | null { return this.currentBiome; }
+  public setCurrentBiome(biome: string | null): void { this.currentBiome = biome; this.renderWorlds(); }
 
   public open(coins: number, unlocked: string[], selected: string, currentBiome?: string | null): void {
     this.updateCoins(coins);
@@ -140,10 +141,7 @@ export class SkinsCollectionModal {
     }
   }
 
-  public isOpen(): boolean {
-    return Boolean(this.modal && !this.modal.classList.contains('hidden'));
-  }
-
+  public isOpen(): boolean { return Boolean(this.modal && !this.modal.classList.contains('hidden')); }
   public updateCoins(coins: number): void {
     if (this.coinsEl) this.coinsEl.textContent = String(Math.max(0, coins));
   }
@@ -244,10 +242,7 @@ export class SkinsCollectionModal {
     return false;
   }
 
-  public getFocusedIndex(): number {
-    return this.focusedIndex;
-  }
-
+  public getFocusedIndex(): number { return this.focusedIndex; }
   public setFocusedIndex(index: number): void {
     const total = ALL_SKINS.length;
     if (total === 0) return;
@@ -261,7 +256,7 @@ export class SkinsCollectionModal {
     }
   }
 
-  private focusDelta(delta: number): void {
+  public focusDelta(delta: number): void {
     const total = ALL_SKINS.length;
     if (total === 0) return;
     this.focusedIndex = (this.focusedIndex + delta + total) % total;

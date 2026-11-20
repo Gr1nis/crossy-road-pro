@@ -5,35 +5,40 @@ import path from 'node:path';
 import { SkinsCollectionModal } from '../src/app/skinsCollectionModal.ts';
 import { ALL_SKINS } from '../src/core/types.ts';
 
-describe('Skins & Worlds Modal Scrolling & Full Visibility Suite', () => {
+describe('Skins & Worlds Modal Horizontal Slider & Clearance Suite', () => {
   const indexPath = path.join(process.cwd(), 'index.html');
   const indexHtml = fs.readFileSync(indexPath, 'utf8');
 
-  it('Requirement 1: .modal-card-skins-pc has max-height and margin auto preventing off-screen clipping', () => {
+  it('Requirement 1: .modal-card-skins-pc has compact height and headroom preventing off-screen clipping', () => {
     assert.ok(
-      indexHtml.includes('max-height: calc(100vh - 64px);'),
-      'modal-card-skins-pc must have max-height calc(100vh - 64px) to stay on-screen'
+      indexHtml.includes('max-height: calc(100vh - 80px);'),
+      'modal-card-skins-pc must have max-height calc(100vh - 80px) to stay on-screen'
     );
     assert.ok(
       indexHtml.includes('#skins-modal {') && indexHtml.includes('overflow-y: auto;'),
       '#skins-modal must have overflow-y: auto'
     );
-  });
-
-  it('Requirement 2: .skins-tab-content has flex: 1, min-height: 0, and overflow-y: auto for vertical scrolling', () => {
     assert.ok(
-      indexHtml.includes('.skins-tab-content {') &&
-      indexHtml.includes('overflow-y: auto;') &&
-      indexHtml.includes('flex: 1;'),
-      'skins-tab-content must be a scrollable flex container (flex: 1, overflow-y: auto)'
-    );
-    assert.ok(
-      indexHtml.includes('.skins-tab-content::-webkit-scrollbar'),
-      'Custom styled scrollbar must be defined for skins-tab-content'
+      indexHtml.includes('margin-top: 36px;'),
+      'modal-card-skins-pc must have margin-top: 36px to leave headroom for top 3D title'
     );
   });
 
-  it('Requirement 3: Keyboard navigation handles Up and Down arrows / W and S keys across rows', () => {
+  it('Requirement 2: .skins-cards-grid is styled as a horizontal slider (flex-direction: row, nowrap, overflow-x: auto)', () => {
+    assert.ok(
+      indexHtml.includes('.skins-cards-grid {') &&
+      indexHtml.includes('overflow-x: auto;') &&
+      indexHtml.includes('flex-wrap: nowrap;') &&
+      indexHtml.includes('scroll-snap-type: x mandatory;'),
+      'skins-cards-grid must be a horizontal slider (overflow-x: auto, flex-wrap: nowrap, scroll-snap-type: x mandatory)'
+    );
+    assert.ok(
+      indexHtml.includes('.skins-cards-grid::-webkit-scrollbar'),
+      'Custom styled horizontal scrollbar must be defined for skins-cards-grid'
+    );
+  });
+
+  it('Requirement 3: Carousel buttons and keyboard navigation handle both single step and jump navigation', () => {
     const events: string[] = [];
     const elements = new Map<string, HTMLElement>();
 
@@ -62,10 +67,10 @@ describe('Skins & Worlds Modal Scrolling & Full Visibility Suite', () => {
     // Mock DOM elements
     ['skins-modal', 'skins-modal-coins', 'skins-modal-close-btn', 'skins-modal-list',
      'skins-tab-btn-characters', 'skins-tab-btn-worlds', 'skins-tab-characters-content',
-     'skins-tab-worlds-content', 'skins-worlds-list'].forEach(mockEl);
+     'skins-tab-worlds-content', 'skins-worlds-list',
+     'skins-carousel-prev', 'skins-carousel-next', 'worlds-carousel-prev', 'worlds-carousel-next'].forEach(mockEl);
 
     // Provide global document.getElementById
-    const origGetElementById = globalThis.document?.getElementById;
     if (typeof globalThis.document === 'undefined') {
       (globalThis as unknown as { document: unknown }).document = {
         getElementById: (id: string) => elements.get(id) || null,
@@ -80,21 +85,33 @@ describe('Skins & Worlds Modal Scrolling & Full Visibility Suite', () => {
     modal.open(500, ['corgi'], 'corgi');
     assert.strictEqual(modal.getFocusedIndex(), 0, 'Initial focus on corgi (index 0)');
 
-    // Press ArrowDown -> jump 5 cards to next row
+    // Press ArrowRight / KeyD -> advance 1 card
+    modal.handleKeyDown({ code: 'ArrowRight', preventDefault: () => {} } as KeyboardEvent);
+    assert.strictEqual(modal.getFocusedIndex(), 1, 'ArrowRight advances by 1 card');
+
+    modal.handleKeyDown({ code: 'KeyD', preventDefault: () => {} } as KeyboardEvent);
+    assert.strictEqual(modal.getFocusedIndex(), 2, 'KeyD advances by 1 card');
+
+    // Press ArrowLeft / KeyA -> retreat 1 card
+    modal.handleKeyDown({ code: 'ArrowLeft', preventDefault: () => {} } as KeyboardEvent);
+    assert.strictEqual(modal.getFocusedIndex(), 1, 'ArrowLeft retreats by 1 card');
+
+    modal.handleKeyDown({ code: 'KeyA', preventDefault: () => {} } as KeyboardEvent);
+    assert.strictEqual(modal.getFocusedIndex(), 0, 'KeyA retreats by 1 card');
+
+    // Press ArrowDown / KeyS -> jump 5 cards across slider
     modal.handleKeyDown({ code: 'ArrowDown', preventDefault: () => {} } as KeyboardEvent);
-    assert.strictEqual(modal.getFocusedIndex(), 5, 'ArrowDown must advance by 5 cards to row 2');
+    assert.strictEqual(modal.getFocusedIndex(), 5, 'ArrowDown must jump 5 cards');
 
-    // Press KeyS -> jump 5 cards to row 3
     modal.handleKeyDown({ code: 'KeyS', preventDefault: () => {} } as KeyboardEvent);
-    assert.strictEqual(modal.getFocusedIndex(), 10, 'KeyS must advance by 5 cards to row 3');
+    assert.strictEqual(modal.getFocusedIndex(), 10, 'KeyS must jump 5 cards');
 
-    // Press ArrowUp -> jump back 5 cards to row 2
+    // Press ArrowUp / KeyW -> jump back 5 cards
     modal.handleKeyDown({ code: 'ArrowUp', preventDefault: () => {} } as KeyboardEvent);
-    assert.strictEqual(modal.getFocusedIndex(), 5, 'ArrowUp must retreat by 5 cards to row 2');
+    assert.strictEqual(modal.getFocusedIndex(), 5, 'ArrowUp must retreat 5 cards');
 
-    // Press KeyW -> jump back 5 cards to row 1
     modal.handleKeyDown({ code: 'KeyW', preventDefault: () => {} } as KeyboardEvent);
-    assert.strictEqual(modal.getFocusedIndex(), 0, 'KeyW must retreat by 5 cards to row 1');
+    assert.strictEqual(modal.getFocusedIndex(), 0, 'KeyW must retreat 5 cards');
 
     modal.destroy();
   });

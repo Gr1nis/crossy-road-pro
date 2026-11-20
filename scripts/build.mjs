@@ -1269,9 +1269,11 @@ const htmlContent = `<!DOCTYPE html>
     /* ========================================================================== */
 
     #skins-modal {
-      padding: 44px 16px 20px;
+      padding: 60px 16px 20px;
       box-sizing: border-box;
       overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
       align-items: center;
       justify-content: center;
     }
@@ -1285,11 +1287,12 @@ const htmlContent = `<!DOCTYPE html>
         0 0 35px rgba(245, 158, 11, 0.45),
         inset 0 0 20px rgba(245, 158, 11, 0.2),
         0 25px 60px rgba(0, 0, 0, 0.85);
-      max-width: 860px;
-      width: 92%;
-      max-height: calc(100vh - 64px);
-      height: min(86vh, 820px);
-      padding: 32px 24px 20px;
+      max-width: 920px;
+      width: 94%;
+      max-height: calc(100vh - 80px);
+      height: auto;
+      min-height: 380px;
+      padding: 24px 20px 16px;
       position: relative;
       color: #f8fafc;
       display: flex;
@@ -1299,6 +1302,7 @@ const htmlContent = `<!DOCTYPE html>
       overflow: visible;
       box-sizing: border-box;
       margin: auto;
+      margin-top: 36px;
     }
     .modal-card-skins-pc::before {
       content: '';
@@ -1433,26 +1437,95 @@ const htmlContent = `<!DOCTYPE html>
       filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.55));
     }
 
-    /* Сетка карточек персонажей */
+    /* Горизонтальный слайдер карточек персонажей и миров */
+    .skins-slider-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      gap: 8px;
+    }
+    .skins-carousel-arrow {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+      border: 2px solid #f59e0b;
+      color: #fbbf24;
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 12px rgba(245, 158, 11, 0.35);
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+      outline: none;
+      z-index: 10;
+      padding: 0;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .skins-carousel-arrow:hover {
+      background: #f59e0b;
+      color: #0f172a;
+      transform: scale(1.12);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.7);
+    }
+    .skins-carousel-arrow:active {
+      transform: scale(0.92);
+    }
+
+    /* Сетка карточек персонажей (горизонтальный слайдер) */
     .skins-cards-grid {
       display: flex;
-      gap: 14px;
-      justify-content: center;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 16px;
       width: 100%;
-      margin-top: 10px;
-      flex-wrap: wrap;
-      z-index: 5;
-      position: relative;
-      padding: 6px 4px 10px;
+      max-width: 100%;
+      margin: 4px 0;
+      padding: 10px 14px 14px;
       box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+    }
+    .skins-cards-grid::-webkit-scrollbar {
+      height: 8px;
+    }
+    .skins-cards-grid::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 999px;
+      margin: 0 12px;
+    }
+    .skins-cards-grid::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+      border-radius: 999px;
+      border: 2px solid rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+    }
+    .skins-cards-grid::-webkit-scrollbar-thumb:hover {
+      background: #fbbf24;
     }
 
     /* Карточка персонажа */
     .skin-card {
       --rarity-color: #94a3b8;
       --rarity-glow: rgba(148, 163, 184, 0.4);
-      width: 146px;
+      flex: 0 0 148px;
+      width: 148px;
       min-height: 236px;
+      height: 238px;
       background: rgba(15, 23, 42, 0.75);
       border: 2px solid var(--rarity-color);
       border-radius: 18px;
@@ -1472,6 +1545,8 @@ const htmlContent = `<!DOCTYPE html>
       user-select: none;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
+      scroll-snap-align: center;
+      box-sizing: border-box;
     }
     .skin-card:hover:not(.locked) {
       transform: translateY(-4px) scale(1.02);
@@ -1697,38 +1772,30 @@ const htmlContent = `<!DOCTYPE html>
     }
     .skins-tab-content {
       width: 100%;
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: visible;
       display: flex;
       flex-direction: column;
       align-items: center;
-      overscroll-behavior: contain;
-      padding: 4px 6px 12px;
+      padding: 0;
       box-sizing: border-box;
     }
     .skins-tab-content.hidden {
       display: none !important;
     }
-    .skins-tab-content::-webkit-scrollbar,
     #skins-modal::-webkit-scrollbar {
       width: 8px;
     }
-    .skins-tab-content::-webkit-scrollbar-track,
     #skins-modal::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
       border-radius: 999px;
       margin: 8px 0;
     }
-    .skins-tab-content::-webkit-scrollbar-thumb,
     #skins-modal::-webkit-scrollbar-thumb {
       background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
       border-radius: 999px;
       border: 2px solid rgba(15, 23, 42, 0.8);
       box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
     }
-    .skins-tab-content::-webkit-scrollbar-thumb:hover,
     #skins-modal::-webkit-scrollbar-thumb:hover {
       background: #fbbf24;
     }
@@ -2418,6 +2485,9 @@ const htmlContent = `<!DOCTYPE html>
         width: 18px;
         height: 18px;
       }
+      .skins-carousel-arrow {
+        display: none !important;
+      }
       .skins-cards-grid {
         display: flex;
         flex-wrap: nowrap;
@@ -3015,7 +3085,11 @@ const htmlContent = `<!DOCTYPE html>
 
       <!-- Вкладка 1: Карточки персонажей -->
       <div id="skins-tab-characters-content" class="skins-tab-content active">
-        <div id="skins-modal-list" class="skins-cards-grid"></div>
+        <div class="skins-slider-wrap">
+          <button type="button" id="skins-carousel-prev" class="skins-carousel-arrow skins-carousel-prev" aria-label="Предыдущий персонаж" title="[A] / [←]">‹</button>
+          <div id="skins-modal-list" class="skins-cards-grid"></div>
+          <button type="button" id="skins-carousel-next" class="skins-carousel-arrow skins-carousel-next" aria-label="Следующий персонаж" title="[D] / [→]">›</button>
+        </div>
         <div class="skins-nav-hint">
           <span class="skins-key-badge">[A]</span> / <span class="skins-key-badge">[D]</span> <span data-i18n="skins_nav_hint">ВЫБОР</span> • <span class="skins-key-badge">[ENTER]</span> <span data-i18n="skins_select_hint">ВЫБРАТЬ</span>
         </div>
@@ -3023,7 +3097,11 @@ const htmlContent = `<!DOCTYPE html>
 
       <!-- Вкладка 2: Карточки миров / локаций -->
       <div id="skins-tab-worlds-content" class="skins-tab-content hidden">
-        <div id="skins-worlds-list" class="skins-cards-grid"></div>
+        <div class="skins-slider-wrap">
+          <button type="button" id="worlds-carousel-prev" class="skins-carousel-arrow skins-carousel-prev" aria-label="Предыдущий мир" title="[A] / [←]">‹</button>
+          <div id="skins-worlds-list" class="skins-cards-grid"></div>
+          <button type="button" id="worlds-carousel-next" class="skins-carousel-arrow skins-carousel-next" aria-label="Следующий мир" title="[D] / [→]">›</button>
+        </div>
         <div class="skins-nav-hint">
           <span class="skins-key-badge">[A]</span> / <span class="skins-key-badge">[D]</span> ВЫБОР МИРА • <span class="skins-key-badge">[ENTER]</span> ПРИМЕНИТЬ
         </div>
