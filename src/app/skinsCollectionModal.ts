@@ -125,7 +125,7 @@ export class SkinsCollectionModal {
 
     const selectedIndex = ALL_SKINS.findIndex((s) => s.id === selected);
     this.focusedIndex = selectedIndex >= 0 ? selectedIndex : 0;
-    this.updateFocusVisual();
+    this.updateFocusVisual(true);
   }
 
   public close(): void {
@@ -229,17 +229,13 @@ export class SkinsCollectionModal {
     const key = e.key?.toLowerCase();
     const isLeft = e.code === 'ArrowLeft' || e.code === 'KeyA' || key === 'a' || key === 'ф';
     const isRight = e.code === 'ArrowRight' || e.code === 'KeyD' || key === 'd' || key === 'в';
+    const isUp = e.code === 'ArrowUp' || e.code === 'KeyW' || key === 'w' || key === 'ц';
+    const isDown = e.code === 'ArrowDown' || e.code === 'KeyS' || key === 's' || key === 'ы';
 
-    if (isLeft) {
-      e.preventDefault();
-      this.focusDelta(-1);
-      return true;
-    }
-    if (isRight) {
-      e.preventDefault();
-      this.focusDelta(1);
-      return true;
-    }
+    if (isLeft) { e.preventDefault(); this.focusDelta(-1); return true; }
+    if (isRight) { e.preventDefault(); this.focusDelta(1); return true; }
+    if (isUp) { e.preventDefault(); this.focusDelta(-5); return true; }
+    if (isDown) { e.preventDefault(); this.focusDelta(5); return true; }
     if (e.code === 'Enter' || e.code === 'Space') {
       e.preventDefault();
       this.selectFocused();

@@ -1268,6 +1268,13 @@ const htmlContent = `<!DOCTYPE html>
     /* SKINS COLLECTION MODAL (PC / Mobile Glassmorphism by Reference)            */
     /* ========================================================================== */
 
+    #skins-modal {
+      padding: 44px 16px 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      align-items: center;
+      justify-content: center;
+    }
     .modal-card-skins-pc {
       background: linear-gradient(180deg, rgba(20, 31, 53, 0.95) 0%, rgba(13, 20, 36, 0.98) 100%);
       border: 3px solid #f59e0b;
@@ -1280,7 +1287,9 @@ const htmlContent = `<!DOCTYPE html>
         0 25px 60px rgba(0, 0, 0, 0.85);
       max-width: 860px;
       width: 92%;
-      padding: 32px 24px 24px;
+      max-height: calc(100vh - 64px);
+      height: min(86vh, 820px);
+      padding: 32px 24px 20px;
       position: relative;
       color: #f8fafc;
       display: flex;
@@ -1288,6 +1297,8 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       user-select: none;
       overflow: visible;
+      box-sizing: border-box;
+      margin: auto;
     }
     .modal-card-skins-pc::before {
       content: '';
@@ -1428,10 +1439,12 @@ const htmlContent = `<!DOCTYPE html>
       gap: 14px;
       justify-content: center;
       width: 100%;
-      margin-top: 24px;
+      margin-top: 10px;
       flex-wrap: wrap;
       z-index: 5;
       position: relative;
+      padding: 6px 4px 10px;
+      box-sizing: border-box;
     }
 
     /* Карточка персонажа */
@@ -1684,17 +1697,46 @@ const htmlContent = `<!DOCTYPE html>
     }
     .skins-tab-content {
       width: 100%;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
+      overscroll-behavior: contain;
+      padding: 4px 6px 12px;
+      box-sizing: border-box;
     }
     .skins-tab-content.hidden {
       display: none !important;
+    }
+    .skins-tab-content::-webkit-scrollbar,
+    #skins-modal::-webkit-scrollbar {
+      width: 8px;
+    }
+    .skins-tab-content::-webkit-scrollbar-track,
+    #skins-modal::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 999px;
+      margin: 8px 0;
+    }
+    .skins-tab-content::-webkit-scrollbar-thumb,
+    #skins-modal::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+      border-radius: 999px;
+      border: 2px solid rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+    }
+    .skins-tab-content::-webkit-scrollbar-thumb:hover,
+    #skins-modal::-webkit-scrollbar-thumb:hover {
+      background: #fbbf24;
     }
 
     /* Навигационная подсказка для ПК */
     .skins-nav-hint {
       margin-top: 18px;
+      flex-shrink: 0;
       font-family: 'Fredoka', 'Lilita One', system-ui, sans-serif;
       font-size: 12px;
       font-weight: 800;
