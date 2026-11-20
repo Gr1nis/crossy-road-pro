@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crossy Road MVP — Инженерный анализ и Архитектурный план (Vibe-Pro)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-alt: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-amber: #fbbf24;
+      --accent-red: #f87171;
+      --accent-purple: #c084fc;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem 4rem;
+    }
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .badge-green {
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--accent-green);
+      border-color: rgba(74, 222, 128, 0.35);
+      margin-left: 0.5rem;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-top: 0.5rem;
+      color: #fff;
+    }
+    h2 {
+      font-size: 1.35rem;
+      margin: 2rem 0 1rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h3 {
+      font-size: 1.08rem;
+      margin-bottom: 0.5rem;
+      color: #e2e8f0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .card p, .card li {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+    .card ul {
+      padding-left: 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .card li {
+      margin-bottom: 0.35rem;
+    }
+    .card strong {
+      color: var(--text);
+    }
+    .contract-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .contract-item {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .contract-item span {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--accent-green);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .phase {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .phase.done { border-top-color: var(--accent-green); }
+    .phase.red { border-top-color: var(--accent-red); }
+    .phase.green { border-top-color: var(--accent-green); }
+    .phase.amber { border-top-color: var(--accent-amber); }
+    .phase.purple { border-top-color: var(--accent-purple); }
+    .phase-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+      background: var(--surface);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+    }
+    th {
+      background: rgba(51, 65, 85, 0.5);
+      color: var(--text);
+      font-weight: 600;
+    }
+    td { color: var(--muted); }
+    code {
+      font-family: 'Cascadia Code', Consolas, monospace;
+      background: rgba(15, 23, 42, 0.7);
+      color: #38bdf8;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.86rem;
+    }
+    .invariant-box {
+      background: rgba(248, 113, 113, 0.08);
+      border-left: 4px solid var(--accent-red);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 0.75rem 0;
+    }
+    .formula {
+      background: #090d16;
+      border: 1px solid var(--border);
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      font-family: 'Cascadia Code', Consolas, monospace;
+      color: var(--accent-green);
+      font-size: 0.88rem;
+      margin-top: 0.5rem;
+      overflow-x: auto;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <span class="badge">Vibe-Pro Engineering Pipeline</span>
+        <span class="badge badge-green">Фаза 1 и 2 Утверждены</span>
+        <h1>Crossy Road: Инженерный анализ и План разработки (HTML5 / Three.js)</h1>
+        <p style="color: var(--muted); margin-top: 0.35rem;">
+          Декомпозиция механик оригинала, утверждённый контракт MVP и архитектура под Anti-Goodhart TDD
+        </p>
+      </div>
+    </header>
+
+    <!-- УТВЕРЖДЕННЫЙ БРИФ ФАЗЫ 1 -->
+    <h2>0. Утверждённый архитектурный контракт (Итоги Фазы 1)</h2>
+    <div class="contract-grid">
+      <div class="contract-item">
+        <span>Стек и Сборка</span>
+        <strong>TypeScript + Three.js + Vite + Vitest</strong>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem;">
+          Модульная разработка с возможностью бандла в автономный HTML-файл.
+        </p>
+      </div>
+      <div class="contract-item">
+        <span>Объём механик (Core MVP)</span>
+        <strong>Трава + Дороги + Реки с брёвнами</strong>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem;">
+          Деревья-препятствия, легковые/грузовые авто, плавающие брёвна (без Ж/Д и без Орла).
+        </p>
+      </div>
+      <div class="contract-item">
+        <span>Мета и Прогрессия</span>
+        <strong>Score + High Score (LocalStorage)</strong>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem;">
+          Чистый аркадный геймплей, мгновенный рестарт и сохранение рекорда.
+        </p>
+      </div>
+      <div class="contract-item">
+        <span>Git и Инфраструктура</span>
+        <strong>Локальный Git + GitHub (Gr1nis)</strong>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem;">
+          Коммиты по фазам TDD и авто-пуш в приватный репозиторий.
+        </p>
+      </div>
+    </div>
+
+    <!-- 1. ГЕЙМДИЗАЙН И ИНЖЕНЕРНЫЙ АНАЛИЗ -->
+    <h2>1. Глубокий разбор игры Crossy Road</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>🎯 Core Loop и Микро-ритм</h3>
+        <ul>
+          <li><strong>Дискретный тайминг прыжка (`120 мс`):</strong> Игрок принимает решение каждые 0.2–0.4 секунды. Анимация прыжка по параболе с пружинистым сжатием (`squash &amp; stretch`) даёт тактильный отклик.</li>
+          <li><strong>Асимметрия очков:</strong> Счёт (`score`) увеличивается только при достижении <strong>нового максимального ряда</strong> (`score = Math.max(score, currentRow)`). Шаги назад (`S`) или вбок (`A/D`) позволяют маневрировать, но не начисляют очков.</li>
+          <li><strong>Zero-friction Restart:</strong> Переход из экрана `Game Over` к новой генерации карты занимает 1 клик / нажатие `Space`.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>📐 Гибридная координатная модель (Grid + Continuous)</h3>
+        <ul>
+          <li><strong>Ось полос `Z` (Row Index):</strong> Всегда целочисленная (`Z ∈ ℤ`, шаг `1.0`). Каждая полоса имеет свой тип (`GRASS`, `ROAD`, `RIVER`).</li>
+          <li><strong>Ось ширины `X` (Column):</strong> Дискретна на траве и дороге (`X ∈ [-9..+9]`), но становится <strong>непрерывной (`X ∈ ℝ`)</strong> при приземлении на бревно на реке!</li>
+          <li><strong>Квантование при сходе с бревна:</strong> Пока игрок стоит на бревне, его `X` смещается со скоростью бревна `player.x += log.speed * dt`. При прыжке с бревна на траву/дорогу целевой `X` округляется к ближайшей клетке сетки (`Math.round(player.x)`).</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🎲 Процедурный генератор полос (Chunk Generator)</h3>
+        <ul>
+          <li><strong>Безопасная стартовая зона:</strong> Полосы `Z = -3..+2` всегда являются чистой травой без центральных деревьев, чтобы игрок не спавнился в тупике.</li>
+          <li><strong>Гарантия проходимости (Solvability):</strong> На любой полосе `GRASS` минимум 3 клетки в игровой зоне `[-9..+9]` остаются свободными, и всегда существует проход из предыдущей полосы.</li>
+          <li><strong>Кривая сложности:</strong> С ростом `rowIndex` плавно увеличивается скорость машин и брёвен `v(row) = v_base * (1 + min(row * 0.012, 1.2))` и уменьшается интервал между машинами.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🎥 Изометрическая камера и Смерть за экраном</h3>
+        <ul>
+          <li><strong>Ортографическая проекция:</strong> Камера зафиксирована под углом (~`35.26°` pitch, `-30°` yaw) и плавно ползёт вперёд вдоль оси `Z` с базовой скоростью `v_scroll`, а также догоняет игрока через экспоненциальный `lerp`, если игрок вырывается вперёд.</li>
+          <li><strong>Нижняя граница фрустума:</strong> Если игрок стоит на месте слишком долго и камера уезжает вперёд так, что `player.row < camera.z - BACK_LIMIT`, наступает `GameOver(OUT_OF_BOUNDS_BACK)`.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2. МАТЕМАТИКА И КОЛЛИЗИИ -->
+    <h2>2. Математическая спецификация физических систем (MVP)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Подсистема</th>
+          <th>Формула / Правило симуляции</th>
+          <th>Граничные условия (Edge Cases для TDD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Прыжок и Input Queue</strong></td>
+          <td><code>t = elapsed / HOP_DURATION</code> (`0.12s`). Высота: <code>y = 4 * H * t * (1 - t)</code>. Буфер очереди хранит не более 1 следующего хода.</td>
+          <td>Прыжок в дерево на `GRASS` отменяется (игрок остаётся на текущей клетке), прыжок за левую/правую стену (`|targetX| > 9`) на суше блокируется.</td>
+        </tr>
+        <tr>
+          <td><strong>Дорога (`ROAD`)</strong></td>
+          <td>1D AABB проверка по `X` при `player.row == lane.row`: <code>|player.x - car.x| &lt; (PLAYER_WIDTH + car.length) / 2</code>.</td>
+          <td>Проверка выполняется непрерывно на каждом тике `update(dt)`. При пересечении — состояние `DEAD_BY_CAR` (сплющивание).</td>
+        </tr>
+        <tr>
+          <td><strong>Река (`RIVER`)</strong></td>
+          <td>В момент завершения прыжка (`t == 1.0`) на полосу `RIVER` проверяется попадание центра игрока с допуском `MARGIN = 0.35` на интервал бревна `[log.left, log.right]`.</td>
+          <td>Если бревна под игроком нет — `DEAD_BY_WATER`. Если бревно уносит игрока за край карты (`|player.x| > 9.5`) — `DEAD_BY_OUT_OF_BOUNDS`.</td>
+        </tr>
+        <tr>
+          <td><strong>Счёт и Рекорд (`ScoreTracker`)</strong></td>
+          <td><code>score = Math.max(score, player.row)</code>. При `score > highScore` обновляется `highScore` и записывается в `StorageAdapter`.</td>
+          <td>При шагах назад (`row` уменьшается) текущий `score` строго сохраняет максимум. Некорректные данные в `LocalStorage` (`NaN`, отрицательные строки) безопасно сбрасываются в `0`.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 3. VIBE-PRO 5-ФАЗНЫЙ ПАЙПЛАЙН -->
+    <h2>3. Дорожная карта выполнения по пайплайну Vibe-Pro</h2>
+    <div class="pipeline">
+      <div class="phase done">
+        <div class="phase-num">Фаза 1 • Выполнено ✓</div>
+        <h3>Бриф и Опрос</h3>
+        <p style="color: var(--muted); font-size: 0.88rem;">
+          Утверждён стек TS + Three.js + Vitest, MVP (Трава/Дороги/Реки), High Score, Git + GitHub.
+        </p>
+      </div>
+      <div class="phase purple">
+        <div class="phase-num">Фаза 2 • В работе</div>
+        <h3>Спецификация &amp; Git</h3>
+        <p style="color: var(--muted); font-size: 0.88rem;">
+          Инициализация Git, `.gitignore`, `PROJECT_STATE.md`, `implementation_plan.md` и структура пакетов.
+        </p>
+      </div>
+      <div class="phase red">
+        <div class="phase-num">Фаза 3 • Следующая</div>
+        <h3>Adversarial TDD (RED)</h3>
+        <p style="color: var(--muted); font-size: 0.88rem;">
+          Написание жёстких property-based и граничных тестов в Vitest и фиксация падения (`npm test`).
+        </p>
+      </div>
+      <div class="phase green">
+        <div class="phase-num">Фаза 4</div>
+        <h3>Реализация (GREEN)</h3>
+        <p style="color: var(--muted); font-size: 0.88rem;">
+          Реализация `src/core/*` до 100% прохождения тестов + изометрический 3D-рендерер на Three.js.
+        </p>
+      </div>
+      <div class="phase amber">
+        <div class="phase-num">Фаза 5</div>
+        <h3>Аудит и GitHub Push</h3>
+        <p style="color: var(--muted); font-size: 0.88rem;">
+          Анти-хардкод проверка, сборка Vite, коммит и синхронизация с приватным репозиторием `Gr1nis`.
+        </p>
+      </div>
+    </div>
+
+    <!-- 4. ИНВАРИАНТЫ TDD -->
+    <h2>4. Защита от подгонки под тесты (Anti-Goodhart Invariants)</h2>
+    <div class="invariant-box">
+      <h3>Инвариант №1: Проходимость любых 5 000 полос (Path Solvability Property)</h3>
+      <p style="color: var(--muted); font-size: 0.92rem;">
+        Для любого целочисленного `seed` в последовательности полос `0..5000` ни одна полоса `GRASS` не блокирует 100% клеток `[-9..+9]`, и между любыми двумя соседними полосами `GRASS` существует минимум один общий свободный столбец `X` (или достижимый через шаг вбок).
+      </p>
+    </div>
+    <div class="invariant-box">
+      <h3>Инвариант №2: Синхронность дрейфа на бревне и квантование при сходе</h3>
+      <p style="color: var(--muted); font-size: 0.92rem;">
+        Для любой скорости бревна `v ∈ [-8, +8]` и любого шага `dt > 0` относительная координата игрока на бревне `player.x - log.x` остаётся инвариантной (`Δ < 1e-6`), а после прыжка на `GRASS`/`ROAD` координата `player.x` строго целочисленная (`Number.isInteger(player.x) === true`).
+      </p>
+    </div>
+    <div class="invariant-box">
+      <h3>Инвариант №3: Монотонность очков и защита HighScore</h3>
+      <p style="color: var(--muted); font-size: 0.92rem;">
+        При любой последовательности валидных ходов `['F', 'B', 'L', 'R']` значение `score(t_2) >= score(t_1)` для всех `t_2 > t_1`, и `highScore >= score`.
+      </p>
+    </div>
+
+    <!-- 5. СТРУКТУРА ФАЙЛОВ -->
+    <h2>5. Архитектура файлов проекта</h2>
+    <div class="formula">crossy-road-pro/
+├── index.html                        # Точка входа HTML5 + UI оверлей (Score, High Score, Game Over)
+├── package.json                      # Скрипты dev, build, test (Vite + Vitest + Three.js)
+├── tsconfig.json                     # Строгая типизация (strict: true)
+├── PROJECT_STATE.md                  # Живой якорь памяти (Vibe-Pro)
+├── crossy_road_plan.html             # Данный интерактивный архитектурный план
+├── src/
+│   ├── core/                         # Чистое ядро (0 зависимостей от браузера и Three.js)
+│   │   ├── types.ts                  # Контракты состояния, типы полос, причины смерти
+│   │   ├── prng.ts                   # Детерминированный генератор случайных чисел (Mulberry32)
+│   │   ├── laneGenerator.ts          # Генератор полос (Grass, Road, River) с гарантией пути
+│   │   ├── collision.ts              # Математика пересечений AABB (авто, брёвна, границы)
+│   │   ├── scoreTracker.ts           # Логика счёта, рекорда и адаптера хранилища
+│   │   └── gameEngine.ts             # Главный конечный автомат (FSM), физика брёвен и камеры
+│   ├── view/                         # Визуальный слой Three.js
+│   │   ├── sceneManager.ts           # Изометрическая камера, направленный свет, мягкие тени
+│   │   ├── meshFactory.ts            # Процедурные воксельные модели (курица, деревья, авто, брёвна)
+│   │   └── audioSynth.ts             # WebAudio синтезатор звуков прыжка, воды и удара
+│   └── main.ts                       # Связка игрового цикла requestAnimationFrame + UI
+└── tests/                            # Adversarial TDD сьют (Vitest)
+    ├── laneGenerator.test.ts         # Property-based тесты проходимости и детерминизма
+    ├── gameEngine.adversarial.test.ts# Тесты коллизий, дрейфа на бревне, квантования и границ
+    └── scoreTracker.test.ts          # Тесты монотонности счёта и устойчивости к битому Storage</div>
+  </div>
+</body>
+</html>
